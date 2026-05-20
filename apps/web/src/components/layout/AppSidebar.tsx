@@ -23,15 +23,31 @@ const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
 ]
 
-export default function AppSidebar() {
+interface AppSidebarProps {
+  activePathOverride?: string
+  isDemo?: boolean
+  isSneakPeek?: boolean
+  onNavItemClick?: (href: string) => void
+}
+
+export default function AppSidebar({
+  activePathOverride,
+  isDemo = false,
+  isSneakPeek = false,
+  onNavItemClick
+}: AppSidebarProps = {}) {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const pathname = usePathname()
+  const routerPathname = usePathname()
+  const pathname = activePathOverride || routerPathname
 
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isCollapsed ? '80px' : '240px' }}
-      className="h-[calc(100vh-32px)] my-4 ml-4 bg-[#171A20]/70 backdrop-blur-[20px] border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-[24px] overflow-hidden"
+      animate={{ width: isCollapsed ? '64px' : (isDemo ? '180px' : '240px') }}
+      className={isDemo
+        ? "h-full bg-[#12151A]/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[24px] overflow-hidden select-none shrink-0"
+        : "h-[calc(100vh-32px)] my-4 ml-4 bg-[#171A20]/70 backdrop-blur-[20px] border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-[24px] overflow-hidden"
+      }
     >
       {/* Sidebar Header */}
       <div className="h-24 flex items-center px-6 justify-between">
@@ -62,15 +78,25 @@ export default function AppSidebar() {
       {/* Nav Items */}
       <div className="flex-1 py-2 px-4 space-y-2">
         {navItems.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || (isSneakPeek && item.name === 'Lead Feed')
+          const isBlurred = isSneakPeek && item.name !== 'Lead Feed'
+          
           return (
             <Link
               key={item.href}
-              href={item.href}
-              className="block relative"
+              href={isDemo || isBlurred ? '#' : item.href}
+              onClick={(e) => {
+                if (isDemo || isBlurred) {
+                  e.preventDefault()
+                  if (isDemo && onNavItemClick) {
+                    onNavItemClick(item.href)
+                  }
+                }
+              }}
+              className={`block relative ${isBlurred ? 'opacity-40 blur-[2px] cursor-not-allowed select-none' : ''}`}
             >
               <motion.div
-                whileHover={{ x: isActive ? 0 : 4 }}
+                whileHover={{ x: isActive || isBlurred ? 0 : 4 }}
                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 ${
                   isActive 
                     ? 'text-accent-mint' 
@@ -142,11 +168,19 @@ export default function AppSidebar() {
       {/* Sidebar Footer */}
       <div className="p-4 space-y-2">
         <Link
-          href="/settings"
-          className="block relative"
+          href={isDemo || isSneakPeek ? '#' : '/settings'}
+          onClick={(e) => {
+            if (isDemo || isSneakPeek) {
+              e.preventDefault()
+              if (isDemo && onNavItemClick) {
+                onNavItemClick('/settings')
+              }
+            }
+          }}
+          className={`block relative ${isSneakPeek ? 'opacity-40 blur-[2px] cursor-not-allowed select-none' : ''}`}
         >
           <motion.div
-            whileHover={{ x: pathname === '/settings' ? 0 : 4 }}
+            whileHover={{ x: (pathname === '/settings' || isSneakPeek) ? 0 : 4 }}
             className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 ${
               pathname === '/settings' 
                 ? 'text-accent-mint' 
@@ -167,7 +201,7 @@ export default function AppSidebar() {
               )}
             </AnimatePresence>
           </motion.div>
-          {pathname === '/settings' && (
+          {pathname === '/settings' && !isSneakPeek && (
             <motion.div
               layoutId="sidebar-active"
               className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(184,243,107,0.1)] z-0"
@@ -175,10 +209,13 @@ export default function AppSidebar() {
           )}
         </Link>
         <button
-          className="w-full relative"
+          className={`w-full relative ${isSneakPeek ? 'opacity-40 blur-[2px] cursor-not-allowed select-none' : ''}`}
+          onClick={(e) => {
+            if (isSneakPeek) e.preventDefault()
+          }}
         >
           <motion.div
-            whileHover={{ x: 4 }}
+            whileHover={{ x: isSneakPeek ? 0 : 4 }}
             className="flex items-center gap-3 px-3 py-3 rounded-xl text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition-colors duration-300 relative z-10"
           >
             <LogOut size={18} className="stroke-[1.5]" />

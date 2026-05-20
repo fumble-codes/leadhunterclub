@@ -13,18 +13,19 @@ const themeMap = {
   pink: { cardBg: 'bg-accent-pink', text: 'text-[#11150C]', textMuted: 'text-[#11150C]/60', tagBg: 'bg-[#11150C]/10 border-[#11150C]/10', matchTag: 'bg-[#11150C] text-accent-pink', button: 'bg-[#11150C] hover:bg-black text-accent-pink', blurBg: 'bg-[#11150C]/10', blurLine: 'bg-[#11150C]/15' },
 }
 
-export default function LeadCard({ lead }: { lead: AppLead }) {
+export default function LeadCard({ lead, onClick }: { lead: AppLead; onClick?: () => void }) {
   const theme = themeMap[lead.accent]
   
   return (
     <motion.button
+      onClick={onClick}
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className={`group relative text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[300px] w-full col-span-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 ${theme.cardBg}`}
+      className={`group relative text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[300px] w-full h-full col-span-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 ${theme.cardBg}`}
     >
       
       {/* Header: Source & Urgency */}
-      <div className="flex items-center justify-between mb-5 w-full">
+      <div className="flex items-center justify-between mb-5 w-full shrink-0 select-none">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full bg-current ${theme.text}`} />
           <span className={`text-[11px] font-bold tracking-[0.2em] uppercase ${theme.textMuted}`}>
@@ -37,18 +38,19 @@ export default function LeadCard({ lead }: { lead: AppLead }) {
           {lead.urgency}
         </div>
       </div>
-
+ 
       {/* Small Title */}
-      <h4 className={`text-[13px] font-bold tracking-widest uppercase mb-3 ${theme.text}`}>
+      <h4 className={`text-[13px] font-bold tracking-widest uppercase mb-3 shrink-0 ${theme.text}`}>
         {lead.title}
       </h4>
-
+ 
+      {/* Dynamic Signal Context description with full-stretching flex growth */}
       <h3 className={`text-[22px] font-semibold tracking-tight leading-[1.3] mb-6 flex-grow ${theme.text}`}>
         &quot;{lead.signalContext}&quot;
       </h3>
-
+ 
       {/* Niche Tags */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6 shrink-0">
         {lead.nicheTags.map(tag => (
           <span key={tag} className={`px-3 py-1.5 text-[12px] font-semibold rounded-lg border ${theme.tagBg} ${theme.text}`}>
             {tag}
@@ -56,13 +58,13 @@ export default function LeadCard({ lead }: { lead: AppLead }) {
         ))}
         {lead.replyProbability > 80 && (
             <span className={`px-3 py-1.5 text-[12px] font-bold rounded-lg border-transparent flex items-center gap-1.5 shadow-sm ${theme.matchTag}`}>
-              <ShieldCheck size={14} /> {lead.replyProbability}% Match
+              <ShieldCheck size={14} className="stroke-[2.5]" /> {lead.replyProbability}% Match
             </span>
         )}
       </div>
-
+ 
       {/* Footer Area */}
-      <div className="w-full pt-4 flex items-center justify-between shrink-0 border-t border-black/5">
+      <div className="w-full pt-4 flex items-center justify-between shrink-0 border-t border-black/5 mt-auto">
         
         {/* Blurred Details Area */}
         <div className="flex items-center gap-3 select-none">
@@ -82,7 +84,7 @@ export default function LeadCard({ lead }: { lead: AppLead }) {
             <Coins size={14} /> -3
           </span>
         </div>
-
+ 
       </div>
     </motion.button>
   )

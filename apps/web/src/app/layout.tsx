@@ -28,7 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     pathname.startsWith('/outreach') || 
                     pathname.startsWith('/saved') || 
                     pathname.startsWith('/analytics') || 
-                    pathname.startsWith('/settings')
+                    pathname.startsWith('/settings') ||
+                    pathname.startsWith('/sneak-peek')
 
   return (
     <html lang="en" className="dark" style={{ backgroundColor: '#0F1115' }}>
