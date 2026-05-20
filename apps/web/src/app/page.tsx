@@ -329,7 +329,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2, ease }}
             className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
           >
-            Here's exactly how Lead Hunter Club turns unindexed buyer signals into high-value client conversations — before your competitors even know they exist.
+            Here&apos;s exactly how Lead Hunter Club turns unindexed buyer signals into high-value client conversations — before your competitors even know they exist.
           </motion.p>
         </div>
 
@@ -565,7 +565,7 @@ export default function LandingPage() {
               <span className="text-xs font-mono text-accent-cyan uppercase tracking-widest mb-3 block">Step 04</span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">Released to the Hunters</h3>
               <p className="text-text-secondary text-sm leading-relaxed">
-                Qualified, intelligence-loaded leads land directly in your dashboard — ready to act on. Use our AI outreach writer to craft the perfect first touch, or engage with your own strategy. Either way, you're reaching warm buyers while the opportunity is still fresh.
+                Qualified, intelligence-loaded leads land directly in your dashboard — ready to act on. Use our AI outreach writer to craft the perfect first touch, or engage with your own strategy. Either way, you&apos;re reaching warm buyers while the opportunity is still fresh.
               </p>
             </div>
           </motion.div>
