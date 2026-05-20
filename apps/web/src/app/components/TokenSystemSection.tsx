@@ -186,9 +186,9 @@ export default function TokenSystemSection() {
       
       {/* Centered Header Section with Big Eyebrow */}
       <div className="text-center mb-24 max-w-4xl mx-auto space-y-5">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 shadow-[0_1px_12px_rgba(255,255,255,0.02)]">
-          <Coins className="w-3.5 h-3.5 text-accent-pink animate-pulse" />
-          <span className="text-[11px] font-mono font-bold tracking-[0.25em] text-accent-pink uppercase">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 border-l-2 border-accent-pink bg-gradient-to-r from-accent-pink/10 to-transparent text-accent-pink shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+          <Coins className="w-3.5 h-3.5 animate-pulse" />
+          <span className="text-[11px] font-mono font-bold tracking-[0.25em] uppercase shadow-[0_0_8px_currentColor]">
             Simple Token-Based System
           </span>
         </div>

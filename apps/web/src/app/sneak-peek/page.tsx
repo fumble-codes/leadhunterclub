@@ -58,8 +58,8 @@ export default function SneakPeekPage() {
               <div>
                 <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                   Lead Feed
-                  <div className="px-3 py-1 rounded-full bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-[11px] font-bold tracking-widest uppercase flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
+                  <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[11px] font-bold tracking-[0.2em] uppercase">
+                    <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                     {sneakPeekLeads.length} Signals
                   </div>
                 </h1>

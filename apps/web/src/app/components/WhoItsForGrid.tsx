@@ -427,8 +427,8 @@ export default function WhoItsForGrid() {
                       <Menu size={15} className={`transition-transform duration-300 ${isSidebarOpen ? 'rotate-90 text-accent-mint' : ''}`} />
                     </button>
                     <h3 className="text-lg font-bold text-text-primary tracking-tight">Lead Feed</h3>
-                    <div className="px-2.5 py-0.5 rounded-full bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-[9px] font-bold tracking-widest uppercase flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-accent-mint animate-pulse" />
+                    <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[9px] font-bold tracking-[0.2em] uppercase">
+                      <span className="w-1 h-1 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                       6 Signals
                     </div>
                   </div>

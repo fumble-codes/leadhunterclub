@@ -68,8 +68,8 @@ function LeadsContent() {
             <div>
               <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                 Lead Feed
-                <div className="px-3 py-1 rounded-full bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-[11px] font-bold tracking-widest uppercase flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
+                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[11px] font-bold tracking-[0.2em] uppercase">
+                  <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                   15 Signals
                 </div>
               </h1>
@@ -544,8 +544,8 @@ export default function HeroSection() {
       {/* Centered copy */}
       <div className="relative z-10 text-center max-w-4xl mx-auto mb-14">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] text-xs font-medium text-text-secondary mb-7">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 border-l-2 border-white/20 bg-gradient-to-r from-white/5 to-transparent text-xs font-medium text-text-secondary mb-7 uppercase tracking-widest shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+            <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
             Intelligence Engine · Live
           </div>
         </motion.div>

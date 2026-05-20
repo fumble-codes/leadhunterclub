@@ -80,7 +80,7 @@ export default function LeadList({ selectedId, onSelect }: LeadListProps) {
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {['All', 'Design', 'Engineering', 'Marketing', 'High Intent'].map((tag) => (
-            <button key={tag} className="px-3 py-1.5 rounded-full bg-surface-secondary border border-subtle text-[11px] font-medium text-text-secondary hover:text-text-primary whitespace-nowrap transition-colors">
+            <button key={tag} className="px-3 py-1.5 rounded-md bg-surface-secondary border border-subtle text-[11px] font-medium text-text-secondary hover:text-text-primary whitespace-nowrap transition-colors">
               {tag}
             </button>
           ))}

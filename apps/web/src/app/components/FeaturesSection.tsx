@@ -448,10 +448,10 @@ function PersonaCardsVisual() {
               <p className="text-[9px] text-text-secondary/50 leading-snug">{p.desc}</p>
 
               {/* Activity indicator */}
-              <div className={`mt-3 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-${p.accent}/5 border border-${p.accent}/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+              <div className={`mt-3 flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border-l-2 border-${p.accent} bg-gradient-to-r from-${p.accent}/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 style={{ transitionDelay: `${i * 100 + 300}ms` }}
               >
-                <span className={`w-1 h-1 rounded-full bg-${p.accent} animate-pulse`} />
+                <span className={`w-1 h-1 bg-${p.accent} animate-pulse shadow-[0_0_8px_currentColor]`} />
                 <span className={`text-[7px] font-bold text-${p.accent} uppercase tracking-widest`}>Active</span>
               </div>
             </motion.div>
@@ -481,7 +481,7 @@ export default function FeaturesSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan text-[10px] font-bold tracking-widest uppercase mb-6">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-cyan bg-gradient-to-r from-accent-cyan/10 to-transparent text-accent-cyan text-[10px] font-bold tracking-widest uppercase mb-6">
             Product Capabilities
           </div>
         </motion.div>
