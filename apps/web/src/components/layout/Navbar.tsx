@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { Menu, X, ArrowRight, Eye } from 'lucide-react'
+import AnimatedLogo from '@/components/ui/AnimatedLogo'
 
 const navLinks = [
   { name: 'How It Works', href: '#funnel' },
@@ -39,9 +40,7 @@ export default function Navbar() {
 
           {/* Left: Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center font-bold text-accent-mint text-[11px] tracking-tight shadow-[0_0_12px_rgba(184,243,107,0.15)] group-hover:shadow-[0_0_20px_rgba(184,243,107,0.25)] transition-all duration-500">
-              LH
-            </div>
+            <AnimatedLogo className="w-8 h-8" />
             <span className="font-display text-[16px] font-semibold tracking-tight text-text-primary group-hover:opacity-80 transition-opacity duration-300">
               Lead Hunter Club
             </span>
