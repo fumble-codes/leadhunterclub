@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -62,7 +63,7 @@ export default function AppSidebar({
               exit={{ opacity: 0, x: -10 }}
               className="flex items-center gap-3"
             >
-              <img src="/logo.svg" alt="Lead Hunter Club" className="w-8 h-8 rounded-xl" />
+              <Image src="/logo.svg" alt="Lead Hunter Club" width={32} height={32} className="w-8 h-8 rounded-xl" />
               <span className="font-semibold text-text-primary tracking-tight">Lead Hunter Club</span>
             </motion.div>
           )}

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Activity, ShieldCheck, Zap, MessageCircle, Brain, Sparkles, ArrowRight, Eye } from 'lucide-react'
@@ -972,7 +973,7 @@ export default function LandingPage() {
             {/* Brand Column */}
             <div className="md:col-span-4">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.svg" alt="Lead Hunter Club" className="w-8 h-8 rounded-lg" />
+                <Image src="/logo.svg" alt="Lead Hunter Club" width={32} height={32} className="w-8 h-8 rounded-lg" />
                 <span className="font-display text-2xl font-bold tracking-tight text-text-primary">Lead Hunter Club</span>
               </div>
               <p className="text-sm text-text-secondary/70 font-light leading-relaxed mb-6 max-w-xs">

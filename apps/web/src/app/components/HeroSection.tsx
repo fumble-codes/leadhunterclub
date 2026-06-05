@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import {
@@ -654,7 +655,7 @@ export default function HeroSection() {
             {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
             <div className="w-[240px] shrink-0 bg-[#121316] border-r border-white/[0.04] flex flex-col py-4">
               <div className="px-5 mb-6 flex items-center gap-3">
-                <img src="/logo.svg" alt="Lead Hunter Club" className="w-7 h-7 rounded-lg" />
+                <Image src="/logo.svg" alt="Lead Hunter Club" width={28} height={28} className="w-7 h-7 rounded-lg" />
                 <span className="font-semibold text-sm text-text-primary tracking-tight">Lead Hunter Club</span>
               </div>
 

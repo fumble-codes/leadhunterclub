@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -52,7 +53,7 @@ export default function RegisterPage() {
         className="relative z-10 w-full max-w-md"
       >
         <div className="text-center mb-10">
-          <img src="/logo.svg" alt="Lead Hunter Club" className="w-12 h-12 rounded-xl mx-auto mb-4 shadow-[0_0_20px_rgba(167,139,250,0.1)]" />
+          <Image src="/logo.svg" alt="Lead Hunter Club" width={48} height={48} className="w-12 h-12 rounded-xl mx-auto mb-4 shadow-[0_0_20px_rgba(167,139,250,0.1)]" />
           <h1 className="text-2xl font-bold text-text-primary tracking-tight">Create your account</h1>
           <p className="text-sm text-text-secondary mt-2">Start intercepting high-intent leads</p>
         </div>
