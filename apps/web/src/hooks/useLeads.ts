@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { leadsService, type LeadListParams } from '@/lib/services'
 import { useApi } from './useApi'
-import type { Lead, PaginatedResponse } from '@leadhunter/shared'
+import type { Lead, PaginatedResponse } from '@/lib/types'
 
 export function useLeads(params: LeadListParams = {}) {
   const fetcher = useCallback(

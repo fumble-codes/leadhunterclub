@@ -1,5 +1,5 @@
 import { api, setTokens, clearTokens } from '@/lib/api'
-import type { User, AuthSession, LoginInput, RegisterInput } from '@leadhunter/shared'
+import type { User, AuthSession, LoginInput, RegisterInput } from '@/lib/types'
 
 export const authService = {
   login: async (input: LoginInput): Promise<AuthSession> => {

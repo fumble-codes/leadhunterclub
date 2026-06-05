@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import type { DashboardData } from '@leadhunter/shared'
+import type { DashboardData } from '@/lib/types'
 
 export const dashboardService = {
   getData: () =>

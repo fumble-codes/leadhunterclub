@@ -5,7 +5,7 @@ import type {
   UpdateLeadInput,
   PaginatedResponse,
   LeadStatus,
-} from '@leadhunter/shared'
+} from '@/lib/types'
 
 export interface LeadListParams {
   status?: LeadStatus | 'all'

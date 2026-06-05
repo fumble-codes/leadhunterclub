@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { allLeads } from '@/lib/mock/leadsData'
-import type { Lead, LeadStatus } from '@leadhunter/shared'
+import type { Lead, LeadStatus } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)

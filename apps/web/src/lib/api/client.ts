@@ -1,6 +1,6 @@
 import { config } from '@/lib/config'
 import { ApiError, AuthError, NetworkError, ValidationError } from './errors'
-import type { ApiResponse, PaginatedResponse, RequestMethod } from '@leadhunter/shared'
+import type { ApiResponse, PaginatedResponse, RequestMethod } from '@/lib/types'
 
 const TOKEN_KEY = config.auth.tokenKey
 const REFRESH_KEY = config.auth.refreshKey
