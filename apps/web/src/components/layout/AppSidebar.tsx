@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '@/hooks/useAuth'
 import { 
   LayoutDashboard, 
   Rss, 
@@ -39,6 +40,8 @@ export default function AppSidebar({
   const [isCollapsed, setIsCollapsed] = useState(false)
   const routerPathname = usePathname()
   const pathname = activePathOverride || routerPathname
+  const { user, logout } = useAuth()
+  const router = useRouter()
 
   return (
     <motion.aside
@@ -59,9 +62,7 @@ export default function AppSidebar({
               exit={{ opacity: 0, x: -10 }}
               className="flex items-center gap-3"
             >
-              <div className="w-8 h-8 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center font-bold text-accent-mint shadow-[0_0_15px_rgba(184,243,107,0.15)]">
-                LH
-              </div>
+              <img src="/logo.svg" alt="Lead Hunter Club" className="w-8 h-8 rounded-xl" />
               <span className="font-semibold text-text-primary tracking-tight">Lead Hunter Club</span>
             </motion.div>
           )}
@@ -146,7 +147,7 @@ export default function AppSidebar({
                   <Coins size={14} className="text-accent-mint" />
                   <span className="text-[10px] font-bold text-text-primary uppercase tracking-widest">Credits</span>
                 </div>
-                <span className="text-[10px] font-bold text-text-secondary">750 / 1k</span>
+                <span className="text-[10px] font-bold text-text-secondary">{user?.credits ?? 0} / 1k</span>
               </div>
               
               <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
@@ -211,7 +212,9 @@ export default function AppSidebar({
         <button
           className={`w-full relative ${isSneakPeek ? 'opacity-40 blur-[2px] cursor-not-allowed select-none' : ''}`}
           onClick={(e) => {
-            if (isSneakPeek) e.preventDefault()
+            if (isSneakPeek) { e.preventDefault(); return }
+            logout()
+            router.push('/login')
           }}
         >
           <motion.div

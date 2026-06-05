@@ -21,7 +21,7 @@ export default function LeadCard({ lead, onClick }: { lead: AppLead; onClick?: (
       onClick={onClick}
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className={`group relative text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[300px] w-full h-full col-span-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 ${theme.cardBg}`}
+      className={`group relative text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[300px] w-full h-full col-span-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-[background-color,border-color,box-shadow] duration-300 ${theme.cardBg}`}
     >
       
       {/* Header: Source & Urgency */}

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import {
   Rss, Bookmark, Send, LayoutDashboard, Coins,
   Sparkles, ArrowRight, Target, MessageSquare, Zap,
@@ -25,8 +25,8 @@ const tabs = [
 
 // ─── Real Lead Feed content (100% precise to leads/page.tsx) ──────────────
 function LeadsContent() {
-  // Generate 15 leads as requested by user
-  const feedLeads = Array.from({ length: 15 }, (_, i) => ({
+  // Generate 4 leads for mockup preview
+  const feedLeads = Array.from({ length: 4 }, (_, i) => ({
     ...allLeads[i % allLeads.length],
     id: `hero-lead-${i}`,
   }))
@@ -34,8 +34,8 @@ function LeadsContent() {
   return (
     <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative w-full scrollbar-hide">
       {/* Ambient Background Glows */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.03] blur-[120px] rounded-[100%] pointer-events-none" />
-      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] bg-accent-cyan/[0.02] blur-[100px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.03] blur-[60px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] bg-accent-cyan/[0.02] blur-[60px] rounded-[100%] pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header & Command Bar */}
@@ -43,7 +43,7 @@ function LeadsContent() {
           {/* Raycast-style Command Palette */}
           <div className="relative group w-full max-w-2xl mb-12">
             <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-cyan/20 to-accent-mint/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative flex items-center bg-[#171A20]/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
+            <div className="relative flex items-center bg-[#181b22] border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
               <div className="pl-4 pr-3 text-text-secondary">
                 <Search size={20} className="stroke-[1.5]" />
               </div>
@@ -70,7 +70,7 @@ function LeadsContent() {
                 Lead Feed
                 <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[11px] font-bold tracking-[0.2em] uppercase">
                   <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
-                  15 Signals
+                  4 Signals
                 </div>
               </h1>
               <p className="text-text-secondary/80 text-sm">Real-time conversational opportunities intercepted across your network.</p>
@@ -169,7 +169,7 @@ function SavedContent() {
         </div>
 
         {/* High-Density Pipeline Table */}
-        <div className="bg-surface-secondary/30 border border-white/[0.05] rounded-[32px] overflow-hidden backdrop-blur-md">
+        <div className="bg-[#121316] border border-white/[0.05] rounded-[24px] overflow-hidden">
           <div className="grid grid-cols-12 gap-4 px-8 py-4 border-b border-white/[0.05] text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] min-w-[800px]">
             <div className="col-span-1">Status</div>
             <div className="col-span-4">Lead</div>
@@ -314,7 +314,7 @@ function OutreachContent() {
           </div>
         </div>
 
-        <div className="p-6 border-t border-white/[0.06] bg-[#171A20]/40 backdrop-blur-xl">
+        <div className="p-6 border-t border-white/[0.06] bg-[#13151b]">
           <div className="flex items-center gap-3 mb-4 overflow-x-auto pb-2 scrollbar-hide">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
               <Sparkles size={12} /> AI Angles:
@@ -397,8 +397,8 @@ function DashboardContent() {
   return (
     <div className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       {/* Ambient Background Glows */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-mint/[0.03] blur-[120px] rounded-[100%] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-accent-purple/[0.02] blur-[100px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-mint/[0.03] blur-[60px] rounded-[100%] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-accent-purple/[0.02] blur-[60px] rounded-[100%] pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header */}
@@ -531,76 +531,118 @@ function DashboardContent() {
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState('leads')
 
+  const { scrollY } = useScroll()
+
+  // Direct scroll-linked transforms — no spring wrapper to avoid fighting Lenis
+  const rotateX = useTransform(scrollY, [0, 600], [22, 0])
+  const scale = useTransform(scrollY, [0, 600], [0.95, 1])
+  const y = useTransform(scrollY, [0, 600], [0, 0])
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden pt-32 pb-0 px-6">
-      {/* Ambient glows */}
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.05) 0%, transparent 65%)' }} />
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(249,168,212,0.04) 0%, transparent 65%)' }} />
+    <section className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-[#080808] pt-20 pb-0 px-6" data-color="mint">
+      
+      {/* Subtle geometric grid background (Centered under the text, faint mint lines) */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0 opacity-100"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(184, 243, 107, 0.015) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(184, 243, 107, 0.015) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+          maskImage: 'radial-gradient(circle at 50% 30%, black 10%, transparent 60%)',
+          WebkitMaskImage: 'radial-gradient(circle at 50% 30%, black 10%, transparent 60%)'
+        }}
+      />
+
+      {/* Faint precise technical backlight glow */}
+      <div 
+        className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[600px] h-[350px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-70"
+        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(184,243,107,0.03) 0%, rgba(167,139,250,0.02) 50%, transparent 70%)' }} 
+      />
+
+      {/* Centered Clario-style hero layout */}
+      <div className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col justify-center items-center text-center pt-20 pb-4 transform-gpu">
+        <div className="flex flex-col items-center relative w-full">
+          
+          {/* Centered Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.07, ease }}
+            className="font-sans text-[38px] md:text-[54px] lg:text-[68px] font-semibold leading-[1.05] tracking-tighter mb-6 text-text-primary max-w-4xl mx-auto antialiased"
+          >
+            Stop looking for clients —<br />
+            <span className="text-accent-mint">
+              Start intercepting them.
+            </span>
+          </motion.h1>
+
+          {/* Centered Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease }}
+            className="text-[15px] md:text-[17px] text-text-secondary font-light leading-relaxed mb-10 max-w-2xl mx-auto antialiased"
+          >
+            Lead Hunter Club monitors active service demand in real-time, compiles deep social intelligence, and drafts personalized outreach that actually gets replies.
+          </motion.p>
+
+          {/* Centered CTA Row */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease }}
+            className="flex flex-row items-center justify-center gap-4 w-full relative z-10"
+          >
+            <Link href="/dashboard">
+              <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent-mint text-[#080808] font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(184,243,107,0.25)] transition-all hover:bg-accent-mint/90">
+                Start Hunting <ArrowUpRight size={16} />
+              </motion.span>
+            </Link>
+            <Link href="/sneak-peek">
+              <motion.span whileHover={{ scale: 1.02 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] font-medium text-text-secondary hover:text-text-primary text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03]">
+                Sneak Peek
+              </motion.span>
+            </Link>
+          </motion.div>
+
+          {/* Concentrated green backlight aura directly behind the button */}
+          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] rounded-full bg-accent-mint/25 blur-[50px] pointer-events-none z-0" />
+          
+          {/* Larger ambient backlight glow under button and behind mockup top edge */}
+          <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] rounded-full bg-accent-mint/12 blur-[80px] pointer-events-none z-0" />
+          
+        </div>
       </div>
 
-      {/* Centered copy */}
-      <div className="relative z-10 text-center max-w-4xl mx-auto mb-14">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 border-l-2 border-white/20 bg-gradient-to-r from-white/5 to-transparent text-xs font-medium text-text-secondary mb-7 uppercase tracking-widest shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
-            <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
-            Intelligence Engine · Live
-          </div>
-        </motion.div>
-
-        {/* Pure solid text, NO gradient */}
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.07, ease }}
-          className="font-display text-[72px] md:text-[92px] font-semibold leading-[1.02] tracking-tight mb-6 text-text-primary"
-        >
-          We find the leads<br />
-          <span className="whitespace-nowrap">You focus on closing.</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15, ease }}
-          className="text-xl text-text-secondary font-light leading-relaxed mb-10 max-w-2xl mx-auto"
-        >
-          We intercept unindexed high-intent signals and generate socially intelligent outreach — so you close elite clients, not inboxes.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease }}
-          className="flex items-center justify-center gap-4"
-        >
-          <Link href="/dashboard">
-            <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-text-primary text-bg-main font-bold cursor-pointer shadow-[0_0_30px_-8px_rgba(255,255,255,0.2)]">
-              Start Hunting <ArrowRight size={18} />
-            </motion.span>
-          </Link>
-          <Link href="/sneak-peek">
-            <motion.span whileHover={{ scale: 1.02 }} className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03]">
-              <Eye size={16} className="text-accent-purple" /> Sneak Peek
-            </motion.span>
-          </Link>
-        </motion.div>
-      </div>
-
-      {/* Full interactive app window */}
-      <motion.div
-        initial={{ opacity: 0, y: 60, rotateX: 8 }}
-        animate={{ opacity: 1, y: 0, rotateX: 4 }}
-        transition={{ duration: 1.2, delay: 0.35, ease }}
-        style={{ transformStyle: 'preserve-3d', perspective: '2000px' }}
-        className="relative z-10 w-full max-w-[1400px] group/appwindow"
+      {/* 3D Perspective Container for Clario-style tilt reveal */}
+      <div 
+        style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
+        className="relative z-10 w-full max-w-[1200px] mt-[-24px] lg:mt-[-48px] group/appwindow"
       >
-        {/* Stage glow */}
-        <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 w-2/3 h-24 rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(184,243,107,0.07) 0%, transparent 70%)', filter: 'blur(16px)' }} />
+        <motion.div
+          style={{ 
+            transformStyle: 'preserve-3d', 
+            rotateX,
+            scale,
+            y
+          }}
+          className="w-full transform-gpu will-change-transform"
+        >
+        {/* Faint separation backlight Behind the App Window */}
+        <div className="absolute top-[-25%] left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-[100%] pointer-events-none -z-10 mix-blend-screen"
+          style={{ background: 'radial-gradient(circle, rgba(184,243,107,0.06) 0%, transparent 70%)' }} />
 
-        <div className="rim-light rounded-t-[28px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(0,0,0,0.8)] border-b-0 transition-all duration-700 ease-out grayscale blur-[1.5px] group-hover/appwindow:grayscale-0 group-hover/appwindow:blur-0">
+        {/* Faint Stage shadow glow */}
+        <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 w-2/3 h-24 rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(184,243,107,0.07) 0%, transparent 75%)', filter: 'blur(20px)' }} />
+
+        <div className="rim-light rounded-t-[24px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(0,0,0,0.9)] border border-white/[0.04] border-t-accent-mint/20 border-b-0 relative">
+          {/* Glass reflection sheen overlay */}
+          <div className="absolute inset-0 pointer-events-none z-20 bg-gradient-to-tr from-transparent via-white/[0.015] to-white/[0.05] mix-blend-overlay" />
           {/* macOS chrome */}
-          <div className="flex items-center gap-2 px-5 py-3 bg-[#12151a] border-b border-white/[0.04]">
+          <div className="flex items-center gap-2 px-5 py-3 bg-[#121316] border-b border-white/[0.06]">
             <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
             <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
             <span className="w-3 h-3 rounded-full bg-[#28C840]" />
@@ -610,9 +652,9 @@ export default function HeroSection() {
           {/* App body */}
           <div className="flex h-[760px] bg-bg-main overflow-hidden">
             {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
-            <div className="w-[240px] shrink-0 bg-[#171A20]/80 backdrop-blur-xl border-r border-white/[0.04] flex flex-col py-4">
+            <div className="w-[240px] shrink-0 bg-[#121316] border-r border-white/[0.04] flex flex-col py-4">
               <div className="px-5 mb-6 flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center font-bold text-accent-mint text-xs shadow-[0_0_12px_rgba(184,243,107,0.15)]">LH</div>
+                <img src="/logo.svg" alt="Lead Hunter Club" className="w-7 h-7 rounded-lg" />
                 <span className="font-semibold text-sm text-text-primary tracking-tight">Lead Hunter Club</span>
               </div>
 
@@ -666,8 +708,14 @@ export default function HeroSection() {
               </AnimatePresence>
             </div>
           </div>
+
+          {/* Bottom fade-out overlay (opaque gradient — no backdrop-blur to avoid GPU thrash during scroll) */}
+          <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-30">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/90 via-60% to-transparent pointer-events-none" />
+          </div>
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   )
 }

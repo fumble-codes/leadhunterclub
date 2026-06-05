@@ -186,12 +186,9 @@ export default function TokenSystemSection() {
       
       {/* Centered Header Section with Big Eyebrow */}
       <div className="text-center mb-24 max-w-4xl mx-auto space-y-5">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 border-l-2 border-accent-pink bg-gradient-to-r from-accent-pink/10 to-transparent text-accent-pink shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
-          <Coins className="w-3.5 h-3.5 animate-pulse" />
-          <span className="text-[11px] font-mono font-bold tracking-[0.25em] uppercase shadow-[0_0_8px_currentColor]">
-            Simple Token-Based System
-          </span>
-        </div>
+        <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+          Simple Token-Based System
+        </span>
         <h2 className="font-display text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-tight text-text-primary leading-[1.1] max-w-3xl mx-auto">
           You control how your workflow operates.
         </h2>
@@ -206,7 +203,7 @@ export default function TokenSystemSection() {
         <div className="lg:col-span-5 space-y-8 text-left">
 
           {/* Core Balance Pill */}
-          <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] backdrop-blur-xl flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-[#12141A] border border-white/[0.08] flex items-center justify-between">
             <span className="text-xs font-mono tracking-widest uppercase text-text-secondary/60">
               Live Token Ledger Simulator
             </span>

@@ -295,7 +295,7 @@ export default function WhoItsForGrid() {
   return (
     <section id="who" className="py-36 px-6 max-w-[1400px] mx-auto relative overflow-hidden border-t border-white/[0.03]">
       {/* Background ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-accent-purple/[0.01] blur-[180px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-accent-purple/[0.01] blur-[80px] rounded-full pointer-events-none" />
 
       {/* HEADER BLOCK: Large text left, horizontal navigation segmented buttons right */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-16 relative z-10">
@@ -332,7 +332,7 @@ export default function WhoItsForGrid() {
 
         {/* Top-Right Interactive horizontal navigation segmented controls */}
         <div className="lg:shrink-0 flex items-center w-full lg:w-auto">
-          <div className="w-full flex flex-wrap gap-2.5 md:gap-3 items-center justify-center lg:justify-end bg-[#171A20]/65 p-2 md:p-2.5 border border-white/[0.08] rounded-[28px] md:rounded-[32px] backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          <div className="w-full flex flex-wrap gap-2.5 md:gap-3 items-center justify-center lg:justify-end bg-[#171A20] p-2 md:p-2.5 border border-white/[0.08] rounded-[28px] md:rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             {PERSONAS.map(p => {
               const isActive = p.id === activeTab
               const Icon = p.icon
@@ -372,7 +372,7 @@ export default function WhoItsForGrid() {
         <div 
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-[32px] bg-[#171A20]/80 border border-white/[0.08] flex flex-col relative overflow-hidden backdrop-blur-2xl transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(0,0,0,0.85)] shadow-[0_30px_70px_rgba(0,0,0,0.6)] h-[780px] md:h-[860px] justify-between"
+          className="w-full rounded-[32px] bg-[#171A20] border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(0,0,0,0.85)] shadow-[0_30px_70px_rgba(0,0,0,0.6)] h-[780px] md:h-[860px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-[#171A20] flex items-center px-6 justify-between shrink-0 select-none">
@@ -481,7 +481,7 @@ export default function WhoItsForGrid() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-                    className="absolute inset-6 md:left-[10%] md:right-[10%] xl:left-[15%] xl:right-[15%] bg-[#0F1115]/95 border border-white/[0.08] shadow-[0_30px_90px_rgba(0,0,0,0.95)] rounded-3xl flex flex-col p-6 justify-between z-30 backdrop-blur-xl"
+                    className="absolute inset-6 md:left-[10%] md:right-[10%] xl:left-[15%] xl:right-[15%] bg-[#0F1115] border border-white/[0.08] shadow-[0_30px_90px_rgba(0,0,0,0.95)] rounded-3xl flex flex-col p-6 justify-between z-30"
                   >
                     {/* Messaging Cockpit Header */}
                     <div className="flex items-center justify-between pb-4 border-b border-white/[0.06] shrink-0 select-none">
@@ -558,6 +558,11 @@ export default function WhoItsForGrid() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Bottom fade-out overlay (opaque gradient — no backdrop-blur for scroll perf) */}
+              <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-20">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F1115] via-[#0F1115]/90 via-60% to-transparent pointer-events-none" />
+              </div>
             </div>
           </div>
 

@@ -53,6 +53,9 @@ const config: Config = {
           '50%': { transform: 'translateY(-10px)' },
         },
       },
+      boxShadow: {
+        glowMint: '0 0 12px rgba(184, 243, 107, 0.8)',
+      }
     },
   },
   plugins: [],

@@ -8,6 +8,7 @@ import HeroSection from '@/app/components/HeroSection'
 import TokenSystemSection from '@/app/components/TokenSystemSection';
 import WhoItsForGrid from '@/app/components/WhoItsForGrid';
 import FeaturesSection from '@/app/components/FeaturesSection';
+import TestimonialsSection from '@/app/components/TestimonialsSection';
 const ease = [0.16, 1, 0.3, 1] as const
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -119,7 +120,7 @@ function OutreachPreviewUI() {
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="w-full rounded-[28px] bg-[#171A20]/80 border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left backdrop-blur-2xl transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(0,0,0,0.7)] shadow-[0_40px_100px_rgba(0,0,0,0.6)]"
+      className="w-full rounded-[28px] bg-[#171A20] border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(0,0,0,0.7)] shadow-[0_40px_100px_rgba(0,0,0,0.6)]"
     >
       {/* Decorative top window bar for macOS chrome */}
       <div className="absolute top-0 left-0 right-0 h-10 border-b border-white/[0.04] bg-white/[0.01] flex items-center px-6">
@@ -296,8 +297,8 @@ export default function LandingPage() {
       {/* Problem & How It Works (Bento Grid) */}
       <section id="funnel" className="py-40 px-6 max-w-[1200px] mx-auto relative">
         {/* Ambient section glows */}
-        <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[150px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] bg-accent-mint/[0.015] blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] bg-accent-mint/[0.015] blur-[80px] rounded-full pointer-events-none" />
 
         <div className="text-center mb-24 relative z-10">
           <motion.div 
@@ -306,9 +307,9 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[10px] font-bold tracking-widest uppercase mb-6">
+            <span className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 block text-text-secondary/40">
               How It Works
-            </div>
+            </span>
           </motion.div>
           
           <motion.h2 
@@ -338,63 +339,77 @@ export default function LandingPage() {
           
           {/* CARD 1: Fresh Buyer Intent (2/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: -80 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, ease }}
             whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-8 md:p-10 rounded-[32px] bg-surface-secondary/20 border border-white/[0.04] hover:bg-surface-secondary/40 hover:border-white/10 transition-all duration-500 overflow-hidden min-h-[380px] flex flex-col justify-between"
+            className="md:col-span-2 group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
           >
             {/* Visual Radar Container */}
             <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 overflow-hidden pointer-events-none flex items-center justify-center">
-              {/* Concentric circles */}
-              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-white/[0.04] flex items-center justify-center">
-                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-white/[0.04] flex items-center justify-center">
-                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-white/[0.04]" />
+              {/* Concentric circles - slightly more visible */}
+              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-accent-mint/[0.15] flex items-center justify-center shadow-[inset_0_0_40px_rgba(184,243,107,0.05)]">
+                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-accent-mint/[0.2] flex items-center justify-center shadow-[inset_0_0_20px_rgba(184,243,107,0.05)]">
+                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-accent-mint/[0.3] shadow-[0_0_15px_rgba(184,243,107,0.1)]" />
                 </div>
               </div>
               
-              {/* Sweeping line */}
-              <div className="absolute w-[300px] h-[300px] animate-[spin_6s_linear_infinite]">
-                <div className="absolute top-1/2 left-1/2 w-1/2 h-[1.5px] bg-gradient-to-r from-accent-mint/40 via-accent-mint/10 to-transparent origin-left -translate-y-1/2" />
+              {/* Eye-catching Hero Radar Sweep */}
+              <div className="absolute w-[300px] h-[300px] animate-[spin_4s_linear_infinite] rounded-full overflow-hidden">
+                {/* Radar sweep cone */}
+                <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[conic-gradient(from_180deg_at_0_100%,rgba(184,243,107,0)_0deg,rgba(184,243,107,0.25)_90deg)]" />
+                {/* Leading edge line */}
+                <div className="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-accent-mint origin-left -translate-y-1/2 shadow-[0_0_15px_#B8F36B,0_0_5px_#B8F36B]" />
               </div>
 
               {/* Glowing cinematic intercept logos */}
+              {/* X / Twitter */}
               <motion.div 
-                className="absolute top-[20%] left-[20%] w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#1DA1F2] backdrop-blur-md shadow-[0_0_20px_rgba(29,161,242,0.2)] group-hover:scale-110 group-hover:border-[#1DA1F2]/30 transition-all duration-500"
-                animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.3, 1, 0.3] }}
+                className="absolute top-[20%] left-[20%] w-10 h-10 rounded-full bg-[#1DA1F2]/10 border border-[#1DA1F2]/30 flex items-center justify-center text-[#1DA1F2] shadow-[0_0_15px_rgba(29,161,242,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(29,161,242,0.5)] group-hover:border-[#1DA1F2]/50 group-hover:bg-[#1DA1F2]/20 transition-all duration-500 backdrop-blur-md"
+                animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               >
-                {/* Official Twitter / X SVG */}
-                <svg className="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-current text-[#1DA1F2]" viewBox="0 0 24 24">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </motion.div>
               
+              {/* LinkedIn */}
               <motion.div 
-                className="absolute bottom-[25%] right-[15%] w-12 h-12 rounded-full bg-[#0A66C2]/10 border border-[#0A66C2]/30 flex items-center justify-center text-[#0A66C2] backdrop-blur-md shadow-[0_0_20px_rgba(10,102,194,0.3)] group-hover:scale-110 group-hover:border-[#0A66C2]/50 transition-all duration-500"
-                animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.2, 1, 0.2] }}
+                className="absolute bottom-[25%] right-[15%] w-12 h-12 rounded-full bg-[#0A66C2]/10 border border-[#0A66C2]/30 flex items-center justify-center text-[#0A66C2] shadow-[0_0_15px_rgba(10,102,194,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(10,102,194,0.5)] group-hover:border-[#0A66C2]/50 group-hover:bg-[#0A66C2]/20 transition-all duration-500 backdrop-blur-md"
+                animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.3, 1, 0.3] }}
                 transition={{ duration: 5, repeat: Infinity, delay: 1.5, ease: "easeInOut" }}
               >
-                {/* Official LinkedIn SVG */}
                 <svg className="w-5 h-5 fill-current text-[#0A66C2]" viewBox="0 0 24 24">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/>
                 </svg>
               </motion.div>
               
+              {/* Reddit */}
               <motion.div 
-                className="absolute top-[40%] right-[30%] w-8 h-8 rounded-full bg-[#FF4500]/10 border border-[#FF4500]/30 flex items-center justify-center text-[#FF4500] backdrop-blur-md shadow-[0_0_15px_rgba(255,69,0,0.3)] group-hover:scale-110 group-hover:border-[#FF4500]/50 transition-all duration-500"
-                animate={{ scale: [0.9, 1.25, 0.9], opacity: [0.4, 1, 0.4] }}
+                className="absolute top-[35%] right-[25%] w-11 h-11 rounded-full bg-[#FF4500]/10 border border-[#FF4500]/30 flex items-center justify-center text-[#FF4500] shadow-[0_0_15px_rgba(255,69,0,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,69,0,0.5)] group-hover:border-[#FF4500]/50 group-hover:bg-[#FF4500]/20 transition-all duration-500 backdrop-blur-md"
+                animate={{ scale: [0.9, 1.25, 0.9], opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
               >
-                <MessageCircle size={14} />
+                <svg className="w-5 h-5 fill-current text-[#FF4500]" viewBox="0 0 24 24">
+                  <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 0-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.203-.094z"/>
+                </svg>
+              </motion.div>
+
+              {/* Threads */}
+              <motion.div 
+                className="absolute bottom-[20%] left-[25%] w-10 h-10 rounded-full bg-white/5 border border-white/20 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] group-hover:border-white/40 group-hover:bg-white/10 transition-all duration-500 backdrop-blur-md"
+                animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 4.5, repeat: Infinity, delay: 2, ease: "easeInOut" }}
+              >
+                <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 192 192">
+                  <path d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.881 72.2328C81.6116 63.5383 90.6052 61.6848 97.2286 61.6848C97.3051 61.6848 97.3819 61.6848 97.4576 61.6855C105.707 61.7381 111.932 64.1366 115.961 68.814C118.893 72.2193 120.854 76.925 121.825 82.8638C114.511 81.6207 106.601 81.2385 98.145 81.7233C74.3247 83.0954 59.0111 96.9879 60.0396 116.292C60.5615 126.084 65.4397 134.508 73.775 140.011C80.8224 144.663 89.899 146.938 99.3323 146.423C111.79 145.74 121.563 140.987 128.381 132.296C133.559 125.696 136.834 117.143 138.28 106.366C144.217 109.949 148.617 114.664 151.047 120.332C155.179 129.967 155.42 145.8 142.501 158.708C131.182 170.016 117.576 174.908 97.0135 175.059C74.2042 174.89 56.9538 167.575 45.7381 153.317C35.2355 139.966 29.8077 120.682 29.6052 96C29.8077 71.3178 35.2355 52.0336 45.7381 38.6827C56.9538 24.4249 74.2039 17.11 97.0132 16.9405C119.988 17.1113 137.539 24.4614 148.902 38.8168C156.035 47.8225 160.852 59.2065 163.093 72.8468L179.882 70.0932C177.108 53.6491 170.932 39.8146 162.062 28.627C148.067 10.9231 126.069 1.70613 97.0094 1.5H96.9458C67.9224 1.70613 46.0629 10.9254 32.228 28.5303C19.7891 44.3644 13.1118 67.246 12.9062 95.8943V96.1057C13.1118 124.754 19.7891 147.636 32.228 163.47C46.0629 181.075 67.9224 190.294 96.9458 190.5H97.0094C126.115 190.294 145.457 182.261 159.277 168.455C175.291 152.457 175.143 131.258 166.726 111.666C161.42 99.3093 153.256 92.4287 141.537 88.9883ZM98.4405 129.507C88.0005 130.095 77.1544 125.409 76.6196 115.372C76.2232 107.93 81.9158 99.626 99.0812 98.6368C101.047 98.5234 102.976 98.468 104.871 98.468C111.106 98.468 116.939 99.0737 122.242 100.233C120.264 124.935 108.662 128.946 98.4405 129.507Z"/>
+                </svg>
               </motion.div>
             </div>
 
             <div className="relative z-10 pointer-events-none">
-              <div className="w-10 h-10 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center text-accent-mint mb-6">
-                <Zap size={18} />
-              </div>
               <span className="text-xs font-mono text-accent-mint uppercase tracking-widest mb-3 block">Step 01</span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">We Intercept Fresh Signals</h3>
               <p className="text-text-secondary text-sm leading-relaxed max-w-sm">
@@ -405,12 +420,12 @@ export default function LandingPage() {
 
           {/* CARD 2: Qualified Leads (1/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: 80 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, ease }}
             whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 rounded-[32px] bg-surface-secondary/20 border border-white/[0.04] hover:bg-surface-secondary/40 hover:border-white/10 transition-all duration-500 overflow-hidden min-h-[380px] flex flex-col justify-between"
+            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
           >
             {/* AI Filter Funnel Visual */}
             <div className="relative h-[140px] mb-4">
@@ -426,14 +441,14 @@ export default function LandingPage() {
                     key={item.label}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[10px] transition-all duration-500 ${
                       item.status === 'pass'
-                        ? 'bg-accent-purple/5 border border-accent-purple/15 group-hover:border-accent-purple/30 group-hover:bg-accent-purple/10'
+                        ? 'bg-accent-purple/5 border border-accent-purple/10 group-hover:border-accent-purple/20 group-hover:bg-accent-purple/8'
                         : 'bg-white/[0.01] border border-white/[0.04] group-hover:opacity-30 group-hover:line-through'
                     }`}
                     style={{ transitionDelay: `${i * 60}ms` }}
                   >
                     <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[8px] font-black transition-all duration-500 ${
                       item.status === 'pass'
-                        ? 'bg-accent-purple/20 text-accent-purple group-hover:bg-accent-purple/40'
+                        ? 'bg-accent-purple/15 text-accent-purple group-hover:bg-accent-purple/30'
                         : 'bg-white/5 text-text-secondary/30 group-hover:bg-red-500/20 group-hover:text-red-400'
                     }`}>
                       {item.status === 'pass' ? '✓' : '✕'}
@@ -447,9 +462,6 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <div className="w-10 h-10 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center text-accent-purple mb-6">
-                <ShieldCheck size={18} />
-              </div>
               <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">Step 02</span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">AI Filters Out the Noise</h3>
               <p className="text-text-secondary text-sm leading-relaxed">
@@ -460,17 +472,17 @@ export default function LandingPage() {
 
           {/* CARD 3: AI Outreach Writer (1/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: -80 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, ease }}
             whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 rounded-[32px] bg-surface-secondary/20 border border-white/[0.04] hover:bg-surface-secondary/40 hover:border-white/10 transition-all duration-500 overflow-hidden min-h-[380px] flex flex-col justify-between"
+            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
           >
             {/* Intelligence Dossier Builder */}
-            <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden group-hover:border-accent-pink/20 transition-colors duration-500">
-              {/* Ambient node glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-accent-pink/10 blur-[30px] rounded-full group-hover:bg-accent-pink/30 transition-colors duration-500" />
+            <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-[#06080B]/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] overflow-hidden group-hover:border-accent-pink/15 transition-colors duration-500">
+              {/* Ambient node glow (toned down by 90% in opacity and size) */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-pink/[0.02] blur-[20px] rounded-full group-hover:bg-accent-pink/[0.06] transition-colors duration-500" />
               
               <div className="relative z-10 h-full flex flex-col">
                 <div className="flex items-center gap-2 text-accent-pink font-bold text-[10px] uppercase tracking-widest mb-3">
@@ -504,9 +516,6 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <div className="w-10 h-10 rounded-xl bg-accent-pink/10 border border-accent-pink/20 flex items-center justify-center text-accent-pink mb-6">
-                <Activity size={18} />
-              </div>
               <span className="text-xs font-mono text-accent-pink uppercase tracking-widest mb-3 block">Step 03</span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">We Build Lead Intelligence</h3>
               <p className="text-text-secondary text-sm leading-relaxed">
@@ -517,12 +526,12 @@ export default function LandingPage() {
 
           {/* CARD 4: Automated Follow-Ups (2/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: 80 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, ease }}
             whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-8 md:p-10 rounded-[32px] bg-surface-secondary/20 border border-white/[0.04] hover:bg-surface-secondary/40 hover:border-white/10 transition-all duration-500 overflow-hidden min-h-[380px] flex flex-col justify-between"
+            className="md:col-span-2 group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
           >
             {/* Dashboard Lead Drop Visual */}
             <div className="absolute right-10 top-10 bottom-10 w-[240px] hidden md:flex flex-col justify-center space-y-3">
@@ -534,7 +543,7 @@ export default function LandingPage() {
               ].map((lead) => (
                 <div 
                   key={lead.name} 
-                  className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex items-center gap-3 transform transition-all duration-500 group-hover:border-accent-cyan/20 group-hover:bg-[#171A20]/90 group-hover:shadow-[0_0_20px_rgba(103,232,249,0.1)] group-hover:translate-x-2 backdrop-blur-xl"
+                  className="p-3.5 rounded-xl bg-[#0A0D12]/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-accent-cyan/15 group-hover:bg-[#0E1117] group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.6)] group-hover:translate-x-2"
                   style={{ transitionDelay: `${lead.delay}ms` }}
                 >
                   <div className={`w-8 h-8 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 flex items-center justify-center shrink-0`}>
@@ -559,9 +568,6 @@ export default function LandingPage() {
             </div>
 
             <div className="relative z-10 pointer-events-none md:w-[60%]">
-              <div className="w-10 h-10 rounded-xl bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center text-accent-cyan mb-6">
-                <ChevronDown size={18} className="-rotate-90" />
-              </div>
               <span className="text-xs font-mono text-accent-cyan uppercase tracking-widest mb-3 block">Step 04</span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">Released to the Hunters</h3>
               <p className="text-text-secondary text-sm leading-relaxed">
@@ -576,7 +582,7 @@ export default function LandingPage() {
       {/* Conversational Intelligence Section */}
       <section id="conversational" className="py-40 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]">
         {/* Fine background glow */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-mint/[0.015] blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-mint/[0.015] blur-[80px] rounded-full pointer-events-none" />
         
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column - Copy Breakdown */}
@@ -668,11 +674,14 @@ export default function LandingPage() {
 {/* Who It's For */}
 <WhoItsForGrid />
 
+{/* Testimonials */}
+<TestimonialsSection />
+
       {/* Pricing */}
       <section id="pricing" className="py-40 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]">
         {/* Ambient glows */}
-        <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] bg-accent-pink/[0.015] blur-[150px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] bg-accent-pink/[0.015] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[80px] rounded-full pointer-events-none" />
 
         {/* Header */}
         <div className="text-center mb-24 relative z-10">
@@ -682,9 +691,9 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-pink/10 border border-accent-pink/20 text-accent-pink text-[10px] font-bold tracking-widest uppercase mb-6">
-              Pricing
-            </div>
+            <span className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 block text-text-secondary/40">
+              Pricing Plans
+            </span>
           </motion.div>
 
           <motion.h2
@@ -769,29 +778,21 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.1, ease }}
               whileHover={{ y: -6 }}
-              className={`group relative rounded-[32px] flex flex-col transition-all duration-500 overflow-hidden ${
-                p.featured
-                  ? 'bg-surface-secondary/40 shadow-[0_0_60px_rgba(249,168,212,0.06)]'
-                  : 'bg-surface-secondary/20'
-              }`}
+              className={`group relative flex flex-col transition-all duration-500 metallic-card`}
             >
-              {/* Gradient border glow for featured */}
+              {/* Featured ambient glow underneath */}
               {p.featured && (
-                <div className="absolute -inset-[1px] rounded-[32px] bg-gradient-to-b from-accent-pink/30 via-accent-purple/15 to-transparent pointer-events-none z-0" />
+                <div className="absolute inset-0 bg-gradient-to-b from-accent-pink/5 via-transparent to-transparent pointer-events-none rounded-[28px]" />
               )}
 
               {/* Card inner */}
-              <div className={`relative z-10 p-8 md:p-10 flex flex-col flex-1 rounded-[32px] border transition-all duration-500 ${
-                p.featured
-                  ? 'border-transparent bg-[#171A20]/90 backdrop-blur-xl'
-                  : 'border-white/[0.04] hover:border-white/10 bg-transparent'
-              }`}>
+              <div className="relative z-10 p-8 md:p-10 flex flex-col flex-1">
 
                 {/* Popular badge */}
                 {p.featured && (
-                  <div className="absolute top-6 right-6 px-3 py-1 rounded-full bg-accent-pink/10 border border-accent-pink/20 text-accent-pink text-[9px] font-bold tracking-widest uppercase">
+                  <span className="absolute top-6 right-6 text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
                     Most Popular
-                  </div>
+                  </span>
                 )}
 
                 {/* Plan name & description */}
@@ -885,23 +886,20 @@ export default function LandingPage() {
       {/* Final CTA */}
       <section className="py-32 px-6 max-w-[1100px] mx-auto text-center relative overflow-hidden">
         {/* Glowing aura */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-pink/[0.03] blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-pink/[0.03] blur-[80px] rounded-full pointer-events-none" />
         
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="relative z-10 p-16 md:p-24 rounded-[48px] border border-white/[0.06] bg-gradient-to-b from-white/[0.01] to-transparent overflow-hidden backdrop-blur-xl"
+          className="relative z-10 p-16 md:p-24 rounded-[48px] border border-white/[0.06] bg-gradient-to-b from-[#12141A] to-[#0a0a0a] overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
           
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-accent-pink" />
-            <span className="text-[11px] font-mono font-bold tracking-widest text-text-secondary uppercase">
-              Exclusive Syndicate Access
-            </span>
-          </div>
+          <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+            Exclusive Syndicate Access
+          </span>
 
           <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight text-text-primary mb-6 leading-tight">
             Stop Wasting Time <br />Looking For Clients.
@@ -944,7 +942,7 @@ export default function LandingPage() {
                 href="/sneak-peek"
                 className="inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03] text-sm"
               >
-                <Eye size={16} className="text-accent-purple" /> Sneak Peek
+                Sneak Peek
               </Link>
             </motion.div>
           </div>
@@ -965,7 +963,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       <footer className="relative border-t border-white/[0.03] overflow-hidden">
         {/* Ambient glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.02] blur-[180px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.02] blur-[80px] rounded-full pointer-events-none" />
 
         {/* Main footer content */}
         <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12 relative z-10">
@@ -973,8 +971,9 @@ export default function LandingPage() {
 
             {/* Brand Column */}
             <div className="md:col-span-4">
-              <div className="font-display text-2xl font-bold tracking-tight mb-4 text-text-primary">
-                Lead Hunter Club
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/logo.svg" alt="Lead Hunter Club" className="w-8 h-8 rounded-lg" />
+                <span className="font-display text-2xl font-bold tracking-tight text-text-primary">Lead Hunter Club</span>
               </div>
               <p className="text-sm text-text-secondary/70 font-light leading-relaxed mb-6 max-w-xs">
                 Premium client acquisition intelligence for freelancers, agencies, and growth consultants who refuse to chase cold leads.
