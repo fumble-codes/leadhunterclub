@@ -45,7 +45,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                           pathname.startsWith('/settings')
 
   useEffect(() => {
-    // Dynamic import to bypass Next.js SSR build issues for ESM packages
+    // Only use smooth scroll on the landing page, not app routes
+    const isLanding = !isAppRoute
+    if (!isLanding) return
+
     let lenisInstance: any = null
 
     import('lenis').then(({ default: Lenis }) => {
@@ -69,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         lenisInstance.destroy()
       }
     }
-  }, [])
+  }, [isAppRoute])
 
   return (
     <html lang="en" className="dark" style={{ backgroundColor: '#080808' }}>

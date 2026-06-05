@@ -54,7 +54,7 @@ export default function DashboardPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="group relative p-6 rounded-[24px] bg-surface-secondary border border-subtle hover:border-white/10 transition-all duration-300 overflow-hidden"
+                className="group metallic-card p-6"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className={`p-3 rounded-xl bg-accent-${stat.accent}/10 text-accent-${stat.accent}`}>
@@ -82,7 +82,7 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Activity Chart Section */}
-            <div className="lg:col-span-2 p-8 rounded-[32px] bg-surface-secondary border border-subtle relative overflow-hidden">
+            <div className="lg:col-span-2 metallic-card p-8">
                <div className="flex items-center justify-between mb-10">
                  <div>
                    <h3 className="text-lg font-bold text-text-primary tracking-tight">Conversion Velocity</h3>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                 </motion.button>
               </div>
 
-              <div className="p-8 rounded-[32px] bg-surface-secondary border border-subtle">
+              <div className="metallic-card p-8">
                 <h3 className="text-sm font-bold text-text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
                   <TrendingUp size={16} className="text-accent-purple" />
                   Lead Distribution
