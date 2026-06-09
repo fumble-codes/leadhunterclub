@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { authService } from '@/lib/services'
 import { getAccessToken, clearTokens } from '@/lib/api'
-import type { User } from '@leadhunter/shared'
+import type { User } from '@/lib/types'
 
 export interface AuthContextValue {
   user: User | null
