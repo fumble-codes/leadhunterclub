@@ -77,7 +77,44 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark" style={{ backgroundColor: '#080808' }}>
       <head>
+        <title>LeadHunterClub — AI-Powered Lead Generation &amp; Outreach</title>
+        <meta name="description" content="Find and close more deals with AI-powered lead generation, smart outreach, and advanced analytics. The all-in-one platform for modern sales teams." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
+        <meta property="og:title" content="LeadHunterClub — AI-Powered Lead Generation &amp; Outreach" />
+        <meta property="og:description" content="Find and close more deals with AI-powered lead generation, smart outreach, and advanced analytics." />
+        <meta property="og:image" content={`${process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com'}/logo.svg`} />
+        <meta property="og:image:width" content="1080" />
+        <meta property="og:image:height" content="1080" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="LeadHunterClub — AI-Powered Lead Generation &amp; Outreach" />
+        <meta name="twitter:description" content="Find and close more deals with AI-powered lead generation, smart outreach, and advanced analytics." />
+        <meta name="twitter:image" content={`${process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com'}/logo.svg`} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'LeadHunterClub',
+              url: process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com',
+              logo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com'}/logo.svg`,
+              description: 'AI-powered lead generation and outreach platform for modern sales teams.',
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'LeadHunterClub',
+              url: process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com',
+            }),
+          }}
+        />
       </head>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} ${spaceGrotesk.variable} ${inter.variable} font-sans antialiased bg-[#080808] text-white`}
