@@ -1,79 +1,355 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from './components/LeadCard'
-import { Command, Search, Sparkles } from 'lucide-react'
+import LeadDrawer from './components/LeadDrawer'
+import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
+import type { AppLead } from '@/types/lead'
 
-import { allLeads } from '@/lib/mock/leadsData'
-
-// Filtering for 'new' signals for the live feed
-const feedLeads = allLeads.filter(l => l.status === 'new')
+const primaryNiches = [
+  'All',
+  'Development',
+  'Marketing',
+  'Design',
+  'AI & Automation',
+  'Web Dev',
+  'Web Design',
+  'SEO',
+  'Sales & RevOps',
+  'Copywriting'
+]
 
 export default function LeadsPage() {
-  return (
-    <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
-      {/* App Sidebar */}
-      <AppSidebar />
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
+  
+  // State for search and filters
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [activeNiche, setActiveNiche] = useState<string>('All')
+  
+  const [leadsList, setLeadsList] = useState<AppLead[]>([])
+  const [loading, setLoading] = useState(true)
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative">
+  const fetchLeads = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch('/api/leads?status=new')
+      const json = await res.json()
+      if (json.data) {
+        setLeadsList(json.data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch leads:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchLeads()
+  }, [])
+
+  const handleSaveToggle = async (leadId: string, isSaved: boolean) => {
+    try {
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isSaved, status: isSaved ? 'saved' : 'new' }),
+      })
+      if (res.ok) {
+        setLeadsList(prev => prev.filter(l => l.id !== leadId))
+        if (selectedLeadId === leadId) {
+          setSelectedLeadId(null)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to toggle save state:', err)
+    }
+  }
+
+  // Get all unique tags from currently new leads
+  const allTags = Array.from(
+    new Set(
+      leadsList
+        .filter(l => l.status === 'new')
+        .flatMap(l => l.nicheTags)
+    )
+  )
+
+  // Filter leads based on status, search, niche, and selected tags
+  const filteredLeads = leadsList.filter(lead => {
+    // Only show 'new' leads in the feed
+    if (lead.status !== 'new') return false
+
+    // Apply primary niche filter if not 'All'
+    if (activeNiche !== 'All') {
+      if (!lead.niches || !lead.niches.includes(activeNiche)) return false
+    }
+
+    // Apply search filter if query exists
+    if (searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase()
+      const matchesSearch = 
+        lead.title.toLowerCase().includes(query) ||
+        lead.signalContext.toLowerCase().includes(query) ||
+        lead.company.toLowerCase().includes(query) ||
+        lead.category.toLowerCase().includes(query) ||
+        lead.nicheTags.some(tag => tag.toLowerCase().includes(query)) ||
+        (lead.niches && lead.niches.some(n => n.toLowerCase().includes(query)))
+      
+      if (!matchesSearch) return false
+    }
+
+    // Apply tag filter if tags are selected
+    if (selectedTags.length > 0) {
+      const hasMatchingTag = selectedTags.some(tag => lead.nicheTags.includes(tag))
+      if (!hasMatchingTag) return false
+    }
+
+    return true
+  })
+
+  const selectedLead = leadsList.find(l => l.id === selectedLeadId)
+
+  return (
+      <main className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative">
         
         {/* Ambient Background Glows */}
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.03] blur-[120px] rounded-[100%] pointer-events-none" />
-        <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] bg-accent-cyan/[0.02] blur-[100px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
+        <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-cyan-soft pointer-events-none" />
 
         <div className="max-w-[1400px] mx-auto relative z-10">
           
-          {/* Header & Command Bar */}
-          <div className="flex flex-col items-center justify-center mb-16 mt-4">
+          {/* Header Row: Title, Search, Filters */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10 mt-2">
             
-            {/* Raycast-style Command Palette */}
-            <div className="relative group w-full max-w-2xl mb-12">
-              <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-cyan/20 to-accent-mint/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative flex items-center bg-[#171A20]/80 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
-                <div className="pl-4 pr-3 text-text-secondary">
-                  <Search size={20} className="stroke-[1.5]" />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="Ask AI or search signals... (Press ⌘K)"
-                  className="w-full bg-transparent border-none text-text-primary text-[15px] placeholder:text-text-secondary/50 focus:outline-none focus:ring-0 py-3"
-                />
-                <div className="flex items-center gap-2 pr-3">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                    <Sparkles size={14} className="text-accent-purple" />
-                    <span className="text-[11px] font-semibold text-text-secondary">AI Filter</span>
+            {/* Title & Search Section */}
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 flex-1 w-full">
+              
+              {/* Title Section */}
+              <div className="flex items-center gap-4 shrink-0">
+                <h1 className="text-[28px] font-bold text-text-primary tracking-tight">
+                  Lead Feed
+                </h1>
+              </div>
+
+              {/* Stretched Search Bar */}
+              <div className="relative group flex-1 w-full">
+                <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-cyan/20 to-accent-mint/20 rounded-xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative flex items-center bg-code-bg/80 backdrop-blur-xl border border-white/[0.08] rounded-xl p-1.5 shadow-lg focus-within:ring-1 focus-within:ring-white/20 transition-all">
+                  <div className="pl-3 pr-2 text-text-secondary">
+                    <MagnifyingGlassIcon className="w-4 h-4 text-current" />
                   </div>
-                  <div className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-text-secondary tracking-widest">
-                    ⌘K
+                  <input 
+                    type="text" 
+                    placeholder="Search signals... (⌘K)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent border-none text-text-primary text-[13px] placeholder:text-text-secondary/50 focus:outline-none focus:ring-0 py-1.5"
+                  />
+                  {searchQuery && (
+                    <button 
+                      onClick={() => setSearchQuery('')}
+                      className="px-2 text-[11px] font-medium text-accent-purple hover:text-accent-purple/80 transition-colors"
+                    >
+                      Clear
+                    </button>
+                  )}
+                  <div className="flex items-center gap-1.5 pr-2">
+                    <div className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-text-secondary tracking-widest">
+                      ⌘K
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="w-full flex items-end justify-between">
-              <div>
-                <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
-                  Lead Feed
-                  <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[11px] font-bold tracking-[0.2em] uppercase">
-                    <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
-                    6 Signals
-                  </div>
-                </h1>
-                <p className="text-text-secondary/80 text-sm">Real-time conversational opportunities intercepted across your network.</p>
-              </div>
+            {/* Filters Section */}
+            <div className="relative shrink-0 flex items-center gap-3 w-full md:w-auto justify-end">
+              
+              {/* Filter Button */}
+              <button 
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl bg-code-bg/80 backdrop-blur-xl border shadow-lg text-[13px] font-medium transition-all ${
+                  isFilterOpen || selectedTags.length > 0
+                    ? 'border-accent-purple bg-accent-purple/10 text-text-primary'
+                    : 'border-white/[0.08] hover:bg-white/5 hover:border-white/15 text-text-primary'
+                }`}
+              >
+                <AdjustmentsHorizontalIcon className={`w-[14px] h-[14px] ${isFilterOpen || selectedTags.length > 0 ? "text-accent-purple" : "text-text-secondary"}`} />
+                <span>Filters</span>
+                {selectedTags.length > 0 && (
+                  <span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-accent-purple text-text-on-accent rounded-full ml-1">
+                    {selectedTags.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Dropdown Menu */}
+              <AnimatePresence>
+                {isFilterOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-45" 
+                      onClick={() => setIsFilterOpen(false)}
+                    />
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-72 rounded-2xl bg-surface-elevated border border-white/[0.08] p-4 shadow-2xl z-50 backdrop-blur-xl"
+                    >
+                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
+                        <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Filter by Tags</span>
+                        {selectedTags.length > 0 && (
+                          <button 
+                            onClick={() => setSelectedTags([])}
+                            className="text-[11px] font-medium text-accent-purple hover:underline"
+                          >
+                            Clear all
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto py-1 scrollbar-hide">
+                        {allTags.length === 0 ? (
+                          <span className="text-xs text-text-secondary/50 py-2">No tags available</span>
+                        ) : (
+                          allTags.map(tag => {
+                            const isSelected = selectedTags.includes(tag);
+                            return (
+                              <button
+                                key={tag}
+                                onClick={() => {
+                                  if (isSelected) {
+                                    setSelectedTags(selectedTags.filter(t => t !== tag));
+                                  } else {
+                                    setSelectedTags([...selectedTags, tag]);
+                                  }
+                                }}
+                                className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-all duration-200 ${
+                                  isSelected
+                                    ? 'bg-accent-purple/20 border-accent-purple text-accent-purple'
+                                    : 'bg-white/5 border-white/[0.06] text-text-secondary hover:bg-white/10 hover:border-white/10 hover:text-text-primary'
+                                }`}
+                              >
+                                {tag}
+                              </button>
+                            );
+                          })
+                        )}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+
             </div>
           </div>
 
-          {/* Asymmetrical CSS Grid Feed */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(340px,auto)]">
-            {feedLeads.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} />
-            ))}
+          {/* Niche Filter Pills */}
+          <div 
+            className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 -mx-4 px-4 md:-mx-0 md:px-0"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {primaryNiches.map((niche) => {
+              const isActive = activeNiche === niche
+              return (
+                <button
+                  key={niche}
+                  onClick={() => setActiveNiche(niche)}
+                  className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all duration-300 whitespace-nowrap ${
+                    isActive
+                      ? 'bg-accent-purple/10 border-accent-purple text-accent-purple shadow-[0_0_15px_rgba(168,85,247,0.15)]'
+                      : 'bg-white/5 border-white/[0.06] text-text-secondary hover:bg-white/10 hover:border-white/12 hover:text-text-primary'
+                  }`}
+                >
+                  {niche}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Grid Feed & Drawer Container */}
+          <div className={`grid gap-6 transition-all duration-300 ${selectedLeadId ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            
+            {/* Main Feed Area */}
+            <div className={selectedLeadId ? 'lg:col-span-2' : 'col-span-1'}>
+              <div className={`grid gap-5 auto-rows-[minmax(280px,auto)] transition-all duration-300 ${
+                selectedLeadId ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              }`}>
+                {loading ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center">
+                    <ArrowPathIcon className="w-8 h-8 animate-spin text-accent-purple mb-4" />
+                    <h3 className="text-sm font-medium text-text-secondary">Loading fresh buyer-intent leads...</h3>
+                  </div>
+                ) : filteredLeads.length === 0 ? (
+                  <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl backdrop-blur-md">
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-text-secondary">
+                      <AdjustmentsHorizontalIcon className="w-5 h-5 text-text-secondary" />
+                    </div>
+                    <h3 className="text-base font-bold text-text-primary mb-1">No signals found</h3>
+                    <p className="text-sm text-text-secondary/70 max-w-sm">
+                      Try clearing your search query or selected tags to view more opportunities.
+                    </p>
+                    {(searchQuery || selectedTags.length > 0 || activeNiche !== 'All') && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('')
+                          setSelectedTags([])
+                          setActiveNiche('All')
+                        }}
+                        className="mt-5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-xs font-semibold text-text-primary transition-all"
+                      >
+                        Reset Filters
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  filteredLeads.map((lead) => (
+                    <LeadCard 
+                      key={lead.id} 
+                      lead={lead} 
+                      isSelected={lead.id === selectedLeadId}
+                      onClick={() => setSelectedLeadId(lead.id)}
+                      onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Right Side Panel Drawer */}
+            <AnimatePresence>
+              {selectedLead && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  className="hidden lg:block lg:col-span-1 h-[calc(100vh-160px)] sticky top-0"
+                >
+                  <LeadDrawer 
+                    lead={selectedLead} 
+                    onClose={() => setSelectedLeadId(null)} 
+                    onReveal={(name, email, phone) => {
+                      setLeadsList(prev => prev.map(l => l.id === selectedLead.id ? { ...l, isRevealed: true, name, email, phone } : l))
+                    }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
           </div>
           
         </div>
       </main>
-    </div>
   )
 }
+

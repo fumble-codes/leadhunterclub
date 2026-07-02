@@ -10,6 +10,7 @@ export interface User {
   role: UserRole
   credits: number
   provider: AuthProvider
+  emailVerified: string | null
   createdAt: string
   updatedAt: string
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, Star } from 'lucide-react'
+import { ArrowRightIcon, StarIcon } from '@heroicons/react/24/solid'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -20,7 +20,7 @@ interface Testimonial {
   name: string
   handle: string
   role: string
-  accentRaw: string
+  accentToken: string
   initials: string
   quote: string
   result: string
@@ -33,7 +33,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Alex Moreno',
     handle: '@alexmoreno_dev',
     role: 'Freelance Developer',
-    accentRaw: '#B8F36B',
+    accentToken: 'persona-green',
     initials: 'AM',
     result: '$4,200 contract in week 1',
     quote: 'Found a $4k Shopify contract within my first week. The intent signals are insanely accurate — it honestly felt like cheating.',
@@ -47,13 +47,13 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'AI Outreach Writer',
-        tagColor: 'bg-[#B8F36B]/10 border-[#B8F36B]/20 text-[#B8F36B]',
+        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
         detail: 'LeadHunter surfaces the exact posts with buyer intent and drafts a personalized pitch in seconds — no guesswork.'
       },
       {
         label: 'Their result',
         tag: '+28% Reply Rate',
-        tagColor: 'bg-[#7DD3FC]/10 border-[#7DD3FC]/20 text-[#7DD3FC]',
+        tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
         detail: 'Went from 4% cold email replies to 28% in under a month. First paid contract landed in week one.'
       },
     ]
@@ -63,7 +63,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Priya Sharma',
     handle: '@priyaux',
     role: 'UI/UX Designer',
-    accentRaw: '#F9A8D4',
+    accentToken: 'persona-pink',
     initials: 'PS',
     result: '3 retainers closed in 30 days',
     quote: 'LeadHunter surfaces clients I\'d never find cold emailing. Every lead already wants design help — it\'s that good.',
@@ -77,13 +77,13 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Intent Scoring',
-        tagColor: 'bg-[#F9A8D4]/10 border-[#F9A8D4]/20 text-[#F9A8D4]',
+        tagColor: 'bg-persona-pink/10 border-persona-pink/20 text-persona-pink',
         detail: 'Every lead is ranked by urgency and budget signal — she pitches only when there\'s a real buying signal.'
       },
       {
         label: 'Their result',
         tag: '3 Retainers / 30 Days',
-        tagColor: 'bg-[#B8F36B]/10 border-[#B8F36B]/20 text-[#B8F36B]',
+        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
         detail: 'Closed three ongoing monthly design retainers by week four. Zero cold applications sent since.'
       },
     ]
@@ -93,7 +93,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Koen Voss',
     handle: '@koenvoss',
     role: 'Brand Designer',
-    accentRaw: '#A78BFA',
+    accentToken: 'tab-purple',
     initials: 'KV',
     result: 'Replaced job boards entirely',
     quote: 'I stopped wasting time on job boards. Warm intent leads close 3x faster — the quality difference is night and day.',
@@ -107,13 +107,13 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Automated Follow-Ups',
-        tagColor: 'bg-[#A78BFA]/10 border-[#A78BFA]/20 text-[#A78BFA]',
+        tagColor: 'bg-tab-purple/10 border-tab-purple/20 text-tab-purple',
         detail: 'Multi-stage sequences now run in the background. Deals move forward even when he\'s heads-down on client work.'
       },
       {
         label: 'Their result',
         tag: '3× Faster Closes',
-        tagColor: 'bg-[#F9A8D4]/10 border-[#F9A8D4]/20 text-[#F9A8D4]',
+        tagColor: 'bg-persona-pink/10 border-persona-pink/20 text-persona-pink',
         detail: 'Warm intent leads close three times faster than cold applications. Fully replaced job boards within 6 weeks.'
       },
     ]
@@ -123,7 +123,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Marcus Tse',
     handle: '@marcustse',
     role: 'Full-Stack Developer',
-    accentRaw: '#7DD3FC',
+    accentToken: 'persona-blue',
     initials: 'MT',
     result: 'Response rate: 4% → 28%',
     quote: 'The AI drafts outreach that actually sounds like me. Response rates went from 4% to 28% without touching my email setup.',
@@ -137,13 +137,13 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'AI Context Insight',
-        tagColor: 'bg-[#7DD3FC]/10 border-[#7DD3FC]/20 text-[#7DD3FC]',
+        tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
         detail: 'Every outreach is written around the specific signal that triggered the lead — founders respond because it feels personal.'
       },
       {
         label: 'Their result',
         tag: '7× More Pipeline',
-        tagColor: 'bg-[#A78BFA]/10 border-[#A78BFA]/20 text-[#A78BFA]',
+        tagColor: 'bg-tab-purple/10 border-tab-purple/20 text-tab-purple',
         detail: 'Pipeline grew 7x in 45 days. Now closes 2–3 new contracts monthly without any additional marketing spend.'
       },
     ]
@@ -153,7 +153,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Jade Williams',
     handle: '@jadegrowth',
     role: 'SMMA Owner',
-    accentRaw: '#FB923C',
+    accentToken: 'persona-orange',
     initials: 'JW',
     result: '2 → 8 retainers in 60 days',
     quote: 'Scaled from 2 to 8 retainer clients in 60 days. This is the unfair advantage agencies need. Nothing else comes close.',
@@ -167,13 +167,13 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Multi-Platform Feed',
-        tagColor: 'bg-[#FB923C]/10 border-[#FB923C]/20 text-[#FB923C]',
+        tagColor: 'bg-persona-orange/10 border-persona-orange/20 text-persona-orange',
         detail: 'One feed now aggregates high-intent signals from 5 platforms. The team pitches only when a real buying signal exists.'
       },
       {
         label: 'Their result',
         tag: '4× Revenue in 60 Days',
-        tagColor: 'bg-[#B8F36B]/10 border-[#B8F36B]/20 text-[#B8F36B]',
+        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
         detail: 'Grew from $6k/mo to $24k/mo MRR in two months. Cold outreach budget reduced to zero.'
       },
     ]
@@ -183,7 +183,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'David Kaur',
     handle: '@davidkaur',
     role: 'Agency Owner',
-    accentRaw: '#A78BFA',
+    accentToken: 'tab-purple',
     initials: 'DK',
     result: 'Replaced entire SDR stack',
     quote: 'We replaced our entire outbound SDR stack with LeadHunter. Same pipeline at 20% of the cost. I wish I found it sooner.',
@@ -197,13 +197,13 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Email Integration',
-        tagColor: 'bg-[#7DD3FC]/10 border-[#7DD3FC]/20 text-[#7DD3FC]',
+        tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
         detail: 'LeadHunter now handles lead discovery, enrichment, and outreach sequencing — fully automated with no seat cost.'
       },
       {
         label: 'Their result',
         tag: '80% Cost Reduction',
-        tagColor: 'bg-[#B8F36B]/10 border-[#B8F36B]/20 text-[#B8F36B]',
+        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
         detail: 'Eliminated 3 SDR salaries while hitting the same pipeline targets. Reinvested savings into product and growth.'
       },
     ]
@@ -229,8 +229,8 @@ function TestimonialCard({
         relative flex items-center gap-4 px-5 py-4 rounded-2xl border cursor-pointer
         transition-colors duration-300 select-none min-w-[240px] max-w-[280px] shrink-0
         ${isActive
-          ? 'bg-[#1D212A] border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.7)]'
-          : 'bg-[#131619]/60 border-white/[0.04] hover:bg-[#1A1D23]/80'
+          ? 'bg-surface border-white/10 shadow-[0_20px_60px_rgba(var(--rgb-black),0.7)]'
+          : 'bg-surface/60 border-white/[0.04] hover:bg-surface-secondary/80'
         }
       `}
       animate={isActive ? { scale: 1, opacity: 1 } : { scale: 0.92, opacity: 0.45 }}
@@ -241,9 +241,9 @@ function TestimonialCard({
       <div
         className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border"
         style={{
-          background: `${testimonial.accentRaw}18`,
-          borderColor: `${testimonial.accentRaw}30`,
-          color: testimonial.accentRaw,
+          background: `rgba(var(--rgb-${testimonial.accentToken}), 0.07)`,
+          borderColor: `rgba(var(--rgb-${testimonial.accentToken}), 0.12)`,
+          color: `var(--color-${testimonial.accentToken})`,
         }}
       >
         {testimonial.initials}
@@ -263,7 +263,7 @@ function TestimonialCard({
         <motion.div
           layoutId="active-testimonial-ring"
           className="absolute inset-0 rounded-2xl border pointer-events-none"
-          style={{ borderColor: `${testimonial.accentRaw}35` }}
+          style={{ borderColor: `rgba(var(--rgb-${testimonial.accentToken}), 0.14)` }}
           transition={{ type: 'spring', stiffness: 350, damping: 30 }}
         />
       )}
@@ -340,7 +340,7 @@ export default function TestimonialsSection() {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Ambient glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-accent-purple/[0.03] blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] glow-purple-medium pointer-events-none" />
 
       {/* Header */}
       <div className="text-center mb-16 relative z-10">
@@ -460,25 +460,25 @@ export default function TestimonialsSection() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.4, ease }}
-                className="p-6 rounded-2xl bg-[#1A1D23] border border-white/[0.05] relative overflow-hidden"
+                className="p-6 rounded-2xl bg-surface border border-white/[0.05] relative overflow-hidden"
               >
                 {/* Accent glow */}
                 <div
                   className="absolute top-0 right-0 w-28 h-28 blur-[60px] rounded-full pointer-events-none opacity-25"
-                  style={{ background: active.accentRaw }}
+                  style={{ background: `var(--color-${active.accentToken})` }}
                 />
 
                 {/* Stars */}
                 <div className="flex items-center gap-0.5 mb-4 relative z-10">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={11} className="fill-current" style={{ color: active.accentRaw, opacity: 0.8 }} />
+                    <StarIcon key={i} className="w-[11px] h-[11px]" style={{ color: `var(--color-${active.accentToken})`, opacity: 0.8 }} />
                   ))}
                 </div>
 
                 {/* Big quote mark */}
                 <span
                   className="text-[56px] font-serif leading-none block mb-1 -mt-2 opacity-20"
-                  style={{ color: active.accentRaw }}
+                  style={{ color: `var(--color-${active.accentToken})` }}
                 >
                   &quot;
                 </span>
@@ -491,9 +491,9 @@ export default function TestimonialsSection() {
                 <div
                   className="inline-flex items-center gap-1.5 mt-4 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider relative z-10"
                   style={{
-                    background: `${active.accentRaw}12`,
-                    borderColor: `${active.accentRaw}25`,
-                    color: active.accentRaw,
+                    background: `rgba(var(--rgb-${active.accentToken}), 0.05)`,
+                    borderColor: `rgba(var(--rgb-${active.accentToken}), 0.10)`,
+                    color: `var(--color-${active.accentToken})`,
                   }}
                 >
                   {active.result}
@@ -504,9 +504,9 @@ export default function TestimonialsSection() {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border shrink-0"
                     style={{
-                      background: `${active.accentRaw}18`,
-                      borderColor: `${active.accentRaw}30`,
-                      color: active.accentRaw,
+                      background: `rgba(var(--rgb-${active.accentToken}), 0.07)`,
+                      borderColor: `rgba(var(--rgb-${active.accentToken}), 0.12)`,
+                      color: `var(--color-${active.accentToken})`,
                     }}
                   >
                     {active.initials}
@@ -533,7 +533,7 @@ export default function TestimonialsSection() {
       >
         <button className="group flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/[0.08] hover:border-white/15 text-sm text-text-secondary hover:text-text-primary transition-all duration-300 cursor-pointer">
           See all reviews
-          <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" />
+          <ArrowRightIcon className="w-[14px] h-[14px] group-hover:translate-x-1 transition-transform duration-300" />
         </button>
       </motion.div>
     </section>

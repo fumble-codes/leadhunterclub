@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Space_Grotesk as SpaceGrotesk, Inter } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import { ClerkProvider } from '@clerk/nextjs'
 import ClientLayout from './ClientLayout'
 import './globals.css'
 
@@ -44,7 +45,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" style={{ backgroundColor: '#080808' }}>
+    <ClerkProvider>
+      <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -72,10 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} ${spaceGrotesk.variable} ${inter.variable} font-sans antialiased bg-[#080808] text-white`}
+        className={`${GeistSans.variable} ${GeistMono.variable} ${spaceGrotesk.variable} ${inter.variable} font-sans antialiased bg-page-bg text-white`}
       >
         <ClientLayout>{children}</ClientLayout>
       </body>
-    </html>
+      </html>
+    </ClerkProvider>
   )
 }

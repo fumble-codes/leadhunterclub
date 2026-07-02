@@ -22,6 +22,8 @@ export interface Lead {
   timestamp: string
   lastActionDate?: string
   isActionable?: boolean
+  isSaved?: boolean
+  isRevealed?: boolean
 }
 
 export interface LeadIntentScore {

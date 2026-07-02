@@ -1,35 +1,39 @@
 'use client'
 
-import AppSidebar from '@/components/layout/AppSidebar'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  Zap, 
-  Target, 
-  MessageSquare, 
-  Coins, 
-  TrendingUp, 
-  ArrowUpRight,
-  ShieldCheck,
-  Sparkles
-} from 'lucide-react'
+import { BoltIcon, ViewfinderCircleIcon, ChatBubbleLeftRightIcon, BanknotesIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon } from '@heroicons/react/24/solid'
 import { dashboardStats, activityData } from '@/lib/mock/dashboardData'
 
 export default function DashboardPage() {
-  return (
-    <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
-      <AppSidebar />
+  const [stats, setStats] = useState<any[]>(dashboardStats)
+  const [outreachCount, setOutreachCount] = useState(12)
+  const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    fetch('/api/dashboard')
+      .then(res => res.json())
+      .then(json => {
+        if (json.data) {
+          if (json.data.stats) setStats(json.data.stats)
+          if (json.data.readyForOutreachCount !== undefined) setOutreachCount(json.data.readyForOutreachCount)
+        }
+      })
+      .catch(err => console.error('Failed to load dashboard data:', err))
+      .finally(() => setLoading(false))
+  }, [])
+  return (
       <main className="flex-1 overflow-y-auto px-10 py-12 relative">
         {/* Ambient Background Glows */}
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-mint/[0.03] blur-[120px] rounded-[100%] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-accent-purple/[0.02] blur-[100px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 
         <div className="max-w-[1400px] mx-auto relative z-10">
           {/* Header */}
           <div className="mb-12 flex items-end justify-between">
             <div>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-accent-mint uppercase tracking-[0.3em] mb-3">
-                <ShieldCheck size={14} />
+              <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-[0.3em] mb-3">
+                <CheckCircleIcon className="w-[14px] h-[14px]" />
                 Operational Status: Active
               </div>
               <h1 className="text-4xl font-bold text-text-primary tracking-tight">
@@ -48,7 +52,7 @@ export default function DashboardPage() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {dashboardStats.map((stat, i) => (
+            {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
@@ -58,15 +62,15 @@ export default function DashboardPage() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className={`p-3 rounded-xl bg-accent-${stat.accent}/10 text-accent-${stat.accent}`}>
-                    {stat.label === 'Signals Intercepted' && <Target size={20} />}
-                    {stat.label === 'Active Conversations' && <MessageSquare size={20} />}
-                    {stat.label === 'Avg. Reply Probability' && <Zap size={20} />}
-                    {stat.label === 'Credits Remaining' && <Coins size={20} />}
+                    {stat.label === 'Signals Intercepted' && <ViewfinderCircleIcon className="w-5 h-5" />}
+                    {stat.label === 'Active Conversations' && <ChatBubbleLeftRightIcon className="w-5 h-5" />}
+                    {stat.label === 'Avg. Reply Probability' && <BoltIcon className="w-5 h-5" />}
+                    {stat.label === 'Credits Remaining' && <BanknotesIcon className="w-5 h-5" />}
                   </div>
                   {stat.trend && (
                     <span className={`text-[11px] font-bold ${stat.trendUp ? 'text-accent-mint' : 'text-text-secondary'} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-md`}>
                       {stat.trend}
-                      {stat.trendUp && <ArrowUpRight size={12} />}
+                      {stat.trendUp && <ArrowTopRightOnSquareIcon className="w-3 h-3" />}
                     </span>
                   )}
                 </div>
@@ -103,7 +107,7 @@ export default function DashboardPage() {
                          transition={{ duration: 1, delay: i * 0.1, ease: 'circOut' }}
                          className="w-full max-w-[40px] rounded-t-xl bg-gradient-to-t from-accent-mint/10 to-accent-mint/40 group-hover:to-accent-mint/60 transition-all relative"
                        >
-                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-accent-mint bg-surface-elevated px-2 py-1 rounded border border-accent-mint/30">
+                         <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors bg-surface-elevated px-2 py-1 rounded border border-border-subtle">
                            {data.value}%
                          </div>
                        </motion.div>
@@ -115,25 +119,23 @@ export default function DashboardPage() {
 
             {/* Quick Actions & AI Status */}
             <div className="space-y-6">
-              <div className="p-8 rounded-[32px] bg-accent-mint text-[#11150C] relative overflow-hidden group">
-                <Sparkles className="absolute top-[-20px] right-[-20px] w-32 h-32 opacity-10 rotate-12" />
+              <div className="p-8 rounded-[32px] bg-accent-mint text-text-on-accent relative overflow-hidden group">
                 <h3 className="text-xl font-bold mb-2">Ready for Outreach</h3>
                 <p className="text-sm opacity-80 mb-8 leading-relaxed">
-                  You have 12 high-intent leads waiting for outreach strategy.
+                  You have {outreachCount} high-intent lead{outreachCount === 1 ? '' : 's'} waiting for outreach strategy.
                 </p>
                 <motion.button 
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full py-4 bg-[#11150C] text-accent-mint font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl"
+                  className="w-full py-4 bg-text-on-accent text-accent-mint font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl"
                 >
                   Review New Leads
-                  <ArrowUpRight size={18} />
+                  <ArrowTopRightOnSquareIcon className="w-[18px] h-[18px]" />
                 </motion.button>
               </div>
 
               <div className="metallic-card p-8">
-                <h3 className="text-sm font-bold text-text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <TrendingUp size={16} className="text-accent-purple" />
+                <h3 className="text-sm font-bold text-text-primary uppercase tracking-widest mb-6">
                   Lead Distribution
                 </h3>
                 <div className="space-y-4">
@@ -155,6 +157,5 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-    </div>
   )
 }

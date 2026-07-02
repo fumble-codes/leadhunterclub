@@ -3,13 +3,7 @@
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import {
-  Rss, Bookmark, Send, LayoutDashboard, Coins,
-  Sparkles, ArrowRight, Target, MessageSquare, Zap,
-  ArrowUpRight, TrendingUp, ShieldCheck, Filter,
-  Search, Clock, Activity, ShieldAlert, User,
-  MoreHorizontal, Info, ExternalLink, Eye
-} from 'lucide-react'
+import { BanknotesIcon, BookmarkIcon, PaperAirplaneIcon, Squares2X2Icon, SparklesIcon, ArrowRightIcon, ViewfinderCircleIcon, ChatBubbleLeftRightIcon, BoltIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon, ChartBarSquareIcon, ExclamationTriangleIcon, UserIcon, EllipsisHorizontalIcon, InformationCircleIcon, EyeIcon, ClockIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { dashboardStats, activityData } from '@/lib/mock/dashboardData'
 import { getSavedLeads, getOutreachLeads, allLeads } from '@/lib/mock/leadsData'
@@ -18,10 +12,10 @@ import LeadCard from '@/app/leads/components/LeadCard'
 const ease = [0.16, 1, 0.3, 1] as const
 
 const tabs = [
-  { id: 'leads', label: 'Lead Feed', icon: Rss },
-  { id: 'saved', label: 'Saved Leads', icon: Bookmark },
-  { id: 'outreach', label: 'Outreach', icon: Send },
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'leads', label: 'Lead Feed', icon: BanknotesIcon },
+  { id: 'saved', label: 'Saved Leads', icon: BookmarkIcon },
+  { id: 'outreach', label: 'Outreach', icon: PaperAirplaneIcon },
+  { id: 'dashboard', label: 'Dashboard', icon: Squares2X2Icon },
 ]
 
 // ─── Real Lead Feed content (100% precise to leads/page.tsx) ──────────────
@@ -35,8 +29,8 @@ function LeadsContent() {
   return (
     <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative w-full scrollbar-hide">
       {/* Ambient Background Glows */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.03] blur-[60px] rounded-[100%] pointer-events-none" />
-      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] bg-accent-cyan/[0.02] blur-[60px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
+      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-cyan-soft pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header & Command Bar */}
@@ -44,9 +38,9 @@ function LeadsContent() {
           {/* Raycast-style Command Palette */}
           <div className="relative group w-full max-w-2xl mb-12">
             <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-cyan/20 to-accent-mint/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative flex items-center bg-[#181b22] border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
+            <div className="relative flex items-center bg-surface border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
               <div className="pl-4 pr-3 text-text-secondary">
-                <Search size={20} className="stroke-[1.5]" />
+                <MagnifyingGlassIcon className="w-5 h-5 text-text-secondary" />
               </div>
               <input
                 type="text"
@@ -55,7 +49,7 @@ function LeadsContent() {
               />
               <div className="flex items-center gap-2 pr-3">
                 <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                  <Sparkles size={14} className="text-accent-purple" />
+                  <SparklesIcon className="w-[14px] h-[14px] text-text-secondary" />
                   <span className="text-[11px] font-semibold text-text-secondary">AI Filter</span>
                 </div>
                 <div className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-text-secondary tracking-widest">
@@ -69,8 +63,8 @@ function LeadsContent() {
             <div>
               <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                 Lead Feed
-                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[11px] font-bold tracking-[0.2em] uppercase">
-                  <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
+                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-[0.2em] uppercase">
+                  <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse" />
                   4 Signals
                 </div>
               </h1>
@@ -96,15 +90,15 @@ function SavedContent() {
   const savedLeads = getSavedLeads()
 
   const summaryCards = [
-    { label: 'Reply Received', sub: 'Awaiting negotiation', count: '4 Leads', accent: 'purple', icon: MessageSquare },
-    { label: 'Urgent Follow-up', sub: 'SLA window closing', count: '2 Urgent', accent: 'orange', icon: ShieldAlert },
-    { label: 'High Budget', sub: 'Whale tier opportunities', count: '$10k+ Potential', accent: 'mint', icon: Target },
-    { label: 'High Intent', sub: 'AI-verified opportunities', count: '8 New', accent: 'cyan', icon: Sparkles },
+    { label: 'Reply Received', sub: 'Awaiting negotiation', count: '4 Leads', accent: 'purple', icon: ChatBubbleLeftRightIcon },
+    { label: 'Urgent Follow-up', sub: 'SLA window closing', count: '2 Urgent', accent: 'orange', icon: ExclamationTriangleIcon },
+    { label: 'High Budget', sub: 'Whale tier opportunities', count: '$10k+ Potential', accent: 'mint', icon: ViewfinderCircleIcon },
+    { label: 'High Intent', sub: 'AI-verified opportunities', count: '8 New', accent: 'cyan', icon: SparklesIcon },
   ]
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide">
-      <div className="max-w-[1400px] mx-auto relative z-10">
+    <div className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide border-accent-mint text-accent-mint bg-gradient-to-r from-accent-mint/10">
+      <div className="max-w-[1400px] mx-auto relative z-10 border-accent-mint text-accent-mint bg-gradient-to-r from-accent-mint/10">
         {/* Summary Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {summaryCards.map((card, i) => (
@@ -117,7 +111,7 @@ function SavedContent() {
             >
               <div className="flex justify-between items-start mb-6">
                 <div className={`p-3 rounded-2xl bg-accent-${card.accent}/10 text-accent-${card.accent} shadow-inner`}>
-                  <card.icon size={22} />
+                  <card.icon className="w-[22px] h-[22px]" />
                 </div>
                 <span className={`text-[10px] font-bold uppercase tracking-widest text-accent-${card.accent}`}>
                   {card.count}
@@ -134,7 +128,7 @@ function SavedContent() {
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-4">
           <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
             <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
-              <Bookmark className="text-accent-orange" size={24} />
+              <BookmarkIcon className="w-6 h-6 text-text-secondary" />
               Saved Leads
             </h2>
             <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
@@ -143,7 +137,7 @@ function SavedContent() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all ${activeTab === tab
-                    ? 'bg-accent-orange text-[#11150C] shadow-lg'
+                    ? 'bg-accent-orange text-text-on-accent shadow-lg'
                     : 'text-text-secondary hover:text-text-primary'
                     }`}
                 >
@@ -155,22 +149,22 @@ function SavedContent() {
 
           <div className="flex items-center gap-4">
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary group-focus-within:text-accent-orange transition-colors" size={16} />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
               <input
                 type="text"
                 placeholder="Search pipeline..."
-                className="bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-accent-orange/50 transition-all w-48 lg:w-64"
+                className="bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-border-subtle transition-all w-48 lg:w-64"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-accent-orange text-[#11150C] rounded-xl font-bold text-xs hover:shadow-[0_0_20px_rgba(255,184,107,0.3)] transition-all">
-              <TrendingUp size={14} />
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-accent-orange text-text-on-accent rounded-xl font-bold text-xs hover: transition-all">
+              <SparklesIcon className="w-[14px] h-[14px]" />
               Report
             </button>
           </div>
         </div>
 
         {/* High-Density Pipeline Table */}
-        <div className="bg-[#121316] border border-white/[0.05] rounded-[24px] overflow-hidden">
+        <div className="bg-code-header border border-white/[0.05] rounded-[24px] overflow-hidden">
           <div className="grid grid-cols-12 gap-4 px-8 py-4 border-b border-white/[0.05] text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] min-w-[800px]">
             <div className="col-span-1">Status</div>
             <div className="col-span-4">Lead</div>
@@ -187,10 +181,10 @@ function SavedContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 + i * 0.05 }}
-                className="grid grid-cols-12 gap-4 px-8 py-5 items-center group hover:bg-white/[0.02] transition-colors"
+                className="grid grid-cols-12 gap-4 px-8 py-5 items-center group hover:bg-white/[0.02] transition-colors focus:border-accent-orange/50"
               >
                 <div className="col-span-1 flex items-center">
-                  <div className={`w-2.5 h-2.5 rounded-full bg-accent-${lead.accent} ${lead.isActionable ? 'animate-pulse ring-4 ring-accent-purple/20' : 'opacity-40'}`} />
+                  <div className={`w-2.5 h-2.5 rounded-full bg-accent-${lead.accent || 'mint'} ${lead.isActionable ? 'animate-pulse ring-4 ring-accent-purple/20' : 'opacity-40'}`} />
                 </div>
 
                 <div className="col-span-4 flex items-center gap-4">
@@ -198,8 +192,8 @@ function SavedContent() {
                     {lead.name.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-text-primary group-hover:text-accent-orange transition-colors truncate">{lead.name}</div>
-                    <div className="text-[10px] text-text-secondary truncate">{lead.email}</div>
+                    <div className="text-sm font-bold text-text-primary group-hover:text-text-secondary hover:text-text-primary transition-colors transition-colors truncate group-hover:text-accent-orange">{lead.name}</div>
+                    <div className="text-[10px] group-hover:text-accent-orange truncate">{lead.email}</div>
                   </div>
                 </div>
 
@@ -225,8 +219,8 @@ function SavedContent() {
                       Engage
                     </button>
                   ) : (
-                    <button className="p-2 text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-all">
-                      <ArrowUpRight size={16} />
+<button className="p-2 text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-all hover:bg-accent-orange">
+                        <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                     </button>
                   )}
                 </div>
@@ -250,10 +244,10 @@ function OutreachContent() {
   return (
     <div className="flex-1 flex overflow-hidden">
       {/* Left Column: Thread List */}
-      <div className="w-[320px] shrink-0 border-r border-white/[0.06] bg-[#12151A]/40 flex flex-col">
+      <div className="w-[320px] shrink-0 border-r border-white/[0.06] bg-background/40 flex flex-col">
         <div className="p-6 border-b border-white/[0.06]">
           <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
-            <MessageSquare size={18} className="text-accent-mint" />
+            <ChatBubbleLeftRightIcon className="w-[18px] h-[18px] text-text-secondary" />
             Conversations
           </h2>
         </div>
@@ -272,7 +266,7 @@ function OutreachContent() {
                 <span className="text-sm font-bold text-text-primary truncate">{lead.name}</span>
                 <span className="text-[10px] text-text-secondary font-mono ml-2 shrink-0">{lead.timestamp}</span>
               </div>
-              <div className="text-[10px] text-accent-mint uppercase tracking-widest font-bold mb-2">
+              <div className="text-[10px] text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest font-bold mb-2">
                 {lead.company}
               </div>
               <p className="text-xs text-text-secondary line-clamp-1 italic">
@@ -280,7 +274,7 @@ function OutreachContent() {
               </p>
               {selectedLead.id === lead.id && (
                 <motion.div layoutId="outreach-active-hero"
-                  className="absolute inset-0 border border-accent-mint/30 rounded-2xl pointer-events-none" />
+                  className="absolute inset-0 border border-border-subtle rounded-2xl pointer-events-none" />
               )}
             </button>
           ))}
@@ -288,11 +282,11 @@ function OutreachContent() {
       </div>
 
       {/* Center Column: Messaging Cockpit */}
-      <div className="flex-1 flex flex-col bg-[#0F1115] relative min-w-0">
+      <div className="flex-1 flex flex-col bg-background relative min-w-0">
         <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`w-10 h-10 rounded-xl bg-accent-${selectedLead.accent}/10 border border-accent-${selectedLead.accent}/20 flex items-center justify-center`}>
-              <User size={20} className={`text-accent-${selectedLead.accent}`} />
+            <div className={`w-8 h-8 rounded-md bg-accent-${selectedLead.accent}/10 border border-accent-${selectedLead.accent}/20 flex items-center justify-center`}>
+              <UserIcon className={`w-5 h-5 text-accent-${selectedLead.accent}`} />
             </div>
             <div className="min-w-0">
               <h3 className="text-base font-bold text-text-primary leading-tight truncate">{selectedLead.name}</h3>
@@ -300,33 +294,33 @@ function OutreachContent() {
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0 ml-4">
-            <button className="p-2 hover:bg-white/5 rounded-lg text-text-secondary transition-colors"><Clock size={18} /></button>
-            <button className="p-2 hover:bg-white/5 rounded-lg text-text-secondary transition-colors"><MoreHorizontal size={18} /></button>
+            <button className="p-2 hover:bg-white/5 rounded-lg text-text-secondary transition-colors"><ClockIcon className="w-[18px] h-[18px]" /></button>
+            <button className="p-2 hover:bg-white/5 rounded-lg text-text-secondary transition-colors"><EllipsisHorizontalIcon className="w-[18px] h-[18px]" /></button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide">
-          <div className="max-w-[80%] mx-auto text-center space-y-4 py-12">
-            <div className="w-12 h-12 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center mx-auto text-accent-mint">
-              <Target size={24} />
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide text-accent-mint">
+          <div className="max-w-[80%] mx-auto text-center space-y-4 py-12 text-accent-mint">
+            <div className="w-8 h-8 rounded-md bg-surface-secondary border border-border-subtle flex items-center justify-center mx-auto text-accent-mint">
+              <ViewfinderCircleIcon className="w-6 h-6" />
             </div>
             <h4 className="text-sm font-bold text-text-primary uppercase tracking-widest">Initial Intercept Sent</h4>
             <p className="text-xs text-text-secondary italic">&quot;Hey Alex, saw your Shopify store load times are a bit sluggish. Just worked with a similar DTC brand to shave 2s off their LCP. Any interest in a quick audit?&quot;</p>
           </div>
         </div>
 
-        <div className="p-6 border-t border-white/[0.06] bg-[#13151b]">
+        <div className="p-6 border-t border-white/[0.06] bg-background">
           <div className="flex items-center gap-3 mb-4 overflow-x-auto pb-2 scrollbar-hide">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
-              <Sparkles size={12} /> AI Angles:
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+              <SparklesIcon className="w-3 h-3" /> AI Angles:
             </div>
             {[
-              { label: 'Curiosity Loop', icon: Zap },
-              { label: 'Authority Play', icon: Info },
-              { label: 'Subtle Humor', icon: MessageSquare }
+              { label: 'Curiosity Loop', icon: BoltIcon },
+              { label: 'Authority Play', icon: InformationCircleIcon },
+              { label: 'Subtle Humor', icon: ChatBubbleLeftRightIcon }
             ].map((angle) => (
               <button key={angle.label} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-text-secondary hover:text-text-primary hover:border-white/20 transition-all whitespace-nowrap">
-                <angle.icon size={12} /> {angle.label}
+                <angle.icon className="w-3 h-3" /> {angle.label}
               </button>
             ))}
           </div>
@@ -335,21 +329,21 @@ function OutreachContent() {
             <textarea
               value={draft} onChange={(e) => setDraft(e.target.value)}
               placeholder="Draft your socially intelligent outreach..."
-              className="w-full bg-[#0F1115] border border-white/[0.08] rounded-[24px] p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-mint/50 transition-all min-h-[140px] resize-none"
+              className="w-full bg-background border border-white/[0.08] rounded-[24px] p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-border-subtle transition-all min-h-[140px] resize-none focus:border-accent-mint/50"
             />
-            <button className="absolute bottom-4 right-4 p-4 bg-accent-mint text-[#11150C] rounded-xl font-bold flex items-center gap-2 hover:shadow-[0_0_20px_rgba(184,243,107,0.3)] transition-all">
-              Send <Send size={16} />
+            <button className="absolute bottom-4 right-4 p-4 bg-accent-mint text-text-on-accent rounded-xl font-bold flex items-center gap-2 hover: transition-all">
+              Send <PaperAirplaneIcon className="w-4 h-4" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Right Column: Intelligence Summary */}
-      <div className="w-[300px] lg:w-[340px] shrink-0 border-l border-white/[0.06] bg-[#12151A]/40 flex flex-col p-8 overflow-y-auto scrollbar-hide">
+      <div className="w-[300px] lg:w-[340px] shrink-0 border-l border-white/[0.06] bg-background/40 flex flex-col p-8 overflow-y-auto scrollbar-hide">
         <div className="space-y-8">
           <section>
             <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-              <Info size={12} /> Intelligence Brief
+              <InformationCircleIcon className="w-3 h-3" /> Intelligence Brief
             </h4>
             <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
               <div className="text-xs text-text-primary leading-relaxed font-medium">
@@ -368,19 +362,19 @@ function OutreachContent() {
           <section>
             <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4">Conversion Paths</h4>
             <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-accent-mint/30 transition-all">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-border-subtle transition-all">
                 <span className="text-xs text-text-secondary group-hover:text-text-primary">Company Website</span>
-                <ExternalLink size={14} className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowTopRightOnSquareIcon className="w-[14px] h-[14px] text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-accent-purple/30 transition-all">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-border-subtle transition-all">
                 <span className="text-xs text-text-secondary group-hover:text-text-primary">LinkedIn Profile</span>
-                <ExternalLink size={14} className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowTopRightOnSquareIcon className="w-[14px] h-[14px] text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
           </section>
 
           <section className="mt-auto">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-accent-mint/10 to-transparent border border-accent-mint/20 mt-8">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-accent-mint/10 to-transparent border border-border-subtle mt-8">
               <h5 className="text-xs font-bold text-accent-mint mb-2">Socially Intelligent Note:</h5>
               <p className="text-[11px] text-text-secondary leading-relaxed italic">
                 &quot;Alex likes direct, no-BS communication. Avoid fluff and focus on the technical Shopify metric improvement.&quot;
@@ -395,18 +389,48 @@ function OutreachContent() {
 
 // ─── Real Dashboard content (100% precise to dashboard/page.tsx) ─────────
 function DashboardContent() {
+  const staticStats = [
+    {
+      label: 'Signals Intercepted',
+      value: '1,284',
+      trend: '+12%',
+      trendUp: true,
+      accent: 'mint' as const,
+    },
+    {
+      label: 'Active Conversations',
+      value: '42',
+      trend: '+5',
+      trendUp: true,
+      accent: 'purple' as const,
+    },
+    {
+      label: 'Avg. Reply Probability',
+      value: '84%',
+      trend: '+2.4%',
+      trendUp: true,
+      accent: 'cyan' as const,
+    },
+    {
+      label: 'Credits Remaining',
+      value: '750',
+      trend: '/ 1,000',
+      accent: 'orange' as const,
+    },
+  ]
+
   return (
     <div className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       {/* Ambient Background Glows */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-mint/[0.03] blur-[60px] rounded-[100%] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] bg-accent-purple/[0.02] blur-[60px] rounded-[100%] pointer-events-none" />
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="mb-12 flex items-end justify-between">
           <div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-accent-mint uppercase tracking-[0.3em] mb-3">
-              <ShieldCheck size={14} /> Operational Status: Active
+            <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-[0.3em] mb-3">
+              <CheckCircleIcon className="w-[14px] h-[14px]" /> Operational Status: Active
             </div>
             <h1 className="text-4xl font-bold text-text-primary tracking-tight">Operational Overview</h1>
             <p className="text-text-secondary mt-2">Welcome back. Your conversion pipeline is performing at 84% efficiency.</p>
@@ -422,25 +446,25 @@ function DashboardContent() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {dashboardStats.map((stat, i) => (
+          {staticStats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="group relative p-6 rounded-[24px] bg-surface-secondary border border-subtle hover:border-white/10 transition-all duration-300 overflow-hidden"
+              className="group metallic-card p-6"
             >
               <div className="flex justify-between items-start mb-4">
                 <div className={`p-3 rounded-xl bg-accent-${stat.accent}/10 text-accent-${stat.accent}`}>
-                  {stat.label === 'Analyzed Leads' && <Target size={20} />}
-                  {stat.label === 'Active Conversations' && <MessageSquare size={20} />}
-                  {stat.label === 'Avg. Reply Probability' && <Zap size={20} />}
-                  {stat.label === 'Credits Remaining' && <Coins size={20} />}
+                  {stat.label === 'Signals Intercepted' && <ViewfinderCircleIcon className="w-5 h-5" />}
+                  {stat.label === 'Active Conversations' && <ChatBubbleLeftRightIcon className="w-5 h-5" />}
+                  {stat.label === 'Avg. Reply Probability' && <BoltIcon className="w-5 h-5" />}
+                  {stat.label === 'Credits Remaining' && <BanknotesIcon className="w-5 h-5" />}
                 </div>
                 {stat.trend && (
                   <span className={`text-[11px] font-bold ${stat.trendUp ? 'text-accent-mint' : 'text-text-secondary'} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-md`}>
                     {stat.trend}
-                    {stat.trendUp && <ArrowUpRight size={12} />}
+                    {stat.trendUp && <ArrowTopRightOnSquareIcon className="w-3 h-3" />}
                   </span>
                 )}
               </div>
@@ -453,7 +477,7 @@ function DashboardContent() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Activity Chart Section */}
-          <div className="lg:col-span-2 p-8 rounded-[32px] bg-surface-secondary border border-subtle relative overflow-hidden">
+          <div className="lg:col-span-2 metallic-card p-8">
             <div className="flex items-center justify-between mb-10">
               <div>
                 <h3 className="text-lg font-bold text-text-primary tracking-tight">Conversion Velocity</h3>
@@ -474,7 +498,7 @@ function DashboardContent() {
                     transition={{ duration: 1, delay: i * 0.1, ease: 'circOut' }}
                     className="w-full max-w-[40px] rounded-t-xl bg-gradient-to-t from-accent-mint/10 to-accent-mint/40 group-hover:to-accent-mint/60 transition-all relative"
                   >
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-accent-mint bg-surface-elevated px-2 py-1 rounded border border-accent-mint/30">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors bg-surface-elevated px-2 py-1 rounded border border-border-subtle">
                       {data.value}%
                     </div>
                   </motion.div>
@@ -486,8 +510,7 @@ function DashboardContent() {
 
           {/* Quick Actions & AI Status */}
           <div className="space-y-6">
-            <div className="p-8 rounded-[32px] bg-accent-mint text-[#11150C] relative overflow-hidden group">
-              <Sparkles className="absolute top-[-20px] right-[-20px] w-32 h-32 opacity-10 rotate-12" />
+            <div className="p-8 rounded-[32px] bg-accent-mint text-text-on-accent relative overflow-hidden group">
               <h3 className="text-xl font-bold mb-2">Ready for Outreach</h3>
               <p className="text-sm opacity-80 mb-8 leading-relaxed">
                 You have 12 high-intent leads waiting for outreach strategy.
@@ -495,15 +518,14 @@ function DashboardContent() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-[#11150C] text-accent-mint font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl"
+                className="w-full py-4 bg-text-on-accent text-accent-mint font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl"
               >
-                Review New Leads <ArrowUpRight size={18} />
+                Review New Leads <ArrowTopRightOnSquareIcon className="w-[18px] h-[18px]" />
               </motion.button>
             </div>
 
-            <div className="p-8 rounded-[32px] bg-surface-secondary border border-subtle">
-              <h3 className="text-sm font-bold text-text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
-                <TrendingUp size={16} className="text-accent-purple" />
+            <div className="metallic-card p-8">
+              <h3 className="text-sm font-bold text-text-primary uppercase tracking-widest mb-6">
                 Lead Distribution
               </h3>
               <div className="space-y-4">
@@ -540,15 +562,15 @@ export default function HeroSection() {
   const y = useTransform(scrollY, [0, 600], [0, 0])
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-[#080808] pt-20 pb-0 px-6" data-color="mint">
+    <section className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-6" data-color="mint">
       
       {/* Subtle geometric grid background (Centered under the text, faint mint lines) */}
       <div 
         className="absolute inset-0 pointer-events-none z-0 opacity-100"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(184, 243, 107, 0.015) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(184, 243, 107, 0.015) 1px, transparent 1px)
+            linear-gradient(to right, rgba(var(--rgb-persona-green), 0.015) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(var(--rgb-persona-green), 0.015) 1px, transparent 1px)
           `,
           backgroundSize: '48px 48px',
           maskImage: 'radial-gradient(circle at 50% 30%, black 10%, transparent 60%)',
@@ -559,7 +581,7 @@ export default function HeroSection() {
       {/* Faint precise technical backlight glow */}
       <div 
         className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[600px] h-[350px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-70"
-        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(184,243,107,0.03) 0%, rgba(167,139,250,0.02) 50%, transparent 70%)' }} 
+        style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(var(--rgb-persona-green),0.03) 0%, rgba(var(--rgb-tab-purple),0.02) 50%, transparent 70%)' }} 
       />
 
       {/* Centered Clario-style hero layout */}
@@ -573,7 +595,7 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.07, ease }}
             className="font-sans text-[38px] md:text-[54px] lg:text-[68px] font-semibold leading-[1.05] tracking-tighter mb-6 text-text-primary max-w-4xl mx-auto antialiased"
           >
-            Stop looking for clients —<br />
+            Stop looking for clients<br />
             <span className="text-accent-mint">
               Start intercepting them.
             </span>
@@ -597,22 +619,22 @@ export default function HeroSection() {
             className="flex flex-row items-center justify-center gap-4 w-full relative z-10"
           >
             <Link href="/dashboard">
-              <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent-mint text-[#080808] font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(184,243,107,0.25)] transition-all hover:bg-accent-mint/90">
-                Start Hunting <ArrowUpRight size={16} />
+              <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent-mint text-page-bg font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(var(--rgb-persona-green),0.25)] transition-all hover:bg-surface-secondary hover:bg-accent-mint/90">
+                Start Hunting <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </motion.span>
             </Link>
             <Link href="/sneak-peek">
-              <motion.span whileHover={{ scale: 1.02 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] font-medium text-text-secondary hover:text-text-primary text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03]">
+              <motion.span whileHover={{ scale: 1.02 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] hover:border-accent-purple/20">
                 Sneak Peek
               </motion.span>
             </Link>
           </motion.div>
 
           {/* Concentrated green backlight aura directly behind the button */}
-          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] rounded-full bg-accent-mint/25 blur-[50px] pointer-events-none z-0" />
+          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] glow-mint-strong pointer-events-none z-0" />
           
           {/* Larger ambient backlight glow under button and behind mockup top edge */}
-          <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] rounded-full bg-accent-mint/12 blur-[80px] pointer-events-none z-0" />
+          <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] glow-mint-strong pointer-events-none z-0" />
           
         </div>
       </div>
@@ -633,27 +655,27 @@ export default function HeroSection() {
         >
         {/* Faint separation backlight Behind the App Window */}
         <div className="absolute top-[-25%] left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-[100%] pointer-events-none -z-10 mix-blend-screen"
-          style={{ background: 'radial-gradient(circle, rgba(184,243,107,0.06) 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(circle, rgba(var(--rgb-persona-green),0.06) 0%, transparent 70%)' }} />
 
         {/* Faint Stage shadow glow */}
         <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 w-2/3 h-24 rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(184,243,107,0.07) 0%, transparent 75%)', filter: 'blur(20px)' }} />
+          style={{ background: 'radial-gradient(ellipse, rgba(var(--rgb-persona-green),0.07) 0%, transparent 75%)', filter: 'blur(20px)' }} />
 
-        <div className="rim-light rounded-t-[24px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(0,0,0,0.9)] border border-white/[0.04] border-t-accent-mint/20 border-b-0 relative">
+        <div className="rim-light rounded-t-[24px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(var(--rgb-black),0.9)] border border-white/[0.04] border-t-accent-mint/20 border-b-0 relative">
           {/* Glass reflection sheen overlay */}
           <div className="absolute inset-0 pointer-events-none z-20 bg-gradient-to-tr from-transparent via-white/[0.015] to-white/[0.05] mix-blend-overlay" />
           {/* macOS chrome */}
-          <div className="flex items-center gap-2 px-5 py-3 bg-[#121316] border-b border-white/[0.06]">
-            <span className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-            <span className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-            <span className="w-3 h-3 rounded-full bg-[#28C840]" />
+          <div className="flex items-center gap-2 px-5 py-3 bg-code-header border-b border-white/[0.06]">
+            <span className="w-3 h-3 rounded-full bg-dot-red" />
+            <span className="w-3 h-3 rounded-full bg-dot-yellow" />
+            <span className="w-3 h-3 rounded-full bg-dot-green" />
             <span className="ml-4 text-xs font-mono text-text-secondary/30 tracking-wider">lead-hunter.app</span>
           </div>
 
           {/* App body */}
           <div className="flex h-[760px] bg-bg-main overflow-hidden">
             {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
-            <div className="w-[240px] shrink-0 bg-[#121316] border-r border-white/[0.04] flex flex-col py-4">
+            <div className="w-[240px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
               <div className="px-5 mb-6 flex items-center gap-3">
                 <Image src="/logo.svg" alt="Lead Hunter Club" width={28} height={28} className="w-7 h-7 rounded-lg" />
                 <span className="font-semibold text-sm text-text-primary tracking-tight">Lead Hunter Club</span>
@@ -668,9 +690,9 @@ export default function HeroSection() {
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left relative ${isActive ? 'text-accent-mint' : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'}`}>
                       {isActive && (
                         <motion.div layoutId="hero-sidebar-active"
-                          className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(184,243,107,0.1)]" />
+                          className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-persona-green),0.1)]" />
                       )}
-                      <t.icon size={16} className="stroke-[1.5] relative z-10" />
+                      <t.icon className="w-4 h-4 relative z-10" />
                       <span className="relative z-10">{t.label}</span>
                     </button>
                   )
@@ -682,13 +704,13 @@ export default function HeroSection() {
                 <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.04] space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-[10px] font-bold text-text-primary uppercase tracking-widest">
-                      <Coins size={11} className="text-accent-mint" /> Credits
+                      <BanknotesIcon className="w-[11px] h-[11px] text-text-secondary" /> Credits
                     </div>
                     <span className="text-[10px] text-text-secondary">750/1k</span>
                   </div>
                   <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
                     <motion.div initial={{ width: 0 }} animate={{ width: '75%' }} transition={{ duration: 1 }}
-                      className="h-full bg-accent-mint rounded-full shadow-[0_0_8px_rgba(184,243,107,0.4)]" />
+                      className="h-full bg-accent-mint rounded-full shadow-[0_0_8px_rgba(var(--rgb-persona-green),0.4)]" />
                   </div>
                 </div>
               </div>
@@ -712,7 +734,7 @@ export default function HeroSection() {
 
           {/* Bottom fade-out overlay (opaque gradient — no backdrop-blur to avoid GPU thrash during scroll) */}
           <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-30">
-            <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/90 via-60% to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-page-bg via-page-bg/90 via-60% to-transparent pointer-events-none" />
           </div>
         </div>
         </motion.div>

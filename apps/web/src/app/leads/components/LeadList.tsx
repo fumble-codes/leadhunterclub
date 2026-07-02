@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, Filter, Clock, Zap } from 'lucide-react'
+import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid'
 import { motion } from 'framer-motion'
 
 export interface Lead {
@@ -65,16 +65,16 @@ export default function LeadList({ selectedId, onSelect }: LeadListProps) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-text-primary tracking-tight">Intel Feed</h2>
           <button className="p-2 rounded-lg hover:bg-surface-secondary text-text-secondary transition-colors">
-            <Filter size={18} />
+            <AdjustmentsHorizontalIcon className="w-[18px] h-[18px]" />
           </button>
         </div>
         
         <div className="relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary group-focus-within:text-accent-mint transition-colors" size={16} />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
           <input 
             type="text" 
             placeholder="Search signals..."
-            className="w-full bg-surface-secondary border border-subtle rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-accent-mint/50 transition-all placeholder:text-text-secondary/50"
+            className="w-full bg-surface-secondary border focus:border-accent-mint/50 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-border-subtle transition-all placeholder:text-text-secondary/50"
           />
         </div>
 
@@ -98,25 +98,24 @@ export default function LeadList({ selectedId, onSelect }: LeadListProps) {
               whileHover={{ x: 4 }}
               className={`w-full text-left p-4 rounded-2xl transition-all relative group rim-light ${
                 isActive 
-                  ? 'bg-surface-secondary border border-subtle ring-1 ring-accent-mint/20 shadow-[0_8px_24px_rgba(0,0,0,0.2)]' 
+                  ? 'bg-surface-secondary border border-subtle ring-1 ring-accent-mint/20 shadow-[0_8px_24px_rgba(var(--rgb-black),0.2)]' 
                   : 'hover:bg-surface-secondary/50 border border-transparent'
               }`}
             >
               <div className="flex justify-between items-start mb-2">
                 <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md ${
-                  lead.urgency === 'high' ? 'text-accent-orange bg-accent-orange/10' : 
-                  lead.urgency === 'medium' ? 'text-accent-purple bg-accent-purple/10' : 
-                  'text-accent-cyan bg-accent-cyan/10'
+                  lead.urgency === 'high' ? 'text-text-secondary hover:text-text-primary transition-colors bg-surface-secondary' : 
+                  lead.urgency === 'medium' ? 'text-text-secondary hover:text-text-primary transition-colors bg-surface-secondary' : 
+                  'text-text-secondary hover:text-text-primary transition-colors bg-surface-secondary'
                 }`}>
                   {lead.category}
                 </span>
-                <span className="text-[10px] text-text-secondary flex items-center gap-1">
-                  <Clock size={10} />
+                <span className="text-[10px] text-text-secondary">
                   {lead.timestamp}
                 </span>
               </div>
 
-              <h3 className={`font-semibold text-sm mb-1 line-clamp-1 transition-colors ${isActive ? 'text-accent-mint' : 'text-text-primary'}`}>
+              <h3 className={`font-semibold text-sm mb-1 line-clamp-1 transition-colors ${isActive ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-primary'} 'text-accent-mint'`}>
                 {lead.title}
               </h3>
               <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
@@ -126,13 +125,10 @@ export default function LeadList({ selectedId, onSelect }: LeadListProps) {
               {isActive && (
                 <motion.div 
                   layoutId="active-border"
-                  className="absolute inset-0 rounded-2xl border border-accent-mint/30 pointer-events-none"
+                  className="absolute inset-0 rounded-2xl border border-border-subtle pointer-events-none"
                 />
               )}
               
-              <div className="absolute right-4 bottom-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                 <Zap size={14} className="text-accent-mint" />
-              </div>
             </motion.button>
           )
         })}

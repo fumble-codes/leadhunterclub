@@ -3,8 +3,7 @@
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Navbar from '@/components/layout/Navbar'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { RouteGuard } from '@/components/auth/RouteGuard'
+import AppSidebar from '@/components/layout/AppSidebar'
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -14,10 +13,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     pathname.startsWith('/outreach') ||
     pathname.startsWith('/saved') ||
     pathname.startsWith('/analytics') ||
-    pathname.startsWith('/settings') ||
-    pathname.startsWith('/sneak-peek') ||
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/register')
+    pathname.startsWith('/settings')
 
   const isProtectedRoute = pathname.startsWith('/dashboard') ||
     pathname.startsWith('/leads') ||
@@ -56,9 +52,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [isAppRoute])
 
   return (
-    <AuthProvider>
+    <>
       {!isAppRoute && <Navbar />}
-      {isProtectedRoute ? <RouteGuard>{children}</RouteGuard> : children}
-    </AuthProvider>
+      {isAppRoute ? (
+        <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
+          <AppSidebar />
+          {children}
+        </div>
+      ) : (
+        children
+      )}
+    </>
   )
 }

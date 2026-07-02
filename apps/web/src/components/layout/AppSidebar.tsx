@@ -6,23 +6,13 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
-import { 
-  LayoutDashboard, 
-  Rss, 
-  Send, 
-  Settings, 
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  Coins,
-  Bookmark
-} from 'lucide-react'
+import { Squares2X2Icon, BanknotesIcon, PaperAirplaneIcon, ChevronRightIcon, ChevronLeftIcon, BookmarkIcon, Cog6ToothIcon, ArrowLeftStartOnRectangleIcon } from '@heroicons/react/24/solid'
 
 const navItems = [
-  { name: 'Lead Feed', href: '/leads', icon: Rss },
-  { name: 'Saved Leads', href: '/saved', icon: Bookmark },
-  { name: 'Outreach', href: '/outreach', icon: Send },
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Lead Feed', href: '/leads', icon: BanknotesIcon },
+  { name: 'Saved Leads', href: '/saved', icon: BookmarkIcon },
+  { name: 'Outreach', href: '/outreach', icon: PaperAirplaneIcon },
+  { name: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
 ]
 
 interface AppSidebarProps {
@@ -49,8 +39,8 @@ export default function AppSidebar({
       initial={false}
       animate={{ width: isCollapsed ? '64px' : (isDemo ? '180px' : '240px') }}
       className={isDemo
-        ? "h-full bg-[#12151A]/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[24px] overflow-hidden select-none shrink-0"
-        : "h-[calc(100vh-32px)] my-4 ml-4 bg-[#171A20]/70 backdrop-blur-[20px] border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-[24px] overflow-hidden"
+        ? "h-full bg-surface/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[24px] overflow-hidden select-none shrink-0"
+        : "h-[calc(100vh-32px)] my-4 ml-4 bg-surface/70 backdrop-blur-[20px] border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-[24px] overflow-hidden"
       }
     >
       {/* Sidebar Header */}
@@ -73,7 +63,7 @@ export default function AppSidebar({
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-1.5 rounded-lg hover:bg-white/5 text-text-secondary hover:text-text-primary transition-colors active:scale-95"
         >
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {isCollapsed ? <ChevronRightIcon className="w-4 h-4" /> : <ChevronLeftIcon className="w-4 h-4" />}
         </button>
       </div>
 
@@ -105,7 +95,7 @@ export default function AppSidebar({
                     : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
                 }`}
               >
-                <item.icon size={18} className="stroke-[1.5]" />
+                <item.icon className="w-[18px] h-[18px] text-current" />
                 
                 <AnimatePresence>
                   {!isCollapsed && (
@@ -125,7 +115,7 @@ export default function AppSidebar({
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(184,243,107,0.1)] z-0"
+                  className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-crimson),0.15)] z-0"
                 />
               )}
             </Link>
@@ -145,7 +135,7 @@ export default function AppSidebar({
             <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Coins size={14} className="text-accent-mint" />
+                  <BanknotesIcon className="w-[14px] h-[14px] text-accent-mint" />
                   <span className="text-[10px] font-bold text-text-primary uppercase tracking-widest">Credits</span>
                 </div>
                 <span className="text-[10px] font-bold text-text-secondary">{user?.credits ?? 0} / 1k</span>
@@ -155,7 +145,7 @@ export default function AppSidebar({
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: '75%' }}
-                  className="h-full bg-accent-mint shadow-[0_0_10px_rgba(184,243,107,0.5)]" 
+                  className="h-full bg-accent-mint shadow-[0_0_10px_rgba(var(--rgb-crimson),0.5)]" 
                 />
               </div>
 
@@ -189,7 +179,7 @@ export default function AppSidebar({
                 : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
             }`}
           >
-            <Settings size={18} className="stroke-[1.5]" />
+            <Cog6ToothIcon className="w-[18px] h-[18px] text-current" />
             <AnimatePresence>
               {!isCollapsed && (
                 <motion.span
@@ -206,7 +196,7 @@ export default function AppSidebar({
           {pathname === '/settings' && !isSneakPeek && (
             <motion.div
               layoutId="sidebar-active"
-              className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(184,243,107,0.1)] z-0"
+              className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-crimson),0.15)] z-0"
             />
           )}
         </Link>
@@ -215,14 +205,13 @@ export default function AppSidebar({
           onClick={(e) => {
             if (isSneakPeek) { e.preventDefault(); return }
             logout()
-            router.push('/login')
           }}
         >
           <motion.div
             whileHover={{ x: isSneakPeek ? 0 : 4 }}
             className="flex items-center gap-3 px-3 py-3 rounded-xl text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition-colors duration-300 relative z-10"
           >
-            <LogOut size={18} className="stroke-[1.5]" />
+            <ArrowLeftStartOnRectangleIcon className="w-[18px] h-[18px] text-current" />
             <AnimatePresence>
               {!isCollapsed && (
                 <motion.span

@@ -10,6 +10,12 @@ export interface User {
   role: UserRole
   credits: number
   provider: AuthProvider
+  emailVerified: string | null
+  plan: string
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  stripePriceId?: string | null
+  stripeCurrentPeriodEnd?: string | null
   createdAt: string
   updatedAt: string
 }

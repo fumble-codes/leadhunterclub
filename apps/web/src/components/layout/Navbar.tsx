@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X, ArrowRight } from 'lucide-react'
+import { Bars3Icon, XMarkIcon, ArrowRightIcon } from '@heroicons/react/24/solid'
 
 const navLinks = [
   { name: 'How It Works', href: '#funnel' },
@@ -111,7 +111,7 @@ export default function Navbar() {
               className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-mint hover:accent-glow-mint transition-all duration-500 hover:scale-[1.03] active:scale-95 group"
             >
               <span>Start Hunting</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+              <ArrowRightIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
             </a>
 
             {/* Mobile Menu Button */}
@@ -120,7 +120,7 @@ export default function Navbar() {
               className="md:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-white/[0.08] transition-all duration-300"
               aria-label="Toggle menu"
             >
-              {mobileOpen ? <X size={16} /> : <Menu size={16} />}
+              {mobileOpen ? <XMarkIcon className="w-4 h-4" /> : <Bars3Icon className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function Navbar() {
             className="fixed inset-0 z-40 md:hidden"
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-[#0F1115]/95" onClick={() => setMobileOpen(false)} />
+            <div className="absolute inset-0 bg-background/95" onClick={() => setMobileOpen(false)} />
 
             {/* Menu Panel */}
             <motion.div
@@ -145,7 +145,7 @@ export default function Navbar() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.4, ease }}
-              className="relative z-10 mt-24 mx-4 p-6 rounded-2xl bg-[#171A20] border border-white/[0.06] shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+              className="relative z-10 mt-24 mx-4 p-6 rounded-2xl bg-surface border border-white/[0.06] shadow-[0_20px_60px_rgba(var(--rgb-black),0.5)]"
             >
               <div className="space-y-1 mb-6">
                 {navLinks.map((link, i) => (
@@ -159,7 +159,7 @@ export default function Navbar() {
                     className="flex items-center justify-between px-4 py-3.5 rounded-xl text-[15px] font-medium text-text-secondary/80 hover:text-text-primary hover:bg-white/[0.04] transition-all duration-300"
                   >
                     <span>{link.name}</span>
-                    <ArrowRight size={14} className="text-text-secondary/30" />
+                    <ArrowRightIcon className="w-[14px] h-[14px] text-text-secondary/30" />
                   </motion.a>
                 ))}
               </div>
@@ -182,10 +182,10 @@ export default function Navbar() {
                 <a
                   href="/dashboard"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-text-primary text-bg-main text-[14px] font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-500"
+                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-text-primary text-bg-main text-[14px] font-bold shadow-[0_0_20px_rgba(var(--rgb-white),0.1)] transition-all duration-500"
                 >
                   Start Hunting
-                  <ArrowRight size={15} />
+                  <ArrowRightIcon className="w-[15px] h-[15px]" />
                 </a>
               </div>
             </motion.div>

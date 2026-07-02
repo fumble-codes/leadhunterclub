@@ -1,21 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import AppSidebar from '@/components/layout/AppSidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { motion } from 'framer-motion'
-import {
-  User,
-  Mail,
-  Coins,
-  CreditCard,
-  Shield,
-  Calendar,
-  Zap,
-  ArrowUpRight,
-  CheckCircle,
-  Crown,
-} from 'lucide-react'
+import { UserIcon, EnvelopeIcon, BanknotesIcon, BoltIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, LockClosedIcon, CalendarIcon, StarIcon } from '@heroicons/react/24/solid'
 
 export default function SettingsPage() {
   const { user, logout } = useAuth()
@@ -27,11 +15,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
-      <AppSidebar />
-
       <main className="flex-1 overflow-y-auto px-10 py-12 relative">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-mint/[0.03] blur-[120px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
 
         <div className="max-w-[1000px] mx-auto relative z-10">
           <div className="mb-10">
@@ -49,7 +34,7 @@ export default function SettingsPage() {
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center font-bold text-accent-mint text-xl">
+                  <div className="w-14 h-14 rounded-xl bg-surface-secondary border border-border-subtle flex items-center justify-center font-bold text-text-secondary hover:text-text-primary transition-colors text-xl">
                     {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <div>
@@ -61,7 +46,7 @@ export default function SettingsPage() {
                   onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
                   className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                     isEditing
-                      ? 'bg-accent-mint text-[#11150C] hover:bg-accent-mint/90'
+                      ? 'bg-accent-mint text-text-on-accent hover:bg-surface-secondary'
                       : 'bg-white/5 text-text-secondary hover:text-text-primary hover:bg-white/10'
                   }`}
                 >
@@ -72,7 +57,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-                    <User size={12} className="inline mr-1" />
+                    <UserIcon className="w-3 h-3 inline mr-1" />
                     Full Name
                   </label>
                   {isEditing ? (
@@ -91,18 +76,18 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-                    <Mail size={12} className="inline mr-1" />
+                    <EnvelopeIcon className="w-3 h-3 inline mr-1" />
                     Email
                   </label>
                   <p className="text-sm text-text-primary font-medium px-4 py-3 rounded-xl bg-surface-elevated/50 border border-subtle/50 flex items-center justify-between">
                     {user?.email || '—'}
-                    <CheckCircle size={14} className="text-accent-mint shrink-0" />
+                    <CheckCircleIcon className="w-[14px] h-[14px] text-text-secondary shrink-0" />
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-                    <Shield size={12} className="inline mr-1" />
+                    <LockClosedIcon className="w-3 h-3 inline mr-1" />
                     Role
                   </label>
                   <p className="text-sm text-text-primary font-medium px-4 py-3 rounded-xl bg-surface-elevated/50 border border-subtle/50 capitalize">
@@ -112,7 +97,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
-                    <Calendar size={12} className="inline mr-1" />
+                    <CalendarIcon className="w-3 h-3 inline mr-1" />
                     Member Since
                   </label>
                   <p className="text-sm text-text-primary font-medium px-4 py-3 rounded-xl bg-surface-elevated/50 border border-subtle/50">
@@ -130,8 +115,8 @@ export default function SettingsPage() {
               className="glass-panel rounded-[24px] border-subtle bg-surface/40 p-8"
             >
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center">
-                  <Coins size={24} className="text-accent-purple" />
+                <div className="w-14 h-14 rounded-xl bg-surface-secondary border border-border-subtle flex items-center justify-center">
+                  <BanknotesIcon className="w-6 h-6 text-text-secondary" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-text-primary">Credits & Tokens</h2>
@@ -148,7 +133,7 @@ export default function SettingsPage() {
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, ((user?.credits ?? 0) / 1000) * 100)}%` }}
-                    className="h-full bg-accent-purple shadow-[0_0_10px_rgba(167,139,250,0.3)] rounded-full"
+                    className="h-full bg-accent-purple rounded-full"
                   />
                 </div>
                 <p className="text-[10px] text-text-secondary/50 mt-3">
@@ -156,10 +141,10 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              <button className="w-full py-3.5 rounded-xl bg-accent-purple text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent-purple/90 transition-all shadow-[0_0_20px_rgba(167,139,250,0.15)]">
-                <Zap size={16} />
+              <button className="w-full py-3.5 rounded-xl bg-accent-purple text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-secondary transition-all shadow-[0_0_20px_rgba(var(--rgb-tab-purple),0.15)] hover:bg-accent-purple/90">
+                <BoltIcon className="w-4 h-4" />
                 Refill Credits
-                <ArrowUpRight size={16} />
+                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </button>
             </motion.div>
 
@@ -171,8 +156,8 @@ export default function SettingsPage() {
               className="glass-panel rounded-[24px] border-subtle bg-surface/40 p-8"
             >
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-xl bg-accent-pink/10 border border-accent-pink/20 flex items-center justify-center">
-                  <Crown size={24} className="text-accent-pink" />
+                <div className="w-14 h-14 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center">
+                  <StarIcon className="w-6 h-6 text-accent-purple" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-text-primary">Subscription</h2>
@@ -184,20 +169,20 @@ export default function SettingsPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-sm font-bold text-text-primary uppercase tracking-wider">Hunter Plan</span>
-                    <span className="px-2 py-0.5 rounded-md bg-accent-mint/10 border border-accent-mint/20 text-[9px] font-bold text-accent-mint uppercase tracking-widest">Active</span>
+                    <span className="px-2 py-0.5 rounded-md bg-surface-secondary border border-border-subtle text-[9px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest">Active</span>
                   </div>
                   <p className="text-xs text-text-secondary">₹999 / month · 1,000 credits monthly · Renews Dec 15, 2024</p>
                 </div>
-                <button className="px-4 py-2 rounded-xl bg-white/5 border border-subtle text-xs font-bold text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all">
+                <button className="px-4 py-2 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-bold text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all">
                   Manage
                 </button>
               </div>
 
               <div className="mt-4 flex gap-2">
-                <button className="flex-1 py-2.5 rounded-xl bg-white/5 border border-subtle text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all">
+                <button className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all">
                   Change Plan
                 </button>
-                <button className="flex-1 py-2.5 rounded-xl bg-white/5 border border-subtle text-xs font-medium text-text-secondary hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all">
+                <button className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-medium text-text-secondary hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all">
                   Cancel Subscription
                 </button>
               </div>
@@ -212,7 +197,7 @@ export default function SettingsPage() {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                  <Shield size={24} className="text-red-400" />
+                  <LockClosedIcon className="w-6 h-6 text-red-400" />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-text-primary">Danger Zone</h2>
@@ -237,6 +222,5 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
-    </div>
   )
 }

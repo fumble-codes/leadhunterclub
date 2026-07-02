@@ -2,10 +2,7 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Zap, Filter, Send, Brain, MessageSquare, Clock, Coins, Target,
-  Sparkles, Mail, Palette, Code2, BarChart3
-} from 'lucide-react'
+import { BoltIcon, AdjustmentsHorizontalIcon, PaperAirplaneIcon, GlobeAltIcon, ChatBubbleLeftRightIcon, BanknotesIcon, ViewfinderCircleIcon, SparklesIcon, EnvelopeIcon, CodeBracketIcon, PaintBrushIcon, ChartBarIcon } from '@heroicons/react/24/solid'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -29,12 +26,12 @@ function FreshLeadsVisual({ className = "", hoveredPlatform }: { className?: str
             key={notif.name}
             onMouseEnter={() => setHoveredNotif(i)}
             onMouseLeave={() => setHoveredNotif(null)}
-            className={`p-3 rounded-2xl bg-[#1D212A] border transition-all duration-300 flex items-center gap-3 relative overflow-hidden ${
+            className={`p-3 rounded-2xl bg-surface border transition-all duration-300 flex items-center gap-3 relative overflow-hidden ${
               isSelfHovered
-                ? 'border-accent-mint/40 bg-[#222732] shadow-[0_12px_30px_rgba(184,243,107,0.12)] -translate-y-0.5'
+                ? 'border-border-subtle bg-surface-secondary shadow-[0_12px_30px_rgba(var(--rgb-persona-green),0.12)] -translate-y-0.5'
                 : isPlatformHighlighted
-                  ? 'border-accent-cyan/40 bg-[#1D212A] shadow-[0_8px_20px_rgba(125,211,252,0.1)] scale-[1.02]'
-                  : 'border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)]'
+                  ? 'border-border-subtle bg-surface shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.1)] scale-[1.02]'
+                  : 'border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)]'
             }`}
           >
             <div className="w-8 h-8 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center shrink-0">
@@ -48,7 +45,7 @@ function FreshLeadsVisual({ className = "", hoveredPlatform }: { className?: str
               <p className="text-[10px] text-text-secondary/70 truncate">{notif.signal}</p>
             </div>
             <div className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest shrink-0 transition-colors duration-300 ${
-              isPlatformHighlighted ? 'bg-accent-cyan text-[#11150C]' : 'bg-white/5 border border-white/[0.06] text-text-secondary/50'
+              isPlatformHighlighted ? 'bg-accent-cyan text-text-on-accent' : 'bg-white/5 border border-white/[0.06] text-text-secondary/50'
             }`}>
               {notif.platform}
             </div>
@@ -58,7 +55,7 @@ function FreshLeadsVisual({ className = "", hoveredPlatform }: { className?: str
               initial={{ x: "100%" }}
               animate={{ x: isSelfHovered ? 0 : "100%" }}
               transition={{ duration: 0.25, ease }}
-              className="absolute inset-y-0 right-0 w-[75px] bg-accent-mint flex items-center justify-center cursor-pointer font-bold text-[8.5px] text-[#11150C] uppercase tracking-wider"
+              className="absolute inset-y-0 right-0 w-[75px] bg-accent-mint flex items-center justify-center cursor-pointer font-bold text-[8.5px] text-text-on-accent uppercase tracking-wider"
             >
               Qualify →
             </motion.div>
@@ -77,22 +74,22 @@ function FreshLeadsVisual({ className = "", hoveredPlatform }: { className?: str
 function PlatformNetworkVisual({ className = "", hoveredPlatform, onHoverPlatform }: { className?: string, hoveredPlatform: string | null, onHoverPlatform: (p: string | null) => void }) {
   const [hovered, setHovered] = React.useState<string | null>(null)
   const platforms = [
-    { name: 'X', color: '#F5F7FA', x: '50%', y: '15%', size: 36, delay: 0, tooltip: 'Scanning Twitter/X posts...', icon: (
+    { name: 'X', x: '50%', y: '15%', size: 36, delay: 0, tooltip: 'Scanning Twitter/X posts...', icon: (
       <svg className="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
       </svg>
     )},
-    { name: 'Li', color: '#0A66C2', x: '15%', y: '55%', size: 40, delay: 0.8, tooltip: 'Scanning LinkedIn feeds...', icon: (
-      <svg className="w-4 h-4 fill-current text-[#0A66C2]" viewBox="0 0 24 24">
+    { name: 'Li', x: '15%', y: '55%', size: 40, delay: 0.8, tooltip: 'Scanning LinkedIn feeds...', icon: (
+      <svg className="w-4 h-4 fill-current text-social-linkedin" viewBox="0 0 24 24">
         <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/>
       </svg>
     )},
-    { name: 'R', color: '#FF4500', x: '80%', y: '50%', size: 34, delay: 1.2, tooltip: 'Scanning Reddit threads...', icon: (
-      <svg className="w-3.5 h-3.5 fill-current text-[#FF4500]" viewBox="0 0 24 24">
+    { name: 'R', x: '80%', y: '50%', size: 34, delay: 1.2, tooltip: 'Scanning Reddit threads...', icon: (
+      <svg className="w-3.5 h-3.5 fill-current text-social-reddit" viewBox="0 0 24 24">
         <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 0-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.203-.094z"/>
       </svg>
     )},
-    { name: 'Th', color: '#000000', x: '55%', y: '80%', size: 32, delay: 1.8, tooltip: 'Scanning Threads feeds...', icon: (
+    { name: 'Th', x: '55%', y: '80%', size: 32, delay: 1.8, tooltip: 'Scanning Threads feeds...', icon: (
       <span className="text-[10px] font-black text-white">@</span>
     )},
   ]
@@ -101,7 +98,7 @@ function PlatformNetworkVisual({ className = "", hoveredPlatform, onHoverPlatfor
     <div className={`relative aspect-[200/160] w-full max-w-[220px] mx-auto ${className}`}>
       {/* Center hub */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center z-20">
-        <Filter size={16} className="text-accent-cyan animate-pulse" />
+        <AdjustmentsHorizontalIcon className="w-4 h-4 text-text-secondary animate-pulse" />
       </div>
 
       {/* Connection lines */}
@@ -115,7 +112,7 @@ function PlatformNetworkVisual({ className = "", hoveredPlatform, onHoverPlatfor
           <motion.line
             key={i}
             x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2}
-            stroke="rgba(125,211,252,0.15)"
+            stroke="rgba(var(--rgb-persona-blue), 0.15)"
             strokeWidth="1"
             strokeDasharray="4 4"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -138,10 +135,10 @@ function PlatformNetworkVisual({ className = "", hoveredPlatform, onHoverPlatfor
             style={{ left: p.x, top: p.y, transform: 'translate(-50%, -50%)' }}
           >
             <motion.div
-              className={`rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] ${
+              className={`rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)] ${
                 isHovered
-                  ? 'border-accent-cyan bg-[#222732] scale-115 shadow-[0_0_15px_rgba(125,211,252,0.3)]'
-                  : 'bg-[#1D212A] border-white/5'
+                  ? 'border-accent-cyan bg-surface-secondary scale-115 '
+                  : 'bg-surface border-white/5'
               }`}
               style={{ width: p.size, height: p.size }}
               animate={{ scale: isHovered ? 1.15 : [0.95, 1.05, 0.95] }}
@@ -157,7 +154,7 @@ function PlatformNetworkVisual({ className = "", hoveredPlatform, onHoverPlatfor
                   initial={{ opacity: 0, y: 10, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                  className="absolute bottom-[115%] left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-[#1D212A] border border-accent-cyan/30 text-[8px] text-accent-cyan font-bold tracking-wide uppercase whitespace-nowrap z-30 shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+                  className="absolute bottom-[115%] left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-surface border border-border-subtle text-[8px] text-text-secondary hover:text-text-primary transition-colors font-bold tracking-wide uppercase whitespace-nowrap z-30 shadow-[0_4px_12px_rgba(var(--rgb-black),0.5)]"
                 >
                   {p.tooltip}
                 </motion.div>
@@ -169,7 +166,7 @@ function PlatformNetworkVisual({ className = "", hoveredPlatform, onHoverPlatfor
 
       {/* Data pulse traveling along lines */}
       <motion.div
-        className="absolute w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_8px_rgba(125,211,252,0.6)] z-30"
+        className="absolute w-1.5 h-1.5 rounded-full bg-accent-cyan  z-30"
         animate={{
           x: [0, 30, -40, 10, 0],
           y: [0, -50, 10, 50, 0],
@@ -214,13 +211,13 @@ function AIWriterVisual({ className = "", selectedStep }: { className?: string, 
   const current = copies[selectedStep] || copies[0]
 
   return (
-    <div className={`relative h-[220px] w-full p-4 rounded-2xl bg-[#1D212A] border border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col justify-between hover:border-accent-purple/20 transition-all duration-500 ${className}`}>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-accent-purple/5 blur-[30px] rounded-full" />
+    <div className={`relative h-[220px] w-full p-4 rounded-2xl bg-surface border border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)] overflow-hidden flex flex-col justify-between hover:border-border-subtle transition-all duration-500 ${className} hover:border-accent-purple/20`}>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 glow-purple-intense pointer-events-none" />
 
       <div className="relative z-10 font-mono text-[11px] leading-relaxed flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 text-accent-purple font-bold mb-3 uppercase tracking-wider text-[9px]">
-            <Sparkles size={11} className="animate-[spin_4s_linear_infinite]" /> AI Compose: {current.title}
+            <SparklesIcon className="w-[11px] h-[11px] animate-[spin_4s_linear_infinite]" /> AI Compose: {current.title}
           </div>
 
           <motion.div
@@ -240,7 +237,7 @@ function AIWriterVisual({ className = "", selectedStep }: { className?: string, 
           <span className="px-2 py-0.5 rounded bg-accent-purple/10 border border-accent-purple/20 text-[8px] font-bold text-accent-purple uppercase tracking-widest">
             {current.rate}
           </span>
-          <span className="px-2 py-0.5 rounded bg-accent-mint/10 border border-accent-mint/20 text-[8px] font-bold text-accent-mint uppercase tracking-widest">
+          <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[8px] font-bold text-text-secondary uppercase tracking-widest">
             {current.badge}
           </span>
         </div>
@@ -264,20 +261,20 @@ function LeadIntelVisual({ className = "", emailStatus }: { className?: string, 
       {/* Lead profile card */}
       <div className="metallic-card p-4 transition-all duration-500 relative">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center shrink-0">
-            <span className="text-[10px] font-bold text-accent-mint">AK</span>
+          <div className="w-8 h-8 rounded-xl bg-surface-secondary border border-border-subtle flex items-center justify-center shrink-0">
+            <span className="text-[10px] font-bold text-accent-purple bg-accent-purple/10 border-accent-purple/20">AK</span>
           </div>
           <div className="min-w-0 flex-1">
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-[9px] font-bold tracking-wider uppercase mb-0.5">
-              <span className="w-1 h-1 bg-accent-mint rounded-full animate-pulse" />
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[9px] font-bold tracking-wider uppercase mb-0.5">
+              <span className="w-1 h-1 bg-accent-purple rounded-full animate-pulse" />
               15 Signals
             </span>
             <div className="text-[11px] font-bold text-text-primary truncate">Alex K.</div>
           </div>
           <div className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest shrink-0 transition-colors duration-300 ${
             emailStatus === 'sent' 
-              ? 'bg-accent-mint text-[#11150C]' 
-              : 'bg-accent-mint/10 border border-accent-mint/20 text-accent-mint'
+              ? 'bg-accent-mint text-text-on-accent' 
+              : 'bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors'
           }`}>
             {emailStatus === 'sent' ? 'Outreached' : 'Verified'}
           </div>
@@ -314,7 +311,7 @@ function LeadIntelVisual({ className = "", emailStatus }: { className?: string, 
                       initial={{ opacity: 0, scale: 0.95, y: 5 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="absolute z-30 bottom-[110%] left-0 w-full p-2 rounded-lg bg-[#222732] border border-white/5 text-[8.5px] text-text-secondary shadow-lg leading-snug"
+                      className="absolute z-30 bottom-[110%] left-0 w-full p-2 rounded-lg bg-surface-secondary border border-white/5 text-[8.5px] text-text-secondary shadow-lg leading-snug"
                     >
                       {m.tip}
                     </motion.div>
@@ -332,10 +329,10 @@ function LeadIntelVisual({ className = "", emailStatus }: { className?: string, 
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.6 }}
-        className="p-3 rounded-xl bg-[#222732] border border-accent-mint/20 shadow-md"
+        className="p-3 rounded-xl bg-surface-secondary border border-border-subtle shadow-md"
       >
         <div className="text-[9px] text-accent-mint font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5">
-          <Brain size={10} /> AI Context
+          <GlobeAltIcon className="w-[10px] h-[10px]" /> AI Context
         </div>
         <p className="text-[10px] text-text-secondary/70 leading-snug">
           {emailStatus === 'sent'
@@ -352,19 +349,19 @@ function LeadIntelVisual({ className = "", emailStatus }: { className?: string, 
 function EmailComposeVisual({ className = "", emailStatus, onSend }: { className?: string, emailStatus: 'idle' | 'sending' | 'sent', onSend: () => void }) {
   return (
     <div className={`w-full overflow-hidden ${className}`}>
-      <div className={`w-full rounded-2xl bg-[#1D212A] border transition-all duration-500 flex flex-col h-[230px] justify-between ${
-        emailStatus === 'sent' ? 'border-accent-mint/20 shadow-[0_12px_30px_rgba(184,243,107,0.05)]' : 'border-white/[0.04]'
+      <div className={`w-full rounded-2xl bg-surface border transition-all duration-500 flex flex-col h-[230px] justify-between ${
+        emailStatus === 'sent' ? 'border-border-subtle shadow-[0_12px_30px_rgba(var(--rgb-persona-green),0.05)]' : 'border-white/[0.04]'
       }`}>
         {/* Email header bar */}
-        <div className="px-4 py-2 border-b border-white/[0.04] flex items-center gap-3">
-          <div className="flex items-center gap-1 shrink-0">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#FF5F56] opacity-60" />
-            <div className="w-1.5 h-1.5 rounded-full bg-[#FFBD2E] opacity-60" />
-            <div className="w-1.5 h-1.5 rounded-full bg-[#27C93F] opacity-60" />
+        <div className="px-4 py-2 border-b border-white/[0.04] flex items-center gap-3 text-accent-mint">
+          <div className="flex items-center gap-1 shrink-0 text-accent-mint">
+            <div className="w-1.5 h-1.5 rounded-full bg-dot-red opacity-60 text-accent-mint" />
+            <div className="w-1.5 h-1.5 rounded-full bg-dot-yellow opacity-60 text-accent-mint" />
+            <div className="w-1.5 h-1.5 rounded-full bg-dot-green opacity-60 text-accent-mint" />
           </div>
           <span className="text-[9.5px] text-text-secondary/40 font-mono">New Message</span>
-          <div className="ml-auto flex items-center gap-1.5">
-            <span className="text-accent-orange text-[8.5px] font-bold tracking-widest uppercase">Connected</span>
+          <div className="ml-auto flex items-center gap-1.5 text-accent-mint">
+            <span className="text-text-secondary hover:text-text-primary transition-colors text-[8.5px] font-bold tracking-widest uppercase">Connected</span>
           </div>
         </div>
 
@@ -372,7 +369,7 @@ function EmailComposeVisual({ className = "", emailStatus, onSend }: { className
         <div className="px-4 py-1.5 border-b border-white/[0.03]">
           <div className="flex items-center gap-2 text-[10px]">
             <span className="text-text-secondary/40 font-medium w-8 shrink-0">To:</span>
-            <span className="text-accent-orange truncate">alex.k@shopifybrand.com</span>
+            <span className="text-text-secondary hover:text-text-primary transition-colors truncate">alex.k@shopifybrand.com</span>
           </div>
         </div>
         <div className="px-4 py-1.5 border-b border-white/[0.03]">
@@ -385,8 +382,8 @@ function EmailComposeVisual({ className = "", emailStatus, onSend }: { className
         {/* Email body */}
         <div className="flex-1 px-4 py-2.5 text-[9.5px] text-text-primary/80 leading-relaxed overflow-hidden relative">
           {emailStatus === 'sent' ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-[#1D212A]/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-accent-mint/10 border border-accent-mint/30 flex items-center justify-center text-accent-mint">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-surface/90 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center gap-2">
+              <span className="w-8 h-8 rounded-full bg-surface-secondary border border-border-subtle flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors">
                 ✓
               </span>
               <span className="text-[10px] text-text-primary font-bold">Email Sent to Alex K.!</span>
@@ -403,7 +400,7 @@ function EmailComposeVisual({ className = "", emailStatus, onSend }: { className
         {/* Send bar */}
         <div className="px-4 py-2 border-t border-white/[0.04] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
-            <Mail size={12} className="text-text-secondary/30" />
+            <EnvelopeIcon className="w-3 h-3 text-text-secondary/30" />
             <span className="text-[8.5px] text-text-secondary/30 font-mono">
               {emailStatus === 'sending' ? 'Sending...' : emailStatus === 'sent' ? 'Sent' : 'Draft'}
             </span>
@@ -415,8 +412,8 @@ function EmailComposeVisual({ className = "", emailStatus, onSend }: { className
               emailStatus === 'sending' 
                 ? 'bg-white/10 text-white/40 cursor-wait' 
                 : emailStatus === 'sent'
-                  ? 'bg-accent-mint text-[#11150C] cursor-default'
-                  : 'bg-accent-orange hover:bg-accent-orange/90 text-[#11150C] cursor-pointer hover:scale-105 shadow-[0_4px_12px_rgba(249,115,22,0.15)]'
+                  ? 'bg-accent-mint text-text-on-accent cursor-default'
+                  : 'bg-accent-orange hover:bg-surface-secondary text-text-on-accent cursor-pointer hover:scale-105 shadow-[0_4px_12px_rgba(var(--rgb-orange-deep),0.15)]'
             }`}
           >
             {emailStatus === 'sending' ? (
@@ -425,7 +422,7 @@ function EmailComposeVisual({ className = "", emailStatus, onSend }: { className
               'Sent ✓'
             ) : (
               <>
-                <Send size={9} /> Send
+                <PaperAirplaneIcon className="w-[9px] h-[9px]" /> Send
               </>
             )}
           </button>
@@ -462,15 +459,15 @@ function FollowUpTimelineVisual({ className = "", selectedStep, onSelectStep }: 
             <div
               key={step.day}
               onClick={(e) => { e.stopPropagation(); onSelectStep(i); }}
-              className="flex items-center gap-3 pl-0.5 cursor-pointer relative"
+              className="flex items-center gap-3 pl-0.5 cursor-pointer relative bg-gradient-to-b via-accent-cyan"
             >
               <div className={`w-[8px] h-[8px] rounded-full border shrink-0 flex items-center justify-center transition-all duration-500 ${
                 isSelected
-                  ? 'border-accent-cyan bg-accent-cyan/40 scale-125 shadow-[0_0_8px_rgba(125,211,252,0.6)]'
+                  ? 'border-accent-cyan bg-surface-secondary scale-125 '
                   : step.status === 'sent'
-                    ? 'border-accent-cyan bg-accent-cyan/20 shadow-[0_0_6px_rgba(125,211,252,0.3)]'
+                    ? 'border-accent-cyan bg-surface-secondary '
                     : step.status === 'pending'
-                      ? 'border-accent-orange/40 bg-accent-orange/10'
+                      ? 'border-border-subtle bg-surface-secondary'
                       : 'border-white/10 bg-white/5'
               }`}>
                 {step.status === 'sent' && (
@@ -479,13 +476,13 @@ function FollowUpTimelineVisual({ className = "", selectedStep, onSelectStep }: 
               </div>
               <div className={`flex-1 p-2 rounded-xl border transition-all duration-300 ${
                 isSelected 
-                  ? 'border-accent-cyan bg-[#222732] shadow-[0_8px_20px_rgba(125,211,252,0.08)] scale-[1.02]' 
-                  : 'border-white/[0.04] bg-[#1D212A] hover:bg-[#222732] hover:border-white/10'
+                  ? 'border-accent-cyan bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.08)] scale-[1.02]' 
+                  : 'border-white/[0.04] bg-surface hover:bg-surface-secondary hover:border-white/10'
               }`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[9px] font-bold text-text-primary uppercase tracking-wider">{step.day}</span>
                   <span className={`text-[8px] font-bold uppercase tracking-widest ${
-                    step.status === 'sent' ? 'text-accent-cyan' : step.status === 'pending' ? 'text-accent-orange' : 'text-text-secondary/40'
+                    step.status === 'sent' ? 'text-text-secondary hover:text-text-primary transition-colors' : step.status === 'pending' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary/40'
                   }`}>
                     {step.action}
                   </span>
@@ -521,7 +518,7 @@ function TokenMeterVisual({ className = "", selectedPersona }: { className?: str
       {/* Circular meter */}
       <div className="relative w-[110px] h-[110px]">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="6" />
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(var(--rgb-white),0.04)" strokeWidth="6" />
           <motion.circle
             key={selectedPersona || 'default'}
             cx="60" cy="60" r="50" fill="none"
@@ -534,8 +531,8 @@ function TokenMeterVisual({ className = "", selectedPersona }: { className?: str
           />
           <defs>
             <linearGradient id="tokenGradientRow" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F9A8D4" />
-              <stop offset="100%" stopColor="#A78BFA" />
+              <stop offset="0%" stopColor="var(--color-persona-pink)" />
+              <stop offset="100%" stopColor="var(--color-tab-purple)" />
             </linearGradient>
           </defs>
         </svg>
@@ -557,11 +554,11 @@ function TokenMeterVisual({ className = "", selectedPersona }: { className?: str
       {/* Token breakdown pills */}
       <div className="flex items-center gap-2 mt-3.5">
         <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-          <Coins size={9} className="text-accent-pink" />
+          <BanknotesIcon className="w-[9px] h-[9px] text-text-secondary" />
           <span className="text-[7.5px] font-bold text-text-secondary/60 uppercase tracking-widest">{current.label}</span>
         </div>
         <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-          <Coins size={9} className="text-accent-purple" />
+          <BanknotesIcon className="w-[9px] h-[9px] text-text-secondary" />
           <span className="text-[7.5px] font-bold text-text-secondary/60 uppercase tracking-widest">{current.label2}</span>
         </div>
       </div>
@@ -572,9 +569,9 @@ function TokenMeterVisual({ className = "", selectedPersona }: { className?: str
 // ─── Card 8: Built For Freelancers — Persona cards ───────────────────
 function PersonaCardsVisual({ className = "", selectedPersona, onSelectPersona }: { className?: string, selectedPersona: string | null, onSelectPersona: (p: string | null) => void }) {
   const personas = [
-    { id: 'freelancer', role: 'Freelancer', icon: Code2, accent: 'accent-mint', desc: 'Land Shopify & SaaS contracts' },
-    { id: 'agency', role: 'Studio/Agency', icon: Palette, accent: 'accent-purple', desc: 'Secure high-ticket design deals' },
-    { id: 'consultant', role: 'Consultant', icon: BarChart3, accent: 'accent-cyan', desc: 'Close retainers with warm intent' },
+    { id: 'freelancer', role: 'Freelancer', icon: CodeBracketIcon, accent: 'accent-mint', desc: 'Land Shopify & SaaS contracts' },
+    { id: 'agency', role: 'Studio/Agency', icon: PaintBrushIcon, accent: 'accent-purple', desc: 'Secure high-ticket design deals' },
+    { id: 'consultant', role: 'Consultant', icon: ChartBarIcon, accent: 'accent-cyan', desc: 'Close retainers with warm intent' },
   ]
 
   return (
@@ -590,14 +587,14 @@ function PersonaCardsVisual({ className = "", selectedPersona, onSelectPersona }
               onMouseLeave={() => onSelectPersona(null)}
               className={`p-3 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center cursor-pointer ${
                 isSelected 
-                  ? `border-${p.accent}/40 bg-[#171A20]/90 scale-[1.04] shadow-[0_8px_20px_rgba(255,255,255,0.02)]`
+                  ? `border-${p.accent}/40 bg-code-bg/90 scale-[1.04] shadow-[0_8px_20px_rgba(var(--rgb-white),0.02)]`
                   : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.04]'
               }`}
             >
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-2.5 transition-colors duration-300 ${
                 isSelected ? `bg-${p.accent}/20 text-${p.accent}` : `bg-${p.accent}/10 text-${p.accent}`
               }`}>
-                <Icon size={15} />
+                <Icon className="w-[15px] h-[15px]" />
               </div>
               <h5 className="text-[10px] font-bold text-text-primary tracking-tight mb-1">{p.role}</h5>
               <p className="text-[8.5px] text-text-secondary/60 leading-snug mb-1">{p.desc}</p>
@@ -634,8 +631,8 @@ export default function FeaturesSection() {
   return (
     <section id="features" className="py-40 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]">
       {/* Ambient backdrop glows */}
-      <div className="absolute top-[-5%] left-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[80px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] bg-accent-mint/[0.015] blur-[80px] rounded-full pointer-events-none" />
+      <div className="absolute top-[-5%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
+      <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-mint-very-faint pointer-events-none" />
 
       {/* Headline */}
       <div className="text-center mb-28 relative z-10">
@@ -717,8 +714,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/[0.06] to-transparent blur-2xl opacity-15 pointer-events-none" />
-            <div className="absolute top-0 left-0 w-40 h-40 bg-accent-cyan/[0.04] blur-[60px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 left-0 w-40 h-40 glow-cyan-strong pointer-events-none" />
             <PlatformNetworkVisual className="max-w-[200px]" hoveredPlatform={hoveredPlatform} onHoverPlatform={setHoveredPlatform} />
             <FreshLeadsVisual hoveredPlatform={hoveredPlatform} />
           </motion.div>
@@ -768,8 +764,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full lg:order-first group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute inset-0 bg-gradient-to-bl from-accent-purple/[0.06] to-transparent blur-2xl opacity-15 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-40 h-40 bg-accent-purple/[0.04] blur-[60px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <LeadIntelVisual emailStatus={emailStatus} />
             <EmailComposeVisual emailStatus={emailStatus} onSend={handleSendEmail} />
           </motion.div>
@@ -819,8 +814,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/[0.06] to-transparent blur-2xl opacity-15 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-40 h-40 bg-accent-cyan/[0.04] blur-[60px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 right-0 w-40 h-40 glow-cyan-strong pointer-events-none" />
             <AIWriterVisual selectedStep={selectedStep} />
             <FollowUpTimelineVisual selectedStep={selectedStep} onSelectStep={setSelectedStep} />
           </motion.div>
@@ -870,8 +864,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full lg:order-first group relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute inset-0 bg-gradient-to-bl from-accent-pink/[0.06] to-transparent blur-2xl opacity-15 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-40 h-40 bg-accent-pink/[0.04] blur-[60px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 glow-pink-strong pointer-events-none" />
             <div className="lg:col-span-5 flex justify-center w-full group-hover:-translate-y-1 transition-transform duration-500">
               <TokenMeterVisual selectedPersona={selectedPersona} />
             </div>

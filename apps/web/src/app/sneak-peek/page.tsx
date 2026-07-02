@@ -2,7 +2,7 @@
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff, Lock, Sparkles, ArrowRight, Coins } from 'lucide-react'
+import { EyeIcon, EyeSlashIcon, LockClosedIcon, SparklesIcon, ArrowRightIcon, BanknotesIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 
 const ease = [0.16, 1, 0.3, 1] as const
@@ -23,8 +23,8 @@ export default function SneakPeekPage() {
 
       <main className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative">
         {/* Ambient Background Glows */}
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.03] blur-[120px] rounded-[100%] pointer-events-none" />
-        <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] bg-accent-cyan/[0.02] blur-[100px] rounded-[100%] pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
+        <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-cyan-soft pointer-events-none" />
 
         <div className="max-w-[1400px] mx-auto relative z-10">
 
@@ -36,8 +36,8 @@ export default function SneakPeekPage() {
             className="mb-8 p-4 rounded-2xl bg-accent-purple/5 border border-accent-purple/15 flex items-center justify-between gap-4 backdrop-blur-xl"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center text-accent-purple">
-                <Eye size={16} />
+              <div className="w-8 h-8 rounded-xl bg-surface-secondary border border-border-subtle flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors">
+                <EyeIcon className="w-4 h-4" />
               </div>
               <div>
                 <span className="text-sm font-bold text-text-primary">Sneak Peek Mode</span>
@@ -46,9 +46,9 @@ export default function SneakPeekPage() {
             </div>
             <Link
               href="/#pricing"
-              className="shrink-0 px-5 py-2 rounded-xl bg-accent-purple text-[#11150C] text-xs font-bold hover:shadow-[0_0_20px_rgba(167,139,250,0.3)] transition-all duration-300 flex items-center gap-2"
+              className="shrink-0 px-5 py-2 rounded-xl bg-accent-purple text-text-on-accent text-xs font-bold hover:bg-accent-purple/90 transition-all duration-300 flex items-center gap-2"
             >
-              Get Tokens <Coins size={14} />
+               Get Tokens <BanknotesIcon className="w-[14px] h-[14px]" />
             </Link>
           </motion.div>
 
@@ -58,8 +58,8 @@ export default function SneakPeekPage() {
               <div>
                 <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                   Lead Feed
-                  <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-accent-mint text-[11px] font-bold tracking-[0.2em] uppercase">
-                    <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
+                  <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-[0.2em] uppercase">
+                    <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse" />
                     {sneakPeekLeads.length} Signals
                   </div>
                 </h1>
@@ -84,7 +84,7 @@ export default function SneakPeekPage() {
                     {lead.platform}
                   </div>
                   <div className="flex items-center gap-1.5 text-[10px] text-text-secondary/40 font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                     Live
                   </div>
                 </div>
@@ -97,7 +97,7 @@ export default function SneakPeekPage() {
                 {/* Intent bar */}
                 <div className="mb-5">
                   <div className="flex justify-between text-[10px] mb-1.5">
-                    <span className="text-text-secondary/50 font-bold uppercase tracking-widest">Intent Score</span>
+                    <span className="text-text-secondary/50 font-bold uppercase tracking-widest bg-accent-mint">Intent Score</span>
                     <span className={`font-bold text-accent-${lead.accent}`}>{lead.intent}%</span>
                   </div>
                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
@@ -112,9 +112,9 @@ export default function SneakPeekPage() {
 
                 {/* Urgency */}
                 <div className="flex items-center justify-between mb-5">
-                  <span className="text-[10px] text-text-secondary/40 font-bold uppercase tracking-widest">Urgency</span>
+                  <span className="text-[10px] text-text-secondary/40 font-bold uppercase tracking-widest bg-accent-mint">Urgency</span>
                   <span className={`text-[10px] font-bold uppercase tracking-widest ${
-                    lead.urgency === 'Critical' ? 'text-accent-pink' : lead.urgency === 'High' ? 'text-accent-orange' : 'text-accent-cyan'
+                    lead.urgency === 'Critical' ? 'text-text-secondary hover:text-text-primary transition-colors' : lead.urgency === 'High' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary hover:text-text-primary transition-colors'
                   }`}>{lead.urgency}</span>
                 </div>
 
@@ -132,15 +132,15 @@ export default function SneakPeekPage() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <div className="px-3 py-1.5 rounded-lg bg-accent-mint/10 text-[9px] font-bold text-accent-mint">View Profile</div>
-                      <div className="px-3 py-1.5 rounded-lg bg-accent-purple/10 text-[9px] font-bold text-accent-purple">AI Outreach</div>
+                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-[9px] font-bold text-text-secondary hover:text-text-primary transition-colors">View Profile</div>
+                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-[9px] font-bold text-text-secondary hover:text-text-primary transition-colors">AI Outreach</div>
                     </div>
                   </div>
 
                   {/* Lock overlay */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#12151A]/60 backdrop-blur-[2px] rounded-2xl">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-2xl">
                     <div className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-2">
-                      <Lock size={14} className="text-text-secondary/50" />
+                      <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary/50" />
                     </div>
                     <span className="text-[10px] font-bold text-text-secondary/60 uppercase tracking-widest">3 Tokens to Reveal</span>
                   </div>
@@ -156,18 +156,18 @@ export default function SneakPeekPage() {
             transition={{ delay: 0.6, duration: 0.8, ease }}
             className="mt-16 p-10 rounded-[32px] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/[0.05] text-center relative overflow-hidden"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(167,139,250,0.03)_0%,transparent_70%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-tab-purple),0.03)_0%,transparent_70%)] pointer-events-none" />
             <div className="relative z-10">
-              <Sparkles className="w-6 h-6 text-accent-purple mx-auto mb-4" />
+              <SparklesIcon className="w-6 h-6 text-text-secondary mx-auto mb-4" />
               <h3 className="font-display text-2xl font-bold tracking-tight mb-3">Like What You See?</h3>
               <p className="text-sm text-text-secondary/70 font-light max-w-md mx-auto mb-6 leading-relaxed">
                 These are real signals captured in the last 24 hours. Get tokens to reveal identities, generate AI outreach, and start closing.
               </p>
               <Link
                 href="/#pricing"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-accent-purple text-[#11150C] font-bold text-sm shadow-[0_0_30px_rgba(167,139,250,0.2)] hover:shadow-[0_0_40px_rgba(167,139,250,0.35)] transition-all duration-500"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-accent-purple text-text-on-accent font-bold text-sm hover:bg-accent-purple/90 transition-all duration-500"
               >
-                Get Started <ArrowRight size={16} />
+                Get Started <ArrowRightIcon className="w-4 h-4" />
               </Link>
             </div>
           </motion.div>

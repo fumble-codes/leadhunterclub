@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Coins, ShieldCheck, ChevronRight, Activity, Eye, User, Mail, Sparkles, RefreshCw } from 'lucide-react';
+import { LockClosedIcon, BanknotesIcon, CheckCircleIcon, ChevronRightIcon, ChartBarSquareIcon, EyeIcon, UserIcon, EnvelopeIcon, SparklesIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -24,58 +24,58 @@ interface LeadCardData {
 const themeMap = {
   mint: {
     cardBg: 'bg-accent-mint',
-    text: 'text-[#11150C]',
-    textMuted: 'text-[#11150C]/60',
-    tagBg: 'bg-[#11150C]/10 border-[#11150C]/10',
-    matchTag: 'bg-[#11150C] text-accent-mint',
-    button: 'bg-[#11150C] hover:bg-black text-accent-mint',
-    blurBg: 'bg-[#11150C]/10',
-    blurLine: 'bg-[#11150C]/15',
-    buttonReveal: 'bg-[#11150C] text-[#11150C] hover:bg-black/10'
+    text: 'text-text-on-accent',
+    textMuted: 'text-text-on-accent/60',
+    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
+    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
+    button: 'bg-text-on-accent hover:bg-black text-text-secondary hover:text-text-primary transition-colors',
+    blurBg: 'bg-text-on-accent/10',
+    blurLine: 'bg-text-on-accent/15',
+    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10'
   },
   purple: {
     cardBg: 'bg-accent-purple',
     text: 'text-white',
     textMuted: 'text-white/70',
     tagBg: 'bg-white/10 border-white/20',
-    matchTag: 'bg-white text-[#11150C]',
-    button: 'bg-white hover:bg-white/90 text-[#11150C]',
+    matchTag: 'bg-white text-text-on-accent',
+    button: 'bg-white hover:bg-white/90 text-text-on-accent',
     blurBg: 'bg-white/10',
     blurLine: 'bg-white/20',
     buttonReveal: 'bg-white text-white hover:bg-white/10'
   },
   cyan: {
     cardBg: 'bg-accent-cyan',
-    text: 'text-[#11150C]',
-    textMuted: 'text-[#11150C]/60',
-    tagBg: 'bg-[#11150C]/10 border-[#11150C]/10',
-    matchTag: 'bg-[#11150C] text-accent-cyan',
-    button: 'bg-[#11150C] hover:bg-black text-accent-cyan',
-    blurBg: 'bg-[#11150C]/10',
-    blurLine: 'bg-[#11150C]/15',
-    buttonReveal: 'bg-[#11150C] text-[#11150C] hover:bg-black/10'
+    text: 'text-text-on-accent',
+    textMuted: 'text-text-on-accent/60',
+    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
+    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
+    button: 'bg-text-on-accent hover:bg-black text-text-secondary hover:text-text-primary transition-colors',
+    blurBg: 'bg-text-on-accent/10',
+    blurLine: 'bg-text-on-accent/15',
+    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10'
   },
   orange: {
     cardBg: 'bg-accent-orange',
-    text: 'text-[#11150C]',
-    textMuted: 'text-[#11150C]/60',
-    tagBg: 'bg-[#11150C]/10 border-[#11150C]/10',
-    matchTag: 'bg-[#11150C] text-accent-orange',
-    button: 'bg-[#11150C] hover:bg-[#11150C]/90 text-white',
-    blurBg: 'bg-[#11150C]/10',
-    blurLine: 'bg-[#11150C]/15',
-    buttonReveal: 'bg-[#11150C] text-[#11150C] hover:bg-black/10'
+    text: 'text-text-on-accent',
+    textMuted: 'text-text-on-accent/60',
+    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
+    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
+    button: 'bg-text-on-accent hover:bg-text-on-accent/90 text-white',
+    blurBg: 'bg-text-on-accent/10',
+    blurLine: 'bg-text-on-accent/15',
+    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10'
   },
   pink: {
     cardBg: 'bg-accent-pink',
-    text: 'text-[#11150C]',
-    textMuted: 'text-[#11150C]/60',
-    tagBg: 'bg-[#11150C]/10 border-[#11150C]/10',
-    matchTag: 'bg-[#11150C] text-accent-pink',
-    button: 'bg-[#11150C] hover:bg-black text-accent-pink',
-    blurBg: 'bg-[#11150C]/10',
-    blurLine: 'bg-[#11150C]/15',
-    buttonReveal: 'bg-[#11150C] text-[#11150C] hover:bg-black/10'
+    text: 'text-text-on-accent',
+    textMuted: 'text-text-on-accent/60',
+    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
+    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
+    button: 'bg-text-on-accent hover:bg-black text-text-secondary hover:text-text-primary transition-colors',
+    blurBg: 'bg-text-on-accent/10',
+    blurLine: 'bg-text-on-accent/15',
+    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10'
   },
 };
 
@@ -203,12 +203,12 @@ export default function TokenSystemSection() {
         <div className="lg:col-span-5 space-y-8 text-left">
 
           {/* Core Balance Pill */}
-          <div className="p-4 rounded-2xl bg-[#12141A] border border-white/[0.08] flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-code-bg-dark border border-white/[0.08] flex items-center justify-between">
             <span className="text-xs font-mono tracking-widest uppercase text-text-secondary/60">
               Live Token Ledger Simulator
             </span>
             <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-xl">
-              <Coins className="w-4 h-4 text-accent-pink animate-pulse" />
+              <BanknotesIcon className="w-4 h-4 text-text-secondary animate-pulse" />
               <span className="font-mono text-base font-bold text-text-primary">
                 {tokens} Credits
               </span>
@@ -218,7 +218,7 @@ export default function TokenSystemSection() {
                   className="ml-2 text-xs text-text-secondary/40 hover:text-text-primary transition-colors"
                   title="Reset Token Balance"
                 >
-                  <RefreshCw className="w-3 h-3" />
+                  <ArrowPathIcon className="w-3 h-3" />
                 </button>
               )}
             </div>
@@ -232,15 +232,15 @@ export default function TokenSystemSection() {
               onClick={() => setActiveTab('leads')}
               className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
                 activeTab === 'leads' 
-                  ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]' 
+                  ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]' 
                   : 'bg-transparent border-transparent hover:bg-white/[0.01]'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'leads' ? 'text-accent-pink' : 'text-text-secondary'}`}>
+                <span className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'leads' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'} 'text-accent-pink'`}>
                   ● USER INTENT FEEDS
                 </span>
-                <ChevronRight className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'leads' ? 'rotate-90' : ''}`} />
+                <ChevronRightIcon className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'leads' ? 'rotate-90' : ''}`} />
               </div>
               
               {activeTab === 'leads' && (
@@ -271,9 +271,9 @@ export default function TokenSystemSection() {
                       >
                         <span>{lead.company} ({lead.source})</span>
                         {lead.isLocked ? (
-                          <span className="text-[10px] text-[#FFBD2E] font-bold uppercase tracking-wider">Locked</span>
+                          <span className="text-[10px] text-badge-amber font-bold uppercase tracking-wider">Locked</span>
                         ) : (
-                          <span className="text-[10px] text-accent-mint font-bold uppercase tracking-wider">Revealed</span>
+                          <span className="text-[10px] text-text-secondary hover:text-text-primary transition-colors font-bold uppercase tracking-wider">Revealed</span>
                         )}
                       </button>
                     ))}
@@ -287,15 +287,15 @@ export default function TokenSystemSection() {
               onClick={() => setActiveTab('outreach')}
               className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
                 activeTab === 'outreach' 
-                  ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]' 
+                  ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]' 
                   : 'bg-transparent border-transparent hover:bg-white/[0.01]'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'outreach' ? 'text-accent-pink' : 'text-text-secondary'}`}>
+                <span className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'outreach' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'} 'text-accent-pink'`}>
                   ○ GENERATE OUTREACH
                 </span>
-                <ChevronRight className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'outreach' ? 'rotate-90' : ''}`} />
+                <ChevronRightIcon className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'outreach' ? 'rotate-90' : ''}`} />
               </div>
               
               {activeTab === 'outreach' && (
@@ -317,15 +317,15 @@ export default function TokenSystemSection() {
               onClick={() => setActiveTab('automation')}
               className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
                 activeTab === 'automation' 
-                  ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]' 
+                  ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]' 
                   : 'bg-transparent border-transparent hover:bg-white/[0.01]'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'automation' ? 'text-accent-pink' : 'text-text-secondary'}`}>
+                <span className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'automation' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'} 'text-accent-pink'`}>
                   ○ CAMPAIGN AUTOMATION
                 </span>
-                <ChevronRight className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'automation' ? 'rotate-90' : ''}`} />
+                <ChevronRightIcon className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'automation' ? 'rotate-90' : ''}`} />
               </div>
               
               {activeTab === 'automation' && (
@@ -349,7 +349,7 @@ export default function TokenSystemSection() {
         <div className="lg:col-span-7 flex items-center justify-center py-20 relative min-h-[460px] md:min-h-[500px]">
           
           {/* Decorative Background grid glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
 
           {/* Layered sheets container */}
           <div className="relative w-full max-w-[420px] h-[340px]">
@@ -434,14 +434,14 @@ export default function TokenSystemSection() {
                       setActiveTab('leads');
                     }
                   }}
-                  className={`absolute top-0 left-0 right-0 text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[320px] w-full shadow-[0_30px_100px_rgba(0,0,0,0.6)] border transition-all duration-300 ${theme.cardBg} ${filterClass}`}
+                  className={`absolute top-0 left-0 right-0 text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[320px] w-full shadow-[0_30px_100px_rgba(var(--rgb-black),0.6)] border transition-all duration-300 ${theme.cardBg} ${filterClass}`}
                 >
                   {/* Decorative card glow */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.05] to-transparent pointer-events-none" />
 
                   {/* Header: Source & Urgency */}
-                  <div className="flex items-center justify-between mb-5 w-full relative z-10">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between mb-5 w-full relative z-10 bg-gradient-to-tr">
+                    <div className="flex items-center gap-2 bg-gradient-to-tr">
                       <div className={`w-2 h-2 rounded-full bg-current ${theme.text}`} />
                       <span className={`text-[10px] font-mono font-bold tracking-[0.2em] uppercase ${theme.textMuted}`}>
                         {lead.source}
@@ -449,7 +449,7 @@ export default function TokenSystemSection() {
                     </div>
 
                     <div className={`flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider ${theme.textMuted}`}>
-                      <Activity size={12} />
+                      <ChartBarSquareIcon className="w-3 h-3" />
                       {lead.urgency}
                     </div>
                   </div>
@@ -465,7 +465,7 @@ export default function TokenSystemSection() {
                   </h3>
 
                   {/* Niche tags list */}
-                  <div className="flex flex-wrap gap-1.5 mb-6 relative z-10">
+                  <div className="flex flex-wrap gap-1.5 mb-6 relative z-10 bg-gradient-to-tr">
                     {lead.nicheTags.map(tag => (
                       <span key={tag} className={`px-2.5 py-1 text-[11px] font-mono font-bold rounded-lg border ${theme.tagBg} ${theme.text}`}>
                         {tag}
@@ -473,7 +473,7 @@ export default function TokenSystemSection() {
                     ))}
                     {lead.replyProbability > 90 && (
                       <span className={`px-2.5 py-1 text-[11px] font-mono font-bold rounded-lg border-transparent flex items-center gap-1.5 shadow-sm ${theme.matchTag}`}>
-                        <ShieldCheck size={12} /> {lead.replyProbability}% Match
+                        <CheckCircleIcon className="w-3 h-3" /> {lead.replyProbability}% Match
                       </span>
                     )}
                   </div>
@@ -485,9 +485,9 @@ export default function TokenSystemSection() {
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-full flex items-center justify-center ${theme.blurBg}`}>
                         {lead.isLocked ? (
-                          <Lock size={14} className={theme.textMuted} />
+                          <LockClosedIcon className={`w-[14px] h-[14px] ${theme.textMuted}`} />
                         ) : (
-                          <User size={14} className={theme.text} />
+                          <UserIcon className={`w-[14px] h-[14px] ${theme.text}`} />
                         )}
                       </div>
 
@@ -536,14 +536,14 @@ export default function TokenSystemSection() {
                             <>
                               Reveal
                               <span className="flex items-center gap-0.5 opacity-90 text-[10px] uppercase font-mono tracking-widest ml-1 font-bold">
-                                <Coins className="w-3 h-3 text-current" /> -3
+                                <BanknotesIcon className="w-3 h-3 text-current" /> -3
                               </span>
                             </>
                           )}
                         </button>
                       ) : (
                         <div className={`flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold border border-black/10 bg-black/10 ${theme.text}`}>
-                          <ShieldCheck className="w-4 h-4 text-current" /> Unlocked
+                          <CheckCircleIcon className="w-4 h-4 text-current" /> Unlocked
                         </div>
                       )}
                     </div>

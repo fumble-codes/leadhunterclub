@@ -1,9 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Activity, ShieldCheck, Zap, MessageCircle, Brain, Sparkles, ArrowRight, Eye } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
+import { ChevronDownIcon, CheckCircleIcon, GlobeAltIcon, SparklesIcon, ArrowRightIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import HeroSection from '@/app/components/HeroSection'
 import TokenSystemSection from '@/app/components/TokenSystemSection';
@@ -19,7 +19,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between text-left group focus:outline-none">
         <h4 className="font-display text-xl text-text-primary group-hover:text-accent-pink transition-colors duration-300">{q}</h4>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.4, ease }}>
-          <ChevronDown size={22} className="text-text-secondary" />
+          <ChevronDownIcon className="w-[22px] h-[22px] text-text-secondary" />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -68,25 +68,25 @@ const ACCENT_COLORS: Record<string, {
   dot: string
 }> = {
   curiosity: {
-    text: 'text-[#A78BFA]',
+    text: 'text-tab-purple',
     bg: 'bg-white/5',
     border: 'border-white/[0.08]',
     glow: 'bg-accent-purple/[0.005]',
-    dot: 'bg-[#A78BFA]'
+    dot: 'bg-tab-purple'
   },
   audit: {
-    text: 'text-[#22D3EE]',
+    text: 'text-tab-cyan',
     bg: 'bg-white/5',
     border: 'border-white/[0.08]',
     glow: 'bg-accent-cyan/[0.005]',
-    dot: 'bg-[#22D3EE]'
+    dot: 'bg-tab-cyan'
   },
   case_study: {
-    text: 'text-[#F472B6]',
+    text: 'text-tab-pink',
     bg: 'bg-white/5',
     border: 'border-white/[0.08]',
     glow: 'bg-accent-pink/[0.005]',
-    dot: 'bg-[#F472B6]'
+    dot: 'bg-tab-pink'
   }
 }
 
@@ -94,11 +94,14 @@ function OutreachPreviewUI() {
   const [selected, setSelected] = useState(OUTREACH_ANGLES[0])
   const [displayedText, setDisplayedText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(sectionRef, { once: true })
 
   const activeColor = ACCENT_COLORS[selected.id] || ACCENT_COLORS.curiosity
 
   useEffect(() => {
+    if (!isInView) return
+
     setIsTyping(true)
     setDisplayedText('')
     
@@ -115,28 +118,27 @@ function OutreachPreviewUI() {
     }, 15)
 
     return () => clearInterval(interval)
-  }, [selected])
+  }, [selected, isInView])
 
   return (
-    <div 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="w-full rounded-[28px] bg-[#171A20] border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(0,0,0,0.7)] shadow-[0_40px_100px_rgba(0,0,0,0.6)]"
+      <div
+      ref={sectionRef}
+      className="w-full rounded-[28px] bg-code-bg border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(var(--rgb-black),0.7)] shadow-[0_40px_100px_rgba(var(--rgb-black),0.6)]"
     >
       {/* Decorative top window bar for macOS chrome */}
       <div className="absolute top-0 left-0 right-0 h-10 border-b border-white/[0.04] bg-white/[0.01] flex items-center px-6">
         <div className="flex items-center gap-1.5">
-          <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${isHovered ? 'bg-[#FF5F56]' : 'bg-white/10'}`} />
-          <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${isHovered ? 'bg-[#FFBD2E]' : 'bg-white/10'}`} />
-          <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${isHovered ? 'bg-[#27C93F]' : 'bg-white/10'}`} />
+          <div className="w-2 h-2 rounded-full bg-dot-red transition-colors duration-500" />
+          <div className="w-2 h-2 rounded-full bg-dot-yellow transition-colors duration-500" />
+          <div className="w-2 h-2 rounded-full bg-dot-green transition-colors duration-500" />
         </div>
         <div className="mx-auto text-[11px] font-medium tracking-tight text-text-secondary/50">
           Outreach Editor
         </div>
       </div>
 
-      {/* Subtle Dynamic Ambient Background Glow (only active on hover) */}
-      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 blur-[80px] rounded-full pointer-events-none transition-all duration-1000 ${isHovered ? activeColor.glow : 'bg-white/[0.002] opacity-0'}`} />
+      {/* Subtle Dynamic Ambient Background Glow */}
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 blur-[80px] rounded-full pointer-events-none transition-all duration-1000 ${activeColor.glow}`} />
       
       {/* Editor Column */}
       <div className="flex-1 flex flex-col justify-between relative z-10 pt-6">
@@ -153,7 +155,7 @@ function OutreachPreviewUI() {
               </div>
             </div>
             
-            <div className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg border text-[9px] font-bold uppercase tracking-wider transition-all duration-500 ${isHovered ? 'bg-accent-mint/5 border-accent-mint/20 text-accent-mint' : 'bg-white/5 border-white/10 text-text-secondary'}`}>
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg border text-[9px] font-bold uppercase tracking-wider transition-all duration-500 bg-surface-secondary border-border-subtle text-text-secondary hover:text-text-primary transition-colors">
               Verified Signal
             </div>
           </div>
@@ -164,15 +166,14 @@ function OutreachPreviewUI() {
               const isSelected = selected.id === angle.id
               const tabAccent = ACCENT_COLORS[angle.id] || ACCENT_COLORS.curiosity
               
-              // Dynamic border styling on interaction
-              let activeTabClass = 'bg-white/10 border-white/20 text-text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]'
-              if (isSelected && isHovered) {
+              let activeTabClass = 'bg-white/10 border-white/20 text-text-primary shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]'
+              if (isSelected) {
                 if (angle.id === 'curiosity') {
-                  activeTabClass = 'bg-accent-purple/5 border-accent-purple/30 text-[#A78BFA]'
+                  activeTabClass = 'bg-surface-secondary border-border-subtle text-tab-purple'
                 } else if (angle.id === 'audit') {
-                  activeTabClass = 'bg-accent-cyan/5 border-accent-cyan/30 text-[#22D3EE]'
+                  activeTabClass = 'bg-surface-secondary border-border-subtle text-tab-cyan'
                 } else if (angle.id === 'case_study') {
-                  activeTabClass = 'bg-accent-pink/5 border-accent-pink/30 text-[#F472B6]'
+                  activeTabClass = 'bg-surface-secondary border-border-subtle text-tab-pink'
                 }
               }
 
@@ -189,10 +190,10 @@ function OutreachPreviewUI() {
           </div>
 
           {/* Email Body Area */}
-          <div className="min-h-[160px] p-5 rounded-2xl bg-black/30 border border-white/[0.04] text-xs text-text-primary leading-relaxed relative shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)] transition-colors duration-500">
+          <div className="min-h-[160px] p-5 rounded-2xl bg-black/30 border border-white/[0.04] text-xs text-text-primary leading-relaxed relative shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.5)] transition-colors duration-500">
             {isTyping && (
               <div className="absolute top-4 right-4 flex items-center gap-1 text-[10px] text-text-secondary/40 font-bold uppercase tracking-wider">
-                <Sparkles size={10} className="animate-spin" /> writing...
+                <SparklesIcon className="w-[10px] h-[10px] animate-spin" /> writing...
               </div>
             )}
             <div className="text-[11px] text-text-secondary flex items-center gap-2">
@@ -202,7 +203,7 @@ function OutreachPreviewUI() {
             <div className="h-px bg-white/[0.04] my-2.5" />
             <p className="whitespace-pre-line text-text-primary/95 leading-relaxed font-light font-sans">
               {displayedText}
-              {isTyping && <span className={`inline-block w-1.5 h-3.5 ml-0.5 animate-pulse align-middle transition-colors duration-500 ${isHovered ? activeColor.dot : 'bg-white/40'}`} />}
+              {isTyping && <span className={`inline-block w-1.5 h-3.5 ml-0.5 animate-pulse align-middle transition-colors duration-500 ${activeColor.dot}`} />}
             </p>
           </div>
         </div>
@@ -213,7 +214,7 @@ function OutreachPreviewUI() {
             Draft Sandbox
           </span>
           
-          <button className="px-5 py-2.5 rounded-xl bg-white hover:bg-white/95 text-black font-semibold text-xs shadow-[0_4px_20px_rgba(255,255,255,0.1)] transition-all duration-300">
+          <button className="px-5 py-2.5 rounded-xl bg-white hover:bg-white/95 text-black font-semibold text-xs shadow-[0_4px_20px_rgba(var(--rgb-white),0.1)] transition-all duration-300">
             Generate Pitch
           </button>
         </div>
@@ -223,7 +224,7 @@ function OutreachPreviewUI() {
       <div className="w-full md:w-[180px] border-t md:border-t-0 md:border-l border-white/[0.04] pt-6 md:pt-0 md:pl-6 flex flex-col justify-between relative z-10 text-left">
         <div>
           <h5 className="text-[11px] font-semibold text-text-secondary/60 tracking-tight mb-4 flex items-center gap-1.5">
-            <Brain size={13} className="text-text-secondary/80" /> Analysis Metrics
+            <GlobeAltIcon className="w-[13px] h-[13px] text-text-secondary/80" /> Analysis Metrics
           </h5>
           
           <div className="space-y-4">
@@ -240,7 +241,7 @@ function OutreachPreviewUI() {
                   className="h-full bg-white/60 rounded-full" 
                 />
                 <motion.span
-                  className={`absolute top-0 bottom-0 w-1.5 rounded-full transition-colors duration-500 ${isHovered ? activeColor.dot : 'bg-white/40'}`}
+                  className={`absolute top-0 bottom-0 w-1.5 rounded-full transition-colors duration-500 ${activeColor.dot}`}
                   animate={{ left: selected.replyProbability }}
                   transition={{ duration: 0.6, ease }}
                 />
@@ -252,7 +253,7 @@ function OutreachPreviewUI() {
             <div>
               <div className="text-[10px] text-text-secondary/50 mb-0.5">Spam Score</div>
               <div className="text-xs font-medium text-text-primary uppercase tracking-wide flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500 ${isHovered ? 'bg-accent-mint' : 'bg-white/20'}`} /> {selected.spamScore}
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500 bg-accent-mint" /> {selected.spamScore}
               </div>
             </div>
 
@@ -281,25 +282,13 @@ export default function LandingPage() {
     <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden">
       <HeroSection />
 
-      {/* Trust marquee */}
-      <section className="py-10 bg-white/[0.01] overflow-hidden mt-0">
-        <div className="animate-marquee whitespace-nowrap text-text-secondary/30">
-          {[1, 2, 3, 4].map(g => (
-            <span key={g} className="inline-flex items-center gap-24 mx-12 shrink-0">
-              <span className="font-display font-semibold text-xl tracking-widest inline-flex items-center gap-3"><Zap size={20} /> NEXUS</span>
-              <span className="font-display font-semibold text-xl tracking-widest inline-flex items-center gap-3"><Activity size={20} /> VANGUARD</span>
-              <span className="font-display font-semibold text-xl tracking-widest inline-flex items-center gap-3"><ShieldCheck size={20} /> STELLAR LABS</span>
-              <span className="font-mono text-sm tracking-[0.3em]">PRISM</span>
-            </span>
-          ))}
-        </div>
-      </section>
+
 
       {/* Problem & How It Works (Bento Grid) */}
       <section id="funnel" className="py-40 px-6 max-w-[1200px] mx-auto relative">
         {/* Ambient section glows */}
-        <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[80px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] bg-accent-mint/[0.015] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
+        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] glow-mint-very-faint pointer-events-none" />
 
         <div className="text-center mb-24 relative z-10">
           <motion.div 
@@ -350,57 +339,57 @@ export default function LandingPage() {
             {/* Visual Radar Container */}
             <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 overflow-hidden pointer-events-none flex items-center justify-center">
               {/* Concentric circles - slightly more visible */}
-              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-accent-mint/[0.15] flex items-center justify-center shadow-[inset_0_0_40px_rgba(184,243,107,0.05)]">
-                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-accent-mint/[0.2] flex items-center justify-center shadow-[inset_0_0_20px_rgba(184,243,107,0.05)]">
-                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-accent-mint/[0.3] shadow-[0_0_15px_rgba(184,243,107,0.1)]" />
+              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-accent-mint/[0.15] flex items-center justify-center shadow-[inset_0_0_40px_rgba(var(--rgb-persona-green),0.05)]">
+                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-accent-mint/[0.2] flex items-center justify-center shadow-[inset_0_0_20px_rgba(var(--rgb-persona-green),0.05)]">
+                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-accent-mint/[0.3]" />
                 </div>
               </div>
               
               {/* Eye-catching Hero Radar Sweep */}
               <div className="absolute w-[300px] h-[300px] animate-[spin_4s_linear_infinite] rounded-full overflow-hidden">
                 {/* Radar sweep cone */}
-                <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[conic-gradient(from_180deg_at_0_100%,rgba(184,243,107,0)_0deg,rgba(184,243,107,0.25)_90deg)]" />
+                <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[conic-gradient(from_180deg_at_0_100%,rgba(var(--rgb-persona-green),0)_0deg,rgba(var(--rgb-persona-green),0.25)_90deg)]" />
                 {/* Leading edge line */}
-                <div className="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-accent-mint origin-left -translate-y-1/2 shadow-[0_0_15px_#B8F36B,0_0_5px_#B8F36B]" />
+                <div className="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-accent-mint origin-left -translate-y-1/2" />
               </div>
 
               {/* Glowing cinematic intercept logos */}
               {/* X / Twitter */}
               <motion.div 
-                className="absolute top-[20%] left-[20%] w-10 h-10 rounded-full bg-[#1DA1F2]/10 border border-[#1DA1F2]/30 flex items-center justify-center text-[#1DA1F2] shadow-[0_0_15px_rgba(29,161,242,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(29,161,242,0.5)] group-hover:border-[#1DA1F2]/50 group-hover:bg-[#1DA1F2]/20 transition-all duration-500 backdrop-blur-md"
+                className="absolute top-[20%] left-[20%] w-10 h-10 rounded-full bg-social-twitter/10 border border-social-twitter/30 flex items-center justify-center text-social-twitter group-hover:scale-110 group-hover: group-hover:border-social-twitter/50 group-hover:bg-social-twitter/20 transition-all duration-500 backdrop-blur-md"
                 animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
               >
-                <svg className="w-4 h-4 fill-current text-[#1DA1F2]" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-current text-social-twitter" viewBox="0 0 24 24">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </motion.div>
               
               {/* LinkedIn */}
               <motion.div 
-                className="absolute bottom-[25%] right-[15%] w-12 h-12 rounded-full bg-[#0A66C2]/10 border border-[#0A66C2]/30 flex items-center justify-center text-[#0A66C2] shadow-[0_0_15px_rgba(10,102,194,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(10,102,194,0.5)] group-hover:border-[#0A66C2]/50 group-hover:bg-[#0A66C2]/20 transition-all duration-500 backdrop-blur-md"
+                className="absolute bottom-[25%] right-[15%] w-8 h-8 rounded-md bg-social-linkedin/10 border border-social-linkedin/30 flex items-center justify-center text-social-linkedin group-hover:scale-110 group-hover: group-hover:border-social-linkedin/50 group-hover:bg-social-linkedin/20 transition-all duration-500 backdrop-blur-md shadow-[0_0_15px_rgba(var(--rgb-social-twitter),0.3)]"
                 animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.3, 1, 0.3] }}
                 transition={{ duration: 5, repeat: Infinity, delay: 1.5, ease: "easeInOut" }}
               >
-                <svg className="w-5 h-5 fill-current text-[#0A66C2]" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 fill-current text-social-linkedin" viewBox="0 0 24 24">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/>
                 </svg>
               </motion.div>
               
               {/* Reddit */}
               <motion.div 
-                className="absolute top-[35%] right-[25%] w-11 h-11 rounded-full bg-[#FF4500]/10 border border-[#FF4500]/30 flex items-center justify-center text-[#FF4500] shadow-[0_0_15px_rgba(255,69,0,0.3)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,69,0,0.5)] group-hover:border-[#FF4500]/50 group-hover:bg-[#FF4500]/20 transition-all duration-500 backdrop-blur-md"
+                className="absolute top-[35%] right-[25%] w-11 h-11 rounded-full bg-social-reddit/10 border border-social-reddit/30 flex items-center justify-center text-social-reddit group-hover:scale-110 group-hover: group-hover:border-social-reddit/50 group-hover:bg-social-reddit/20 transition-all duration-500 backdrop-blur-md shadow-[0_0_15px_rgba(var(--rgb-social-twitter),0.3)]"
                 animate={{ scale: [0.9, 1.25, 0.9], opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 0.5, ease: "easeInOut" }}
               >
-                <svg className="w-5 h-5 fill-current text-[#FF4500]" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 fill-current text-social-reddit" viewBox="0 0 24 24">
                   <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 0-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.203-.094z"/>
                 </svg>
               </motion.div>
 
               {/* Threads */}
               <motion.div 
-                className="absolute bottom-[20%] left-[25%] w-10 h-10 rounded-full bg-white/5 border border-white/20 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,0.3)] group-hover:border-white/40 group-hover:bg-white/10 transition-all duration-500 backdrop-blur-md"
+                className="absolute bottom-[20%] left-[25%] w-10 h-10 rounded-full bg-white/5 border border-white/20 flex items-center justify-center text-white group-hover:scale-110 group-hover: group-hover:border-white/40 group-hover:bg-white/10 transition-all duration-500 backdrop-blur-md shadow-[0_0_15px_rgba(10,102,194,0.3)]"
                 animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.3, 1, 0.3] }}
                 transition={{ duration: 4.5, repeat: Infinity, delay: 2, ease: "easeInOut" }}
               >
@@ -426,7 +415,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, ease }}
             whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between shadow-[0_0_15px_rgba(var(--rgb-white),0.15)]"
           >
             {/* AI Filter Funnel Visual */}
             <div className="relative h-[140px] mb-4">
@@ -442,14 +431,14 @@ export default function LandingPage() {
                     key={item.label}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[10px] transition-all duration-500 ${
                       item.status === 'pass'
-                        ? 'bg-accent-purple/5 border border-accent-purple/10 group-hover:border-accent-purple/20 group-hover:bg-accent-purple/8'
+                        ? 'bg-surface-secondary border border-border-subtle group-hover:border-border-subtle group-hover:bg-surface-secondary'
                         : 'bg-white/[0.01] border border-white/[0.04] group-hover:opacity-30 group-hover:line-through'
                     }`}
                     style={{ transitionDelay: `${i * 60}ms` }}
                   >
                     <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[8px] font-black transition-all duration-500 ${
                       item.status === 'pass'
-                        ? 'bg-accent-purple/15 text-accent-purple group-hover:bg-accent-purple/30'
+                        ? 'bg-surface-secondary text-text-secondary hover:text-text-primary transition-colors group-hover:bg-surface-secondary'
                         : 'bg-white/5 text-text-secondary/30 group-hover:bg-red-500/20 group-hover:text-red-400'
                     }`}>
                       {item.status === 'pass' ? '✓' : '✕'}
@@ -463,7 +452,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">Step 02</span>
+              <span className="text-xs font-mono text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest mb-3 block">Step 02</span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">AI Filters Out the Noise</h3>
               <p className="text-text-secondary text-sm leading-relaxed">
                 Not every signal is worth your time. Our AI automatically filters dead leads, spam, low-intent posts, and irrelevant requests — so only genuine, high-probability opportunities make it through.
@@ -481,17 +470,17 @@ export default function LandingPage() {
             className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
           >
             {/* Intelligence Dossier Builder */}
-            <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-[#06080B]/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(0,0,0,0.8)] overflow-hidden group-hover:border-accent-pink/15 transition-colors duration-500">
+            <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-canvas-deeper/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.8)] overflow-hidden group-hover:border-border-subtle transition-colors duration-500 group-hover:border-accent-pink/15">
               {/* Ambient node glow (toned down by 90% in opacity and size) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-pink/[0.02] blur-[20px] rounded-full group-hover:bg-accent-pink/[0.06] transition-colors duration-500" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-pink/[0.02] blur-[20px] rounded-full group-hover:bg-accent-pink/[0.06] transition-colors duration-500 group-hover:border-accent-pink/15" />
               
-              <div className="relative z-10 h-full flex flex-col">
-                <div className="flex items-center gap-2 text-accent-pink font-bold text-[10px] uppercase tracking-widest mb-3">
-                  <Brain size={12} /> Compiling Intel...
+              <div className="relative z-10 h-full flex flex-col group-hover:border-accent-pink/15">
+                <div className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors font-bold text-[10px] uppercase tracking-widest mb-3 group-hover:border-accent-pink/15">
+                  <GlobeAltIcon className="w-3 h-3" /> Compiling Intel...
                 </div>
                 
                 {/* Data fields building up */}
-                <div className="space-y-2 flex-1">
+                <div className="space-y-2 flex-1 group-hover:border-accent-pink/15">
                   {[
                     { field: 'Pain Point', value: 'High CAC on Shopify store', delay: 0 },
                     { field: 'Budget', value: '$5k-$10k range', delay: 80 },
@@ -544,7 +533,7 @@ export default function LandingPage() {
               ].map((lead) => (
                 <div 
                   key={lead.name} 
-                  className="p-3.5 rounded-xl bg-[#0A0D12]/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-accent-cyan/15 group-hover:bg-[#0E1117] group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.6)] group-hover:translate-x-2"
+                  className="p-3.5 rounded-xl bg-code-bg-dark/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(var(--rgb-black),0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-border-subtle group-hover:bg-surface-secondary group-hover:shadow-[0_4px_16px_rgba(var(--rgb-black),0.6)] group-hover:translate-x-2"
                   style={{ transitionDelay: `${lead.delay}ms` }}
                 >
                   <div className={`w-8 h-8 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 flex items-center justify-center shrink-0`}>
@@ -594,11 +583,11 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease }}
             className="lg:col-span-5 text-left relative z-10"
           >
-            <span className="text-[10px] uppercase tracking-widest mb-4 block font-semibold text-text-secondary/40">
+            <span className="text-[10px] uppercase tracking-widest mb-4 block font-semibold text-text-secondary/40 text-accent-cyan">
               02 / Philosophy
             </span>
             <h2 className="font-display text-[42px] md:text-[48px] font-bold tracking-tight mb-6 leading-[1.1] text-text-primary">
-              Most outreach tools optimize volume.<br />
+              Most outreach tools <span className="text-text-secondary hover:text-text-primary transition-colors">optimize</span> volume.<br />
               <span className="text-text-secondary font-light">We optimize replies.</span>
             </h2>
             <p className="text-text-secondary text-sm leading-relaxed mb-10 max-w-sm font-light">
@@ -681,8 +670,8 @@ export default function LandingPage() {
       {/* Pricing */}
       <section id="pricing" className="py-40 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]">
         {/* Ambient glows */}
-        <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] bg-accent-pink/[0.015] blur-[80px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] bg-accent-purple/[0.015] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] glow-pink-very-faint pointer-events-none" />
+        <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
         {/* Header */}
         <div className="text-center mb-24 relative z-10">
@@ -798,8 +787,8 @@ export default function LandingPage() {
 
                 {/* Plan name & description */}
                 <div className="mb-8">
-                  <div className={`w-10 h-10 rounded-xl bg-accent-${p.accent}/10 border border-accent-${p.accent}/20 flex items-center justify-center text-accent-${p.accent} mb-5`}>
-                    <Sparkles size={18} />
+                  <div className={`w-8 h-8 rounded-md bg-accent-${p.accent}/10 border border-accent-${p.accent}/20 flex items-center justify-center text-accent-${p.accent} mb-5`}>
+                    <SparklesIcon className="w-[18px] h-[18px]" />
                   </div>
                   <h4 className="font-display text-2xl font-bold tracking-tight mb-2">{p.name}</h4>
                   <p className="text-sm text-text-secondary font-light leading-relaxed">{p.desc}</p>
@@ -845,8 +834,8 @@ export default function LandingPage() {
                 {/* CTA */}
                 <button className={`w-full py-4 rounded-2xl font-bold text-sm tracking-tight transition-all duration-500 ${
                   p.featured
-                    ? `bg-accent-${p.accent} text-[#11150C] shadow-[0_0_30px_rgba(249,168,212,0.2)] hover:shadow-[0_0_40px_rgba(249,168,212,0.35)]`
-                    : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] text-text-primary hover:bg-white/[0.07]'
+                    ? `bg-accent-${p.accent} text-text-on-accent  hover:`
+                    : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] text-text-primary hover:bg-white/[0.07]'
                 }`}>
                   Get Started with {p.name}
                 </button>
@@ -894,9 +883,9 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="relative z-10 p-16 md:p-24 rounded-[48px] border border-white/[0.06] bg-gradient-to-b from-[#12141A] to-[#0a0a0a] overflow-hidden"
+          className="relative z-10 p-16 md:p-24 rounded-[48px] border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
           
           <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
             Exclusive Syndicate Access
@@ -929,10 +918,10 @@ export default function LandingPage() {
             >
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-text-primary text-bg-main font-bold text-sm shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_50px_rgba(255,255,255,0.25)] transition-all duration-500 group"
+                className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-text-primary text-bg-main font-bold text-sm hover: transition-all duration-500 group"
               >
                 Start Finding Leads
-                <ArrowRight className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRightIcon className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             </motion.div>
             <motion.div
@@ -941,7 +930,7 @@ export default function LandingPage() {
             >
               <Link
                 href="/sneak-peek"
-                className="inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03] text-sm"
+                className="inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] text-sm"
               >
                 Sneak Peek
               </Link>
