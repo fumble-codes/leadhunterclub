@@ -46,7 +46,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     } else if (user.status === 'REJECTED' || user.status === 'SUSPENDED') {
       router.push('/pending-approval')
     }
-  }, [user, loading, error, pathname, router, isPublicRoute, isOnboardingRoute])
+  }, [user, loading, error, pathname, router, isPublicRoute, isOnboardingRoute, isAdminRoute])
 
   useEffect(() => {
     const isLanding = !isAppRoute
