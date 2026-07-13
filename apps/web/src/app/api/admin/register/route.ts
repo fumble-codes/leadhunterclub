@@ -48,13 +48,12 @@ export async function POST(request: NextRequest) {
 
     const { uid, email, name } = authUser
 
-    // Auto-create the user if they don't exist yet (same pattern as /api/auth/me)
+    // Auto-create the user if they don't exist yet (admin + ACTIVE directly)
     let user = await db.user.findUnique({
       where: { id: uid },
       include: { creditAccount: { select: { id: true } } },
     })
     if (!user) {
-      const userCount = await db.user.count()
       const renewalDate = new Date()
       renewalDate.setDate(renewalDate.getDate() + 30)
 
@@ -63,17 +62,17 @@ export async function POST(request: NextRequest) {
           id: uid,
           email: email || '',
           name: name || 'Admin User',
-          role: 'user',
-          status: 'PENDING',
+          role: 'admin',
+          status: 'ACTIVE',
           creditAccount: {
-            create: {
-              subscriptionBalance: 200,
-              bonusBalance: 0,
-              renewalDate,
-            },
+            create: { subscriptionBalance: 200, bonusBalance: 0, renewalDate },
           },
         },
         include: { creditAccount: { select: { id: true } } },
+      })
+
+      return NextResponse.json({
+        data: { id: user.id, role: 'admin', status: 'ACTIVE' },
       })
     }
 

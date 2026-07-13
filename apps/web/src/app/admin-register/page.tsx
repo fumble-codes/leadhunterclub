@@ -137,6 +137,7 @@ export default function AdminRegisterPage() {
         const code = extractFirebaseCode(err.message)
         const msg = friendlyFirebaseError(code, err.message)
         setError(msg)
+        console.error('[AdminRegister] Error:', err.message)
       } else {
         setError('Something went wrong. Please try again.')
       }

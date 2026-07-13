@@ -35,33 +35,41 @@ export async function GET(request: NextRequest) {
     })
 
     if (!user) {
-      const userCount = await db.user.count()
-      const isFirstUser = userCount === 0
       const limit = getPlanCredits('FREE')
       const renewalDate = new Date()
       renewalDate.setDate(renewalDate.getDate() + 30)
 
-      user = await db.user.create({
-        data: {
-          id: uid,
-          email: email || '',
-          name: name || 'User',
-          phone: phone || null,
-          role: isFirstUser ? 'admin' : 'user',
-          status: isFirstUser ? 'ACTIVE' : 'PENDING',
-          creditAccount: {
-            create: {
-              subscriptionBalance: limit,
-              bonusBalance: 0,
-              renewalDate,
+      user = await db.$transaction(async (tx) => {
+        const existing = await tx.user.findUnique({
+          where: { id: uid },
+          include: {
+            creditAccount: {
+              select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
             },
           },
-        },
-        include: {
-          creditAccount: {
-            select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+        })
+        if (existing) return existing
+
+        const isFirstUser = (await tx.user.count()) === 0
+
+        return tx.user.create({
+          data: {
+            id: uid,
+            email: email || '',
+            name: name || 'User',
+            phone: phone || null,
+            role: isFirstUser ? 'admin' : 'user',
+            status: isFirstUser ? 'ACTIVE' : 'PENDING',
+            creditAccount: {
+              create: { subscriptionBalance: limit, bonusBalance: 0, renewalDate },
+            },
           },
-        },
+          include: {
+            creditAccount: {
+              select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+            },
+          },
+        })
       })
     } else if (email && email !== user.email) {
       user = await db.user.update({
