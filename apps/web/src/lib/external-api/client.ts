@@ -1,19 +1,22 @@
-const BASE_URL = process.env.EXTERNAL_API_BASE_URL
-const EMAIL = process.env.EXTERNAL_API_EMAIL
-const PASSWORD = process.env.EXTERNAL_API_PASSWORD
-
-if (!BASE_URL || !EMAIL || !PASSWORD) {
-  throw new Error(
-    'External API credentials not configured. Set EXTERNAL_API_BASE_URL, EXTERNAL_API_EMAIL, and EXTERNAL_API_PASSWORD.',
-  )
-}
-
 let cachedToken: string | null = null
 let tokenExpiry = 0
+
+function requireCredentials() {
+  const BASE_URL = process.env.EXTERNAL_API_BASE_URL
+  const EMAIL = process.env.EXTERNAL_API_EMAIL
+  const PASSWORD = process.env.EXTERNAL_API_PASSWORD
+  if (!BASE_URL || !EMAIL || !PASSWORD) {
+    throw new Error(
+      'External API credentials not configured. Set EXTERNAL_API_BASE_URL, EXTERNAL_API_EMAIL, and EXTERNAL_API_PASSWORD.',
+    )
+  }
+  return { BASE_URL, EMAIL, PASSWORD }
+}
 
 async function getToken(): Promise<string> {
   if (cachedToken && Date.now() < tokenExpiry) return cachedToken
 
+  const { BASE_URL, EMAIL, PASSWORD } = requireCredentials()
   const res = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -37,6 +40,7 @@ async function fetchApi<T>(
   options: RequestInit = {},
   retries = 3,
 ): Promise<T> {
+  const { BASE_URL } = requireCredentials()
   for (let attempt = 0; attempt < retries; attempt++) {
     const token = await getToken()
     const res = await fetch(`${BASE_URL}${path}`, {
