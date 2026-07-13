@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/solid'
 import type { AppLead } from '@/types/lead'
 import { Select } from '@/components/ui'
+import { getFirebaseToken } from '@/lib/firebase'
 
 const primaryNiches = [
   'All',
@@ -43,7 +44,10 @@ export default function LeadsPage() {
   const fetchLeads = async () => {
     try {
       setLoading(true)
-      const res = await fetch('/api/leads?status=new')
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/leads?status=new', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
       const json = await res.json()
       if (json.data) {
         setLeadsList(json.data)
@@ -61,9 +65,13 @@ export default function LeadsPage() {
 
   const handleSaveToggle = async (leadId: string, isSaved: boolean) => {
     try {
+      const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ isSaved, status: isSaved ? 'saved' : 'new' }),
       })
       if (res.ok) {

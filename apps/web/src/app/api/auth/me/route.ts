@@ -50,16 +50,14 @@ export async function GET(request: NextRequest) {
         })
         if (existing) return existing
 
-        const isFirstUser = (await tx.user.count()) === 0
-
         return tx.user.create({
           data: {
             id: uid,
             email: email || '',
             name: name || 'User',
             phone: phone || null,
-            role: isFirstUser ? 'admin' : 'user',
-            status: isFirstUser ? 'ACTIVE' : 'PENDING',
+            role: 'user',
+            status: 'PENDING',
             creditAccount: {
               create: { subscriptionBalance: limit, bonusBalance: 0, renewalDate },
             },

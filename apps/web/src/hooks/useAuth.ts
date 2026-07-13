@@ -29,6 +29,7 @@ export function useAuth() {
   const [firebaseUser, setFirebaseUser] = useState<import('firebase/auth').User | null>(null)
   const [lastSynced, setLastSynced] = useState<number | null>(null)
   const [lastTokenRefresh, setLastTokenRefresh] = useState<number | null>(null)
+  const fbUserRef = useRef<import('firebase/auth').User | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -39,6 +40,7 @@ export function useAuth() {
       if (now - lastSyncCall < 2000) return
       lastSyncCall = now
 
+      fbUserRef.current = fbUser
       setFirebaseUser(fbUser)
       setError(null)
       setLastTokenRefresh(now)
@@ -108,10 +110,25 @@ export function useAuth() {
       }
     })
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && fbUserRef.current && isMounted) {
+        syncUser(fbUserRef.current)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    const syncInterval = setInterval(() => {
+      if (fbUserRef.current && isMounted) {
+        syncUser(fbUserRef.current)
+      }
+    }, 5 * 60 * 1000)
+
     return () => {
       isMounted = false
       unsubToken()
       unsubAuth()
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(syncInterval)
     }
   }, [router])
 

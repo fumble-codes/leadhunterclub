@@ -16,6 +16,7 @@ import { AppLead } from '@/types/lead'
 import { useRouter } from 'next/navigation'
 import { Badge, Modal, Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { getFirebaseToken } from '@/lib/firebase'
 
 const themeMap = {
   mint: {
@@ -67,9 +68,13 @@ export default function LeadDrawer({
       setIsRevealing(true)
       setErrorMsg(null)
       setShowCreditModal(false)
+      const token = await getFirebaseToken()
       const res = await fetch('/api/leads/reveal', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ leadId: lead.id }),
       })
       const json = await res.json()
@@ -90,9 +95,13 @@ export default function LeadDrawer({
   const handleStartOutreach = async () => {
     setIsStartingOutreach(true)
     try {
+      const token = await getFirebaseToken()
       await fetch(`/api/leads/${lead.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ status: 'drafting' }),
       })
       router.push(`/outreach?leadId=${lead.id}`)

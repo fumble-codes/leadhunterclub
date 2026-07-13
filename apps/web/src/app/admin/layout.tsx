@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return
     }
     if (user.role !== 'admin') {
-      router.push('/dashboard')
+      router.push('/admin-register')
     }
   }, [user, loading, router])
 

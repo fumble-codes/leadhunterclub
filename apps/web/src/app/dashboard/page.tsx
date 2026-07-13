@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { getFirebaseToken } from '@/lib/firebase'
 import {
   BoltIcon,
   ViewfinderCircleIcon,
@@ -30,9 +31,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/dashboard')
-      .then((res) => res.json())
-      .then((json) => {
+    const load = async () => {
+      try {
+        const token = await getFirebaseToken()
+        const res = await fetch('/api/dashboard', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const json = await res.json()
         if (json.data) {
           if (json.data.stats) setStats(json.data.stats)
           if (json.data.activity) setActivity(json.data.activity)
@@ -40,9 +45,13 @@ export default function DashboardPage() {
           if (json.data.readyForOutreachCount !== undefined)
             setOutreachCount(json.data.readyForOutreachCount)
         }
-      })
-      .catch((err) => console.error('Failed to load dashboard data:', err))
-      .finally(() => setLoading(false))
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
   if (loading) {

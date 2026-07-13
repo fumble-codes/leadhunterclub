@@ -18,6 +18,7 @@ import { AppLead } from '@/types/lead'
 import { useRouter } from 'next/navigation'
 import { Badge, Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { getFirebaseToken } from '@/lib/firebase'
 
 export default function SavedLeadsPage() {
   const [activeTab, setActiveTab] = useState('All Leads')
@@ -75,9 +76,13 @@ export default function SavedLeadsPage() {
   const handleEngage = async (leadId: string) => {
     setIsEngaging(leadId)
     try {
+      const token = await getFirebaseToken()
       await fetch(`/api/leads/${leadId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ status: 'drafting' }),
       })
       router.push(`/outreach?leadId=${leadId}`)
@@ -88,9 +93,13 @@ export default function SavedLeadsPage() {
 
   const handleMarkStatus = async (leadId: string, status: string, label: string) => {
     try {
+      const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ status }),
       })
       if (res.ok) {
@@ -107,7 +116,11 @@ export default function SavedLeadsPage() {
   const handleExport = async () => {
     setExporting(true)
     try {
-      const res = await fetch('/api/sheets/export', { method: 'POST' })
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/sheets/export', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
       const json = await res.json()
       if (res.ok && json.success) {
         setSheetUrl(json.data.sheetUrl)
@@ -128,14 +141,20 @@ export default function SavedLeadsPage() {
   const handleSync = async () => {
     setSyncing(true)
     try {
-      const res = await fetch('/api/sheets/sync', { method: 'POST' })
+      const token = await getFirebaseToken()
+      const authHeaders: Record<string, string> = {}
+      if (token) authHeaders['Authorization'] = `Bearer ${token}`
+      const res = await fetch('/api/sheets/sync', {
+        method: 'POST',
+        headers: authHeaders,
+      })
       const json = await res.json()
       if (res.ok && json.success) {
         addToast({
           type: 'success',
           message: `✓ Synced ${json.data.updatedCount} status updates from sheet`,
         })
-        const fetchRes = await fetch('/api/leads?saved=true')
+        const fetchRes = await fetch('/api/leads?saved=true', { headers: authHeaders })
         const fetchJson = await fetchRes.json()
         if (fetchJson.data) setSavedLeads(fetchJson.data)
       } else {
@@ -151,7 +170,10 @@ export default function SavedLeadsPage() {
   useEffect(() => {
     const fetchSavedLeads = async () => {
       try {
-        const res = await fetch('/api/leads?saved=true')
+        const token = await getFirebaseToken()
+        const res = await fetch('/api/leads?saved=true', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
         const json = await res.json()
         if (json.data) setSavedLeads(json.data)
       } catch {

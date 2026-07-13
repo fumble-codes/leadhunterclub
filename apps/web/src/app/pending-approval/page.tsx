@@ -147,7 +147,7 @@ export default function PendingApprovalPage() {
                 <ul className="space-y-3">
                   {[
                     'Our team reviews your profile and services',
-                    'This page checks for updates every 8 seconds',
+                    'This page checks for updates automatically',
                     "Once approved, you'll be auto-redirected to your dashboard",
                     'Start hunting leads and closing clients',
                   ].map((item, i) => (

@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { Card, Badge, Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { AppLead } from '@/types/lead'
+import { getFirebaseToken } from '@/lib/firebase'
 
 type UrgencyTheme = {
   textAccent: string
@@ -120,11 +121,15 @@ export default function LeadCard({
   }
 
   const handleRevealOrEngage = async () => {
+    const token = await getFirebaseToken()
     if (!lead.isRevealed) {
       try {
         const res = await fetch('/api/leads/reveal', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : undefined),
+          },
           body: JSON.stringify({ leadId: lead.id }),
         })
         if (!res.ok) {
@@ -139,7 +144,10 @@ export default function LeadCard({
     }
     await fetch(`/api/leads/${lead.id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : undefined),
+      },
       body: JSON.stringify({ isSaved: true, status: 'drafting' }),
     })
     router.push(`/outreach?leadId=${lead.id}&autoGenerate=true`)
