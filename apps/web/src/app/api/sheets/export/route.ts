@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
 import { createLeadSheet, appendToSheet, type SheetLeadRow } from '@/lib/services/sheets'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const authUser = await requireActiveUser(request)

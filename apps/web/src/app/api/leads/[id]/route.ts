@@ -5,6 +5,8 @@ import { getPost } from '@/lib/external-api/client'
 import { updateLeadSchema } from '@/lib/validators/auth'
 import type { AppLead } from '@/types/lead'
 
+export const dynamic = 'force-dynamic'
+
 function formatTimeAgo(dateStr: string): string {
   const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000)
   if (seconds < 60) return 'Just now'

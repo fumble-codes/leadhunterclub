@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { requireAuth } from '@/lib/auth'
 import { getAdminAuthInstance } from '@/lib/firebase-admin'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const authUser = await requireAuth(request)

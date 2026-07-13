@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { requireAdmin, ForbiddenError } from '@/lib/auth'
 import { adminNoteSchema } from '@/lib/validators/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request)

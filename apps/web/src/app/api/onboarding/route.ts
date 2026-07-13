@@ -4,6 +4,8 @@ import { getAuthUser } from '@/lib/auth'
 import { onboardingSchema } from '@/lib/validators/auth'
 import { emailService } from '@/lib/services/email'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const authUser = await getAuthUser(request)

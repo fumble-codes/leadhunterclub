@@ -6,6 +6,8 @@ import { auditService } from '@/lib/services/audit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 import { emailService } from '@/lib/services/email'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request)

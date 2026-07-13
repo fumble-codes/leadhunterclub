@@ -3,6 +3,8 @@ import { db } from '@/lib/db'
 import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
 import { getPosts } from '@/lib/external-api/client'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const authUser = await requireActiveUser(request)

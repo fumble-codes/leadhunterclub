@@ -6,6 +6,8 @@ import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 import { getPost } from '@/lib/external-api/client'
 
+export const dynamic = 'force-dynamic'
+
 async function generateOutreach(prompt: string, context: string): Promise<string> {
   const { OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY } = process.env
 

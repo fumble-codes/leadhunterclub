@@ -4,6 +4,8 @@ import { getAuthUser } from '@/lib/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { getPlanCredits } from '@/lib/config/plans'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
