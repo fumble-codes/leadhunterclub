@@ -88,8 +88,8 @@ export async function GET(request: NextRequest) {
       user.website ||
       user.linkedin ||
       user.instagram ||
-      user.servicesOffered.length > 0 ||
-      user.preferredLeadCategories.length > 0 ||
+      (user.servicesOffered?.length ?? 0) > 0 ||
+      (user.preferredLeadCategories?.length ?? 0) > 0 ||
       user.outreachExperience ||
       user.discoverySource
     )

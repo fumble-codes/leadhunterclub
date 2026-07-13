@@ -24,8 +24,8 @@ model User {
   website                String?
   linkedin               String?
   instagram              String?
-  servicesOffered        String[]
-  preferredLeadCategories String[]
+  servicesOffered        String[] @default([])
+  preferredLeadCategories String[] @default([])
   outreachExperience     String?
   discoverySource        String?
 
