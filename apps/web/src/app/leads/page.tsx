@@ -45,7 +45,7 @@ export default function LeadsPage() {
     try {
       setLoading(true)
       const token = await getFirebaseToken()
-      const res = await fetch('/api/leads?status=new', {
+      const res = await fetch('/api/leads', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       const json = await res.json()

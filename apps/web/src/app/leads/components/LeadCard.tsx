@@ -105,7 +105,6 @@ export default function LeadCard({
     e.stopPropagation()
     const newState = !isSaved
     setIsSaved(newState)
-    lead.status = newState ? 'saved' : 'new'
     addToast({
       type: 'success',
       message: newState ? '✓ Saved to pipeline' : 'Removed from pipeline',
@@ -128,7 +127,7 @@ export default function LeadCard({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : undefined),
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify({ leadId: lead.id }),
         })
@@ -146,7 +145,7 @@ export default function LeadCard({
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : undefined),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify({ isSaved: true, status: 'drafting' }),
     })

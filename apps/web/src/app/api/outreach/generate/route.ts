@@ -140,27 +140,12 @@ export async function POST(request: NextRequest) {
 
     const externalLead = await getPost(leadId)
 
-    const CREDIT_COST = 2
-
-    const result = await db.$transaction(async (tx) => {
-      const deductResult = await creditService.deductInTx(
-        tx,
-        userId,
-        CREDIT_COST,
-        'outreach_generate',
-        { leadId },
-      )
-
-      const state = await tx.userLeadState.findUnique({
-        where: { userId_leadId: { userId, leadId } },
-      })
-
-      if (!state || !state.isRevealed) {
-        throw new MustRevealFirstError()
-      }
-
-      return { creditsRemaining: deductResult.subscriptionBalance + deductResult.bonusBalance }
+    const state = await db.userLeadState.findUnique({
+      where: { userId_leadId: { userId, leadId } },
     })
+    if (!state || !state.isRevealed) {
+      throw new MustRevealFirstError()
+    }
 
     const context = `
       Lead Name: ${externalLead.author?.name || 'Unknown'}
@@ -201,10 +186,15 @@ export async function POST(request: NextRequest) {
       .replace(/\[Category\]/gi, niche)
       .replace(/\[Niche\]/gi, niche)
 
+    const CREDIT_COST = 2
+    const deductResult = await db.$transaction(async (tx) => {
+      return creditService.deductInTx(tx, userId, CREDIT_COST, 'outreach_generate', { leadId })
+    })
+
     return NextResponse.json({
       success: true,
       content: generatedContent,
-      creditsRemaining: result.creditsRemaining,
+      creditsRemaining: deductResult.subscriptionBalance + deductResult.bonusBalance,
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
