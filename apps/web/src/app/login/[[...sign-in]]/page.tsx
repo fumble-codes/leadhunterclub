@@ -46,7 +46,9 @@ export default function LoginPage() {
       await sendPasswordResetEmail(auth, email)
       setResetSent(true)
     } catch (err: unknown) {
-      setError(err instanceof Error ? friendlyFirebaseError(err.message) : 'Failed to send reset email')
+      setError(
+        err instanceof Error ? friendlyFirebaseError(err.message) : 'Failed to send reset email',
+      )
     }
   }
 
@@ -120,7 +122,9 @@ export default function LoginPage() {
               </div>
             )}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Email address</label>
+              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                Email address
+              </label>
               <input
                 name="email"
                 type="email"
@@ -131,7 +135,9 @@ export default function LoginPage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Password</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Password
+                </label>
                 <button
                   type="button"
                   onClick={handleForgotPassword}
@@ -164,7 +170,10 @@ export default function LoginPage() {
             <div className="text-center mt-4">
               <p className="text-sm text-text-secondary">
                 {"Don't have an account? "}
-                <Link href="/register" className="text-accent-mint hover:text-accent-mint/80 font-semibold">
+                <Link
+                  href="/register"
+                  className="text-accent-mint hover:text-accent-mint/80 font-semibold"
+                >
                   Sign up
                 </Link>
               </p>

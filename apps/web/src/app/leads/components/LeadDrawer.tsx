@@ -2,8 +2,15 @@
 
 import { useState } from 'react'
 import {
-  XMarkIcon, LockClosedIcon, BanknotesIcon, CheckCircleIcon,
-  ChartBarSquareIcon, UserIcon, EnvelopeIcon, ArrowPathIcon, PhoneIcon
+  XMarkIcon,
+  LockClosedIcon,
+  BanknotesIcon,
+  CheckCircleIcon,
+  ChartBarSquareIcon,
+  UserIcon,
+  EnvelopeIcon,
+  ArrowPathIcon,
+  PhoneIcon,
 } from '@heroicons/react/24/solid'
 import { AppLead } from '@/types/lead'
 import { useRouter } from 'next/navigation'
@@ -11,11 +18,26 @@ import { Badge, Modal, Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 
 const themeMap = {
-  mint: { textAccent: 'text-text-secondary hover:text-text-primary transition-colors', bgAccent: 'bg-surface-secondary' },
-  purple: { textAccent: 'text-text-secondary hover:text-text-primary transition-colors', bgAccent: 'bg-surface-secondary' },
-  cyan: { textAccent: 'text-text-secondary hover:text-text-primary transition-colors', bgAccent: 'bg-surface-secondary' },
-  orange: { textAccent: 'text-text-secondary hover:text-text-primary transition-colors', bgAccent: 'bg-surface-secondary' },
-  pink: { textAccent: 'text-text-secondary hover:text-text-primary transition-colors', bgAccent: 'bg-surface-secondary' },
+  mint: {
+    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
+    bgAccent: 'bg-surface-secondary',
+  },
+  purple: {
+    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
+    bgAccent: 'bg-surface-secondary',
+  },
+  cyan: {
+    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
+    bgAccent: 'bg-surface-secondary',
+  },
+  orange: {
+    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
+    bgAccent: 'bg-surface-secondary',
+  },
+  pink: {
+    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
+    bgAccent: 'bg-surface-secondary',
+  },
 }
 
 export default function LeadDrawer({
@@ -99,18 +121,27 @@ export default function LeadDrawer({
           </>
         }
       >
-        <p className="mb-2">This costs <strong>{tokenCost} credits</strong>.</p>
-        <p>You will get access to the lead&apos;s name, email{lead.hasPhone ? ', phone,' : ','} and company details.</p>
+        <p className="mb-2">
+          This costs <strong>{tokenCost} credits</strong>.
+        </p>
+        <p>
+          You will get access to the lead&apos;s name, email{lead.hasPhone ? ', phone,' : ','} and
+          company details.
+        </p>
       </Modal>
 
       {/* Top subtle highlight */}
-      <div className={`absolute top-0 left-0 right-0 h-[2px] opacity-40 bg-gradient-to-r from-transparent via-current to-transparent ${theme.textAccent}`} />
+      <div
+        className={`absolute top-0 left-0 right-0 h-[2px] opacity-40 bg-gradient-to-r from-transparent via-current to-transparent ${theme.textAccent}`}
+      />
 
       {/* Header with Close button */}
       <div className="flex items-center justify-between p-6 pb-4 border-b border-border-subtle shrink-0">
         <div className="flex items-center gap-3">
           <div className={`w-2.5 h-2.5 rounded-full bg-current ${theme.textAccent}`} />
-          <Badge size="sm" color="purple">Lead Hunter Club</Badge>
+          <Badge size="sm" color="purple">
+            Lead Hunter Club
+          </Badge>
         </div>
         <button
           onClick={onClose}
@@ -145,8 +176,12 @@ export default function LeadDrawer({
           {!lead.isRevealed && (
             <div className="absolute inset-0 z-10 backdrop-blur-[6px] bg-surface-secondary/50 flex flex-col items-center justify-center rounded-xl border border-white/5">
               <LockClosedIcon className="w-6 h-6 text-text-secondary mb-2" />
-              <p className="text-[12px] font-bold text-text-primary tracking-widest uppercase">AI Intel Locked</p>
-              <p className="text-[10px] text-text-secondary mt-1">Reveal contact to unlock deep intelligence</p>
+              <p className="text-[12px] font-bold text-text-primary tracking-widest uppercase">
+                AI Intel Locked
+              </p>
+              <p className="text-[10px] text-text-secondary mt-1">
+                Reveal contact to unlock deep intelligence
+              </p>
             </div>
           )}
           <div className={!lead.isRevealed ? 'opacity-30 blur-[2px] select-none' : ''}>
@@ -161,9 +196,14 @@ export default function LeadDrawer({
         <div className="w-full h-px bg-border-subtle my-8" />
 
         <div className="flex flex-wrap gap-2 mb-6">
-          <span className="text-[12px] text-text-secondary font-medium mr-2 self-center">Hashtags:</span>
+          <span className="text-[12px] text-text-secondary font-medium mr-2 self-center">
+            Hashtags:
+          </span>
           {lead.hashtags.map((t) => (
-            <span key={t} className="text-[12px] font-medium text-text-secondary/80 px-2 py-1 rounded bg-white/5">
+            <span
+              key={t}
+              className="text-[12px] font-medium text-text-secondary/80 px-2 py-1 rounded bg-white/5"
+            >
               {t}
             </span>
           ))}
@@ -192,13 +232,23 @@ export default function LeadDrawer({
                 <UserIcon className="w-4 h-4" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[14px] font-bold text-text-primary truncate">{lead.name}</span>
-                <a href={`mailto:${lead.email}`} className="text-[12px] font-medium text-accent-cyan hover:underline flex items-center gap-1 truncate">
-                  <EnvelopeIcon className="w-3 h-3 shrink-0" /> <span className="truncate">{lead.email}</span>
+                <span className="text-[14px] font-bold text-text-primary truncate">
+                  {lead.name}
+                </span>
+                <a
+                  href={`mailto:${lead.email}`}
+                  className="text-[12px] font-medium text-accent-cyan hover:underline flex items-center gap-1 truncate"
+                >
+                  <EnvelopeIcon className="w-3 h-3 shrink-0" />{' '}
+                  <span className="truncate">{lead.email}</span>
                 </a>
                 {lead.phone && (
-                  <a href={`tel:${lead.phone}`} className="text-[12px] font-medium text-accent-orange hover:underline flex items-center gap-1 mt-1 truncate">
-                    <PhoneIcon className="w-3 h-3 shrink-0" /> <span className="truncate">{lead.phone}</span>
+                  <a
+                    href={`tel:${lead.phone}`}
+                    className="text-[12px] font-medium text-accent-orange hover:underline flex items-center gap-1 mt-1 truncate"
+                  >
+                    <PhoneIcon className="w-3 h-3 shrink-0" />{' '}
+                    <span className="truncate">{lead.phone}</span>
                   </a>
                 )}
               </div>
@@ -250,11 +300,7 @@ export default function LeadDrawer({
             </Button>
           </div>
         )}
-        {errorMsg && (
-          <div className="text-11 text-red-400 mt-3 font-medium">
-            {errorMsg}
-          </div>
-        )}
+        {errorMsg && <div className="text-11 text-red-400 mt-3 font-medium">{errorMsg}</div>}
       </div>
     </div>
   )
@@ -263,8 +309,14 @@ export default function LeadDrawer({
 function IntelBlock({ label, value, theme }: { label: string; value: string; theme: any }) {
   return (
     <div>
-      <span className={`block text-11 font-bold tracking-[0.15em] uppercase mb-2 opacity-80 ${theme.textAccent}`}>{label}</span>
-      <span className="block text-[14px] text-text-primary/95 leading-relaxed font-medium">{value}</span>
+      <span
+        className={`block text-11 font-bold tracking-[0.15em] uppercase mb-2 opacity-80 ${theme.textAccent}`}
+      >
+        {label}
+      </span>
+      <span className="block text-[14px] text-text-primary/95 leading-relaxed font-medium">
+        {value}
+      </span>
     </div>
   )
 }

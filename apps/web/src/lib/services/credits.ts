@@ -164,12 +164,7 @@ async function grantInTx(
 }
 
 export const creditService = {
-  async deduct(
-    userId: string,
-    amount: number,
-    reason: string,
-    metadata?: Record<string, unknown>,
-  ) {
+  async deduct(userId: string, amount: number, reason: string, metadata?: Record<string, unknown>) {
     return db.$transaction((tx) => deductInTx(tx, userId, amount, reason, metadata))
   },
 
@@ -180,9 +175,7 @@ export const creditService = {
   },
 
   async grantSubscription(userId: string, amount: number, reason: string, adminId?: string) {
-    return db.$transaction((tx) =>
-      grantInTx(tx, userId, amount, reason, adminId, 'subscription'),
-    )
+    return db.$transaction((tx) => grantInTx(tx, userId, amount, reason, adminId, 'subscription'))
   },
 
   grantInTx,

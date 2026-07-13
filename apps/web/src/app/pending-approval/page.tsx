@@ -63,7 +63,9 @@ export default function PendingApprovalPage() {
     }
 
     schedulePoll()
-    return () => { mountedRef.current = false }
+    return () => {
+      mountedRef.current = false
+    }
   }, [user, router, getToken])
 
   if (loading) {
@@ -118,8 +120,8 @@ export default function PendingApprovalPage() {
                 Application Not Approved
               </h1>
               <p className="text-sm text-text-secondary leading-relaxed mb-8">
-                Unfortunately, your application was not approved at this time.
-                If you believe this is a mistake, please contact support.
+                Unfortunately, your application was not approved at this time. If you believe this
+                is a mistake, please contact support.
               </p>
             </>
           ) : (
@@ -133,8 +135,9 @@ export default function PendingApprovalPage() {
               </h1>
 
               <p className="text-sm text-text-secondary leading-relaxed mb-8">
-                Thanks for completing your profile! Our team is reviewing your application.
-                This page refreshes automatically — you&apos;ll be redirected to the dashboard once approved.
+                Thanks for completing your profile! Our team is reviewing your application. This
+                page refreshes automatically — you&apos;ll be redirected to the dashboard once
+                approved.
               </p>
 
               <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 mb-8 text-left">
@@ -145,7 +148,7 @@ export default function PendingApprovalPage() {
                   {[
                     'Our team reviews your profile and services',
                     'This page checks for updates every 8 seconds',
-                    'Once approved, you\'ll be auto-redirected to your dashboard',
+                    "Once approved, you'll be auto-redirected to your dashboard",
                     'Start hunting leads and closing clients',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-text-secondary">

@@ -6,7 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from './components/LeadCard'
 import LeadDrawer from './components/LeadDrawer'
-import { MagnifyingGlassIcon, AdjustmentsHorizontalIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
+import {
+  MagnifyingGlassIcon,
+  AdjustmentsHorizontalIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/24/solid'
 import type { AppLead } from '@/types/lead'
 import { Select } from '@/components/ui'
 
@@ -64,9 +68,7 @@ export default function LeadsPage() {
       })
       if (res.ok) {
         setLeadsList((prev) =>
-          prev.map((l) =>
-            l.id === leadId ? { ...l, status: isSaved ? 'saved' : 'new' } : l,
-          ),
+          prev.map((l) => (l.id === leadId ? { ...l, status: isSaved ? 'saved' : 'new' } : l)),
         )
       }
     } catch (err) {
@@ -75,11 +77,7 @@ export default function LeadsPage() {
   }
 
   const allTags = Array.from(
-    new Set(
-      leadsList
-        .filter((l) => l.status === 'new')
-        .flatMap((l) => l.nicheTags),
-    ),
+    new Set(leadsList.filter((l) => l.status === 'new').flatMap((l) => l.nicheTags)),
   )
 
   const filteredLeads = useMemo(() => {
@@ -137,9 +135,7 @@ export default function LeadsPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10 mt-2">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 flex-1 w-full">
             <div className="flex items-center gap-4 shrink-0">
-              <h1 className="text-[28px] font-bold text-text-primary tracking-tight">
-                Lead Feed
-              </h1>
+              <h1 className="text-[28px] font-bold text-text-primary tracking-tight">Lead Feed</h1>
             </div>
 
             <div className="relative group flex-1 w-full">
@@ -215,16 +211,23 @@ export default function LeadsPage() {
                     className="absolute right-0 top-full mt-2 w-72 rounded-2xl bg-surface-elevated border border-white/[0.08] p-4 shadow-2xl z-50 backdrop-blur-xl"
                   >
                     <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/5">
-                      <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">Filter by Tags</span>
+                      <span className="text-xs font-bold text-text-secondary uppercase tracking-wider">
+                        Filter by Tags
+                      </span>
                       {selectedTags.length > 0 && (
-                        <button onClick={() => setSelectedTags([])} className="text-[11px] font-medium text-accent-purple hover:underline">
+                        <button
+                          onClick={() => setSelectedTags([])}
+                          className="text-[11px] font-medium text-accent-purple hover:underline"
+                        >
                           Clear all
                         </button>
                       )}
                     </div>
                     <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto py-1 scrollbar-hide">
                       {allTags.length === 0 ? (
-                        <span className="text-xs text-text-secondary/50 py-2">No tags available</span>
+                        <span className="text-xs text-text-secondary/50 py-2">
+                          No tags available
+                        </span>
                       ) : (
                         allTags.map((tag) => {
                           const isSelected = selectedTags.includes(tag)
@@ -280,17 +283,23 @@ export default function LeadsPage() {
           })}
         </div>
 
-        <div className={`grid gap-6 transition-all duration-300 ${selectedLeadId ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}>
+        <div
+          className={`grid gap-6 transition-all duration-300 ${selectedLeadId ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'}`}
+        >
           <div className={selectedLeadId ? 'lg:col-span-2' : 'col-span-1'}>
             <div
               className={`grid gap-5 auto-rows-[minmax(280px,auto)] transition-all duration-300 ${
-                selectedLeadId ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                selectedLeadId
+                  ? 'grid-cols-1 lg:grid-cols-2'
+                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
               }`}
             >
               {loading ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center">
                   <ArrowPathIcon className="w-8 h-8 animate-spin text-accent-purple mb-4" />
-                  <h3 className="text-sm font-medium text-text-secondary">Loading fresh buyer-intent leads...</h3>
+                  <h3 className="text-sm font-medium text-text-secondary">
+                    Loading fresh buyer-intent leads...
+                  </h3>
                 </div>
               ) : filteredLeads.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl backdrop-blur-md">
@@ -343,7 +352,9 @@ export default function LeadsPage() {
                   onReveal={(name, email, phone) => {
                     setLeadsList((prev) =>
                       prev.map((l) =>
-                        l.id === selectedLead.id ? { ...l, isRevealed: true, name, email, phone } : l,
+                        l.id === selectedLead.id
+                          ? { ...l, isRevealed: true, name, email, phone }
+                          : l,
                       ),
                     )
                   }}

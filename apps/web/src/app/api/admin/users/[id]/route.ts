@@ -6,10 +6,7 @@ import { auditService } from '@/lib/services/audit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 import { emailService } from '@/lib/services/email'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request)
 
@@ -42,10 +39,7 @@ export async function GET(
     })
 
     if (!user) {
-      return NextResponse.json(
-        { code: 'NOT_FOUND', message: 'User not found' },
-        { status: 404 },
-      )
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
     }
 
     const userWithCredit = {
@@ -82,10 +76,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authUser = await requireAdmin(request)
 
@@ -95,7 +86,11 @@ export async function PATCH(
     const parsed = adminUserActionSchema.safeParse(rawBody)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
@@ -112,10 +107,7 @@ export async function PATCH(
 
       const user = await db.user.findUnique({ where: { id: targetUserId } })
       if (!user) {
-        return NextResponse.json(
-          { code: 'NOT_FOUND', message: 'User not found' },
-          { status: 404 },
-        )
+        return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
       }
 
       const newStatus = statusMap[body.action]
@@ -132,7 +124,11 @@ export async function PATCH(
       const updated = await db.user.findUnique({
         where: { id: targetUserId },
         select: {
-          id: true, status: true, email: true, name: true, plan: true,
+          id: true,
+          status: true,
+          email: true,
+          name: true,
+          plan: true,
           creditAccount: {
             select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
           },
@@ -149,7 +145,10 @@ export async function PATCH(
           from: user.status,
           to: statusMap[body.action],
           method: body.action,
-          plan: body.action === 'APPROVE' || body.action === 'ACTIVATE' ? body.plan || 'FREE' : undefined,
+          plan:
+            body.action === 'APPROVE' || body.action === 'ACTIVATE'
+              ? body.plan || 'FREE'
+              : undefined,
         },
       })
 
@@ -168,7 +167,8 @@ export async function PATCH(
               ? {
                   subscriptionBalance: updated.creditAccount.subscriptionBalance,
                   bonusBalance: updated.creditAccount.bonusBalance,
-                  total: updated.creditAccount.subscriptionBalance + updated.creditAccount.bonusBalance,
+                  total:
+                    updated.creditAccount.subscriptionBalance + updated.creditAccount.bonusBalance,
                   renewalDate: updated.creditAccount.renewalDate?.toISOString() || null,
                 }
               : { subscriptionBalance: 0, bonusBalance: 0, total: 0, renewalDate: null },
@@ -181,10 +181,7 @@ export async function PATCH(
     if (body.action === 'RENEW_NOW') {
       const user = await db.user.findUnique({ where: { id: targetUserId } })
       if (!user) {
-        return NextResponse.json(
-          { code: 'NOT_FOUND', message: 'User not found' },
-          { status: 404 },
-        )
+        return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
       }
 
       const result = await creditService.renewSubscription(targetUserId)
@@ -224,10 +221,7 @@ export async function PATCH(
         },
       })
       if (!user) {
-        return NextResponse.json(
-          { code: 'NOT_FOUND', message: 'User not found' },
-          { status: 404 },
-        )
+        return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
       }
 
       const amount = body.bonusCredits
@@ -262,16 +256,16 @@ export async function PATCH(
     if (body.changePlan !== undefined) {
       const user = await db.user.findUnique({ where: { id: targetUserId } })
       if (!user) {
-        return NextResponse.json(
-          { code: 'NOT_FOUND', message: 'User not found' },
-          { status: 404 },
-        )
+        return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
       }
 
       const validPlans = ['FREE', 'FREELANCER', 'AGENCY']
       if (!validPlans.includes(body.changePlan)) {
         return NextResponse.json(
-          { code: 'VALIDATION_ERROR', message: `Invalid plan. Must be one of: ${validPlans.join(', ')}` },
+          {
+            code: 'VALIDATION_ERROR',
+            message: `Invalid plan. Must be one of: ${validPlans.join(', ')}`,
+          },
           { status: 400 },
         )
       }

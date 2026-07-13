@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    const totalCredits = (user?.creditAccount?.subscriptionBalance ?? 0) + (user?.creditAccount?.bonusBalance ?? 0)
+    const totalCredits =
+      (user?.creditAccount?.subscriptionBalance ?? 0) + (user?.creditAccount?.bonusBalance ?? 0)
     const creditsRemaining = totalCredits
     const planCredits = user?.plan === 'FREELANCER' ? 500 : user?.plan === 'AGENCY' ? 1000 : 50
 
@@ -48,10 +49,9 @@ export async function GET(request: NextRequest) {
       where: { userId, isSaved: true },
       include: { lead: { select: { replyProbability: true } } },
     })
-    const scores = savedLeadsWithScore.map(s => s.lead.replyProbability).filter(Boolean)
-    const avgReplyProbability = scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : 0
+    const scores = savedLeadsWithScore.map((s) => s.lead.replyProbability).filter(Boolean)
+    const avgReplyProbability =
+      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0
 
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     const recentActivity = await db.userLeadState.findMany({
@@ -63,14 +63,14 @@ export async function GET(request: NextRequest) {
     })
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     const activityMap = new Map<string, number>()
-    dayNames.forEach(d => activityMap.set(d, 0))
-    recentActivity.forEach(state => {
+    dayNames.forEach((d) => activityMap.set(d, 0))
+    recentActivity.forEach((state) => {
       if (state.lastActionDate) {
         const dayName = dayNames[state.lastActionDate.getDay()]
         activityMap.set(dayName, (activityMap.get(dayName) || 0) + 1)
       }
     })
-    const activity = dayNames.map(day => ({
+    const activity = dayNames.map((day) => ({
       day,
       value: activityMap.get(day) || 0,
     }))
@@ -80,9 +80,9 @@ export async function GET(request: NextRequest) {
       include: { lead: { select: { niches: true, nicheTags: true } } },
     })
     const nicheCounts = new Map<string, number>()
-    savedLeadsWithTags.forEach(uls => {
+    savedLeadsWithTags.forEach((uls) => {
       const allTags = [...(uls.lead.niches || []), ...(uls.lead.nicheTags || [])]
-      allTags.forEach(tag => {
+      allTags.forEach((tag) => {
         nicheCounts.set(tag, (nicheCounts.get(tag) || 0) + 1)
       })
     })
@@ -136,10 +136,16 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     console.error('[Dashboard API] GET error:', error)
     return NextResponse.json(

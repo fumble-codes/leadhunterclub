@@ -16,7 +16,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const adminRoutes = ['/admin']
   const authRoutes = ['/login', '/register']
   const onboardingRoutes = ['/onboarding', '/pending-approval', '/admin-register']
-  const isPublicRoute = pathname === '/' || authRoutes.some((r) => pathname.startsWith(r)) || pathname.startsWith('/sneak-peek')
+  const isPublicRoute =
+    pathname === '/' ||
+    authRoutes.some((r) => pathname.startsWith(r)) ||
+    pathname.startsWith('/sneak-peek')
   const isOnboardingRoute = onboardingRoutes.some((r) => pathname.startsWith(r))
   const isAdminRoute = adminRoutes.some((r) => pathname.startsWith(r))
 

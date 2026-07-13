@@ -40,9 +40,7 @@ async function getAdminAuth(): Promise<Auth | null> {
     const { getAuth } = await import('firebase-admin/auth')
 
     const apps = getApps()
-    const app = apps.length
-      ? apps[0]
-      : initializeApp({ credential: cert(serviceAccount) })
+    const app = apps.length ? apps[0] : initializeApp({ credential: cert(serviceAccount) })
 
     adminAuthInstance = getAuth(app)
     return adminAuthInstance

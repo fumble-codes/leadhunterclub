@@ -12,9 +12,11 @@ export const adminUserActionSchema = z
     changePlan: z.enum(['FREE', 'FREELANCER', 'AGENCY']).optional(),
   })
   .refine(
-    (data) => data.action !== undefined || data.bonusCredits !== undefined || data.changePlan !== undefined,
+    (data) =>
+      data.action !== undefined || data.bonusCredits !== undefined || data.changePlan !== undefined,
     {
-      message: 'Provide action (APPROVE/REJECT/SUSPEND/ACTIVATE/RENEW_NOW), bonusCredits, or changePlan',
+      message:
+        'Provide action (APPROVE/REJECT/SUSPEND/ACTIVATE/RENEW_NOW), bonusCredits, or changePlan',
     },
   )
 

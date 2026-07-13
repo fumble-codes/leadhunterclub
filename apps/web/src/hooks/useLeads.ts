@@ -17,10 +17,7 @@ export function useLeads(params: LeadListParams = {}) {
 }
 
 export function useLead(id: string | null) {
-  const fetcher = useCallback(
-    () => leadsService.getById(id!),
-    [id],
-  )
+  const fetcher = useCallback(() => leadsService.getById(id!), [id])
 
   return useApi<Lead>(fetcher)
 }

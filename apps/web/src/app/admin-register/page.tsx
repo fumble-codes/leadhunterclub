@@ -7,12 +7,15 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, auth } from
 import { ShieldCheckIcon } from '@heroicons/react/24/solid'
 
 const FIREBASE_ERRORS: Record<string, string> = {
-  'auth/email-already-in-use': 'This email is already registered. We found your existing account and will upgrade it to admin.',
-  'auth/credential-already-in-use': 'This email is already linked to another account. Use a different email or sign in with the existing account.',
+  'auth/email-already-in-use':
+    'This email is already registered. We found your existing account and will upgrade it to admin.',
+  'auth/credential-already-in-use':
+    'This email is already linked to another account. Use a different email or sign in with the existing account.',
   'auth/invalid-email': 'Please enter a valid email address.',
   'auth/weak-password': 'Password must be at least 6 characters.',
   'auth/user-not-found': 'No account found with this email. A new one will be created.',
-  'auth/wrong-password': 'Incorrect password. If you already have a consumer account, enter its password.',
+  'auth/wrong-password':
+    'Incorrect password. If you already have a consumer account, enter its password.',
   'auth/invalid-credential': 'Incorrect email or password.',
   'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
 }
@@ -112,7 +115,9 @@ export default function AdminRegisterPage() {
           const result = await createUserWithEmailAndPassword(auth, email, password)
           token = await result.user.getIdToken()
         } else if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
-          setError('That email is already registered as a consumer account. Please use the correct password, or use a different email for the admin account.')
+          setError(
+            'That email is already registered as a consumer account. Please use the correct password, or use a different email for the admin account.',
+          )
           setLoading(false)
           return
         } else {
@@ -154,8 +159,12 @@ export default function AdminRegisterPage() {
             <div className="w-12 h-12 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center mx-auto mb-4">
               <ShieldCheckIcon className="w-6 h-6 text-accent-mint" />
             </div>
-            <h1 className="text-2xl font-bold text-text-primary tracking-tight">Admin Registration</h1>
-            <p className="text-sm text-text-secondary mt-2">Restricted to authorized team members only</p>
+            <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+              Admin Registration
+            </h1>
+            <p className="text-sm text-text-secondary mt-2">
+              Restricted to authorized team members only
+            </p>
           </div>
 
           {step === 'key' ? (
@@ -191,7 +200,9 @@ export default function AdminRegisterPage() {
           ) : (
             <form onSubmit={handleRegister} className="flex flex-col gap-5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Name</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Name
+                </label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -202,7 +213,9 @@ export default function AdminRegisterPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Email</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Email
+                </label>
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -214,7 +227,9 @@ export default function AdminRegisterPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Password</label>
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Password
+                </label>
                 <input
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

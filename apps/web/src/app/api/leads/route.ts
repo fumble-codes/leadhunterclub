@@ -24,14 +24,17 @@ function extractTags(post: ExternalPost): string[] {
   return tags
 }
 
-function externalPostToAppLead(post: ExternalPost, userState?: { isSaved: boolean; isRevealed: boolean; status: string } | null): AppLead {
+function externalPostToAppLead(
+  post: ExternalPost,
+  userState?: { isSaved: boolean; isRevealed: boolean; status: string } | null,
+): AppLead {
   const isRevealed = userState?.isRevealed || false
   const phone = post.contact_info?.phone_numbers?.[0]?.number || null
   const email = post.email || post.contact_info?.emails?.[0]?.email || ''
 
   return {
     id: post.id,
-    name: isRevealed ? (post.author?.name || 'Unknown') : 'Unlocked Contact',
+    name: isRevealed ? post.author?.name || 'Unknown' : 'Unlocked Contact',
     email: isRevealed ? email : 'unlocked@leadhunterclub.com',
     company: post.contact_info?.company_name || post.author?.name || post.platform || '',
     source: post.platform || 'Unknown',
@@ -73,36 +76,38 @@ export async function GET(request: NextRequest) {
 
     const externalLeads = externalRes.data
 
-    const leadIds = externalLeads.map(l => l.id)
-    const userStates = leadIds.length > 0
-      ? await db.userLeadState.findMany({
-          where: {
-            userId,
-            leadId: { in: leadIds },
-          },
-        })
-      : []
+    const leadIds = externalLeads.map((l) => l.id)
+    const userStates =
+      leadIds.length > 0
+        ? await db.userLeadState.findMany({
+            where: {
+              userId,
+              leadId: { in: leadIds },
+            },
+          })
+        : []
 
-    const stateMap = new Map(userStates.map(s => [s.leadId, s]))
+    const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
 
-    let data = externalLeads.map(lead => externalPostToAppLead(lead, stateMap.get(lead.id)))
+    let data = externalLeads.map((lead) => externalPostToAppLead(lead, stateMap.get(lead.id)))
 
     if (saved === 'true') {
-      data = data.filter(l => l.isSaved)
+      data = data.filter((l) => l.isSaved)
     } else if (saved === 'outreach') {
-      data = data.filter(l => ['drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
+      data = data.filter((l) => ['drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
     } else {
-      data = data.filter(l => l.status === 'new')
+      data = data.filter((l) => l.status === 'new')
     }
 
     if (search) {
       const q = search.toLowerCase()
-      data = data.filter(l =>
-        l.title.toLowerCase().includes(q) ||
-        l.signalContext.toLowerCase().includes(q) ||
-        l.company.toLowerCase().includes(q) ||
-        l.category.toLowerCase().includes(q) ||
-        l.nicheTags.some(tag => tag.toLowerCase().includes(q))
+      data = data.filter(
+        (l) =>
+          l.title.toLowerCase().includes(q) ||
+          l.signalContext.toLowerCase().includes(q) ||
+          l.company.toLowerCase().includes(q) ||
+          l.category.toLowerCase().includes(q) ||
+          l.nicheTags.some((tag) => tag.toLowerCase().includes(q)),
       )
     }
 
@@ -122,10 +127,16 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     console.error('[Leads API] GET error:', error)
     return NextResponse.json(
@@ -137,7 +148,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST() {
   return NextResponse.json(
-    { code: 'READ_ONLY', message: 'Lead creation is not supported. Leads are read-only from external source.' },
+    {
+      code: 'READ_ONLY',
+      message: 'Lead creation is not supported. Leads are read-only from external source.',
+    },
     { status: 400 },
   )
 }

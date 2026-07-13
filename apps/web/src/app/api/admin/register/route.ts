@@ -19,7 +19,11 @@ export async function POST(request: NextRequest) {
     const parsed = adminRegisterSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }

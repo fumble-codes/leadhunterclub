@@ -45,7 +45,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  if (!user || user.role !== 'admin' || user.status === 'SUSPENDED' || user.status === 'REJECTED') return null
+  if (!user || user.role !== 'admin' || user.status === 'SUSPENDED' || user.status === 'REJECTED')
+    return null
 
   return (
     <div className="min-h-screen bg-bg-main flex">
@@ -56,7 +57,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <nav className="flex flex-col gap-1 flex-1">
           {adminNav.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+            const isActive =
+              pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
             return (
               <Link
                 key={item.href}

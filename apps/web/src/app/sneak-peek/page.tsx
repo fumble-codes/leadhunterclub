@@ -2,18 +2,81 @@
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import { motion } from 'framer-motion'
-import { EyeIcon, EyeSlashIcon, LockClosedIcon, SparklesIcon, ArrowRightIcon, BanknotesIcon } from '@heroicons/react/24/solid'
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  LockClosedIcon,
+  SparklesIcon,
+  ArrowRightIcon,
+  BanknotesIcon,
+} from '@heroicons/react/24/solid'
 import Link from 'next/link'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
 const sneakPeekLeads = [
-  { id: 1, initials: 'SK', name: 'Sarah K.', platform: 'Reddit', signal: 'Looking for a senior Shopify dev to rebuild our checkout flow. Budget $8-12k.', urgency: 'High', intent: 94, accent: 'mint' },
-  { id: 2, initials: 'JT', name: 'James T.', platform: 'Twitter/X', signal: 'Our conversion rate tanked after the redesign. Need someone who actually understands UX.', urgency: 'Critical', intent: 97, accent: 'pink' },
-  { id: 3, initials: 'PM', name: 'Priya M.', platform: 'LinkedIn', signal: 'Searching for a brand designer for our Series A rebrand. Want someone with SaaS experience.', urgency: 'Medium', intent: 82, accent: 'purple' },
-  { id: 4, initials: 'DL', name: 'David L.', platform: 'Threads', signal: 'Website redesign needed ASAP for product launch in 3 weeks. React/Next preferred.', urgency: 'Critical', intent: 91, accent: 'cyan' },
-  { id: 5, initials: 'MR', name: 'Maria R.', platform: 'Reddit', signal: 'Need a growth consultant who can help us crack B2B lead gen. Retainer basis.', urgency: 'High', intent: 88, accent: 'orange' },
-  { id: 6, initials: 'AK', name: 'Alex K.', platform: 'Twitter/X', signal: 'DTC brand looking for email marketing expert. Our CAC is killing us.', urgency: 'High', intent: 90, accent: 'mint' },
+  {
+    id: 1,
+    initials: 'SK',
+    name: 'Sarah K.',
+    platform: 'Reddit',
+    signal: 'Looking for a senior Shopify dev to rebuild our checkout flow. Budget $8-12k.',
+    urgency: 'High',
+    intent: 94,
+    accent: 'mint',
+  },
+  {
+    id: 2,
+    initials: 'JT',
+    name: 'James T.',
+    platform: 'Twitter/X',
+    signal:
+      'Our conversion rate tanked after the redesign. Need someone who actually understands UX.',
+    urgency: 'Critical',
+    intent: 97,
+    accent: 'pink',
+  },
+  {
+    id: 3,
+    initials: 'PM',
+    name: 'Priya M.',
+    platform: 'LinkedIn',
+    signal:
+      'Searching for a brand designer for our Series A rebrand. Want someone with SaaS experience.',
+    urgency: 'Medium',
+    intent: 82,
+    accent: 'purple',
+  },
+  {
+    id: 4,
+    initials: 'DL',
+    name: 'David L.',
+    platform: 'Threads',
+    signal: 'Website redesign needed ASAP for product launch in 3 weeks. React/Next preferred.',
+    urgency: 'Critical',
+    intent: 91,
+    accent: 'cyan',
+  },
+  {
+    id: 5,
+    initials: 'MR',
+    name: 'Maria R.',
+    platform: 'Reddit',
+    signal: 'Need a growth consultant who can help us crack B2B lead gen. Retainer basis.',
+    urgency: 'High',
+    intent: 88,
+    accent: 'orange',
+  },
+  {
+    id: 6,
+    initials: 'AK',
+    name: 'Alex K.',
+    platform: 'Twitter/X',
+    signal: 'DTC brand looking for email marketing expert. Our CAC is killing us.',
+    urgency: 'High',
+    intent: 90,
+    accent: 'mint',
+  },
 ]
 
 export default function SneakPeekPage() {
@@ -27,7 +90,6 @@ export default function SneakPeekPage() {
         <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-cyan-soft pointer-events-none" />
 
         <div className="max-w-[1400px] mx-auto relative z-10">
-
           {/* Sneak Peek Banner */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -41,14 +103,17 @@ export default function SneakPeekPage() {
               </div>
               <div>
                 <span className="text-sm font-bold text-text-primary">Sneak Peek Mode</span>
-                <span className="text-xs text-text-secondary/60 ml-2">— You&apos;re previewing the lead feed. Lead details are locked until you have tokens.</span>
+                <span className="text-xs text-text-secondary/60 ml-2">
+                  — You&apos;re previewing the lead feed. Lead details are locked until you have
+                  tokens.
+                </span>
               </div>
             </div>
             <Link
               href="/#pricing"
               className="shrink-0 px-5 py-2 rounded-xl bg-accent-purple text-text-on-accent text-xs font-bold hover:bg-accent-purple/90 transition-all duration-300 flex items-center gap-2"
             >
-               Get Tokens <BanknotesIcon className="w-[14px] h-[14px]" />
+              Get Tokens <BanknotesIcon className="w-[14px] h-[14px]" />
             </Link>
           </motion.div>
 
@@ -63,7 +128,9 @@ export default function SneakPeekPage() {
                     {sneakPeekLeads.length} Signals
                   </div>
                 </h1>
-                <p className="text-text-secondary/80 text-sm">Real-time conversational opportunities intercepted across your network.</p>
+                <p className="text-text-secondary/80 text-sm">
+                  Real-time conversational opportunities intercepted across your network.
+                </p>
               </div>
             </div>
           </div>
@@ -80,7 +147,9 @@ export default function SneakPeekPage() {
               >
                 {/* Platform badge */}
                 <div className="flex items-center justify-between mb-5">
-                  <div className={`px-2.5 py-1 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 text-accent-${lead.accent} text-9 font-bold uppercase tracking-widest`}>
+                  <div
+                    className={`px-2.5 py-1 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 text-accent-${lead.accent} text-9 font-bold uppercase tracking-widest`}
+                  >
                     {lead.platform}
                   </div>
                   <div className="flex items-center gap-1.5 text-xxs text-text-secondary/40 font-mono">
@@ -97,7 +166,9 @@ export default function SneakPeekPage() {
                 {/* Intent bar */}
                 <div className="mb-5">
                   <div className="flex justify-between text-xxs mb-1.5">
-                    <span className="text-text-secondary/50 font-bold uppercase tracking-widest bg-accent-mint">Intent Score</span>
+                    <span className="text-text-secondary/50 font-bold uppercase tracking-widest bg-accent-mint">
+                      Intent Score
+                    </span>
                     <span className={`font-bold text-accent-${lead.accent}`}>{lead.intent}%</span>
                   </div>
                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
@@ -112,10 +183,20 @@ export default function SneakPeekPage() {
 
                 {/* Urgency */}
                 <div className="flex items-center justify-between mb-5">
-                  <span className="text-xxs text-text-secondary/40 font-bold uppercase tracking-widest bg-accent-mint">Urgency</span>
-                  <span className={`text-xxs font-bold uppercase tracking-widest ${
-                    lead.urgency === 'Critical' ? 'text-text-secondary hover:text-text-primary transition-colors' : lead.urgency === 'High' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary hover:text-text-primary transition-colors'
-                  }`}>{lead.urgency}</span>
+                  <span className="text-xxs text-text-secondary/40 font-bold uppercase tracking-widest bg-accent-mint">
+                    Urgency
+                  </span>
+                  <span
+                    className={`text-xxs font-bold uppercase tracking-widest ${
+                      lead.urgency === 'Critical'
+                        ? 'text-text-secondary hover:text-text-primary transition-colors'
+                        : lead.urgency === 'High'
+                          ? 'text-text-secondary hover:text-text-primary transition-colors'
+                          : 'text-text-secondary hover:text-text-primary transition-colors'
+                    }`}
+                  >
+                    {lead.urgency}
+                  </span>
                 </div>
 
                 {/* Locked identity section */}
@@ -123,17 +204,27 @@ export default function SneakPeekPage() {
                   {/* Blurred content underneath */}
                   <div className="blur-[6px] select-none pointer-events-none">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-9 h-9 rounded-xl bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 flex items-center justify-center`}>
-                        <span className={`text-xxs font-bold text-accent-${lead.accent}`}>{lead.initials}</span>
+                      <div
+                        className={`w-9 h-9 rounded-xl bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 flex items-center justify-center`}
+                      >
+                        <span className={`text-xxs font-bold text-accent-${lead.accent}`}>
+                          {lead.initials}
+                        </span>
                       </div>
                       <div>
                         <div className="text-xs font-bold text-text-primary">{lead.name}</div>
-                        <div className="text-xxs text-text-secondary/50">Founder · E-commerce · $2M ARR</div>
+                        <div className="text-xxs text-text-secondary/50">
+                          Founder · E-commerce · $2M ARR
+                        </div>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">View Profile</div>
-                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">AI Outreach</div>
+                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">
+                        View Profile
+                      </div>
+                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">
+                        AI Outreach
+                      </div>
                     </div>
                   </div>
 
@@ -142,7 +233,9 @@ export default function SneakPeekPage() {
                     <div className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-2">
                       <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary/50" />
                     </div>
-                    <span className="text-xxs font-bold text-text-secondary/60 uppercase tracking-widest">3 Tokens to Reveal</span>
+                    <span className="text-xxs font-bold text-text-secondary/60 uppercase tracking-widest">
+                      3 Tokens to Reveal
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -159,9 +252,12 @@ export default function SneakPeekPage() {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-tab-purple),0.03)_0%,transparent_70%)] pointer-events-none" />
             <div className="relative z-10">
               <SparklesIcon className="w-6 h-6 text-text-secondary mx-auto mb-4" />
-              <h3 className="font-display text-2xl font-bold tracking-tight mb-3">Like What You See?</h3>
+              <h3 className="font-display text-2xl font-bold tracking-tight mb-3">
+                Like What You See?
+              </h3>
               <p className="text-sm text-text-secondary/70 font-light max-w-md mx-auto mb-6 leading-relaxed">
-                These are real signals captured in the last 24 hours. Get tokens to reveal identities, generate AI outreach, and start closing.
+                These are real signals captured in the last 24 hours. Get tokens to reveal
+                identities, generate AI outreach, and start closing.
               </p>
               <Link
                 href="/#pricing"
@@ -171,10 +267,8 @@ export default function SneakPeekPage() {
               </Link>
             </div>
           </motion.div>
-
         </div>
       </main>
-
     </div>
   )
 }

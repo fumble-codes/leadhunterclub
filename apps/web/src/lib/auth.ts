@@ -64,17 +64,11 @@ export function unauthorizedResponse() {
 }
 
 export function forbiddenResponse(message = 'Forbidden') {
-  return NextResponse.json(
-    { code: 'FORBIDDEN', message },
-    { status: 403 },
-  )
+  return NextResponse.json({ code: 'FORBIDDEN', message }, { status: 403 })
 }
 
 export function inactiveResponse(message = 'User account is not active') {
-  return NextResponse.json(
-    { code: 'INACTIVE', message },
-    { status: 403 },
-  )
+  return NextResponse.json({ code: 'INACTIVE', message }, { status: 403 })
 }
 
 export async function requireAdmin(request: Request): Promise<AuthUser> {

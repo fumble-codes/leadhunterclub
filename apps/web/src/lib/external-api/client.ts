@@ -35,11 +35,7 @@ async function getToken(): Promise<string> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-async function fetchApi<T>(
-  path: string,
-  options: RequestInit = {},
-  retries = 3,
-): Promise<T> {
+async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3): Promise<T> {
   const { BASE_URL } = requireCredentials()
   for (let attempt = 0; attempt < retries; attempt++) {
     const token = await getToken()

@@ -11,9 +11,7 @@ export interface UseApiResult<T> extends UseApiState<T> {
   setData: (data: T) => void
 }
 
-export function useApi<T>(
-  fetcher: () => Promise<T>,
-): UseApiResult<T> {
+export function useApi<T>(fetcher: () => Promise<T>): UseApiResult<T> {
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
     loading: true,
@@ -24,13 +22,13 @@ export function useApi<T>(
   fetcherRef.current = fetcher
 
   const execute = useCallback(async () => {
-    setState(prev => ({ ...prev, loading: true, error: null }))
+    setState((prev) => ({ ...prev, loading: true, error: null }))
     try {
       const data = await fetcherRef.current()
       setState({ data, loading: false, error: null })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred'
-      setState(prev => ({ ...prev, loading: false, error: message }))
+      setState((prev) => ({ ...prev, loading: false, error: message }))
     }
   }, [])
 
@@ -41,6 +39,6 @@ export function useApi<T>(
   return {
     ...state,
     refetch: execute,
-    setData: (data: T) => setState(prev => ({ ...prev, data })),
+    setData: (data: T) => setState((prev) => ({ ...prev, data })),
   }
 }

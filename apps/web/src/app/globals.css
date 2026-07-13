@@ -5,7 +5,11 @@
 @layer base {
   body {
     @apply bg-page-bg text-text-primary antialiased selection:bg-accent-mint/30;
-    font-feature-settings: 'ss01' on, 'ss02' on, 'cv01' on, 'cv11' on;
+    font-feature-settings:
+      'ss01' on,
+      'ss02' on,
+      'cv01' on,
+      'cv11' on;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -14,10 +18,10 @@
 @layer utilities {
   .glass-panel {
     @apply bg-surface/80 border border-border-subtle rounded-lg;
-    box-shadow: inset 0 1px 0 0 rgba(var(--rgb-white), 0.05), 0 4px 24px -4px rgba(var(--rgb-black), 0.5);
+    box-shadow:
+      inset 0 1px 0 0 rgba(var(--rgb-white), 0.05),
+      0 4px 24px -4px rgba(var(--rgb-black), 0.5);
   }
-
-
 
   /* Premium machined metallic card */
   .metallic-card {
@@ -26,11 +30,31 @@
     border-radius: 8px;
     background-image:
       url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E"),
-      repeating-linear-gradient(to right, rgba(var(--rgb-white), 0.005) 0px, rgba(var(--rgb-white), 0.005) 1px, transparent 1px, transparent 3px),
-      linear-gradient(135deg, var(--color-metallic-start) 0%, var(--color-metallic-mid) 40%, var(--color-metallic-end) 100%),
-      linear-gradient(to bottom, rgba(var(--rgb-white), 0.09) 0%, rgba(var(--rgb-white), 0.03) 50%, rgba(var(--rgb-black), 0.45) 100%);
+      repeating-linear-gradient(
+        to right,
+        rgba(var(--rgb-white), 0.005) 0px,
+        rgba(var(--rgb-white), 0.005) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      linear-gradient(
+        135deg,
+        var(--color-metallic-start) 0%,
+        var(--color-metallic-mid) 40%,
+        var(--color-metallic-end) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(var(--rgb-white), 0.09) 0%,
+        rgba(var(--rgb-white), 0.03) 50%,
+        rgba(var(--rgb-black), 0.45) 100%
+      );
 
-    background-size: 128px 128px, auto, auto, auto;
+    background-size:
+      128px 128px,
+      auto,
+      auto,
+      auto;
     background-repeat: repeat, repeat, no-repeat, no-repeat;
     background-clip: padding-box, padding-box, padding-box, border-box;
     background-origin: padding-box, padding-box, padding-box, border-box;
@@ -47,9 +71,25 @@
   .metallic-card:hover {
     background-image:
       url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
-      repeating-linear-gradient(to right, rgba(var(--rgb-white), 0.007) 0px, rgba(var(--rgb-white), 0.007) 1px, transparent 1px, transparent 3px),
-      linear-gradient(135deg, var(--color-metallic-start-hover) 0%, var(--color-metallic-mid-hover) 40%, var(--color-metallic-end) 100%),
-      linear-gradient(to bottom, rgba(var(--rgb-white), 0.14) 0%, rgba(var(--rgb-white), 0.05) 50%, rgba(var(--rgb-black), 0.3) 100%);
+      repeating-linear-gradient(
+        to right,
+        rgba(var(--rgb-white), 0.007) 0px,
+        rgba(var(--rgb-white), 0.007) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      linear-gradient(
+        135deg,
+        var(--color-metallic-start-hover) 0%,
+        var(--color-metallic-mid-hover) 40%,
+        var(--color-metallic-end) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(var(--rgb-white), 0.14) 0%,
+        rgba(var(--rgb-white), 0.05) 50%,
+        rgba(var(--rgb-black), 0.3) 100%
+      );
 
     box-shadow:
       0 6px 24px -1px rgba(var(--rgb-black), 0.6),
@@ -58,7 +98,11 @@
   }
 
   .hero-glow {
-    background: radial-gradient(circle at 50% 50%, rgba(var(--rgb-accent-mint), 0.08) 0%, transparent 60%);
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(var(--rgb-accent-mint), 0.08) 0%,
+      transparent 60%
+    );
   }
 
   .accent-glow-mint {
@@ -82,8 +126,12 @@
       rgba(var(--rgb-white), 0.05)
     );
     border-radius: inherit;
-    -webkit-mask: linear-gradient(rgba(var(--rgb-white), 1) 0 0) content-box, linear-gradient(rgba(var(--rgb-white), 1) 0 0);
-    mask: linear-gradient(rgba(var(--rgb-white), 1) 0 0) content-box, linear-gradient(rgba(var(--rgb-white), 1) 0 0);
+    -webkit-mask:
+      linear-gradient(rgba(var(--rgb-white), 1) 0 0) content-box,
+      linear-gradient(rgba(var(--rgb-white), 1) 0 0);
+    mask:
+      linear-gradient(rgba(var(--rgb-white), 1) 0 0) content-box,
+      linear-gradient(rgba(var(--rgb-white), 1) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -102,8 +150,12 @@
   }
 
   @keyframes marquee-scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
 
   .animate-marquee {
@@ -122,77 +174,168 @@
   }
 
   .glow-purple-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.01) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-purple), 0.01) 0%,
+      transparent 70%
+    );
   }
   .glow-purple-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.015) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-purple), 0.015) 0%,
+      transparent 70%
+    );
   }
   .glow-purple-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.02) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-purple), 0.02) 0%,
+      transparent 70%
+    );
   }
   .glow-purple-medium {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.03) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-purple), 0.03) 0%,
+      transparent 70%
+    );
   }
   .glow-purple-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.04) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-purple), 0.04) 0%,
+      transparent 70%
+    );
   }
   .glow-purple-intense {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.05) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-purple), 0.05) 0%,
+      transparent 70%
+    );
   }
 
   .glow-cyan-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-cyan), 0.02) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-cyan), 0.02) 0%,
+      transparent 70%
+    );
   }
   .glow-cyan-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-cyan), 0.04) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-cyan), 0.04) 0%,
+      transparent 70%
+    );
   }
 
   .glow-mint-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-mint), 0.015) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-mint), 0.015) 0%,
+      transparent 70%
+    );
   }
   .glow-mint-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-mint), 0.03) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-mint), 0.03) 0%,
+      transparent 70%
+    );
   }
   .glow-mint-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-mint), 0.25) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-mint), 0.25) 0%,
+      transparent 70%
+    );
   }
 
   .glow-pink-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-pink), 0.015) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-pink), 0.015) 0%,
+      transparent 70%
+    );
   }
   .glow-pink-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-pink), 0.02) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-pink), 0.02) 0%,
+      transparent 70%
+    );
   }
   .glow-pink-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-pink), 0.04) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-pink), 0.04) 0%,
+      transparent 70%
+    );
   }
 
   .glow-orange-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-orange), 0.015) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-orange), 0.015) 0%,
+      transparent 70%
+    );
   }
   .glow-orange-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-orange), 0.02) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-orange), 0.02) 0%,
+      transparent 70%
+    );
   }
   .glow-orange-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-accent-orange), 0.04) 0%, transparent 70%);
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-orange), 0.04) 0%,
+      transparent 70%
+    );
   }
 }
 
-.bg-accent-mint-strong { background-color: rgba(var(--rgb-accent-mint), 0.12); }
-.bg-accent-purple-strong { background-color: rgba(var(--rgb-accent-purple), 0.12); }
-.bg-accent-cyan-strong { background-color: rgba(var(--rgb-accent-cyan), 0.12); }
-.bg-accent-orange-strong { background-color: rgba(var(--rgb-accent-orange), 0.12); }
-.bg-accent-pink-strong { background-color: rgba(var(--rgb-accent-pink), 0.12); }
+.bg-accent-mint-strong {
+  background-color: rgba(var(--rgb-accent-mint), 0.12);
+}
+.bg-accent-purple-strong {
+  background-color: rgba(var(--rgb-accent-purple), 0.12);
+}
+.bg-accent-cyan-strong {
+  background-color: rgba(var(--rgb-accent-cyan), 0.12);
+}
+.bg-accent-orange-strong {
+  background-color: rgba(var(--rgb-accent-orange), 0.12);
+}
+.bg-accent-pink-strong {
+  background-color: rgba(var(--rgb-accent-pink), 0.12);
+}
 
-.glow-accent { box-shadow: 0 0 30px rgba(var(--rgb-accent-mint), 0.3); }
-.glow-accent[data-color="purple"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-purple), 0.3); }
-.glow-accent[data-color="cyan"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-cyan), 0.3); }
-.glow-accent[data-color="orange"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-orange), 0.3); }
-.glow-accent[data-color="pink"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-pink), 0.3); }
+.glow-accent {
+  box-shadow: 0 0 30px rgba(var(--rgb-accent-mint), 0.3);
+}
+.glow-accent[data-color='purple'] {
+  box-shadow: 0 0 30px rgba(var(--rgb-accent-purple), 0.3);
+}
+.glow-accent[data-color='cyan'] {
+  box-shadow: 0 0 30px rgba(var(--rgb-accent-cyan), 0.3);
+}
+.glow-accent[data-color='orange'] {
+  box-shadow: 0 0 30px rgba(var(--rgb-accent-orange), 0.3);
+}
+.glow-accent[data-color='pink'] {
+  box-shadow: 0 0 30px rgba(var(--rgb-accent-pink), 0.3);
+}
 
-.bg-gradient-primary { background: linear-gradient(to bottom right, var(--accent-mint), var(--accent-purple)); }
+.bg-gradient-primary {
+  background: linear-gradient(to bottom right, var(--accent-mint), var(--accent-purple));
+}
 
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
@@ -211,18 +354,26 @@ html.lenis, html.lenis body {
 .nav-top {
   background: transparent;
   border: 1px solid transparent;
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .nav-scrolled {
   background: rgba(var(--rgb-white), 0.04);
   border: 1px solid rgba(var(--rgb-white), 0.06);
   box-shadow: 0 8px 40px rgba(var(--rgb-black), 0.4);
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

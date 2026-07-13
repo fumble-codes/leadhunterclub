@@ -22,7 +22,11 @@ export async function POST(request: NextRequest) {
     const parsed = leadRevealSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
@@ -55,7 +59,9 @@ export async function POST(request: NextRequest) {
     const CREDIT_COST = hasPhone ? 5 : 3
 
     const txResult = await db.$transaction(async (tx) => {
-      const result = await creditService.deductInTx(tx, userId, CREDIT_COST, 'lead_reveal', { leadId })
+      const result = await creditService.deductInTx(tx, userId, CREDIT_COST, 'lead_reveal', {
+        leadId,
+      })
 
       const claimedLead = await claimPost(leadId)
 
@@ -101,14 +107,24 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     if (error instanceof InsufficientCreditsError) {
       return NextResponse.json(
-        { code: 'INSUFFICIENT_CREDITS', message: 'Insufficient credits to reveal lead', required: error.required },
+        {
+          code: 'INSUFFICIENT_CREDITS',
+          message: 'Insufficient credits to reveal lead',
+          required: error.required,
+        },
         { status: 400 },
       )
     }

@@ -3,8 +3,12 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
-  ChartBarSquareIcon, LockClosedIcon, BanknotesIcon, BookmarkIcon,
-  SparklesIcon, ArrowTopRightOnSquareIcon
+  ChartBarSquareIcon,
+  LockClosedIcon,
+  BanknotesIcon,
+  BookmarkIcon,
+  SparklesIcon,
+  ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
 import { Card, Badge, Button } from '@/components/ui'
@@ -25,7 +29,8 @@ const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
     textAccent: 'text-accent-mint',
     dotColor: 'bg-accent-mint',
     glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.10)] hover:border-accent-mint/25',
-    selected: 'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.18)] bg-accent-mint/[0.03]',
+    selected:
+      'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.18)] bg-accent-mint/[0.03]',
     bookmarkActive: 'bg-accent-mint/15 border-accent-mint/30 text-accent-mint',
     topLine: 'from-transparent via-accent-mint to-transparent',
   },
@@ -33,7 +38,8 @@ const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
     textAccent: 'text-accent-mint',
     dotColor: 'bg-accent-mint',
     glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.07)] hover:border-accent-mint/20',
-    selected: 'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.12)] bg-accent-mint/[0.02]',
+    selected:
+      'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.12)] bg-accent-mint/[0.02]',
     bookmarkActive: 'bg-accent-mint/15 border-accent-mint/30 text-accent-mint',
     topLine: 'from-transparent via-accent-mint to-transparent',
   },
@@ -41,7 +47,8 @@ const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
     textAccent: 'text-accent-purple',
     dotColor: 'bg-accent-purple',
     glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.07)] hover:border-accent-purple/20',
-    selected: 'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.12)] bg-accent-purple/[0.02]',
+    selected:
+      'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.12)] bg-accent-purple/[0.02]',
     bookmarkActive: 'bg-accent-purple/15 border-accent-purple/30 text-accent-purple',
     topLine: 'from-transparent via-accent-purple to-transparent',
   },
@@ -49,7 +56,8 @@ const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
     textAccent: 'text-accent-purple',
     dotColor: 'bg-accent-purple',
     glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.05)] hover:border-accent-purple/15',
-    selected: 'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.08)] bg-accent-purple/[0.02]',
+    selected:
+      'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.08)] bg-accent-purple/[0.02]',
     bookmarkActive: 'bg-accent-purple/15 border-accent-purple/30 text-accent-purple',
     topLine: 'from-transparent via-accent-purple to-transparent',
   },
@@ -62,7 +70,10 @@ const urgencyLabel: Record<AppLead['urgency'], string> = {
   low: 'Low',
 }
 
-const urgencyBadgeColor: Record<AppLead['urgency'], 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'> = {
+const urgencyBadgeColor: Record<
+  AppLead['urgency'],
+  'mint' | 'purple' | 'cyan' | 'orange' | 'pink'
+> = {
   critical: 'mint',
   high: 'mint',
   medium: 'purple',
@@ -140,18 +151,14 @@ export default function LeadCard({
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={`group relative text-left flex flex-col overflow-hidden h-full col-span-1 transition-all duration-300 ${
-        isSelected
-          ? `${theme.selected} rounded-2xl`
-          : `rounded-2xl ${theme.glow}`
+        isSelected ? `${theme.selected} rounded-2xl` : `rounded-2xl ${theme.glow}`
       }`}
     >
       <Card
         variant="elevated"
         padding="md"
         hover
-        className={`h-full flex flex-col ${
-          isSelected ? 'border-transparent' : ''
-        }`}
+        className={`h-full flex flex-col ${isSelected ? 'border-transparent' : ''}`}
       >
         {/* Top edge highlight */}
         <div
@@ -164,7 +171,9 @@ export default function LeadCard({
         <div className="flex items-center justify-between mb-5 w-full shrink-0 select-none">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${theme.dotColor}`} />
-            <Badge size="sm" color="purple">Lead Hunter Club</Badge>
+            <Badge size="sm" color="purple">
+              Lead Hunter Club
+            </Badge>
           </div>
 
           <div className="flex items-center gap-3">
@@ -185,7 +194,9 @@ export default function LeadCard({
                   : 'bg-white/5 border-transparent text-text-secondary hover:bg-white/10 hover:text-white hover:border-border-subtle'
               }`}
             >
-              <BookmarkIcon className={`w-[14px] h-[14px] ${isSaved ? 'text-current' : 'text-text-secondary/30'}`} />
+              <BookmarkIcon
+                className={`w-[14px] h-[14px] ${isSaved ? 'text-current' : 'text-text-secondary/30'}`}
+              />
             </div>
           </div>
         </div>
@@ -207,9 +218,12 @@ export default function LeadCard({
               {lead.replyProbability}% Reply Match
             </Badge>
           )}
-          {lead.niches && lead.niches.map((niche) => (
-            <Badge key={niche} size="sm" color="mint">{niche}</Badge>
-          ))}
+          {lead.niches &&
+            lead.niches.map((niche) => (
+              <Badge key={niche} size="sm" color="mint">
+                {niche}
+              </Badge>
+            ))}
           {lead.nicheTags.map((tag) => (
             <span
               key={tag}
@@ -226,7 +240,10 @@ export default function LeadCard({
             <div className="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 overflow-hidden shrink-0">
               {lead.isRevealed ? (
                 <span className="text-11 font-bold text-text-primary uppercase">
-                  {lead.name.split(' ').map(n => n[0]).join('')}
+                  {lead.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
                 </span>
               ) : (
                 <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary" />
@@ -237,7 +254,8 @@ export default function LeadCard({
                 <>
                   <div className="text-sm font-bold text-text-primary truncate">{lead.name}</div>
                   <div className="text-[10px] text-text-secondary truncate">
-                    {lead.email} {lead.phone && <span className="ml-1 opacity-70">• {lead.phone}</span>}
+                    {lead.email}{' '}
+                    {lead.phone && <span className="ml-1 opacity-70">• {lead.phone}</span>}
                   </div>
                 </>
               ) : (
@@ -250,12 +268,7 @@ export default function LeadCard({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              color="mint"
-              onClick={handleQuickEngage}
-            >
+            <Button variant="ghost" size="sm" color="mint" onClick={handleQuickEngage}>
               <SparklesIcon className="w-3 h-3" />
               Engage
             </Button>

@@ -60,12 +60,21 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     console.error('[Sheets Export] Error:', error)
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to export to Google Sheets' }, { status: 500 })
+    return NextResponse.json(
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to export to Google Sheets' },
+      { status: 500 },
+    )
   }
 }

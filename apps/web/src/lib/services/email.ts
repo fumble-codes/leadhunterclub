@@ -1,4 +1,9 @@
-import { renderApproved, renderRejected, renderSuspended, renderApplicationReceived } from '@/lib/email-templates'
+import {
+  renderApproved,
+  renderRejected,
+  renderSuspended,
+  renderApplicationReceived,
+} from '@/lib/email-templates'
 
 interface SendOptions {
   html?: string
@@ -20,7 +25,12 @@ function logDev(...args: unknown[]) {
   }
 }
 
-async function sendWithResend(to: string, subject: string, body: string, opts?: SendOptions): Promise<EmailResult> {
+async function sendWithResend(
+  to: string,
+  subject: string,
+  body: string,
+  opts?: SendOptions,
+): Promise<EmailResult> {
   if (!RESEND_API_KEY) {
     if (IS_PRODUCTION) {
       throw new Error('RESEND_API_KEY is not configured. Email sending is required in production.')
@@ -51,7 +61,11 @@ async function sendWithResend(to: string, subject: string, body: string, opts?: 
 export const emailService = {
   async sendApproved(user: { name: string; email: string }, plan: string) {
     const planLabel = plan === 'FREELANCER' ? 'Freelancer' : plan === 'AGENCY' ? 'Agency' : plan
-    const { subject, text, html } = renderApproved({ name: user.name, plan: planLabel, appUrl: APP_URL })
+    const { subject, text, html } = renderApproved({
+      name: user.name,
+      plan: planLabel,
+      appUrl: APP_URL,
+    })
     return sendWithResend(user.email, subject, text, { html })
   },
 
@@ -77,7 +91,9 @@ export const emailService = {
     }
 
     const subject = `[Lead Hunter Club] ${type}`
-    const lines = Object.entries(data).map(([k, v]) => `${k}: ${v}`).join('\n')
+    const lines = Object.entries(data)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('\n')
     const text = `Admin Notification\n\nType: ${type}\n\n${lines}\n\nView at: ${APP_URL}/admin/users`
 
     return sendWithResend(ADMIN_NOTIFICATION_EMAIL, subject, text)

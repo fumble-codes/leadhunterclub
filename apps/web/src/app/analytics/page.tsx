@@ -1,6 +1,6 @@
-'use client';
+'use client'
 
-import AppSidebar from '@/components/layout/AppSidebar';
+import AppSidebar from '@/components/layout/AppSidebar'
 
 export default function AnalyticsPage() {
   return (
@@ -24,5 +24,5 @@ export default function AnalyticsPage() {
         </div>
       </main>
     </div>
-  );
+  )
 }

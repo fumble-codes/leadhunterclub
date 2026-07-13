@@ -6,7 +6,16 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/solid'
 import { useState, useEffect, useRef } from 'react'
-import { createUserWithEmailAndPassword, sendEmailVerification, signInWithPhoneNumber, PhoneAuthProvider, RecaptchaVerifier, linkWithCredential, type ConfirmationResult, auth } from '@/lib/firebase'
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signInWithPhoneNumber,
+  PhoneAuthProvider,
+  RecaptchaVerifier,
+  linkWithCredential,
+  type ConfirmationResult,
+  auth,
+} from '@/lib/firebase'
 import { normalizePhone } from '@/lib/phone'
 
 const FIREBASE_ERRORS: Record<string, string> = {
@@ -129,7 +138,10 @@ export default function RegisterPage() {
     setPhoneLoading(true)
     setPhoneError('')
     try {
-      const cred = PhoneAuthProvider.credential(confirmationResult.verificationId, verificationCode.trim())
+      const cred = PhoneAuthProvider.credential(
+        confirmationResult.verificationId,
+        verificationCode.trim(),
+      )
       await linkWithCredential(auth.currentUser!, cred)
       router.push('/onboarding')
     } catch (err) {
@@ -164,7 +176,9 @@ export default function RegisterPage() {
       await sendEmailVerification(auth.currentUser!)
       setPhoneStep('send')
     } catch (err: unknown) {
-      setError(err instanceof Error ? friendlyFirebaseError(err.message) : 'Failed to create account')
+      setError(
+        err instanceof Error ? friendlyFirebaseError(err.message) : 'Failed to create account',
+      )
     } finally {
       setIsLoading(false)
     }
@@ -204,7 +218,9 @@ export default function RegisterPage() {
               className="w-12 h-12 rounded-xl mx-auto mb-4 shadow-[0_0_20px_rgba(var(--rgb-orange-deep),0.15)] hover:scale-105 transition-transform duration-300"
             />
           </Link>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Create your account</h1>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+            Create your account
+          </h1>
           <p className="text-sm text-text-secondary mt-2">Start dominating your outreach today</p>
         </div>
 
@@ -215,7 +231,8 @@ export default function RegisterPage() {
                 <div className="flex-1">
                   <p className="text-sm font-medium text-yellow-400">Verify your email</p>
                   <p className="text-xs text-yellow-400/70 mt-1">
-                    We sent a verification email to <strong>{auth.currentUser.email}</strong>. Please verify before continuing.
+                    We sent a verification email to <strong>{auth.currentUser.email}</strong>.
+                    Please verify before continuing.
                   </p>
                 </div>
                 <button
@@ -239,9 +256,7 @@ export default function RegisterPage() {
                 <CheckCircleIcon className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-emerald-400">Email verified</p>
-                  <p className="text-xs text-emerald-400/70 mt-0.5">
-                    {auth.currentUser.email}
-                  </p>
+                  <p className="text-xs text-emerald-400/70 mt-0.5">{auth.currentUser.email}</p>
                 </div>
                 <button
                   onClick={() => router.push('/onboarding')}
@@ -258,14 +273,20 @@ export default function RegisterPage() {
               {phoneStep === 'send' && (
                 <>
                   <div className="text-center mb-2">
-                    <h2 className="text-lg font-bold text-text-primary tracking-tight">Add phone (optional)</h2>
-                    <p className="text-sm text-text-secondary mt-1">Get SMS alerts and secure your account</p>
+                    <h2 className="text-lg font-bold text-text-primary tracking-tight">
+                      Add phone (optional)
+                    </h2>
+                    <p className="text-sm text-text-secondary mt-1">
+                      Get SMS alerts and secure your account
+                    </p>
                   </div>
 
                   <div id="recaptcha-container" />
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Phone number</label>
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Phone number
+                    </label>
                     <input
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
@@ -276,7 +297,9 @@ export default function RegisterPage() {
                   </div>
 
                   {phoneError && (
-                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">{phoneError}</div>
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                      {phoneError}
+                    </div>
                   )}
 
                   <button
@@ -305,12 +328,16 @@ export default function RegisterPage() {
               {phoneStep === 'verify' && (
                 <>
                   <div className="text-center mb-2">
-                    <h2 className="text-lg font-bold text-text-primary tracking-tight">Enter verification code</h2>
+                    <h2 className="text-lg font-bold text-text-primary tracking-tight">
+                      Enter verification code
+                    </h2>
                     <p className="text-sm text-text-secondary mt-1">Sent to {phoneNumber}</p>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">6-digit code</label>
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      6-digit code
+                    </label>
                     <input
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
@@ -323,7 +350,9 @@ export default function RegisterPage() {
                   </div>
 
                   {phoneError && (
-                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">{phoneError}</div>
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                      {phoneError}
+                    </div>
                   )}
 
                   <button
@@ -350,66 +379,75 @@ export default function RegisterPage() {
               )}
             </div>
           ) : (
-          <form onSubmit={handleRegister} className="flex flex-col gap-5">
-            {error && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-                {error}
-              </div>
-            )}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Email address</label>
-              <input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Password</label>
-              <input
-                name="password"
-                type="password"
-                placeholder="Create a password"
-                className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
-                required
-                minLength={6}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Confirm Password</label>
-              <input
-                name="confirm-password"
-                type="password"
-                placeholder="Confirm your password"
-                className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
-                required
-                minLength={6}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-              ) : (
-                'Create Account'
+            <form onSubmit={handleRegister} className="flex flex-col gap-5">
+              {error && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                  {error}
+                </div>
               )}
-            </button>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Email address
+                </label>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Password
+                </label>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Create a password"
+                  className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Confirm Password
+                </label>
+                <input
+                  name="confirm-password"
+                  type="password"
+                  placeholder="Confirm your password"
+                  className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                  required
+                  minLength={6}
+                />
+              </div>
 
-            <div className="text-center mt-4">
-              <p className="text-sm text-text-secondary">
-                Already have an account?{' '}
-                <Link href="/login" className="text-accent-mint hover:text-accent-mint/80 font-semibold">
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </form>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                ) : (
+                  'Create Account'
+                )}
+              </button>
+
+              <div className="text-center mt-4">
+                <p className="text-sm text-text-secondary">
+                  Already have an account?{' '}
+                  <Link
+                    href="/login"
+                    className="text-accent-mint hover:text-accent-mint/80 font-semibold"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </form>
           )}
         </div>
       </motion.div>

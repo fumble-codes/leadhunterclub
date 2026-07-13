@@ -24,10 +24,7 @@ function extractTags(keyword: string | null, platform: string): string[] {
   return tags
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authUser = await requireActiveUser(request)
     const userId = authUser.uid
@@ -49,12 +46,20 @@ export async function GET(
 
     const lead: AppLead = {
       id: externalLead.id,
-      name: isRevealed ? (externalLead.author?.name || 'Unknown') : 'Unlocked Contact',
-      email: isRevealed ? (externalLead.email || externalLead.contact_info?.emails?.[0]?.email || '') : 'unlocked@leadhunterclub.com',
-      company: externalLead.contact_info?.company_name || externalLead.author?.name || externalLead.platform || '',
+      name: isRevealed ? externalLead.author?.name || 'Unknown' : 'Unlocked Contact',
+      email: isRevealed
+        ? externalLead.email || externalLead.contact_info?.emails?.[0]?.email || ''
+        : 'unlocked@leadhunterclub.com',
+      company:
+        externalLead.contact_info?.company_name ||
+        externalLead.author?.name ||
+        externalLead.platform ||
+        '',
       source: externalLead.platform || 'Unknown',
-      category: externalLead.keyword?.replace(/^watchlist:/, '') || externalLead.platform || 'General',
-      title: externalLead.author?.info || externalLead.keyword || externalLead.platform || 'Lead Signal',
+      category:
+        externalLead.keyword?.replace(/^watchlist:/, '') || externalLead.platform || 'General',
+      title:
+        externalLead.author?.info || externalLead.keyword || externalLead.platform || 'Lead Signal',
       signalContext: externalLead.content || '',
       role: externalLead.author?.info || '',
       taskScope: '',
@@ -79,10 +84,16 @@ export async function GET(
     return NextResponse.json({ data: lead })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     console.error('[Lead GET API] Error:', error)
     return NextResponse.json(
@@ -92,10 +103,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authUser = await requireActiveUser(request)
     const userId = authUser.uid
@@ -104,7 +112,11 @@ export async function PATCH(
     const parsed = updateLeadSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
@@ -146,10 +158,16 @@ export async function PATCH(
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     console.error('[Lead PATCH API] Error:', error)
     return NextResponse.json(
@@ -159,10 +177,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const authUser = await requireActiveUser(request)
     const userId = authUser.uid
@@ -177,10 +192,16 @@ export async function DELETE(
     return new NextResponse(null, { status: 204 })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     console.error('[Lead DELETE API] Error:', error)
     return NextResponse.json(

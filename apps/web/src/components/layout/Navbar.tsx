@@ -68,10 +68,15 @@ export default function Navbar() {
           ref={innerRef}
           className="nav-top flex items-center justify-between w-full max-w-[1200px] rounded-2xl px-5 md:px-6 py-3"
         >
-
           {/* Left: Brand */}
           <Link href="/" className="flex items-center gap-3 group">
-            <Image src="/logo.svg" alt="Lead Hunter Club" width={32} height={32} className="w-8 h-8 rounded-xl" />
+            <Image
+              src="/logo.svg"
+              alt="Lead Hunter Club"
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-xl"
+            />
             <span className="font-display text-[16px] font-semibold tracking-tight text-text-primary group-hover:opacity-80 transition-opacity duration-300">
               Lead Hunter Club
             </span>
@@ -137,7 +142,10 @@ export default function Navbar() {
             className="fixed inset-0 z-40 md:hidden"
           >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-background/95" onClick={() => setMobileOpen(false)} />
+            <div
+              className="absolute inset-0 bg-background/95"
+              onClick={() => setMobileOpen(false)}
+            />
 
             {/* Menu Panel */}
             <motion.div

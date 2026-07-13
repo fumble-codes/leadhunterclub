@@ -30,11 +30,7 @@ const CSP_DIRECTIVES = {
     'https://images.unsplash.com',
     'https://cdn.jsdelivr.net',
   ],
-  'font-src': [
-    "'self'",
-    'https://fonts.gstatic.com',
-    'https://fonts.googleapis.com',
-  ],
+  'font-src': ["'self'", 'https://fonts.gstatic.com', 'https://fonts.googleapis.com'],
   'connect-src': [
     "'self'",
     'https://identitytoolkit.googleapis.com',
@@ -47,11 +43,7 @@ const CSP_DIRECTIVES = {
     process.env.EXTERNAL_API_BASE_URL ? process.env.EXTERNAL_API_BASE_URL : '',
     process.env.UPSTASH_REDIS_REST_URL ? process.env.UPSTASH_REDIS_REST_URL : '',
   ].filter(Boolean),
-  'frame-src': [
-    "'self'",
-    'https://www.google.com',
-    'https://apis.google.com',
-  ],
+  'frame-src': ["'self'", 'https://www.google.com', 'https://apis.google.com'],
   'frame-ancestors': ["'none'"],
   'form-action': [
     "'self'",
@@ -65,7 +57,8 @@ const CSP_DIRECTIVES = {
 function formatCsp(directives) {
   return Object.entries(directives)
     .map(function (_ref) {
-      var key = _ref[0], values = _ref[1]
+      var key = _ref[0],
+        values = _ref[1]
       var filtered = values.filter(Boolean)
       if (filtered.length === 0) return ''
       return key + ' ' + filtered.join(' ')

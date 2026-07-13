@@ -45,11 +45,7 @@ const glowClassMap: Record<GlowColor, Record<GlowIntensity, string>> = {
   },
 }
 
-export function Glow({
-  color = 'mint',
-  intensity = 'soft',
-  className = '',
-}: GlowProps) {
+export function Glow({ color = 'mint', intensity = 'soft', className = '' }: GlowProps) {
   return (
     <div
       className={`absolute inset-0 pointer-events-none ${glowClassMap[color][intensity]} ${className}`}

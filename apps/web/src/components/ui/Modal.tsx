@@ -17,14 +17,7 @@ const sizeStyles = {
   md: 'max-w-md',
 }
 
-export function Modal({
-  open,
-  onClose,
-  title,
-  children,
-  actions,
-  size = 'md',
-}: ModalProps) {
+export function Modal({ open, onClose, title, children, actions, size = 'md' }: ModalProps) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -69,15 +62,20 @@ export function Modal({
                 onClick={onClose}
                 className="text-text-muted hover:text-text-primary transition-colors p-1"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
             <div className="text-text-secondary text-sm leading-relaxed">{children}</div>
-            {actions && (
-              <div className="flex justify-end gap-3 mt-6">{actions}</div>
-            )}
+            {actions && <div className="flex justify-end gap-3 mt-6">{actions}</div>}
           </motion.div>
         </div>
       )}

@@ -37,7 +37,9 @@ export default function AdminCreditsPage() {
         .then((res) => {
           setUsers(res.data || [])
           const values: Record<string, string> = {}
-          res.data?.forEach((u: AdminUser) => { values[u.id] = (u.creditAccount?.total ?? 0).toString() })
+          res.data?.forEach((u: AdminUser) => {
+            values[u.id] = (u.creditAccount?.total ?? 0).toString()
+          })
           setEditValues(values)
         })
         .catch(console.error)
@@ -58,14 +60,18 @@ export default function AdminCreditsPage() {
     })
     const json = await res.json()
     if (json.data?.creditAccount) {
-      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, creditAccount: json.data.creditAccount } : u))
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, creditAccount: json.data.creditAccount } : u)),
+      )
       setEditValues((prev) => ({ ...prev, [userId]: '' }))
     }
     setUpdating(null)
   }
 
   const filtered = users.filter(
-    (u) => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase()),
+    (u) =>
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase()),
   )
 
   return (
@@ -94,26 +100,45 @@ export default function AdminCreditsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/[0.06]">
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">User</th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Status</th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Plan</th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Subscription</th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Bonus</th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Total</th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">Grant Bonus</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  User
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Plan
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Subscription
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Bonus
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Total
+                </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Grant Bonus
+                </th>
                 <th className="px-6 py-4"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-text-secondary">No users found</td>
+                  <td colSpan={6} className="px-6 py-12 text-center text-sm text-text-secondary">
+                    No users found
+                  </td>
                 </tr>
               ) : (
                 filtered.map((u) => (
                   <tr key={u.id} className="border-b border-white/[0.03]">
                     <td className="px-6 py-4">
-                      <Link href={`/admin/users/${u.id}`} className="text-sm font-medium text-text-primary hover:text-accent-mint transition-colors">
+                      <Link
+                        href={`/admin/users/${u.id}`}
+                        className="text-sm font-medium text-text-primary hover:text-accent-mint transition-colors"
+                      >
                         {u.name}
                       </Link>
                       <p className="text-xs text-text-secondary">{u.email}</p>
@@ -122,9 +147,15 @@ export default function AdminCreditsPage() {
                       <span className="text-xs text-text-secondary">{u.status}</span>
                     </td>
                     <td className="px-6 py-4 text-sm text-text-secondary">{u.plan}</td>
-                    <td className="px-6 py-4 text-sm text-text-primary">{u.creditAccount?.subscriptionBalance ?? 0}</td>
-                    <td className="px-6 py-4 text-sm text-text-primary">{u.creditAccount?.bonusBalance ?? 0}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-text-primary">{u.creditAccount?.total ?? 0}</td>
+                    <td className="px-6 py-4 text-sm text-text-primary">
+                      {u.creditAccount?.subscriptionBalance ?? 0}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-text-primary">
+                      {u.creditAccount?.bonusBalance ?? 0}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold text-text-primary">
+                      {u.creditAccount?.total ?? 0}
+                    </td>
                     <td className="px-6 py-4">
                       <input
                         type="number"

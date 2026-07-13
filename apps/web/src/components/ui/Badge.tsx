@@ -25,12 +25,7 @@ const sizeStyles: Record<BadgeSize, string> = {
   md: 'px-3 py-1 text-11 rounded-lg',
 }
 
-export function Badge({
-  color = 'mint',
-  size = 'md',
-  className = '',
-  children,
-}: BadgeProps) {
+export function Badge({ color = 'mint', size = 'md', className = '', children }: BadgeProps) {
   return (
     <span
       className={`inline-flex items-center font-bold uppercase tracking-wider ${colorStyles[color]} ${sizeStyles[size]} ${className}`}

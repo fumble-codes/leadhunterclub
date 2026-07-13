@@ -15,16 +15,20 @@ async function generateOutreach(prompt: string, context: string): Promise<string
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
           model: 'gpt-4o',
           messages: [
-            { role: 'system', content: 'You are an elite B2B copywriter. Write a highly personalized, short, punchy outreach message based on the provided lead intel. Do not be overly formal. No subject lines.' },
-            { role: 'user', content: `Lead Context: ${context}\n\nTask: ${prompt}` }
+            {
+              role: 'system',
+              content:
+                'You are an elite B2B copywriter. Write a highly personalized, short, punchy outreach message based on the provided lead intel. Do not be overly formal. No subject lines.',
+            },
+            { role: 'user', content: `Lead Context: ${context}\n\nTask: ${prompt}` },
           ],
           temperature: 0.7,
-        })
+        }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -38,17 +42,16 @@ async function generateOutreach(prompt: string, context: string): Promise<string
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01'
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model: 'claude-3-5-sonnet-20240620',
           max_tokens: 300,
-          system: 'You are an elite B2B copywriter. Write a highly personalized, short, punchy outreach message. No subject lines.',
-          messages: [
-            { role: 'user', content: `Lead Context: ${context}\n\nTask: ${prompt}` }
-          ],
+          system:
+            'You are an elite B2B copywriter. Write a highly personalized, short, punchy outreach message. No subject lines.',
+          messages: [{ role: 'user', content: `Lead Context: ${context}\n\nTask: ${prompt}` }],
           temperature: 0.7,
-        })
+        }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -63,20 +66,24 @@ async function generateOutreach(prompt: string, context: string): Promise<string
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are an elite B2B copywriter. Write a short, personalized outreach message based on this lead. No subject lines. Keep it under 3 sentences. Sound human, not like AI.
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `You are an elite B2B copywriter. Write a short, personalized outreach message based on this lead. No subject lines. Keep it under 3 sentences. Sound human, not like AI.
 
 Lead Context: ${context}
-Angle: ${prompt}`
-              }]
-            }],
+Angle: ${prompt}`,
+                  },
+                ],
+              },
+            ],
             generationConfig: {
               temperature: 0.7,
-              maxOutputTokens: 200
-            }
-          })
-        }
+              maxOutputTokens: 200,
+            },
+          }),
+        },
       )
       if (res.ok) {
         const data = await res.json()
@@ -88,7 +95,7 @@ Angle: ${prompt}`
       throw new Error('AI provider returned an error')
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
     if (prompt.toLowerCase().includes('humor')) {
       return "Hey [Name],\n\nI saw you're looking for someone to handle [Task]. Usually, people in your position either do it themselves and hate it, or hire an agency and regret it.\n\nI specialize in [Niche] and I promise to be less painful than both options. Let me know if you're open to a quick chat."
@@ -97,7 +104,6 @@ Angle: ${prompt}`
     } else {
       return "Hey [Name],\n\nSaw your post looking for help with [Task]. Given your focus on [Niche], I thought I'd reach out directly.\n\nI just wrapped up a very similar project and have the bandwidth to tackle this immediately. Happy to send over some relevant case studies if you're interested."
     }
-
   } catch (error) {
     console.error('[AI Engine] Generation failed:', error)
     throw new Error('Failed to generate outreach')
@@ -121,7 +127,11 @@ export async function POST(request: NextRequest) {
     const parsed = outreachGenerateSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
@@ -133,10 +143,16 @@ export async function POST(request: NextRequest) {
     const CREDIT_COST = 2
 
     const result = await db.$transaction(async (tx) => {
-      const deductResult = await creditService.deductInTx(tx, userId, CREDIT_COST, 'outreach_generate', { leadId })
+      const deductResult = await creditService.deductInTx(
+        tx,
+        userId,
+        CREDIT_COST,
+        'outreach_generate',
+        { leadId },
+      )
 
       const state = await tx.userLeadState.findUnique({
-        where: { userId_leadId: { userId, leadId } }
+        where: { userId_leadId: { userId, leadId } },
       })
 
       if (!state || !state.isRevealed) {
@@ -158,13 +174,16 @@ export async function POST(request: NextRequest) {
     let prompt = ''
     switch (angle) {
       case 'Curiosity':
-        prompt = 'Write an email that sparks intense curiosity about a specific problem they might not realize they have, based on their task scope. End with a soft call to action.'
+        prompt =
+          'Write an email that sparks intense curiosity about a specific problem they might not realize they have, based on their task scope. End with a soft call to action.'
         break
       case 'Authority':
-        prompt = 'Write an authoritative email establishing deep expertise in their exact industry. Mention you have frameworks tailored for their specific task.'
+        prompt =
+          'Write an authoritative email establishing deep expertise in their exact industry. Mention you have frameworks tailored for their specific task.'
         break
       case 'Humor':
-        prompt = 'Write a slightly humorous, pattern-breaking email. Call out the typical boring vendor pitches they receive and offer a refreshing, direct alternative.'
+        prompt =
+          'Write a slightly humorous, pattern-breaking email. Call out the typical boring vendor pitches they receive and offer a refreshing, direct alternative.'
         break
       default:
         prompt = 'Write a standard, highly personalized outreach email.'
@@ -185,24 +204,42 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       content: generatedContent,
-      creditsRemaining: result.creditsRemaining
+      creditsRemaining: result.creditsRemaining,
     })
-
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     if (error instanceof InsufficientCreditsError) {
-      return NextResponse.json({ code: 'INSUFFICIENT_CREDITS', message: 'Insufficient credits to generate outreach', required: error.required }, { status: 400 })
+      return NextResponse.json(
+        {
+          code: 'INSUFFICIENT_CREDITS',
+          message: 'Insufficient credits to generate outreach',
+          required: error.required,
+        },
+        { status: 400 },
+      )
     }
     if (error instanceof MustRevealFirstError) {
-      return NextResponse.json({ code: 'FORBIDDEN', message: 'You must reveal the contact before using AI' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'FORBIDDEN', message: 'You must reveal the contact before using AI' },
+        { status: 403 },
+      )
     }
     console.error('[Outreach API] Error:', error)
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to generate outreach' }, { status: 500 })
+    return NextResponse.json(
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to generate outreach' },
+      { status: 500 },
+    )
   }
 }
 

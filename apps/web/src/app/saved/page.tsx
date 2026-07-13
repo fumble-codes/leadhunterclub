@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import {
-  MagnifyingGlassIcon, SparklesIcon, ChatBubbleLeftRightIcon,
-  ViewfinderCircleIcon, ExclamationTriangleIcon, ArrowTopRightOnSquareIcon,
-  BookmarkIcon, DocumentArrowDownIcon, ArrowPathIcon,
+  MagnifyingGlassIcon,
+  SparklesIcon,
+  ChatBubbleLeftRightIcon,
+  ViewfinderCircleIcon,
+  ExclamationTriangleIcon,
+  ArrowTopRightOnSquareIcon,
+  BookmarkIcon,
+  DocumentArrowDownIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -24,16 +30,46 @@ export default function SavedLeadsPage() {
   const router = useRouter()
   const { addToast } = useToast()
 
-  const readyCount = savedLeads.filter((l) => l.isRevealed && (l.status === 'new' || l.status === 'saved')).length
-  const activeCount = savedLeads.filter((l) => ['drafting', 'sent', 'follow-up'].includes(l.status)).length
+  const readyCount = savedLeads.filter(
+    (l) => l.isRevealed && (l.status === 'new' || l.status === 'saved'),
+  ).length
+  const activeCount = savedLeads.filter((l) =>
+    ['drafting', 'sent', 'follow-up'].includes(l.status),
+  ).length
   const repliedCount = savedLeads.filter((l) => l.status === 'replied').length
-  const priorityCount = savedLeads.filter((l) => l.urgency === 'critical' || l.urgency === 'high').length
+  const priorityCount = savedLeads.filter(
+    (l) => l.urgency === 'critical' || l.urgency === 'high',
+  ).length
 
   const dynamicSummaryCards = [
-    { label: 'Reply Received', sub: 'Awaiting negotiation', count: `${repliedCount} Leads`, accent: 'purple', icon: ChatBubbleLeftRightIcon },
-    { label: 'Active Conversations', sub: 'Currently in outreach', count: `${activeCount} Active`, accent: 'cyan', icon: SparklesIcon },
-    { label: 'Ready for Outreach', sub: 'Unlocked & waiting', count: `${readyCount} Ready`, accent: 'mint', icon: ViewfinderCircleIcon },
-    { label: 'High Priority Targets', sub: 'Critical & High Urgency', count: `${priorityCount} Urgent`, accent: 'orange', icon: ExclamationTriangleIcon },
+    {
+      label: 'Reply Received',
+      sub: 'Awaiting negotiation',
+      count: `${repliedCount} Leads`,
+      accent: 'purple',
+      icon: ChatBubbleLeftRightIcon,
+    },
+    {
+      label: 'Active Conversations',
+      sub: 'Currently in outreach',
+      count: `${activeCount} Active`,
+      accent: 'cyan',
+      icon: SparklesIcon,
+    },
+    {
+      label: 'Ready for Outreach',
+      sub: 'Unlocked & waiting',
+      count: `${readyCount} Ready`,
+      accent: 'mint',
+      icon: ViewfinderCircleIcon,
+    },
+    {
+      label: 'High Priority Targets',
+      sub: 'Critical & High Urgency',
+      count: `${priorityCount} Urgent`,
+      accent: 'orange',
+      icon: ExclamationTriangleIcon,
+    },
   ]
 
   const handleEngage = async (leadId: string) => {
@@ -58,7 +94,9 @@ export default function SavedLeadsPage() {
         body: JSON.stringify({ status }),
       })
       if (res.ok) {
-        setSavedLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, status: status as AppLead['status'] } : l)))
+        setSavedLeads((prev) =>
+          prev.map((l) => (l.id === leadId ? { ...l, status: status as AppLead['status'] } : l)),
+        )
         addToast({ type: 'success', message: `✓ Marked as ${label}` })
       }
     } catch {
@@ -73,7 +111,10 @@ export default function SavedLeadsPage() {
       const json = await res.json()
       if (res.ok && json.success) {
         setSheetUrl(json.data.sheetUrl)
-        addToast({ type: 'success', message: `✓ Exported ${json.data.count} leads to Google Sheets` })
+        addToast({
+          type: 'success',
+          message: `✓ Exported ${json.data.count} leads to Google Sheets`,
+        })
       } else {
         addToast({ type: 'error', message: json.message || 'Export failed' })
       }
@@ -90,7 +131,10 @@ export default function SavedLeadsPage() {
       const res = await fetch('/api/sheets/sync', { method: 'POST' })
       const json = await res.json()
       if (res.ok && json.success) {
-        addToast({ type: 'success', message: `✓ Synced ${json.data.updatedCount} status updates from sheet` })
+        addToast({
+          type: 'success',
+          message: `✓ Synced ${json.data.updatedCount} status updates from sheet`,
+        })
         const fetchRes = await fetch('/api/leads?saved=true')
         const fetchJson = await fetchRes.json()
         if (fetchJson.data) setSavedLeads(fetchJson.data)
@@ -148,16 +192,22 @@ export default function SavedLeadsPage() {
               className="group relative p-6 metallic-card transition-all duration-300 overflow-hidden"
             >
               <div className="flex justify-between items-start mb-6">
-                <div className={`p-3 rounded-2xl bg-accent-${card.accent}/10 text-accent-${card.accent} shadow-inner`}>
+                <div
+                  className={`p-3 rounded-2xl bg-accent-${card.accent}/10 text-accent-${card.accent} shadow-inner`}
+                >
                   <card.icon className="w-[22px] h-[22px]" />
                 </div>
-                <span className={`text-xxs font-bold uppercase tracking-widest text-accent-${card.accent}`}>
+                <span
+                  className={`text-xxs font-bold uppercase tracking-widest text-accent-${card.accent}`}
+                >
                   {card.count}
                 </span>
               </div>
               <h3 className="text-lg font-bold text-text-primary tracking-tight">{card.label}</h3>
               <p className="text-xs text-text-secondary mt-1">{card.sub}</p>
-              <div className={`absolute bottom-0 left-0 w-full h-1 bg-accent-${card.accent}/20 group-hover:bg-accent-${card.accent}/40 transition-all`} />
+              <div
+                className={`absolute bottom-0 left-0 w-full h-1 bg-accent-${card.accent}/20 group-hover:bg-accent-${card.accent}/40 transition-all`}
+              />
             </motion.div>
           ))}
         </div>
@@ -208,13 +258,7 @@ export default function SavedLeadsPage() {
               </a>
             )}
 
-            <Button
-              variant="outline"
-              color="mint"
-              size="sm"
-              onClick={handleSync}
-              loading={syncing}
-            >
+            <Button variant="outline" color="mint" size="sm" onClick={handleSync} loading={syncing}>
               <ArrowPathIcon className="w-3 h-3" />
               Sync from Sheet
             </Button>
@@ -238,7 +282,10 @@ export default function SavedLeadsPage() {
             <div className="p-12 text-center">
               <p className="text-text-secondary text-sm">No leads match this view.</p>
               {activeTab !== 'All Leads' && (
-                <button onClick={() => setActiveTab('All Leads')} className="mt-3 text-accent-mint text-xs hover:underline">
+                <button
+                  onClick={() => setActiveTab('All Leads')}
+                  className="mt-3 text-accent-mint text-xs hover:underline"
+                >
                   View all leads
                 </button>
               )}
@@ -278,10 +325,15 @@ export default function SavedLeadsPage() {
 
                     <div className="col-span-3 flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-surface-elevated border border-white/10 flex items-center justify-center text-11 font-bold text-text-primary overflow-hidden shrink-0">
-                        {lead.name.split(' ').map((n) => n[0]).join('')}
+                        {lead.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .join('')}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-bold text-text-primary truncate">{lead.name}</div>
+                        <div className="text-sm font-bold text-text-primary truncate">
+                          {lead.name}
+                        </div>
                         <div className="text-xxs text-text-secondary truncate">{lead.email}</div>
                       </div>
                     </div>
@@ -296,7 +348,11 @@ export default function SavedLeadsPage() {
                       <div className="flex items-center gap-2">
                         <Badge
                           size="sm"
-                          color={lead.urgency === 'critical' || lead.urgency === 'high' ? 'mint' : 'purple'}
+                          color={
+                            lead.urgency === 'critical' || lead.urgency === 'high'
+                              ? 'mint'
+                              : 'purple'
+                          }
                         >
                           {lead.urgency}
                         </Badge>
@@ -350,7 +406,9 @@ export default function SavedLeadsPage() {
                           </Button>
                         </>
                       ) : lead.status === 'replied' ? (
-                        <Badge size="sm" color="pink">Done</Badge>
+                        <Badge size="sm" color="pink">
+                          Done
+                        </Badge>
                       ) : null}
                     </div>
                   </motion.div>
@@ -360,7 +418,9 @@ export default function SavedLeadsPage() {
           )}
 
           {loading && (
-            <div className="p-8 text-center text-text-secondary text-sm">Loading saved pipeline...</div>
+            <div className="p-8 text-center text-text-secondary text-sm">
+              Loading saved pipeline...
+            </div>
           )}
           {!loading && savedLeads.length === 0 && (
             <div className="p-12 text-center">

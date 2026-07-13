@@ -3,10 +3,7 @@ import { db } from '@/lib/db'
 import { requireAdmin, ForbiddenError } from '@/lib/auth'
 import { adminNoteSchema } from '@/lib/validators/auth'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request)
     const { id: targetUserId } = await params
@@ -53,10 +50,7 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const authUser = await requireAdmin(request)
     const { id: targetUserId } = await params
@@ -65,7 +59,11 @@ export async function POST(
     const parsed = adminNoteSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
@@ -74,10 +72,7 @@ export async function POST(
 
     const user = await db.user.findUnique({ where: { id: targetUserId } })
     if (!user) {
-      return NextResponse.json(
-        { code: 'NOT_FOUND', message: 'User not found' },
-        { status: 404 },
-      )
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
     }
 
     const note = await db.adminNote.create({

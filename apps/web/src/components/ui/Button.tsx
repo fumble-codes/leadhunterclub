@@ -24,17 +24,21 @@ const variantColorStyles: Record<ButtonVariant, Record<ButtonColor, string>> = {
   },
   ghost: {
     mint: 'bg-white/5 text-text-secondary hover:text-accent-mint hover:bg-accent-mint/10 active:scale-98',
-    purple: 'bg-white/5 text-text-secondary hover:text-accent-purple hover:bg-accent-purple/10 active:scale-98',
+    purple:
+      'bg-white/5 text-text-secondary hover:text-accent-purple hover:bg-accent-purple/10 active:scale-98',
     cyan: 'bg-white/5 text-text-secondary hover:text-accent-cyan hover:bg-accent-cyan/10 active:scale-98',
     pink: 'bg-white/5 text-text-secondary hover:text-accent-pink hover:bg-accent-pink/10 active:scale-98',
-    orange: 'bg-white/5 text-text-secondary hover:text-accent-orange hover:bg-accent-orange/10 active:scale-98',
+    orange:
+      'bg-white/5 text-text-secondary hover:text-accent-orange hover:bg-accent-orange/10 active:scale-98',
   },
   outline: {
     mint: 'border border-accent-mint/20 text-accent-mint hover:bg-accent-mint/10 active:scale-98',
-    purple: 'border border-accent-purple/20 text-accent-purple hover:bg-accent-purple/10 active:scale-98',
+    purple:
+      'border border-accent-purple/20 text-accent-purple hover:bg-accent-purple/10 active:scale-98',
     cyan: 'border border-accent-cyan/20 text-accent-cyan hover:bg-accent-cyan/10 active:scale-98',
     pink: 'border border-accent-pink/20 text-accent-pink hover:bg-accent-pink/10 active:scale-98',
-    orange: 'border border-accent-orange/20 text-accent-orange hover:bg-accent-orange/10 active:scale-98',
+    orange:
+      'border border-accent-orange/20 text-accent-orange hover:bg-accent-orange/10 active:scale-98',
   },
 }
 
@@ -62,8 +66,19 @@ export function Button({
     >
       {loading && (
         <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
         </svg>
       )}
       {children}

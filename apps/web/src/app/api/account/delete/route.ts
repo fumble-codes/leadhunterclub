@@ -11,10 +11,7 @@ export async function POST(request: NextRequest) {
 
     const user = await db.user.findUnique({ where: { id: uid } })
     if (!user) {
-      return NextResponse.json(
-        { code: 'NOT_FOUND', message: 'User not found' },
-        { status: 404 },
-      )
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
     }
 
     await db.$transaction([

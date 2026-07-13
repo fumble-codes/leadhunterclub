@@ -5,7 +5,9 @@ import { getFirebaseToken } from '@/lib/firebase'
 
 function buildUrl(path: string, params?: Record<string, string | number | undefined>): string {
   const base = config.api.baseUrl
-  const url = new URL(path.startsWith('http') ? path : `${base}${path.startsWith('/') ? path : `/${path}`}`)
+  const url = new URL(
+    path.startsWith('http') ? path : `${base}${path.startsWith('/') ? path : `/${path}`}`,
+  )
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
@@ -124,15 +126,11 @@ export const api = {
   get: <T>(path: string, params?: Record<string, string | number | undefined>) =>
     request<T>(path, { method: 'GET', params }),
 
-  post: <T>(path: string, body?: unknown) =>
-    request<T>(path, { method: 'POST', body }),
+  post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
 
-  put: <T>(path: string, body?: unknown) =>
-    request<T>(path, { method: 'PUT', body }),
+  put: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PUT', body }),
 
-  patch: <T>(path: string, body?: unknown) =>
-    request<T>(path, { method: 'PATCH', body }),
+  patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
 
-  delete: <T>(path: string) =>
-    request<T>(path, { method: 'DELETE' }),
+  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 }

@@ -3,7 +3,15 @@
 import type { ReactNode, ElementType } from 'react'
 
 type TextVariant = 'hero' | 'section' | 'body-large' | 'ui-label' | 'metadata'
-type TextColor = 'primary' | 'secondary' | 'muted' | 'accent-mint' | 'accent-purple' | 'accent-cyan' | 'accent-orange' | 'accent-pink'
+type TextColor =
+  | 'primary'
+  | 'secondary'
+  | 'muted'
+  | 'accent-mint'
+  | 'accent-purple'
+  | 'accent-cyan'
+  | 'accent-orange'
+  | 'accent-pink'
 
 interface TextProps {
   variant?: TextVariant
@@ -40,8 +48,6 @@ export function Text({
   children,
 }: TextProps) {
   return (
-    <Tag className={`${variantStyles[variant]} ${colorStyles[color]} ${className}`}>
-      {children}
-    </Tag>
+    <Tag className={`${variantStyles[variant]} ${colorStyles[color]} ${className}`}>{children}</Tag>
   )
 }

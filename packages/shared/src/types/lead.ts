@@ -4,7 +4,13 @@ export type LeadUrgency = 'low' | 'medium' | 'high' | 'critical'
 
 export type LeadAccent = 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'
 
-export type LeadSource = 'Twitter' | 'LinkedIn' | 'Reddit' | 'Indie Hackers' | 'Job Board' | 'Threads'
+export type LeadSource =
+  | 'Twitter'
+  | 'LinkedIn'
+  | 'Reddit'
+  | 'Indie Hackers'
+  | 'Job Board'
+  | 'Threads'
 
 export interface Lead {
   id: string

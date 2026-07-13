@@ -29,24 +29,17 @@ export const leadsService = {
   list: (params: LeadListParams = {}) =>
     api.get<PaginatedResponse<Lead>>('/leads', toQueryParams(params)),
 
-  getById: (id: string) =>
-    api.get<Lead>(`/leads/${id}`),
+  getById: (id: string) => api.get<Lead>(`/leads/${id}`),
 
-  create: (input: CreateLeadInput) =>
-    api.post<Lead>('/leads', input),
+  create: (input: CreateLeadInput) => api.post<Lead>('/leads', input),
 
-  update: (id: string, input: UpdateLeadInput) =>
-    api.patch<Lead>(`/leads/${id}`, input),
+  update: (id: string, input: UpdateLeadInput) => api.patch<Lead>(`/leads/${id}`, input),
 
-  remove: (id: string) =>
-    api.delete<void>(`/leads/${id}`),
+  remove: (id: string) => api.delete<void>(`/leads/${id}`),
 
-  getNewLeads: (page?: number) =>
-    leadsService.list({ status: 'new', page, pageSize: 50 }),
+  getNewLeads: (page?: number) => leadsService.list({ status: 'new', page, pageSize: 50 }),
 
-  getSavedLeads: (page?: number) =>
-    leadsService.list({ saved: true, page, pageSize: 50 }),
+  getSavedLeads: (page?: number) => leadsService.list({ saved: true, page, pageSize: 50 }),
 
-  getOutreachLeads: (page?: number) =>
-    leadsService.list({ saved: 'outreach', page, pageSize: 50 }),
+  getOutreachLeads: (page?: number) => leadsService.list({ saved: 'outreach', page, pageSize: 50 }),
 }

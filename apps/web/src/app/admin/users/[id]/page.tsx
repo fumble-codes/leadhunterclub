@@ -4,7 +4,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { getFirebaseToken } from '@/lib/firebase'
 import Link from 'next/link'
-import { ArrowLeftIcon, CalendarIcon, ChatBubbleLeftIcon, ClockIcon, CreditCardIcon, UserIcon } from '@heroicons/react/24/solid'
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  ChatBubbleLeftIcon,
+  ClockIcon,
+  CreditCardIcon,
+  UserIcon,
+} from '@heroicons/react/24/solid'
 
 const PLANS = [
   { id: 'FREE', label: 'Free', credits: 50 },
@@ -166,12 +173,16 @@ export default function AdminUserDetailPage() {
     })
     const json = await res.json()
     if (json.data) {
-      setUser((prev) => prev ? {
-        ...prev,
-        status: json.data.status || prev.status,
-        plan: json.data.plan || prev.plan,
-        creditAccount: json.data.creditAccount || prev.creditAccount,
-      } : prev)
+      setUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: json.data.status || prev.status,
+              plan: json.data.plan || prev.plan,
+              creditAccount: json.data.creditAccount || prev.creditAccount,
+            }
+          : prev,
+      )
     }
     setActionLoading(null)
   }
@@ -188,7 +199,7 @@ export default function AdminUserDetailPage() {
     })
     const json = await res.json()
     if (json.data?.creditAccount) {
-      setUser((prev) => prev ? { ...prev, creditAccount: json.data.creditAccount } : prev)
+      setUser((prev) => (prev ? { ...prev, creditAccount: json.data.creditAccount } : prev))
       setBonusCreditInput('')
     }
     setActionLoading(null)
@@ -237,7 +248,10 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="max-w-4xl">
-      <Link href="/admin/users" className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-white transition-colors mb-6 group">
+      <Link
+        href="/admin/users"
+        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-white transition-colors mb-6 group"
+      >
         <ArrowLeftIcon className="w-[14px] h-[14px] group-hover:-translate-x-0.5 transition-transform" />
         Back to Users
       </Link>
@@ -246,7 +260,9 @@ export default function AdminUserDetailPage() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold text-text-primary tracking-tight">{user.name}</h1>
-            <span className={`inline-flex text-xs font-medium px-3 py-1 rounded-full border ${STATUS_BADGES[user.status] || ''}`}>
+            <span
+              className={`inline-flex text-xs font-medium px-3 py-1 rounded-full border ${STATUS_BADGES[user.status] || ''}`}
+            >
               {user.status}
             </span>
           </div>
@@ -274,12 +290,22 @@ export default function AdminUserDetailPage() {
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Account Info</h3>
+            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+              Account Info
+            </h3>
             <div className="space-y-3">
               <div className="flex justify-between text-sm items-center">
                 <span className="text-text-secondary">Plan</span>
-                <span className={`inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full ${PLAN_BADGES[user.plan] || 'text-text-secondary bg-white/5'}`}>
-                  {user.plan === 'FREE' ? '50' : user.plan === 'FREELANCER' ? 'Freelancer' : user.plan === 'AGENCY' ? 'Agency' : user.plan}
+                <span
+                  className={`inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full ${PLAN_BADGES[user.plan] || 'text-text-secondary bg-white/5'}`}
+                >
+                  {user.plan === 'FREE'
+                    ? '50'
+                    : user.plan === 'FREELANCER'
+                      ? 'Freelancer'
+                      : user.plan === 'AGENCY'
+                        ? 'Agency'
+                        : user.plan}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -292,17 +318,23 @@ export default function AdminUserDetailPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-text-secondary">Joined</span>
-                <span className="text-text-primary font-medium">{new Date(user.createdAt).toLocaleDateString()}</span>
+                <span className="text-text-primary font-medium">
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Actions</h3>
+            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+              Actions
+            </h3>
             <div className="space-y-3">
               {user.status !== 'ACTIVE' && (
                 <div className="space-y-2">
-                  <label className="text-xs text-text-secondary font-medium">Approve with Plan</label>
+                  <label className="text-xs text-text-secondary font-medium">
+                    Approve with Plan
+                  </label>
                   <div className="flex gap-1.5">
                     {PLANS.filter((p) => p.id !== 'FREE').map((p) => (
                       <button
@@ -324,7 +356,9 @@ export default function AdminUserDetailPage() {
                     disabled={actionLoading === 'APPROVE'}
                     className="w-full px-4 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium hover:bg-green-500/20 transition-all disabled:opacity-50"
                   >
-                    {actionLoading === 'APPROVE' ? 'Approving...' : `Approve as ${PLANS.find((p) => p.id === selectedPlan)?.label}`}
+                    {actionLoading === 'APPROVE'
+                      ? 'Approving...'
+                      : `Approve as ${PLANS.find((p) => p.id === selectedPlan)?.label}`}
                   </button>
                 </div>
               )}
@@ -351,13 +385,20 @@ export default function AdminUserDetailPage() {
 
           {user.servicesOffered.length > 0 && (
             <div className="md:col-span-2 bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-              <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Onboarding Info</h3>
+              <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+                Onboarding Info
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-text-secondary mb-1">Services Offered</p>
                   <div className="flex flex-wrap gap-1.5">
                     {user.servicesOffered.map((s) => (
-                      <span key={s} className="px-2.5 py-1 rounded-lg bg-white/[0.04] text-xs text-text-primary">{s}</span>
+                      <span
+                        key={s}
+                        className="px-2.5 py-1 rounded-lg bg-white/[0.04] text-xs text-text-primary"
+                      >
+                        {s}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -365,7 +406,12 @@ export default function AdminUserDetailPage() {
                   <p className="text-xs text-text-secondary mb-1">Preferred Categories</p>
                   <div className="flex flex-wrap gap-1.5">
                     {user.preferredLeadCategories.map((c) => (
-                      <span key={c} className="px-2.5 py-1 rounded-lg bg-white/[0.04] text-xs text-text-primary">{c}</span>
+                      <span
+                        key={c}
+                        className="px-2.5 py-1 rounded-lg bg-white/[0.04] text-xs text-text-primary"
+                      >
+                        {c}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -384,19 +430,40 @@ export default function AdminUserDetailPage() {
                 {user.portfolio && (
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Portfolio</p>
-                    <a href={user.portfolio} target="_blank" rel="noopener noreferrer" className="text-sm text-accent-mint hover:underline">{user.portfolio}</a>
+                    <a
+                      href={user.portfolio}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-accent-mint hover:underline"
+                    >
+                      {user.portfolio}
+                    </a>
                   </div>
                 )}
                 {user.website && (
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Website</p>
-                    <a href={user.website} target="_blank" rel="noopener noreferrer" className="text-sm text-accent-mint hover:underline">{user.website}</a>
+                    <a
+                      href={user.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-accent-mint hover:underline"
+                    >
+                      {user.website}
+                    </a>
                   </div>
                 )}
                 {user.linkedin && (
                   <div>
                     <p className="text-xs text-text-secondary mb-1">LinkedIn</p>
-                    <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="text-sm text-accent-mint hover:underline">{user.linkedin}</a>
+                    <a
+                      href={user.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-accent-mint hover:underline"
+                    >
+                      {user.linkedin}
+                    </a>
                   </div>
                 )}
               </div>
@@ -407,20 +474,28 @@ export default function AdminUserDetailPage() {
 
       {activeTab === 'credits' && (
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-          <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Credit Management</h3>
+          <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+            Credit Management
+          </h3>
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-xs text-text-secondary block mb-1">Subscription</span>
-                <span className="text-lg font-bold text-text-primary">{user.creditAccount?.subscriptionBalance ?? 0}</span>
+                <span className="text-lg font-bold text-text-primary">
+                  {user.creditAccount?.subscriptionBalance ?? 0}
+                </span>
               </div>
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-xs text-text-secondary block mb-1">Bonus</span>
-                <span className="text-lg font-bold text-text-primary">{user.creditAccount?.bonusBalance ?? 0}</span>
+                <span className="text-lg font-bold text-text-primary">
+                  {user.creditAccount?.bonusBalance ?? 0}
+                </span>
               </div>
               <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-xs text-text-secondary block mb-1">Total</span>
-                <span className="text-lg font-bold text-accent-mint">{user.creditAccount?.total ?? 0}</span>
+                <span className="text-lg font-bold text-accent-mint">
+                  {user.creditAccount?.total ?? 0}
+                </span>
               </div>
             </div>
             {user.creditAccount?.renewalDate && (
@@ -462,13 +537,17 @@ export default function AdminUserDetailPage() {
 
       {activeTab === 'history' && (
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-          <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Status History</h3>
+          <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+            Status History
+          </h3>
           {logsLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
             </div>
           ) : auditLogs.length === 0 ? (
-            <p className="text-sm text-text-secondary py-8 text-center">No status history available</p>
+            <p className="text-sm text-text-secondary py-8 text-center">
+              No status history available
+            </p>
           ) : (
             <div className="space-y-0">
               {auditLogs.map((log, i) => (
@@ -476,9 +555,13 @@ export default function AdminUserDetailPage() {
                   {i < auditLogs.length - 1 && (
                     <div className="absolute left-[11px] top-6 bottom-0 w-px bg-white/[0.06]" />
                   )}
-                  <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                    log.action === 'STATUS_CHANGE' ? 'bg-accent-mint/20 text-accent-mint' : 'bg-blue-500/20 text-blue-400'
-                  }`}>
+                  <div
+                    className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                      log.action === 'STATUS_CHANGE'
+                        ? 'bg-accent-mint/20 text-accent-mint'
+                        : 'bg-blue-500/20 text-blue-400'
+                    }`}
+                  >
                     <div className="w-2 h-2 rounded-full bg-current" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -497,7 +580,9 @@ export default function AdminUserDetailPage() {
       {activeTab === 'notes' && (
         <div className="space-y-4">
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Add Note</h3>
+            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+              Add Note
+            </h3>
             <textarea
               value={noteInput}
               onChange={(e) => setNoteInput(e.target.value)}
@@ -517,7 +602,9 @@ export default function AdminUserDetailPage() {
           </div>
 
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">Notes</h3>
+            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
+              Notes
+            </h3>
             {notesLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
@@ -527,7 +614,10 @@ export default function AdminUserDetailPage() {
             ) : (
               <div className="space-y-4">
                 {notes.map((note) => (
-                  <div key={note.id} className="border-b border-white/[0.04] pb-4 last:border-0 last:pb-0">
+                  <div
+                    key={note.id}
+                    className="border-b border-white/[0.04] pb-4 last:border-0 last:pb-0"
+                  >
                     <p className="text-sm text-text-primary whitespace-pre-wrap">{note.content}</p>
                     <p className="text-xs text-text-secondary mt-1">
                       {note.adminName} · {new Date(note.createdAt).toLocaleString()}

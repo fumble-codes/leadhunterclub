@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { getFirebaseToken } from '@/lib/firebase'
-import { ArrowRightIcon, UsersIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
+import {
+  ArrowRightIcon,
+  UsersIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/solid'
 
 interface AdminStats {
   totalUsers: number
@@ -57,10 +63,34 @@ export default function AdminDashboard() {
   }
 
   const cards = [
-    { label: 'Total Users', value: stats?.totalUsers ?? 0, icon: UsersIcon, color: 'text-text-primary', bg: 'bg-white/[0.04]' },
-    { label: 'Pending Review', value: stats?.pendingUsers ?? 0, icon: ClockIcon, color: 'text-yellow-400', bg: 'bg-yellow-500/5' },
-    { label: 'Active', value: stats?.activeUsers ?? 0, icon: CheckCircleIcon, color: 'text-green-400', bg: 'bg-green-500/5' },
-    { label: 'Rejected', value: stats?.rejectedUsers ?? 0, icon: XCircleIcon, color: 'text-red-400', bg: 'bg-red-500/5' },
+    {
+      label: 'Total Users',
+      value: stats?.totalUsers ?? 0,
+      icon: UsersIcon,
+      color: 'text-text-primary',
+      bg: 'bg-white/[0.04]',
+    },
+    {
+      label: 'Pending Review',
+      value: stats?.pendingUsers ?? 0,
+      icon: ClockIcon,
+      color: 'text-yellow-400',
+      bg: 'bg-yellow-500/5',
+    },
+    {
+      label: 'Active',
+      value: stats?.activeUsers ?? 0,
+      icon: CheckCircleIcon,
+      color: 'text-green-400',
+      bg: 'bg-green-500/5',
+    },
+    {
+      label: 'Rejected',
+      value: stats?.rejectedUsers ?? 0,
+      icon: XCircleIcon,
+      color: 'text-red-400',
+      bg: 'bg-red-500/5',
+    },
   ]
 
   return (
@@ -81,10 +111,17 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map((card) => (
-          <div key={card.label} className={`bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 ${
-            card.label === 'Pending Review' && highlightPending ? 'ring-2 ring-yellow-400/50 animate-pulse' : ''
-          }`}>
-            <div className={`w-10 h-10 rounded-xl ${card.bg} flex items-center justify-center mb-4`}>
+          <div
+            key={card.label}
+            className={`bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 ${
+              card.label === 'Pending Review' && highlightPending
+                ? 'ring-2 ring-yellow-400/50 animate-pulse'
+                : ''
+            }`}
+          >
+            <div
+              className={`w-10 h-10 rounded-xl ${card.bg} flex items-center justify-center mb-4`}
+            >
               <card.icon className={`w-5 h-5 ${card.color}`} />
             </div>
             <p className="text-2xl font-bold text-text-primary">{card.value}</p>

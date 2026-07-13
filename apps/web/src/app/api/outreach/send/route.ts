@@ -23,7 +23,11 @@ export async function POST(request: NextRequest) {
     const parsed = outreachSendSchema.safeParse(raw)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid request',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
@@ -57,22 +61,37 @@ export async function POST(request: NextRequest) {
         subject,
         body,
         direction: 'outbound',
-      }
+      },
     })
 
     return NextResponse.json({ success: true, data: email })
-
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
     }
     if (error instanceof InactiveUserError) {
-      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+      return NextResponse.json(
+        { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
     }
     if (error instanceof InsufficientCreditsError) {
-      return NextResponse.json({ code: 'INSUFFICIENT_CREDITS', message: 'Insufficient credits to send outreach', required: error.required }, { status: 400 })
+      return NextResponse.json(
+        {
+          code: 'INSUFFICIENT_CREDITS',
+          message: 'Insufficient credits to send outreach',
+          required: error.required,
+        },
+        { status: 400 },
+      )
     }
     console.error('[Send API Error]', error)
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to send email' }, { status: 500 })
+    return NextResponse.json(
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to send email' },
+      { status: 500 },
+    )
   }
 }

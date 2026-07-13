@@ -2,7 +2,22 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UserIcon, CheckCircleIcon, SparklesIcon, ChartBarSquareIcon, ChartBarIcon, BanknotesIcon, ArrowRightIcon, MagnifyingGlassIcon, BoltIcon, BookmarkIcon, PaperAirplaneIcon, LockClosedIcon, InformationCircleIcon, Bars3Icon } from '@heroicons/react/24/solid'
+import {
+  UserIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+  ChartBarSquareIcon,
+  ChartBarIcon,
+  BanknotesIcon,
+  ArrowRightIcon,
+  MagnifyingGlassIcon,
+  BoltIcon,
+  BookmarkIcon,
+  PaperAirplaneIcon,
+  LockClosedIcon,
+  InformationCircleIcon,
+  Bars3Icon,
+} from '@heroicons/react/24/solid'
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from '@/app/leads/components/LeadCard'
@@ -48,7 +63,7 @@ const mockLead1 = {
   replyProbability: 95,
   accent: 'pink',
   status: 'new',
-  timestamp: '4h ago'
+  timestamp: '4h ago',
 } as AppLead
 
 const mockLead2 = {
@@ -64,7 +79,7 @@ const mockLead2 = {
   replyProbability: 75,
   accent: 'purple',
   status: 'new',
-  timestamp: '3d ago'
+  timestamp: '3d ago',
 } as AppLead
 
 const PERSONAS: PersonaData[] = [
@@ -83,15 +98,17 @@ const PERSONAS: PersonaData[] = [
       company: 'Nexus AI',
       source: 'Reddit',
       title: 'Web Development For —',
-      signalContext: 'Struggling with slow load times and high bounce rates on their current Shopify store.',
+      signalContext:
+        'Struggling with slow load times and high bounce rates on their current Shopify store.',
       urgency: 'high',
       nicheTags: ['E-Commerce', 'Web Dev', 'Shopify'],
       replyProbability: 98,
       accent: 'mint',
       actionPitch: 'Curiosity Loop',
       outreachSubject: 'Quick Webflow/Shopify performance speed audit',
-      outreachBody: 'Hey Andy, saw your post regarding Shopify speed issues. Built a quick local copy of your checkout optimizing LCP shifts and load metrics (boosting conversion by 15%). Happy to send over the preview link?'
-    }
+      outreachBody:
+        'Hey Andy, saw your post regarding Shopify speed issues. Built a quick local copy of your checkout optimizing LCP shifts and load metrics (boosting conversion by 15%). Happy to send over the preview link?',
+    },
   },
   {
     id: 'web-designers',
@@ -115,8 +132,9 @@ const PERSONAS: PersonaData[] = [
       accent: 'pink',
       actionPitch: 'Authority Play',
       outreachSubject: 'DTC Checkout Page: 3 Conversion Leakage Fixes',
-      outreachBody: 'Hey Alex, saw your post about the checkout page conversion drops. Spatially analyzed your desktop checkout mobile layout shifts and spotted three minor trust gaps. Recorded a brief 90-second video teardown of the fix. Mind if I send it over?'
-    }
+      outreachBody:
+        'Hey Alex, saw your post about the checkout page conversion drops. Spatially analyzed your desktop checkout mobile layout shifts and spotted three minor trust gaps. Recorded a brief 90-second video teardown of the fix. Mind if I send it over?',
+    },
   },
   {
     id: 'graphic-designers',
@@ -133,15 +151,17 @@ const PERSONAS: PersonaData[] = [
       company: 'Vanguard Group',
       source: 'LinkedIn',
       title: 'Brand Identity For —',
-      signalContext: 'Looking for a brand designer to completely overhaul our corporate guidelines and slide deck.',
+      signalContext:
+        'Looking for a brand designer to completely overhaul our corporate guidelines and slide deck.',
       urgency: 'high',
       nicheTags: ['Branding', 'Vector Art', 'Figma'],
       replyProbability: 96,
       accent: 'purple',
       actionPitch: 'Authority Play',
       outreachSubject: 'Brand identity overhaul roadmap for Vanguard',
-      outreachBody: 'Hi Sarah, noticed you are planning to redesign Vanguard\'s visual identity guidelines. Our design team recently refreshed growth brand aesthetics for three similar startups, resulting in 40% higher customer trust metrics. Can I send over our 3-step design transition framework?'
-    }
+      outreachBody:
+        "Hi Sarah, noticed you are planning to redesign Vanguard's visual identity guidelines. Our design team recently refreshed growth brand aesthetics for three similar startups, resulting in 40% higher customer trust metrics. Can I send over our 3-step design transition framework?",
+    },
   },
   {
     id: 'developers',
@@ -165,8 +185,9 @@ const PERSONAS: PersonaData[] = [
       accent: 'cyan',
       actionPitch: 'Technical Audit',
       outreachSubject: 'Next.js bundle chunk audit for Stellar Co',
-      outreachBody: 'Hi Michael, saw your post regarding Next.js LCP bottlenecks. We recently optimized a mid-market SaaS site, bringing PageSpeed from 34 to 92 using chunk splitting and dynamic imports. Happy to share a quick bundle analyzer report of your site?'
-    }
+      outreachBody:
+        'Hi Michael, saw your post regarding Next.js LCP bottlenecks. We recently optimized a mid-market SaaS site, bringing PageSpeed from 34 to 92 using chunk splitting and dynamic imports. Happy to share a quick bundle analyzer report of your site?',
+    },
   },
   {
     id: 'smma-owners',
@@ -183,15 +204,17 @@ const PERSONAS: PersonaData[] = [
       company: 'Marcus Apparel',
       source: 'LinkedIn',
       title: 'Paid Ads Scaling For —',
-      signalContext: 'Struggling to maintain ROAS above 1.8x, looking for creative ad testing framework.',
+      signalContext:
+        'Struggling to maintain ROAS above 1.8x, looking for creative ad testing framework.',
       urgency: 'high',
       nicheTags: ['DTC Ads', 'Meta', 'TikTok'],
       replyProbability: 95,
       accent: 'orange',
       actionPitch: 'Authority Play',
       outreachSubject: 'Meta/TikTok creative testing library framework',
-      outreachBody: 'Hi Marcus, saw you are looking to scale paid ads. We recently scaled an apparel brand to 3.2x ROAS by implementing a structured visual hook testing library. Outlined three ad testing concepts specifically for your apparel line. Can I email you the deck?'
-    }
+      outreachBody:
+        'Hi Marcus, saw you are looking to scale paid ads. We recently scaled an apparel brand to 3.2x ROAS by implementing a structured visual hook testing library. Outlined three ad testing concepts specifically for your apparel line. Can I email you the deck?',
+    },
   },
   {
     id: 'agency-owners',
@@ -208,16 +231,18 @@ const PERSONAS: PersonaData[] = [
       company: 'GTM Partners',
       source: 'Twitter',
       title: 'Outbound Infrastructure For —',
-      signalContext: 'Need an agency with proven experience setting up cold email deliverability at scale.',
+      signalContext:
+        'Need an agency with proven experience setting up cold email deliverability at scale.',
       urgency: 'high',
       nicheTags: ['Deliverability', 'Outbound', 'Cold Email'],
       replyProbability: 97,
       accent: 'purple',
       actionPitch: 'Sniper Outreach',
       outreachSubject: 'High-volume deliverability checklist for GTM Partners',
-      outreachBody: 'Hey David, saw you are expanding your outbound outreach channels. We recently designed email infrastructures that set up 200 secondary domains with zero spam-foldering, landing high-ticket bookings for B2B SaaS firms. Mind if I send our deliverability scaling checklist?'
-    }
-  }
+      outreachBody:
+        'Hey David, saw you are expanding your outbound outreach channels. We recently designed email infrastructures that set up 200 secondary domains with zero spam-foldering, landing high-ticket bookings for B2B SaaS firms. Mind if I send our deliverability scaling checklist?',
+    },
+  },
 ]
 
 export default function WhoItsForGrid() {
@@ -228,10 +253,10 @@ export default function WhoItsForGrid() {
   const [isTyping, setIsTyping] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const activePersona = PERSONAS.find(p => p.id === activeTab) || PERSONAS[0]
+  const activePersona = PERSONAS.find((p) => p.id === activeTab) || PERSONAS[0]
 
   const handleReveal = (id: string) => {
-    setRevealed(prev => ({ ...prev, [id]: true }))
+    setRevealed((prev) => ({ ...prev, [id]: true }))
   }
 
   // Construct a type-compliant AppLead representing the primary interactive card
@@ -248,7 +273,7 @@ export default function WhoItsForGrid() {
     replyProbability: activePersona.lead.replyProbability,
     accent: activePersona.lead.accent,
     status: revealed[activePersona.id] ? 'drafting' : 'new',
-    timestamp: '2h ago'
+    timestamp: '2h ago',
   } as AppLead
 
   // Typewriting effect inside messaging cockpit draft
@@ -256,7 +281,7 @@ export default function WhoItsForGrid() {
     if (revealed[activePersona.id]) {
       setIsTyping(true)
       setDisplayedText('')
-      
+
       let index = 0
       const fullText = activePersona.lead.outreachBody
       const interval = setInterval(() => {
@@ -277,14 +302,17 @@ export default function WhoItsForGrid() {
   }, [revealed, activeTab, activePersona])
 
   return (
-    <section id="who" className="py-36 px-6 max-w-[1400px] mx-auto relative overflow-hidden border-t border-white/[0.03]">
+    <section
+      id="who"
+      className="py-36 px-6 max-w-[1400px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+    >
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] glow-purple-faint pointer-events-none" />
 
       {/* HEADER BLOCK: Large text left, horizontal navigation segmented buttons right */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-16 relative z-10">
         <div className="max-w-xl">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -294,7 +322,7 @@ export default function WhoItsForGrid() {
               Target Audiences
             </span>
           </motion.div>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -317,7 +345,7 @@ export default function WhoItsForGrid() {
         {/* Top-Right Interactive horizontal navigation segmented controls */}
         <div className="lg:shrink-0 flex items-center w-full lg:w-auto">
           <div className="w-full flex flex-wrap gap-2.5 md:gap-3 items-center justify-center lg:justify-end bg-surface p-2 md:p-2.5 border border-white/[0.08] rounded-3xl md:rounded-4xl shadow-[0_20px_50px_rgba(var(--rgb-black),0.5)]">
-            {PERSONAS.map(p => {
+            {PERSONAS.map((p) => {
               const isActive = p.id === activeTab
               const Icon = p.icon
               return (
@@ -327,8 +355,8 @@ export default function WhoItsForGrid() {
                     setActiveTab(p.id)
                   }}
                   className={`flex flex-col items-center justify-center gap-2 px-3 py-6 md:px-5 md:py-8 rounded-[20px] md:rounded-4xl transition-all duration-300 relative focus:outline-none cursor-pointer flex-1 sm:flex-initial min-w-[95px] md:min-w-[120px] max-w-[130px] ${
-                    isActive 
-                      ? 'text-text-secondary hover:text-text-primary transition-colors' 
+                    isActive
+                      ? 'text-text-secondary hover:text-text-primary transition-colors'
                       : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
@@ -353,7 +381,7 @@ export default function WhoItsForGrid() {
 
       {/* SPACIOUS OVERLAPPED FULL WIDTH SIMULATOR CONTAINER */}
       <div className="w-full relative z-10">
-        <div 
+        <div
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
           className="w-full rounded-4xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[780px] md:h-[860px] justify-between"
@@ -361,9 +389,15 @@ export default function WhoItsForGrid() {
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">
             <div className="flex items-center gap-1.5">
-              <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isHoveredPanel ? 'bg-dot-red' : 'bg-white/10'}`} />
-              <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isHoveredPanel ? 'bg-dot-yellow' : 'bg-white/10'}`} />
-              <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isHoveredPanel ? 'bg-dot-green' : 'bg-white/10'}`} />
+              <div
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${isHoveredPanel ? 'bg-dot-red' : 'bg-white/10'}`}
+              />
+              <div
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${isHoveredPanel ? 'bg-dot-yellow' : 'bg-white/10'}`}
+              />
+              <div
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${isHoveredPanel ? 'bg-dot-green' : 'bg-white/10'}`}
+              />
             </div>
             <span className="text-[10px] font-mono tracking-widest text-text-secondary/40 font-bold uppercase">
               Interactive App Inside Preview
@@ -373,19 +407,23 @@ export default function WhoItsForGrid() {
 
           {/* Simulated App Viewport */}
           <div className="flex flex-1 flex-row h-full overflow-hidden bg-bg-main relative">
-            
             {/* Real App Sidebar (rendered in compact demo mode) */}
-            <div className={`hidden ${isSidebarOpen ? 'md:block' : ''} shrink-0 h-full border-r border-white/[0.06] transition-all duration-300`}>
-              <AppSidebar 
-                isDemo={true} 
-                activePathOverride={revealed[activePersona.id] ? '/outreach' : '/leads'} 
+            <div
+              className={`hidden ${isSidebarOpen ? 'md:block' : ''} shrink-0 h-full border-r border-white/[0.06] transition-all duration-300`}
+            >
+              <AppSidebar
+                isDemo={true}
+                activePathOverride={revealed[activePersona.id] ? '/outreach' : '/leads'}
                 onNavItemClick={(href) => {
                   if (href === '/leads') {
-                    setRevealed(prev => ({ ...prev, [activePersona.id]: false }))
+                    setRevealed((prev) => ({ ...prev, [activePersona.id]: false }))
                   } else if (href === '/outreach') {
-                    setRevealed(prev => ({ ...prev, [activePersona.id]: true }))
+                    setRevealed((prev) => ({ ...prev, [activePersona.id]: true }))
                   } else {
-                    setRevealed(prev => ({ ...prev, [activePersona.id]: !revealed[activePersona.id] }))
+                    setRevealed((prev) => ({
+                      ...prev,
+                      [activePersona.id]: !revealed[activePersona.id],
+                    }))
                   }
                 }}
               />
@@ -393,12 +431,14 @@ export default function WhoItsForGrid() {
 
             {/* Simulated Desktop Workspace Main Panel */}
             <div className="flex-1 h-full flex flex-col bg-bg-main relative p-8 md:p-10 lg:p-12 overflow-hidden">
-              
               {/* BACKGROUND LAYER: The leads feed dashboard (dimmed/blurred when cockpit overlays) */}
-              <div className={`w-full h-full flex flex-col justify-start gap-5 transition-all duration-500 ${
-                revealed[activePersona.id] ? 'opacity-30 blur-[3px] scale-98 pointer-events-none' : 'opacity-100 blur-0 scale-100'
-              }`}>
-                
+              <div
+                className={`w-full h-full flex flex-col justify-start gap-5 transition-all duration-500 ${
+                  revealed[activePersona.id]
+                    ? 'opacity-30 blur-[3px] scale-98 pointer-events-none'
+                    : 'opacity-100 blur-0 scale-100'
+                }`}
+              >
                 {/* Leads Feed Dashboard Header */}
                 <div className="flex items-end justify-between shrink-0 select-none">
                   <div className="flex items-center gap-2.5">
@@ -406,11 +446,15 @@ export default function WhoItsForGrid() {
                     <button
                       onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                       className={`p-2 bg-surface/80 hover:bg-white/5 border border-white/[0.08] hover:border-white/15 rounded-xl text-text-secondary hover:text-text-primary transition-all cursor-pointer flex items-center justify-center mr-2 shadow-md`}
-                      title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
+                      title={isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
                     >
-                      <Bars3Icon className={`w-[15px] h-[15px] transition-transform duration-300 ${isSidebarOpen ? 'rotate-90 text-text-secondary' : ''}`} />
+                      <Bars3Icon
+                        className={`w-[15px] h-[15px] transition-transform duration-300 ${isSidebarOpen ? 'rotate-90 text-text-secondary' : ''}`}
+                      />
                     </button>
-                    <h3 className="text-lg font-bold text-text-primary tracking-tight">Lead Feed</h3>
+                    <h3 className="text-lg font-bold text-text-primary tracking-tight">
+                      Lead Feed
+                    </h3>
                     <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-super uppercase">
                       <span className="w-1 h-1 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                       6 Signals
@@ -444,10 +488,7 @@ export default function WhoItsForGrid() {
 
                   {/* Card 2: THE PRIMARY ACTIVE PERSONA LEAD CARD (clickable to reveal) */}
                   <div className="flex items-stretch h-full">
-                    <LeadCard 
-                      lead={appLead} 
-                      onClick={() => handleReveal(activePersona.id)} 
-                    />
+                    <LeadCard lead={appLead} onClick={() => handleReveal(activePersona.id)} />
                   </div>
 
                   {/* Card 3: CRM migration signal */}
@@ -470,16 +511,26 @@ export default function WhoItsForGrid() {
                     {/* Messaging Cockpit Header */}
                     <div className="flex items-center justify-between pb-4 border-b border-white/[0.06] shrink-0 select-none">
                       <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-xl bg-accent-${activePersona.lead.accent}/10 border border-accent-${activePersona.lead.accent}/20 flex items-center justify-center`}>
-                          <UserIcon className={`w-4 h-4 text-accent-${activePersona.lead.accent}`} />
+                        <div
+                          className={`w-9 h-9 rounded-xl bg-accent-${activePersona.lead.accent}/10 border border-accent-${activePersona.lead.accent}/20 flex items-center justify-center`}
+                        >
+                          <UserIcon
+                            className={`w-4 h-4 text-accent-${activePersona.lead.accent}`}
+                          />
                         </div>
                         <div>
-                          <h3 className="text-sm font-bold text-text-primary leading-tight">{activePersona.lead.name}</h3>
-                          <span className="text-[10px] text-text-secondary/60">{activePersona.lead.company} · Sourced from {activePersona.lead.source}</span>
+                          <h3 className="text-sm font-bold text-text-primary leading-tight">
+                            {activePersona.lead.name}
+                          </h3>
+                          <span className="text-[10px] text-text-secondary/60">
+                            {activePersona.lead.company} · Sourced from {activePersona.lead.source}
+                          </span>
                         </div>
                       </div>
-                      <button 
-                        onClick={() => setRevealed(prev => ({ ...prev, [activePersona.id]: false }))}
+                      <button
+                        onClick={() =>
+                          setRevealed((prev) => ({ ...prev, [activePersona.id]: false }))
+                        }
                         className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-[10px] font-bold text-text-primary rounded-lg border border-white/10 transition-colors cursor-pointer"
                       >
                         Close Preview
@@ -489,8 +540,12 @@ export default function WhoItsForGrid() {
                     {/* Decrypted details */}
                     <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] shrink-0 flex items-center justify-between select-none my-3">
                       <div className="flex flex-col text-[11px] md:text-xs">
-                        <span className="text-text-primary font-bold">{activePersona.lead.name}</span>
-                        <span className="text-text-secondary hover:text-text-primary transition-colors font-mono text-[9px] md:text-[10px]">{activePersona.lead.email}</span>
+                        <span className="text-text-primary font-bold">
+                          {activePersona.lead.name}
+                        </span>
+                        <span className="text-text-secondary hover:text-text-primary transition-colors font-mono text-[9px] md:text-[10px]">
+                          {activePersona.lead.email}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-[8px] font-bold uppercase tracking-wider">
                         <CheckCircleIcon className="w-[10px] h-[10px]" /> Decrypted
@@ -515,15 +570,19 @@ export default function WhoItsForGrid() {
                         {/* Subject block */}
                         <div className="text-[11px] text-text-secondary flex items-center gap-1.5 mb-2 select-none">
                           <span className="text-text-secondary/50 font-medium">Subject:</span>
-                          <span className="text-text-primary font-semibold">{activePersona.lead.outreachSubject}</span>
+                          <span className="text-text-primary font-semibold">
+                            {activePersona.lead.outreachSubject}
+                          </span>
                         </div>
-                        
+
                         <div className="h-px bg-white/[0.04] mb-3" />
 
                         {/* Typewriter message content */}
                         <p className="text-[11px] md:text-xs text-text-primary/90 leading-relaxed font-light whitespace-pre-line overflow-y-auto max-h-[220px] md:max-h-[280px] pr-1">
                           {displayedText}
-                          {isTyping && <span className="inline-block w-1 h-3 ml-0.5 bg-accent-mint animate-pulse align-middle" />}
+                          {isTyping && (
+                            <span className="inline-block w-1 h-3 ml-0.5 bg-accent-mint animate-pulse align-middle" />
+                          )}
                         </p>
                       </div>
 
@@ -532,7 +591,7 @@ export default function WhoItsForGrid() {
                         <span className="text-[8px] font-mono text-text-secondary/40 tracking-wider">
                           Ready to dispatch SMTP
                         </span>
-                        
+
                         <button className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-mint text-text-on-accent rounded-lg font-bold text-[9px] md:text-[10px] hover: transition-all">
                           Send Intercept
                           <PaperAirplaneIcon className="w-[10px] h-[10px]" />

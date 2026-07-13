@@ -24,8 +24,16 @@ export interface SheetLeadRow {
 }
 
 const HEADERS = [
-  'Name', 'Email', 'Phone', 'Company', 'Buying Signal',
-  'AI Draft', 'Status', 'Urgency', 'Reply %', 'Follow-up Date',
+  'Name',
+  'Email',
+  'Phone',
+  'Company',
+  'Buying Signal',
+  'AI Draft',
+  'Status',
+  'Urgency',
+  'Reply %',
+  'Follow-up Date',
 ]
 
 export async function createLeadSheet(leads: SheetLeadRow[]): Promise<string> {
@@ -38,8 +46,16 @@ export async function createLeadSheet(leads: SheetLeadRow[]): Promise<string> {
 
   const sheetId = response.data.spreadsheetId!
   const rows = leads.map((l) => [
-    l.name, l.email, l.phone, l.company, l.signalContext,
-    l.aiDraft || '', l.status, l.urgency, l.replyProbability, l.followUpDate || '',
+    l.name,
+    l.email,
+    l.phone,
+    l.company,
+    l.signalContext,
+    l.aiDraft || '',
+    l.status,
+    l.urgency,
+    l.replyProbability,
+    l.followUpDate || '',
   ])
 
   await sheets.spreadsheets.values.update({
@@ -84,8 +100,16 @@ export async function createLeadSheet(leads: SheetLeadRow[]): Promise<string> {
 
 export async function appendToSheet(sheetId: string, leads: SheetLeadRow[]) {
   const rows = leads.map((l) => [
-    l.name, l.email, l.phone, l.company, l.signalContext,
-    l.aiDraft || '', l.status, l.urgency, l.replyProbability, l.followUpDate || '',
+    l.name,
+    l.email,
+    l.phone,
+    l.company,
+    l.signalContext,
+    l.aiDraft || '',
+    l.status,
+    l.urgency,
+    l.replyProbability,
+    l.followUpDate || '',
   ])
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
@@ -96,9 +120,7 @@ export async function appendToSheet(sheetId: string, leads: SheetLeadRow[]) {
   })
 }
 
-export async function syncFromSheet(
-  sheetId: string,
-): Promise<{ email: string; status: string }[]> {
+export async function syncFromSheet(sheetId: string): Promise<{ email: string; status: string }[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: sheetId,
     range: 'Leads!A:J',

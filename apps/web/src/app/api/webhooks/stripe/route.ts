@@ -75,7 +75,9 @@ export async function POST(req: Request) {
         const subscriptionId = session.subscription as string
 
         if (!userId) {
-          console.warn('[Stripe Webhook] checkout.session.completed received without client_reference_id')
+          console.warn(
+            '[Stripe Webhook] checkout.session.completed received without client_reference_id',
+          )
           break
         }
 
@@ -152,7 +154,6 @@ export async function POST(req: Request) {
               stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
             },
           })
-
         }
         break
       }

@@ -6,13 +6,14 @@ export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request)
 
-    const [totalUsers, pendingUsers, activeUsers, rejectedUsers, suspendedUsers] = await Promise.all([
-      db.user.count(),
-      db.user.count({ where: { status: 'PENDING' } }),
-      db.user.count({ where: { status: 'ACTIVE' } }),
-      db.user.count({ where: { status: 'REJECTED' } }),
-      db.user.count({ where: { status: 'SUSPENDED' } }),
-    ])
+    const [totalUsers, pendingUsers, activeUsers, rejectedUsers, suspendedUsers] =
+      await Promise.all([
+        db.user.count(),
+        db.user.count({ where: { status: 'PENDING' } }),
+        db.user.count({ where: { status: 'ACTIVE' } }),
+        db.user.count({ where: { status: 'REJECTED' } }),
+        db.user.count({ where: { status: 'SUSPENDED' } }),
+      ])
 
     return NextResponse.json({
       data: {

@@ -71,6 +71,7 @@ They Hate Wasting Time.
 ## Copy
 
 Most freelancers and agencies spend hours:
+
 - scraping leads
 - filtering random prospects
 - guessing who’s serious
@@ -83,6 +84,7 @@ the opportunity is already cold.
 Lead Hunter Club helps you skip the manual hunting and focus on actual conversations.
 
 We bring you fresh, active leads with:
+
 - contact details
 - buyer context
 - service relevance
@@ -118,6 +120,7 @@ Real opportunities with real intent.
 ### Qualified Leads
 
 Every lead comes with:
+
 - contact details
 - buyer context
 - urgency indicators
@@ -133,6 +136,7 @@ So you spend less time filtering and more time selling.
 ### AI-Powered Outreach
 
 Generate personalized outreach using:
+
 - lead intelligence
 - buyer psychology
 - conversational context
@@ -168,12 +172,14 @@ We Optimize Replies.
 Anyone can blast 1,000 cold emails.
 
 Most of them sound:
+
 - robotic
 - desperate
 - copy-pasted
 - forgettable
 
 Lead Hunter Club focuses on:
+
 - better conversations
 - smarter personalization
 - lower resistance
@@ -255,6 +261,7 @@ Simple Token-Based System
 Every subscription includes monthly tokens.
 
 Use them however you want:
+
 - unlock leads
 - generate AI outreach
 - automate follow-ups
@@ -310,8 +317,6 @@ Discover active service demand daily.
 Turn conversations into paying clients faster.
 
 ---
-
-
 
 ## Headline
 
@@ -379,11 +384,13 @@ Less wasted time.
 # POSITIONING NOTES
 
 Lead Hunter Club is NOT:
+
 - a scraping tool
 - a spam automation platform
 - a generic AI writer
 
 Lead Hunter Club IS:
+
 - a conversational client acquisition system
 - a buyer-intent intelligence platform
 - an outreach intelligence engine
@@ -394,6 +401,7 @@ Lead Hunter Club IS:
 # COPYWRITING PRINCIPLES
 
 Focus messaging around:
+
 - conversations
 - replies
 - buyer intent
@@ -404,6 +412,7 @@ Focus messaging around:
 - closing clients
 
 Avoid:
+
 - corporate jargon
 - generic AI buzzwords
 - “10x your business”

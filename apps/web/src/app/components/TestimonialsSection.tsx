@@ -36,27 +36,31 @@ const TESTIMONIALS: Testimonial[] = [
     accentToken: 'persona-green',
     initials: 'AM',
     result: '$4,200 contract in week 1',
-    quote: 'Found a $4k Shopify contract within my first week. The intent signals are insanely accurate — it honestly felt like cheating.',
+    quote:
+      'Found a $4k Shopify contract within my first week. The intent signals are insanely accurate — it honestly felt like cheating.',
     highlights: [
       {
         label: 'Before LeadHunter',
         tag: 'Manually browsing Reddit',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
-        detail: 'Spent 2–3 hours a day manually scrolling forums hoping to stumble across someone asking for dev help.'
+        detail:
+          'Spent 2–3 hours a day manually scrolling forums hoping to stumble across someone asking for dev help.',
       },
       {
         label: 'What changed',
         tag: 'AI Outreach Writer',
         tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
-        detail: 'LeadHunter surfaces the exact posts with buyer intent and drafts a personalized pitch in seconds — no guesswork.'
+        detail:
+          'LeadHunter surfaces the exact posts with buyer intent and drafts a personalized pitch in seconds — no guesswork.',
       },
       {
         label: 'Their result',
         tag: '+28% Reply Rate',
         tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
-        detail: 'Went from 4% cold email replies to 28% in under a month. First paid contract landed in week one.'
+        detail:
+          'Went from 4% cold email replies to 28% in under a month. First paid contract landed in week one.',
       },
-    ]
+    ],
   },
   {
     id: 'priya',
@@ -66,27 +70,31 @@ const TESTIMONIALS: Testimonial[] = [
     accentToken: 'persona-pink',
     initials: 'PS',
     result: '3 retainers closed in 30 days',
-    quote: 'LeadHunter surfaces clients I\'d never find cold emailing. Every lead already wants design help — it\'s that good.',
+    quote:
+      "LeadHunter surfaces clients I'd never find cold emailing. Every lead already wants design help — it's that good.",
     highlights: [
       {
         label: 'Before LeadHunter',
         tag: 'Cold job board applications',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
-        detail: 'Sending 30+ cold applications a week on Contra and Upwork with a 2% callback rate at best.'
+        detail:
+          'Sending 30+ cold applications a week on Contra and Upwork with a 2% callback rate at best.',
       },
       {
         label: 'What changed',
         tag: 'Intent Scoring',
         tagColor: 'bg-persona-pink/10 border-persona-pink/20 text-persona-pink',
-        detail: 'Every lead is ranked by urgency and budget signal — she pitches only when there\'s a real buying signal.'
+        detail:
+          "Every lead is ranked by urgency and budget signal — she pitches only when there's a real buying signal.",
       },
       {
         label: 'Their result',
         tag: '3 Retainers / 30 Days',
         tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
-        detail: 'Closed three ongoing monthly design retainers by week four. Zero cold applications sent since.'
+        detail:
+          'Closed three ongoing monthly design retainers by week four. Zero cold applications sent since.',
       },
-    ]
+    ],
   },
   {
     id: 'koen',
@@ -96,27 +104,31 @@ const TESTIMONIALS: Testimonial[] = [
     accentToken: 'tab-purple',
     initials: 'KV',
     result: 'Replaced job boards entirely',
-    quote: 'I stopped wasting time on job boards. Warm intent leads close 3x faster — the quality difference is night and day.',
+    quote:
+      'I stopped wasting time on job boards. Warm intent leads close 3x faster — the quality difference is night and day.',
     highlights: [
       {
         label: 'Before LeadHunter',
         tag: 'Waiting on referrals',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
-        detail: 'Revenue was entirely dependent on word-of-mouth. Dry months with no predictable pipeline whatsoever.'
+        detail:
+          'Revenue was entirely dependent on word-of-mouth. Dry months with no predictable pipeline whatsoever.',
       },
       {
         label: 'What changed',
         tag: 'Automated Follow-Ups',
         tagColor: 'bg-tab-purple/10 border-tab-purple/20 text-tab-purple',
-        detail: 'Multi-stage sequences now run in the background. Deals move forward even when he\'s heads-down on client work.'
+        detail:
+          "Multi-stage sequences now run in the background. Deals move forward even when he's heads-down on client work.",
       },
       {
         label: 'Their result',
         tag: '3× Faster Closes',
         tagColor: 'bg-persona-pink/10 border-persona-pink/20 text-persona-pink',
-        detail: 'Warm intent leads close three times faster than cold applications. Fully replaced job boards within 6 weeks.'
+        detail:
+          'Warm intent leads close three times faster than cold applications. Fully replaced job boards within 6 weeks.',
       },
-    ]
+    ],
   },
   {
     id: 'marcus',
@@ -126,27 +138,31 @@ const TESTIMONIALS: Testimonial[] = [
     accentToken: 'persona-blue',
     initials: 'MT',
     result: 'Response rate: 4% → 28%',
-    quote: 'The AI drafts outreach that actually sounds like me. Response rates went from 4% to 28% without touching my email setup.',
+    quote:
+      'The AI drafts outreach that actually sounds like me. Response rates went from 4% to 28% without touching my email setup.',
     highlights: [
       {
         label: 'Before LeadHunter',
         tag: 'Generic cold templates',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
-        detail: 'Using the same copy-paste cold email template for every prospect. Felt spammy and landed in inboxes maybe half the time.'
+        detail:
+          'Using the same copy-paste cold email template for every prospect. Felt spammy and landed in inboxes maybe half the time.',
       },
       {
         label: 'What changed',
         tag: 'AI Context Insight',
         tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
-        detail: 'Every outreach is written around the specific signal that triggered the lead — founders respond because it feels personal.'
+        detail:
+          'Every outreach is written around the specific signal that triggered the lead — founders respond because it feels personal.',
       },
       {
         label: 'Their result',
         tag: '7× More Pipeline',
         tagColor: 'bg-tab-purple/10 border-tab-purple/20 text-tab-purple',
-        detail: 'Pipeline grew 7x in 45 days. Now closes 2–3 new contracts monthly without any additional marketing spend.'
+        detail:
+          'Pipeline grew 7x in 45 days. Now closes 2–3 new contracts monthly without any additional marketing spend.',
       },
-    ]
+    ],
   },
   {
     id: 'jade',
@@ -156,27 +172,31 @@ const TESTIMONIALS: Testimonial[] = [
     accentToken: 'persona-orange',
     initials: 'JW',
     result: '2 → 8 retainers in 60 days',
-    quote: 'Scaled from 2 to 8 retainer clients in 60 days. This is the unfair advantage agencies need. Nothing else comes close.',
+    quote:
+      'Scaled from 2 to 8 retainer clients in 60 days. This is the unfair advantage agencies need. Nothing else comes close.',
     highlights: [
       {
         label: 'Before LeadHunter',
         tag: 'Burned out on cold DMs',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
-        detail: 'Sending 50+ cold DMs daily across Instagram and LinkedIn with almost no response. Team was exhausted.'
+        detail:
+          'Sending 50+ cold DMs daily across Instagram and LinkedIn with almost no response. Team was exhausted.',
       },
       {
         label: 'What changed',
         tag: 'Multi-Platform Feed',
         tagColor: 'bg-persona-orange/10 border-persona-orange/20 text-persona-orange',
-        detail: 'One feed now aggregates high-intent signals from 5 platforms. The team pitches only when a real buying signal exists.'
+        detail:
+          'One feed now aggregates high-intent signals from 5 platforms. The team pitches only when a real buying signal exists.',
       },
       {
         label: 'Their result',
         tag: '4× Revenue in 60 Days',
         tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
-        detail: 'Grew from $6k/mo to $24k/mo MRR in two months. Cold outreach budget reduced to zero.'
+        detail:
+          'Grew from $6k/mo to $24k/mo MRR in two months. Cold outreach budget reduced to zero.',
       },
-    ]
+    ],
   },
   {
     id: 'david',
@@ -186,27 +206,31 @@ const TESTIMONIALS: Testimonial[] = [
     accentToken: 'tab-purple',
     initials: 'DK',
     result: 'Replaced entire SDR stack',
-    quote: 'We replaced our entire outbound SDR stack with LeadHunter. Same pipeline at 20% of the cost. I wish I found it sooner.',
+    quote:
+      'We replaced our entire outbound SDR stack with LeadHunter. Same pipeline at 20% of the cost. I wish I found it sooner.',
     highlights: [
       {
         label: 'Before LeadHunter',
         tag: '3 full-time SDRs',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
-        detail: 'Running a 3-person outbound team at $15k/mo in salaries. Results were inconsistent and hard to scale.'
+        detail:
+          'Running a 3-person outbound team at $15k/mo in salaries. Results were inconsistent and hard to scale.',
       },
       {
         label: 'What changed',
         tag: 'Email Integration',
         tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
-        detail: 'LeadHunter now handles lead discovery, enrichment, and outreach sequencing — fully automated with no seat cost.'
+        detail:
+          'LeadHunter now handles lead discovery, enrichment, and outreach sequencing — fully automated with no seat cost.',
       },
       {
         label: 'Their result',
         tag: '80% Cost Reduction',
         tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
-        detail: 'Eliminated 3 SDR salaries while hitting the same pipeline targets. Reinvested savings into product and growth.'
+        detail:
+          'Eliminated 3 SDR salaries while hitting the same pipeline targets. Reinvested savings into product and growth.',
       },
-    ]
+    ],
   },
 ]
 
@@ -228,9 +252,10 @@ function TestimonialCard({
       className={`
         relative flex items-center gap-4 px-5 py-4 rounded-2xl border cursor-pointer
         transition-colors duration-300 select-none min-w-[240px] max-w-[280px] shrink-0
-        ${isActive
-          ? 'bg-surface border-white/10 shadow-[0_20px_60px_rgba(var(--rgb-black),0.7)]'
-          : 'bg-surface/60 border-white/[0.04] hover:bg-surface-secondary/80'
+        ${
+          isActive
+            ? 'bg-surface border-white/10 shadow-[0_20px_60px_rgba(var(--rgb-black),0.7)]'
+            : 'bg-surface/60 border-white/[0.04] hover:bg-surface-secondary/80'
         }
       `}
       animate={isActive ? { scale: 1, opacity: 1 } : { scale: 0.92, opacity: 0.45 }}
@@ -253,7 +278,9 @@ function TestimonialCard({
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-text-primary truncate">{testimonial.name}</span>
-          <span className="text-[10px] text-text-secondary/40 font-mono shrink-0">{testimonial.handle}</span>
+          <span className="text-[10px] text-text-secondary/40 font-mono shrink-0">
+            {testimonial.handle}
+          </span>
         </div>
         <span className="text-[11px] text-text-secondary/60">{testimonial.role}</span>
       </div>
@@ -293,9 +320,7 @@ function HighlightRow({ highlight, index }: { highlight: Highlight; index: numbe
         >
           {highlight.tag}
         </span>
-        <p className="text-[12px] text-text-secondary/65 leading-relaxed">
-          {highlight.detail}
-        </p>
+        <p className="text-[12px] text-text-secondary/65 leading-relaxed">{highlight.detail}</p>
       </div>
     </motion.div>
   )
@@ -309,22 +334,25 @@ export default function TestimonialsSection() {
   const total = TESTIMONIALS.length
   const active = TESTIMONIALS[activeIndex]
 
-  const goTo = useCallback((index: number) => {
-    setActiveIndex(((index % total) + total) % total)
-  }, [total])
+  const goTo = useCallback(
+    (index: number) => {
+      setActiveIndex(((index % total) + total) % total)
+    },
+    [total],
+  )
 
   // Auto-advance
   useEffect(() => {
     if (isPaused) return
     const interval = setInterval(() => {
-      setActiveIndex(prev => (prev + 1) % total)
+      setActiveIndex((prev) => (prev + 1) % total)
     }, 3800)
     return () => clearInterval(interval)
   }, [isPaused, total])
 
   // Only show prev, active, next cards
   const getPosition = (index: number): 'left' | 'center' | 'right' | 'hidden' => {
-    const prev = ((activeIndex - 1) + total) % total
+    const prev = (activeIndex - 1 + total) % total
     const next = (activeIndex + 1) % total
     if (index === activeIndex) return 'center'
     if (index === prev) return 'left'
@@ -362,7 +390,8 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.7, delay: 0.08, ease }}
           className="font-display text-[38px] md:text-[52px] font-semibold tracking-tight text-text-primary leading-[1.1] mb-5 max-w-3xl mx-auto"
         >
-          Real results from real people.<br />
+          Real results from real people.
+          <br />
           <span className="text-text-secondary/60">No fluff, just outcomes.</span>
         </motion.h2>
 
@@ -373,7 +402,8 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.7, delay: 0.15, ease }}
           className="text-base text-text-secondary/60 max-w-lg mx-auto leading-relaxed"
         >
-          Freelancers, designers, and agency owners share exactly what changed after switching to LeadHunterClub.
+          Freelancers, designers, and agency owners share exactly what changed after switching to
+          LeadHunterClub.
         </motion.p>
       </div>
 
@@ -433,7 +463,6 @@ export default function TestimonialsSection() {
         className="relative z-10 max-w-[820px] mx-auto"
       >
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
-
           {/* Left: Highlight rows */}
           <div className="lg:col-span-3">
             <AnimatePresence mode="wait">
@@ -471,7 +500,11 @@ export default function TestimonialsSection() {
                 {/* Stars */}
                 <div className="flex items-center gap-0.5 mb-4 relative z-10">
                   {[...Array(5)].map((_, i) => (
-                    <StarIcon key={i} className="w-[11px] h-[11px]" style={{ color: `var(--color-${active.accentToken})`, opacity: 0.8 }} />
+                    <StarIcon
+                      key={i}
+                      className="w-[11px] h-[11px]"
+                      style={{ color: `var(--color-${active.accentToken})`, opacity: 0.8 }}
+                    />
                   ))}
                 </div>
 
@@ -519,7 +552,6 @@ export default function TestimonialsSection() {
               </motion.div>
             </AnimatePresence>
           </div>
-
         </div>
       </motion.div>
 

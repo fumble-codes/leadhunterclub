@@ -15,13 +15,11 @@ export default function OutreachPage() {
           <SparklesIcon className="w-8 h-8 text-accent-purple" />
         </div>
 
-        <h1 className="text-3xl font-bold text-text-primary tracking-tight">
-          AI Outreach Console
-        </h1>
+        <h1 className="text-3xl font-bold text-text-primary tracking-tight">AI Outreach Console</h1>
 
         <p className="text-text-secondary text-sm leading-relaxed">
-          A dedicated workspace to generate, edit, and copy AI drafts is in development.
-          Generate AI drafts from the Lead Drawer and manage your full pipeline from Saved Leads.
+          A dedicated workspace to generate, edit, and copy AI drafts is in development. Generate AI
+          drafts from the Lead Drawer and manage your full pipeline from Saved Leads.
         </p>
 
         <div className="pt-4">

@@ -18,7 +18,11 @@ export async function POST(request: NextRequest) {
     const parsed = onboardingSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { code: 'VALIDATION_ERROR', message: 'Invalid onboarding data', details: parsed.error.flatten().fieldErrors },
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid onboarding data',
+          details: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 },
       )
     }
