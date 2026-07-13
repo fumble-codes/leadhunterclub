@@ -23,11 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, loading, logout } = useAuth()
 
   useEffect(() => {
-    if (loading) return
-    if (!user) {
-      router.push('/login')
-      return
-    }
+    if (loading || !user) return
     if (user.status === 'SUSPENDED' || user.status === 'REJECTED') {
       router.push('/pending-approval')
       return

@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeftIcon } from '@heroicons/react/24/solid'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { signInWithEmailAndPassword, sendPasswordResetEmail, auth } from '@/lib/firebase'
 
 const FIREBASE_ERRORS: Record<string, string> = {
@@ -30,6 +30,7 @@ function friendlyFirebaseError(message: string): string {
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [resetSent, setResetSent] = useState(false)
@@ -60,10 +61,11 @@ export default function LoginPage() {
     const formData = new FormData(e.currentTarget)
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const redirectTo = searchParams.get('redirect') || '/dashboard'
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      router.push('/dashboard')
+      router.push(redirectTo)
     } catch (err: unknown) {
       setError(err instanceof Error ? friendlyFirebaseError(err.message) : 'Failed to sign in')
     } finally {
