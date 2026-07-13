@@ -33,9 +33,8 @@ function loadServiceAccount(): ServiceAccount {
 async function getAdminAuth(): Promise<Auth | null> {
   if (adminAuthInstance) return adminAuthInstance
 
-  const serviceAccount = loadServiceAccount()
-
   try {
+    const serviceAccount = loadServiceAccount()
     const { getApps, initializeApp, cert } = await import('firebase-admin/app')
     const { getAuth } = await import('firebase-admin/auth')
 
