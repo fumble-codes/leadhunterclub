@@ -1,30 +1,35 @@
-import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { activityData } from '@/lib/mock/dashboardData'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import { getPosts } from '@/lib/external-api/client'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
 
-    if (!userId && false) {
-      return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
-      )
-    }
-
-    // 1. Fetch user to get real credits remaining
     const user = await db.user.findUnique({
       where: { id: userId },
-      select: { credits: true, plan: true },
+      select: {
+        plan: true,
+        creditAccount: {
+          select: { subscriptionBalance: true, bonusBalance: true },
+        },
+      },
     })
 
-    const creditsRemaining = user?.credits ?? 200
-    const planCredits = user?.plan === 'PRO' ? 1000 : user?.plan === 'ENTERPRISE' ? 10000 : 200
+    const totalCredits = (user?.creditAccount?.subscriptionBalance ?? 0) + (user?.creditAccount?.bonusBalance ?? 0)
+    const creditsRemaining = totalCredits
+    const planCredits = user?.plan === 'FREELANCER' ? 500 : user?.plan === 'AGENCY' ? 1000 : 50
 
-    // 2. Count live statistics
-    const totalLeadsCount = await db.lead.count()
+    let totalLeadsCount = 0
+    try {
+      const postsRes = await getPosts({ perPage: 1 })
+      totalLeadsCount = postsRes.counts?.all || 0
+    } catch {
+      totalLeadsCount = 0
+    }
+
     const activeConversationsCount = await db.userLeadState.count({
       where: {
         userId,
@@ -39,12 +44,63 @@ export async function GET() {
       },
     })
 
-    // Construct live stats matching the DashboardStat structure
+    const savedLeadsWithScore = await db.userLeadState.findMany({
+      where: { userId, isSaved: true },
+      include: { lead: { select: { replyProbability: true } } },
+    })
+    const scores = savedLeadsWithScore.map(s => s.lead.replyProbability).filter(Boolean)
+    const avgReplyProbability = scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+      : 0
+
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const recentActivity = await db.userLeadState.findMany({
+      where: {
+        userId,
+        lastActionDate: { gte: sevenDaysAgo },
+      },
+      select: { lastActionDate: true },
+    })
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    const activityMap = new Map<string, number>()
+    dayNames.forEach(d => activityMap.set(d, 0))
+    recentActivity.forEach(state => {
+      if (state.lastActionDate) {
+        const dayName = dayNames[state.lastActionDate.getDay()]
+        activityMap.set(dayName, (activityMap.get(dayName) || 0) + 1)
+      }
+    })
+    const activity = dayNames.map(day => ({
+      day,
+      value: activityMap.get(day) || 0,
+    }))
+
+    const savedLeadsWithTags = await db.userLeadState.findMany({
+      where: { userId, isSaved: true },
+      include: { lead: { select: { niches: true, nicheTags: true } } },
+    })
+    const nicheCounts = new Map<string, number>()
+    savedLeadsWithTags.forEach(uls => {
+      const allTags = [...(uls.lead.niches || []), ...(uls.lead.nicheTags || [])]
+      allTags.forEach(tag => {
+        nicheCounts.set(tag, (nicheCounts.get(tag) || 0) + 1)
+      })
+    })
+    const colors = ['mint', 'purple', 'orange', 'cyan', 'pink']
+    const distribution = [...nicheCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([label, count], i) => ({
+        label,
+        count,
+        color: colors[i % colors.length] as 'mint' | 'purple' | 'orange' | 'cyan' | 'pink',
+      }))
+
     const stats = [
       {
         label: 'Signals Intercepted',
         value: totalLeadsCount.toLocaleString(),
-        trend: '+12%',
+        trend: `${scores.length} saved`,
         trendUp: true,
         accent: 'mint' as const,
       },
@@ -57,9 +113,9 @@ export async function GET() {
       },
       {
         label: 'Avg. Reply Probability',
-        value: '84%',
-        trend: '+2.4%',
-        trendUp: true,
+        value: avgReplyProbability > 0 ? `${avgReplyProbability}%` : '--',
+        trend: avgReplyProbability > 0 ? `based on ${scores.length} leads` : 'No data',
+        trendUp: avgReplyProbability >= 60,
         accent: 'cyan' as const,
       },
       {
@@ -73,16 +129,18 @@ export async function GET() {
     return NextResponse.json({
       data: {
         stats,
-        activity: activityData,
-        distribution: [
-          { label: 'SaaS', trend: 'High Demand', color: 'mint' as const },
-          { label: 'Fintech', trend: 'Growing', color: 'purple' as const },
-          { label: 'E-commerce', trend: 'Saturating', color: 'orange' as const },
-        ],
+        activity,
+        distribution,
         readyForOutreachCount,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
     console.error('[Dashboard API] GET error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve dashboard statistics' },

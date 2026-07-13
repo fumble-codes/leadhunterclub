@@ -30,7 +30,7 @@ function FreshLeadsVisual({ className = "", hoveredPlatform }: { className?: str
               isSelfHovered
                 ? 'border-border-subtle bg-surface-secondary shadow-[0_12px_30px_rgba(var(--rgb-persona-green),0.12)] -translate-y-0.5'
                 : isPlatformHighlighted
-                  ? 'border-border-subtle bg-surface shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.1)] scale-[1.02]'
+                  ? 'border-border-subtle bg-surface shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.1)] scale-102'
                   : 'border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)]'
             }`}
           >
@@ -476,7 +476,7 @@ function FollowUpTimelineVisual({ className = "", selectedStep, onSelectStep }: 
               </div>
               <div className={`flex-1 p-2 rounded-xl border transition-all duration-300 ${
                 isSelected 
-                  ? 'border-accent-cyan bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.08)] scale-[1.02]' 
+                  ? 'border-accent-cyan bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.08)] scale-102' 
                   : 'border-white/[0.04] bg-surface hover:bg-surface-secondary hover:border-white/10'
               }`}>
                 <div className="flex items-center justify-between">
@@ -587,7 +587,7 @@ function PersonaCardsVisual({ className = "", selectedPersona, onSelectPersona }
               onMouseLeave={() => onSelectPersona(null)}
               className={`p-3 rounded-2xl border transition-all duration-300 flex flex-col items-center text-center cursor-pointer ${
                 isSelected 
-                  ? `border-${p.accent}/40 bg-code-bg/90 scale-[1.04] shadow-[0_8px_20px_rgba(var(--rgb-white),0.02)]`
+                  ? `border-${p.accent}/40 bg-code-bg/90 scale-104 shadow-[0_8px_20px_rgba(var(--rgb-white),0.02)]`
                   : 'bg-white/[0.02] border-white/[0.04] hover:bg-white/[0.04]'
               }`}
             >
@@ -642,7 +642,7 @@ export default function FeaturesSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 block text-text-secondary/40">Product Capabilities</span>
+          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">Product Capabilities</span>
         </motion.div>
 
         <motion.h2
@@ -681,7 +681,7 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
                 Real-time acquisition
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
@@ -731,7 +731,7 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
                 Lead Enrichment
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
@@ -781,7 +781,7 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
                 High-converting outreach
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
@@ -831,7 +831,7 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
                 Fair Value System
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">

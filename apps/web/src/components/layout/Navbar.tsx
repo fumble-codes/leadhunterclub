@@ -95,7 +95,7 @@ export default function Navbar() {
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
             <a
-              href="/dashboard"
+              href="/login"
               className="hidden md:block text-[13px] font-medium text-text-secondary/70 hover:text-text-primary transition-colors duration-300 tracking-wide px-4 py-2"
             >
               Log in
@@ -107,7 +107,7 @@ export default function Navbar() {
               <span>Sneak Peek</span>
             </a>
             <a
-              href="/dashboard"
+              href="/register"
               className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-mint hover:accent-glow-mint transition-all duration-500 hover:scale-[1.03] active:scale-95 group"
             >
               <span>Start Hunting</span>
@@ -173,14 +173,14 @@ export default function Navbar() {
                   Sneak Peek
                 </a>
                 <a
-                  href="/dashboard"
+                  href="/login"
                   onClick={() => setMobileOpen(false)}
                   className="block text-center px-5 py-3 rounded-xl text-[14px] font-medium text-text-secondary/70 hover:text-text-primary border border-white/[0.06] hover:bg-white/[0.04] transition-all duration-300"
                 >
                   Log in
                 </a>
                 <a
-                  href="/dashboard"
+                  href="/register"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-text-primary text-bg-main text-[14px] font-bold shadow-[0_0_20px_rgba(var(--rgb-white),0.1)] transition-all duration-500"
                 >

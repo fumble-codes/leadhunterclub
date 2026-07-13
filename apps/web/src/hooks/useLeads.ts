@@ -1,15 +1,16 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { leadsService, type LeadListParams } from '@/lib/services'
 import { useApi } from './useApi'
 import type { Lead, PaginatedResponse } from '@/lib/types'
 
 export function useLeads(params: LeadListParams = {}) {
+  const deps = [params.status, params.saved, params.search, params.page, params.pageSize]
   const fetcher = useCallback(
     () => leadsService.list(params),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [params.status, params.saved, params.search, params.page, params.pageSize],
+    deps,
   )
 
   return useApi<PaginatedResponse<Lead>>(fetcher)

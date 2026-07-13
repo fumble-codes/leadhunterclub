@@ -8,3 +8,24 @@ dist/
 *.log
 .DS_Store
 nul
+serviceAccountKey.json
+**/serviceAccountKey.json
+.admin-creds.local
+
+# Planning & project docs (not for production)
+AGENTS.md
+AUTH.md
+STATUS.md
+PLAN*.md
+DESIGN_MIGRATION.md
+architecture.md
+issues.md
+plan-*.md
+stitch_design_spec.md
+
+# Scratch / temp
+graphify-out/
+apps/web/docs/
+apps/web/sql.txt
+apps/web/scripts/
+apps/web/prisma/migrate-credits.ts

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import { getPost } from '@/lib/external-api/client'
+import { updateLeadSchema } from '@/lib/validators/auth'
+import type { AppLead } from '@/types/lead'
 
-function formatTimeAgo(date: Date): string {
-  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
+function formatTimeAgo(dateStr: string): string {
+  const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000)
   if (seconds < 60) return 'Just now'
   const minutes = Math.floor(seconds / 60)
   if (minutes < 60) return `${minutes}m ago`
@@ -14,70 +17,73 @@ function formatTimeAgo(date: Date): string {
   return `${days}d ago`
 }
 
+function extractTags(keyword: string | null, platform: string): string[] {
+  const tags: string[] = []
+  if (keyword) tags.push(keyword.replace(/^watchlist:/, ''))
+  if (platform) tags.push(platform)
+  return tags
+}
+
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    let { userId } = await auth()
-    userId = userId || 'demo_user_123'
-    if (!userId) {
-      return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
-      )
-    }
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
 
-    const lead = await db.lead.findUnique({
-      where: { id: params.id },
-      include: {
-        userStates: {
-          where: { userId },
+    const externalLead = await getPost(params.id)
+
+    const userState = await db.userLeadState.findUnique({
+      where: {
+        userId_leadId: {
+          userId,
+          leadId: params.id,
         },
       },
     })
 
-    if (!lead) {
-      return NextResponse.json(
-        { code: 'NOT_FOUND', message: 'Lead not found' },
-        { status: 404 },
-      )
+    const isRevealed = userState?.isRevealed || false
+    const phone = externalLead.contact_info?.phone_numbers?.[0]?.number || null
+    const email = externalLead.email || externalLead.contact_info?.emails?.[0]?.email || ''
+
+    const lead: AppLead = {
+      id: externalLead.id,
+      name: isRevealed ? (externalLead.author?.name || 'Unknown') : 'Unlocked Contact',
+      email: isRevealed ? (externalLead.email || externalLead.contact_info?.emails?.[0]?.email || '') : 'unlocked@leadhunterclub.com',
+      company: externalLead.contact_info?.company_name || externalLead.author?.name || externalLead.platform || '',
+      source: externalLead.platform || 'Unknown',
+      category: externalLead.keyword?.replace(/^watchlist:/, '') || externalLead.platform || 'General',
+      title: externalLead.author?.info || externalLead.keyword || externalLead.platform || 'Lead Signal',
+      signalContext: externalLead.content || '',
+      role: externalLead.author?.info || '',
+      taskScope: '',
+      mustHave: '',
+      nicheBonus: '',
+      buyerType: '',
+      urgency: 'medium',
+      winProb: 'medium',
+      nicheTags: extractTags(externalLead.keyword, externalLead.platform),
+      niches: [],
+      hashtags: [],
+      replyProbability: Math.max(externalLead.ai_score || 0, 60),
+      accent: 'mint',
+      status: (userState?.status || 'new') as AppLead['status'],
+      timestamp: externalLead.posted_at?.postedAgoShort || formatTimeAgo(externalLead.created_at),
+      isSaved: userState?.isSaved || false,
+      isRevealed,
+      hasPhone: !!phone,
+      phone,
     }
 
-    const state = lead.userStates[0]
-    const isSaved = state?.isSaved || false
-    const isRevealed = state?.isRevealed || false
-    const status = state?.status || 'new'
-
-    return NextResponse.json({
-      data: {
-        id: lead.id,
-        name: isRevealed ? lead.name : 'Unlocked Contact',
-        email: isRevealed ? lead.email : 'unlocked@leadhunterclub.com',
-        company: lead.company,
-        source: lead.source,
-        category: lead.category,
-        title: lead.title,
-        signalContext: lead.signalContext,
-        role: lead.role,
-        taskScope: lead.taskScope,
-        mustHave: lead.mustHave,
-        nicheBonus: lead.nicheBonus,
-        buyerType: lead.buyerType,
-        urgency: lead.urgency,
-        winProb: lead.winProb,
-        nicheTags: lead.nicheTags,
-        niches: lead.niches,
-        hashtags: lead.hashtags,
-        replyProbability: lead.replyProbability,
-        accent: lead.accent,
-        status,
-        isSaved,
-        isRevealed,
-        timestamp: formatTimeAgo(lead.createdAt),
-      },
-    })
-  } catch (error) {
+    return NextResponse.json({ data: lead })
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
     console.error('[Lead GET API] Error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve lead details' },
@@ -91,38 +97,26 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    let { userId } = await auth()
-    userId = userId || 'demo_user_123'
-    if (!userId) {
-      return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
-      )
-    }
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
 
     const body = await request.json()
-
-    // Verify lead exists
-    const leadExists = await db.lead.findUnique({
-      where: { id: params.id },
-    })
-
-    if (!leadExists) {
+    const parsed = updateLeadSchema.safeParse(body)
+    if (!parsed.success) {
       return NextResponse.json(
-        { code: 'NOT_FOUND', message: 'Lead not found' },
-        { status: 404 },
+        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
       )
     }
 
-    // Prepare update parameters for UserLeadState
-    const updateData: any = {}
-    if (body.status !== undefined) updateData.status = body.status
-    if (body.isSaved !== undefined) updateData.isSaved = body.isSaved
+    const { status, isSaved } = parsed.data
+    const updateData: Record<string, string | boolean> = {}
+    if (status !== undefined) updateData.status = status
+    if (isSaved !== undefined) updateData.isSaved = isSaved
 
-    // If they saved a lead and didn't set status, set status to 'saved'
-    if (body.isSaved === true && body.status === undefined) {
+    if (isSaved === true && status === undefined) {
       updateData.status = 'saved'
-    } else if (body.isSaved === false && body.status === 'saved') {
+    } else if (isSaved === false && status === 'saved') {
       updateData.status = 'new'
     }
 
@@ -137,8 +131,8 @@ export async function PATCH(
       create: {
         userId,
         leadId: params.id,
-        status: updateData.status || 'new',
-        isSaved: updateData.isSaved || false,
+        status: (updateData.status as string) || 'new',
+        isSaved: (updateData.isSaved as boolean) || false,
       },
     })
 
@@ -150,7 +144,13 @@ export async function PATCH(
         isRevealed: userState.isRevealed,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
     console.error('[Lead PATCH API] Error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to update lead status' },
@@ -160,21 +160,13 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
-    let { userId } = await auth()
-    userId = userId || 'demo_user_123'
-    if (!userId) {
-      return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
-      )
-    }
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
 
-    // Find and delete UserLeadState or the Lead
-    // For consistency with lead deletion (like removing it from feed), we can just delete state
     await db.userLeadState.deleteMany({
       where: {
         userId,
@@ -183,7 +175,13 @@ export async function DELETE(
     })
 
     return new NextResponse(null, { status: 204 })
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
     console.error('[Lead DELETE API] Error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to delete lead' },

@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import { outreachGenerateSchema } from '@/lib/validators/auth'
+import { rateLimitByKey } from '@/lib/rate-limit'
+import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
+import { getPost } from '@/lib/external-api/client'
 
-// Multi-LLM AI Generation Engine
-// This will attempt OpenAI -> Anthropic -> Gemini based on available keys.
-// If no keys are present, it simulates a realistic response for demo purposes.
 async function generateOutreach(prompt: string, context: string): Promise<string> {
   const { OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY } = process.env
 
   try {
-    // 1. Try OpenAI
     if (OPENAI_API_KEY) {
-      console.log('[AI Engine] Using OpenAI...')
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -33,9 +32,7 @@ async function generateOutreach(prompt: string, context: string): Promise<string
       }
     }
 
-    // 2. Try Anthropic
     if (ANTHROPIC_API_KEY) {
-      console.log('[AI Engine] Using Anthropic...')
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -59,10 +56,40 @@ async function generateOutreach(prompt: string, context: string): Promise<string
       }
     }
 
-    // 3. Fallback to Simulation for Presentation/Demo Mode
-    console.log('[AI Engine] No API keys found. Simulating response...')
-    await new Promise(resolve => setTimeout(resolve, 1500)) // 1.5s delay for realism
-    
+    if (GEMINI_API_KEY) {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are an elite B2B copywriter. Write a short, personalized outreach message based on this lead. No subject lines. Keep it under 3 sentences. Sound human, not like AI.
+
+Lead Context: ${context}
+Angle: ${prompt}`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 200
+            }
+          })
+        }
+      )
+      if (res.ok) {
+        const data = await res.json()
+        return data.candidates[0].content.parts[0].text
+      }
+    }
+
+    if (OPENAI_API_KEY || ANTHROPIC_API_KEY || GEMINI_API_KEY) {
+      throw new Error('AI provider returned an error')
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
     if (prompt.toLowerCase().includes('humor')) {
       return "Hey [Name],\n\nI saw you're looking for someone to handle [Task]. Usually, people in your position either do it themselves and hate it, or hire an agency and regret it.\n\nI specialize in [Niche] and I promise to be less painful than both options. Let me know if you're open to a quick chat."
     } else if (prompt.toLowerCase().includes('authority')) {
@@ -79,56 +106,53 @@ async function generateOutreach(prompt: string, context: string): Promise<string
 
 export async function POST(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
-    if (!userId && false) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
+
+    const rl = await rateLimitByKey(`user:${userId}:generate`, 10, 60_000)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { code: 'RATE_LIMITED', message: 'Too many requests. Please try again later.' },
+        { status: 429 },
+      )
     }
 
-    const { leadId, angle } = await request.json()
-    if (!leadId || !angle) {
-      return NextResponse.json({ code: 'BAD_REQUEST', message: 'Missing leadId or angle' }, { status: 400 })
+    const body = await request.json()
+    const parsed = outreachGenerateSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      )
     }
+
+    const { leadId, angle } = parsed.data
+
+    const externalLead = await getPost(leadId)
 
     const CREDIT_COST = 2
 
-    // 1. Transaction: Deduct credits and fetch lead
     const result = await db.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: userId } })
-      if (!user) throw new Error('User not found')
-      
-      if (user.credits < CREDIT_COST) {
-        throw new Error('INSUFFICIENT_CREDITS')
-      }
+      const deductResult = await creditService.deductInTx(tx, userId, CREDIT_COST, 'outreach_generate', { leadId })
 
-      const lead = await tx.lead.findUnique({ where: { id: leadId } })
-      if (!lead) throw new Error('Lead not found')
-
-      // Ensure user has unlocked this lead
       const state = await tx.userLeadState.findUnique({
         where: { userId_leadId: { userId, leadId } }
       })
 
       if (!state || !state.isRevealed) {
-        throw new Error('MUST_REVEAL_FIRST')
+        throw new MustRevealFirstError()
       }
 
-      // Deduct credits
-      const updatedUser = await tx.user.update({
-        where: { id: userId },
-        data: { credits: { decrement: CREDIT_COST } }
-      })
-
-      return { lead, creditsRemaining: updatedUser.credits }
+      return { creditsRemaining: deductResult.subscriptionBalance + deductResult.bonusBalance }
     })
 
-    // 2. Prepare context for AI
-    const lead = result.lead
     const context = `
-      Name: ${lead.name}
-      Company: ${lead.company}
-      Role: ${lead.role}
-      Task Needed: ${lead.taskScope}
-      Industry Context: ${lead.signalContext}
+      Lead Name: ${externalLead.author?.name || 'Unknown'}
+      Company: ${externalLead.contact_info?.company_name || ''}
+      Role: ${externalLead.contact_info?.title || externalLead.author?.info || ''}
+      Buying Signal: ${externalLead.content || ''}
+      Keyword/Niche: ${externalLead.keyword || ''}
+      AI Qualification: ${externalLead.qualification_reason || ''}
     `
 
     let prompt = ''
@@ -146,15 +170,17 @@ export async function POST(request: NextRequest) {
         prompt = 'Write a standard, highly personalized outreach email.'
     }
 
-    // 3. Generate Content
     let generatedContent = await generateOutreach(prompt, context)
-    
-    // Simple template replacement for simulation mode
+
+    const firstName = externalLead.author?.name?.split(' ')[0] || 'there'
+    const task = externalLead.content?.split('.')[0] || 'your project'
+    const niche = externalLead.keyword || 'your industry'
+
     generatedContent = generatedContent
-      .replace(/\[Name\]/gi, lead.name.split(' ')[0])
-      .replace(/\[Task\]/gi, lead.title)
-      .replace(/\[Category\]/gi, lead.category)
-      .replace(/\[Niche\]/gi, lead.niches[0] || 'your industry')
+      .replace(/\[Name\]/gi, firstName)
+      .replace(/\[Task\]/gi, task)
+      .replace(/\[Category\]/gi, niche)
+      .replace(/\[Niche\]/gi, niche)
 
     return NextResponse.json({
       success: true,
@@ -162,14 +188,34 @@ export async function POST(request: NextRequest) {
       creditsRemaining: result.creditsRemaining
     })
 
-  } catch (error: any) {
-    console.error('[Outreach API] Error:', error)
-    if (error.message === 'INSUFFICIENT_CREDITS') {
-      return NextResponse.json({ code: 'INSUFFICIENT_CREDITS', message: 'Not enough credits for AI generation' }, { status: 400 })
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
     }
-    if (error.message === 'MUST_REVEAL_FIRST') {
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json({ code: 'INSUFFICIENT_CREDITS', message: 'Insufficient credits to generate outreach', required: error.required }, { status: 400 })
+    }
+    if (error instanceof MustRevealFirstError) {
       return NextResponse.json({ code: 'FORBIDDEN', message: 'You must reveal the contact before using AI' }, { status: 403 })
     }
+    console.error('[Outreach API] Error:', error)
     return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to generate outreach' }, { status: 500 })
+  }
+}
+
+class LeadNotFoundError extends Error {
+  constructor() {
+    super('Lead not found')
+    this.name = 'LeadNotFoundError'
+  }
+}
+
+class MustRevealFirstError extends Error {
+  constructor() {
+    super('You must reveal the contact before using AI')
+    this.name = 'MustRevealFirstError'
   }
 }

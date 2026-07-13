@@ -2,6 +2,8 @@ export type AuthProvider = 'google' | 'github' | 'email'
 
 export type UserRole = 'admin' | 'user'
 
+export type UserStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'SUSPENDED'
+
 export interface User {
   id: string
   email: string

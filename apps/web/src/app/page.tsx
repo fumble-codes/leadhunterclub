@@ -123,7 +123,7 @@ function OutreachPreviewUI() {
   return (
       <div
       ref={sectionRef}
-      className="w-full rounded-[28px] bg-code-bg border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(var(--rgb-black),0.7)] shadow-[0_40px_100px_rgba(var(--rgb-black),0.6)]"
+      className="w-full rounded-3xl bg-code-bg border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(var(--rgb-black),0.7)] shadow-[0_40px_100px_rgba(var(--rgb-black),0.6)]"
     >
       {/* Decorative top window bar for macOS chrome */}
       <div className="absolute top-0 left-0 right-0 h-10 border-b border-white/[0.04] bg-white/[0.01] flex items-center px-6">
@@ -132,13 +132,13 @@ function OutreachPreviewUI() {
           <div className="w-2 h-2 rounded-full bg-dot-yellow transition-colors duration-500" />
           <div className="w-2 h-2 rounded-full bg-dot-green transition-colors duration-500" />
         </div>
-        <div className="mx-auto text-[11px] font-medium tracking-tight text-text-secondary/50">
+        <div className="mx-auto text-11 font-medium tracking-tight text-text-secondary/50">
           Outreach Editor
         </div>
       </div>
 
       {/* Subtle Dynamic Ambient Background Glow */}
-      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 blur-[80px] rounded-full pointer-events-none transition-all duration-1000 ${activeColor.glow}`} />
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 blur-2xl rounded-full pointer-events-none transition-all duration-1000 ${activeColor.glow}`} />
       
       {/* Editor Column */}
       <div className="flex-1 flex flex-col justify-between relative z-10 pt-6">
@@ -196,7 +196,7 @@ function OutreachPreviewUI() {
                 <SparklesIcon className="w-[10px] h-[10px] animate-spin" /> writing...
               </div>
             )}
-            <div className="text-[11px] text-text-secondary flex items-center gap-2">
+            <div className="text-11 text-text-secondary flex items-center gap-2">
               <span className="text-text-secondary/50 font-medium">Subject:</span>
               <span className="text-text-primary/90 font-medium">Quick question about mobile checkout flow</span>
             </div>
@@ -223,13 +223,13 @@ function OutreachPreviewUI() {
       {/* AI Scorecard Column (HUD Style divider) */}
       <div className="w-full md:w-[180px] border-t md:border-t-0 md:border-l border-white/[0.04] pt-6 md:pt-0 md:pl-6 flex flex-col justify-between relative z-10 text-left">
         <div>
-          <h5 className="text-[11px] font-semibold text-text-secondary/60 tracking-tight mb-4 flex items-center gap-1.5">
+          <h5 className="text-11 font-semibold text-text-secondary/60 tracking-tight mb-4 flex items-center gap-1.5">
             <GlobeAltIcon className="w-[13px] h-[13px] text-text-secondary/80" /> Analysis Metrics
           </h5>
           
           <div className="space-y-4">
             <div>
-              <div className="flex justify-between text-[11px] mb-1 text-text-secondary/70">
+              <div className="flex justify-between text-11 mb-1 text-text-secondary/70">
                 <span>Reply Probability</span>
                 <span className="text-text-primary font-semibold">{selected.replyProbability}</span>
               </div>
@@ -297,7 +297,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 block text-text-secondary/40">
+            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
               How It Works
             </span>
           </motion.div>
@@ -472,7 +472,7 @@ export default function LandingPage() {
             {/* Intelligence Dossier Builder */}
             <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-canvas-deeper/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.8)] overflow-hidden group-hover:border-border-subtle transition-colors duration-500 group-hover:border-accent-pink/15">
               {/* Ambient node glow (toned down by 90% in opacity and size) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-pink/[0.02] blur-[20px] rounded-full group-hover:bg-accent-pink/[0.06] transition-colors duration-500 group-hover:border-accent-pink/15" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-pink/[0.02] blur-lg rounded-full group-hover:bg-accent-pink/[0.06] transition-colors duration-500 group-hover:border-accent-pink/15" />
               
               <div className="relative z-10 h-full flex flex-col group-hover:border-accent-pink/15">
                 <div className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors font-bold text-[10px] uppercase tracking-widest mb-3 group-hover:border-accent-pink/15">
@@ -540,7 +540,7 @@ export default function LandingPage() {
                     <span className={`text-[9px] font-bold text-accent-${lead.accent}`}>{lead.name.split(' ').map(n => n[0]).join('')}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[11px] font-bold text-text-primary truncate">{lead.name}</div>
+                    <div className="text-11 font-bold text-text-primary truncate">{lead.name}</div>
                     <div className="text-[9px] text-text-secondary/50 truncate">{lead.signal}</div>
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
@@ -572,7 +572,7 @@ export default function LandingPage() {
       {/* Conversational Intelligence Section */}
       <section id="conversational" className="py-40 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]">
         {/* Fine background glow */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-mint/[0.015] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-mint/[0.015] blur-2xl rounded-full pointer-events-none" />
         
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column - Copy Breakdown */}
@@ -681,7 +681,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 block text-text-secondary/40">
+            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
               Pricing Plans
             </span>
           </motion.div>
@@ -772,7 +772,7 @@ export default function LandingPage() {
             >
               {/* Featured ambient glow underneath */}
               {p.featured && (
-                <div className="absolute inset-0 bg-gradient-to-b from-accent-pink/5 via-transparent to-transparent pointer-events-none rounded-[28px]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-accent-pink/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
               )}
 
               {/* Card inner */}
@@ -780,7 +780,7 @@ export default function LandingPage() {
 
                 {/* Popular badge */}
                 {p.featured && (
-                  <span className="absolute top-6 right-6 text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+                  <span className="absolute top-6 right-6 text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
                     Most Popular
                   </span>
                 )}
@@ -803,7 +803,7 @@ export default function LandingPage() {
 
                   {/* Token meter bar */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-[11px]">
+                    <div className="flex justify-between text-11">
                       <span className="text-text-secondary/60">{p.tokens} Tokens</span>
                       <span className={`font-bold text-accent-${p.accent}`}>{p.tokens} / mo</span>
                     </div>
@@ -832,13 +832,16 @@ export default function LandingPage() {
                 </div>
 
                 {/* CTA */}
-                <button className={`w-full py-4 rounded-2xl font-bold text-sm tracking-tight transition-all duration-500 ${
-                  p.featured
-                    ? `bg-accent-${p.accent} text-text-on-accent  hover:`
-                    : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] text-text-primary hover:bg-white/[0.07]'
-                }`}>
+                <Link
+                  href="/register"
+                  className={`block w-full py-4 rounded-2xl font-bold text-sm tracking-tight text-center transition-all duration-500 ${
+                    p.featured
+                      ? `bg-accent-${p.accent} text-text-on-accent`
+                      : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] text-text-primary hover:bg-white/[0.07]'
+                  }`}
+                >
                   Get Started with {p.name}
-                </button>
+                </Link>
               </div>
             </motion.div>
           ))}
@@ -852,7 +855,7 @@ export default function LandingPage() {
           transition={{ duration: 0.6, delay: 0.4, ease }}
           className="text-center mt-16 relative z-10"
         >
-          <p className="text-xs text-text-secondary/40 font-mono uppercase tracking-[0.2em]">
+          <p className="text-xs text-text-secondary/40 font-mono uppercase tracking-super">
             No contracts · Cancel anytime · Unused tokens roll over
           </p>
         </motion.div>
@@ -876,18 +879,18 @@ export default function LandingPage() {
       {/* Final CTA */}
       <section className="py-32 px-6 max-w-[1100px] mx-auto text-center relative overflow-hidden">
         {/* Glowing aura */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-pink/[0.03] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-pink/[0.03] blur-2xl rounded-full pointer-events-none" />
         
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="relative z-10 p-16 md:p-24 rounded-[48px] border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
+          className="relative z-10 p-16 md:p-24 rounded-5xl border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
           
-          <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-text-secondary/40">
+          <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
             Exclusive Syndicate Access
           </span>
 
@@ -917,7 +920,7 @@ export default function LandingPage() {
               className="inline-block"
             >
               <Link
-                href="/dashboard"
+                href="/register"
                 className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-text-primary text-bg-main font-bold text-sm hover: transition-all duration-500 group"
               >
                 Start Finding Leads
@@ -938,7 +941,7 @@ export default function LandingPage() {
           </div>
 
           {/* Supporting Text from copy.md */}
-          <div className="mt-8 font-mono text-[11px] tracking-[0.2em] uppercase text-text-secondary/50 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <div className="mt-8 font-mono text-11 tracking-super uppercase text-text-secondary/50 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <span>Fresh buyer-intent leads</span>
             <span className="text-accent-pink/40">•</span>
             <span>Smarter outreach</span>
@@ -953,7 +956,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       <footer className="relative border-t border-white/[0.03] overflow-hidden">
         {/* Ambient glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.02] blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.02] blur-2xl rounded-full pointer-events-none" />
 
         {/* Main footer content */}
         <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12 relative z-10">
@@ -996,7 +999,7 @@ export default function LandingPage() {
 
             {/* Product Column */}
             <div className="md:col-span-2">
-              <h5 className="text-[11px] font-bold text-text-secondary/40 uppercase tracking-[0.15em] mb-5">Product</h5>
+              <h5 className="text-11 font-bold text-text-secondary/40 uppercase tracking-[0.15em] mb-5">Product</h5>
               <ul className="space-y-3">
                 {['Features', 'How It Works', 'Pricing', 'Token System'].map((item) => (
                   <li key={item}>
@@ -1008,7 +1011,7 @@ export default function LandingPage() {
 
             {/* Company Column */}
             <div className="md:col-span-2">
-              <h5 className="text-[11px] font-bold text-text-secondary/40 uppercase tracking-[0.15em] mb-5">Company</h5>
+              <h5 className="text-11 font-bold text-text-secondary/40 uppercase tracking-[0.15em] mb-5">Company</h5>
               <ul className="space-y-3">
                 {['About', 'Blog', 'Careers', 'Contact'].map((item) => (
                   <li key={item}>
@@ -1020,7 +1023,7 @@ export default function LandingPage() {
 
             {/* Stay Updated Column */}
             <div className="md:col-span-4">
-              <h5 className="text-[11px] font-bold text-text-secondary/40 uppercase tracking-[0.15em] mb-5">Stay Updated</h5>
+              <h5 className="text-11 font-bold text-text-secondary/40 uppercase tracking-[0.15em] mb-5">Stay Updated</h5>
               <p className="text-sm text-text-secondary/60 font-light leading-relaxed mb-4">
                 Get notified about new features, outreach tactics, and platform updates.
               </p>
@@ -1040,12 +1043,12 @@ export default function LandingPage() {
 
           {/* Divider */}
           <div className="border-t border-white/[0.04] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-[11px] font-mono text-text-secondary/30 uppercase tracking-[0.15em]">
+            <div className="text-11 font-mono text-text-secondary/30 uppercase tracking-[0.15em]">
               © 2026 Lead Hunter Club · All rights reserved.
             </div>
             <div className="flex items-center gap-6">
               {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
-                <a key={item} href="#" className="text-[11px] font-mono text-text-secondary/30 uppercase tracking-[0.12em] hover:text-text-secondary/60 transition-colors duration-300">
+                <a key={item} href="#" className="text-11 font-mono text-text-secondary/30 uppercase tracking-[0.12em] hover:text-text-secondary/60 transition-colors duration-300">
                   {item}
                 </a>
               ))}

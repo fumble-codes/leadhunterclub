@@ -1,14 +1,121 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { auth, signInWithPhoneNumber, PhoneAuthProvider, RecaptchaVerifier, linkWithCredential, type ConfirmationResult } from '@/lib/firebase'
+import { normalizePhone } from '@/lib/phone'
 import { motion } from 'framer-motion'
-import { UserIcon, EnvelopeIcon, BanknotesIcon, BoltIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, LockClosedIcon, CalendarIcon, StarIcon } from '@heroicons/react/24/solid'
+import { UserIcon, EnvelopeIcon, BanknotesIcon, BoltIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, LockClosedIcon, CalendarIcon, StarIcon, ClockIcon, PhoneIcon, ArrowPathIcon, ShieldExclamationIcon } from '@heroicons/react/24/solid'
+
+const PLAN_LABELS: Record<string, string> = {
+  FREE: 'Free',
+  FREELANCER: 'Freelancer',
+  AGENCY: 'Agency',
+}
+
+const PLAN_CREDITS: Record<string, number> = {
+  FREE: 50,
+  FREELANCER: 500,
+  AGENCY: 1000,
+}
 
 export default function SettingsPage() {
   const { user, logout } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [displayName, setDisplayName] = useState(user?.name || '')
+
+  const remainingDays = useMemo(() => {
+    if (!user?.creditAccount?.renewalDate) return null
+    const now = new Date()
+    const renewal = new Date(user.creditAccount.renewalDate)
+    const diff = Math.ceil((renewal.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    return diff
+  }, [user?.creditAccount?.renewalDate])
+
+  const [phoneVerificationCode, setPhoneVerificationCode] = useState('')
+  const [phoneConfirmationResult, setPhoneConfirmationResult] = useState<ConfirmationResult | null>(null)
+  const [phoneFormPhone, setPhoneFormPhone] = useState('')
+  const [phoneError, setPhoneError] = useState('')
+  const [phoneLoading, setPhoneLoading] = useState(false)
+  const [phoneStep, setPhoneStep] = useState<'idle' | 'send' | 'verify'>('idle')
+  const [otpCountdown, setOtpCountdown] = useState(0)
+
+  useEffect(() => {
+    if (otpCountdown <= 0) return
+    const id = setInterval(() => setOtpCountdown((c) => c - 1), 1000)
+    return () => clearInterval(id)
+  }, [otpCountdown])
+
+  const verifierRef = useRef<RecaptchaVerifier | null>(null)
+
+  useEffect(() => {
+    if (phoneStep !== 'send') {
+      if (verifierRef.current) {
+        try { verifierRef.current.clear() } catch {}
+        verifierRef.current = null
+      }
+      return
+    }
+
+    const initVerifier = async () => {
+      for (let i = 0; i < 20; i++) {
+        const el = document.getElementById('settings-recaptcha-container')
+        if (el) {
+          verifierRef.current = new RecaptchaVerifier(auth, 'settings-recaptcha-container', { size: 'invisible' })
+          return
+        }
+        await new Promise((r) => setTimeout(r, 100))
+      }
+    }
+    initVerifier()
+
+    return () => {
+      if (verifierRef.current) {
+        try { verifierRef.current.clear() } catch {}
+        verifierRef.current = null
+      }
+    }
+  }, [phoneStep])
+
+  const handlePhoneSendOtp = async () => {
+    if (!phoneFormPhone.trim()) return
+    setPhoneLoading(true)
+    setPhoneError('')
+    try {
+      const verifier = verifierRef.current
+      if (!verifier) {
+        setPhoneError('Could not initialize verification. Please try again.')
+        return
+      }
+      const normalized = normalizePhone(phoneFormPhone.trim())
+      const result = await signInWithPhoneNumber(auth, normalized, verifier)
+      setPhoneConfirmationResult(result)
+      setPhoneStep('verify')
+      setOtpCountdown(60)
+    } catch {
+      setPhoneError('Failed to send OTP. Check the phone number and try again.')
+    } finally {
+      setPhoneLoading(false)
+    }
+  }
+
+  const handlePhoneVerifyOtp = async () => {
+    if (!phoneVerificationCode.trim() || !phoneConfirmationResult) return
+    setPhoneLoading(true)
+    setPhoneError('')
+    try {
+      const cred = PhoneAuthProvider.credential(phoneConfirmationResult.verificationId, phoneVerificationCode.trim())
+      await linkWithCredential(auth.currentUser!, cred)
+      setPhoneStep('idle')
+      setPhoneFormPhone('')
+      setPhoneVerificationCode('')
+      window.location.reload()
+    } catch {
+      setPhoneError('Invalid verification code. Please try again.')
+    } finally {
+      setPhoneLoading(false)
+    }
+  }
 
   const handleSaveProfile = () => {
     setIsEditing(false)
@@ -30,7 +137,7 @@ export default function SettingsPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-panel rounded-[24px] border-subtle bg-surface/40 p-8"
+              className="glass-panel rounded-4xl border-subtle bg-surface/40 p-8"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
@@ -107,12 +214,146 @@ export default function SettingsPage() {
               </div>
             </motion.div>
 
+            {/* Phone Verification */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="glass-panel rounded-4xl border-subtle bg-surface/40 p-8"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-surface-secondary border border-border-subtle flex items-center justify-center">
+                    <PhoneIcon className="w-6 h-6 text-text-secondary" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-text-primary">Phone Verification</h2>
+                    <p className="text-sm text-text-secondary">Secure your account with SMS</p>
+                  </div>
+                </div>
+                <span className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                  user?.phone
+                    ? 'bg-accent-mint/10 text-accent-mint border border-accent-mint/20'
+                    : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                }`}>
+                  {user?.phone ? 'Verified' : 'Not Verified'}
+                </span>
+              </div>
+
+              {user?.phone ? (
+                <p className="text-sm text-text-secondary">Phone: {user.phone}</p>
+              ) : phoneStep === 'idle' ? (
+                <button
+                  onClick={() => setPhoneStep('send')}
+                  className="px-5 py-2.5 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-sm font-medium hover:bg-accent-mint/20 transition-all"
+                >
+                  Add Phone Number
+                </button>
+              ) : (
+                <div className="space-y-4">
+                  <div id="settings-recaptcha-container" />
+
+                  {phoneStep === 'send' && (
+                    <>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Phone number</label>
+                        <input
+                          value={phoneFormPhone}
+                          onChange={(e) => setPhoneFormPhone(e.target.value)}
+                          type="tel"
+                          placeholder="+1 (555) 123-4567"
+                          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3 max-w-xs"
+                        />
+                      </div>
+
+                      {phoneError && (
+                        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">{phoneError}</div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handlePhoneSendOtp}
+                          disabled={phoneLoading || !phoneFormPhone.trim()}
+                          className="px-5 py-2.5 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-sm font-medium hover:bg-accent-mint/20 transition-all disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {phoneLoading ? (
+                            <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                          ) : (
+                            'Send OTP'
+                          )}
+                        </button>
+                        <button
+                          onClick={() => { setPhoneStep('idle'); setPhoneError('') }}
+                          className="px-5 py-2.5 rounded-xl bg-white/5 text-text-secondary text-sm font-medium hover:text-text-primary transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  {phoneStep === 'verify' && (
+                    <>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">6-digit code</label>
+                        <input
+                          value={phoneVerificationCode}
+                          onChange={(e) => setPhoneVerificationCode(e.target.value)}
+                          type="text"
+                          inputMode="numeric"
+                          placeholder="000000"
+                          maxLength={6}
+                          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3 text-center text-lg tracking-ultra max-w-[200px]"
+                        />
+                      </div>
+
+                      {phoneError && (
+                        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">{phoneError}</div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handlePhoneVerifyOtp}
+                          disabled={phoneLoading || phoneVerificationCode.length < 6}
+                          className="px-5 py-2.5 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-sm font-medium hover:bg-accent-mint/20 transition-all disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {phoneLoading ? (
+                            <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                          ) : (
+                            'Verify'
+                          )}
+                        </button>
+                        <button
+                          onClick={() => { setPhoneStep('idle'); setPhoneError('') }}
+                          className="px-5 py-2.5 rounded-xl bg-white/5 text-text-secondary text-sm font-medium hover:text-text-primary transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      {otpCountdown > 0 ? (
+                        <p className="text-xs text-text-secondary/60">Resend code in {otpCountdown}s</p>
+                      ) : (
+                        <button
+                          onClick={() => { setPhoneStep('send'); setPhoneVerificationCode(''); setPhoneError('') }}
+                          className="text-xs text-accent-mint hover:text-accent-mint/80 transition-colors flex items-center gap-1"
+                        >
+                          <ArrowPathIcon className="w-3 h-3" />
+                          Resend code
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </motion.div>
+
             {/* Credits & Tokens */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="glass-panel rounded-[24px] border-subtle bg-surface/40 p-8"
+              className="glass-panel rounded-4xl border-subtle bg-surface/40 p-8"
             >
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-14 h-14 rounded-xl bg-surface-secondary border border-border-subtle flex items-center justify-center">
@@ -127,16 +368,16 @@ export default function SettingsPage() {
               <div className="p-6 rounded-2xl bg-surface-elevated/50 border border-subtle/50 mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-text-secondary">Available Credits</span>
-                  <span className="text-2xl font-bold text-text-primary">{user?.credits ?? 0}</span>
+                  <span className="text-2xl font-bold text-text-primary">{user?.creditAccount?.total ?? 0}</span>
                 </div>
                 <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(100, ((user?.credits ?? 0) / 1000) * 100)}%` }}
+                    animate={{ width: `${Math.min(100, ((user?.creditAccount?.total ?? 0) / 1000) * 100)}%` }}
                     className="h-full bg-accent-purple rounded-full"
                   />
                 </div>
-                <p className="text-[10px] text-text-secondary/50 mt-3">
+                <p className="text-xxs text-text-secondary/50 mt-3">
                   Credits are consumed when revealing lead identities (3 credits) or generating AI outreach (1 credit).
                 </p>
               </div>
@@ -153,7 +394,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="glass-panel rounded-[24px] border-subtle bg-surface/40 p-8"
+              className="glass-panel rounded-4xl border-subtle bg-surface/40 p-8"
             >
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-14 h-14 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center">
@@ -165,17 +406,34 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-surface-elevated/50 border border-subtle/50 flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold text-text-primary uppercase tracking-wider">Hunter Plan</span>
-                    <span className="px-2 py-0.5 rounded-md bg-surface-secondary border border-border-subtle text-[9px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest">Active</span>
+              <div className="p-6 rounded-2xl bg-surface-elevated/50 border border-subtle/50">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-text-primary uppercase tracking-wider">
+                      {PLAN_LABELS[user?.plan || 'FREE'] || user?.plan || 'Free'} Plan
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-surface-secondary border border-border-subtle text-9 font-bold text-text-secondary uppercase tracking-widest">
+                      {PLAN_CREDITS[user?.plan || 'FREE'] || 50} credits/mo
+                    </span>
                   </div>
-                  <p className="text-xs text-text-secondary">₹999 / month · 1,000 credits monthly · Renews Dec 15, 2024</p>
+                  <span className="px-2 py-0.5 rounded-md bg-accent-mint/10 border border-accent-mint/20 text-9 font-bold text-accent-mint uppercase tracking-widest">Active</span>
                 </div>
-                <button className="px-4 py-2 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-bold text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all">
-                  Manage
-                </button>
+                <div className="flex items-center gap-4 mt-3">
+                  {user?.creditAccount?.renewalDate && remainingDays !== null && (
+                    <p className="text-xs text-text-secondary flex items-center gap-1.5">
+                      <ClockIcon className="w-3 h-3" />
+                      {remainingDays > 0
+                        ? `Renews in ${remainingDays} day${remainingDays === 1 ? '' : 's'} (${new Date(user.creditAccount.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})`
+                        : `Renewal ${remainingDays === 0 ? 'today' : `${Math.abs(remainingDays)} day${Math.abs(remainingDays) === 1 ? '' : 's'} ago`}`}
+                    </p>
+                  )}
+                  {user?.creditAccount && (
+                    <p className="text-xs text-text-secondary flex items-center gap-1.5">
+                      <BanknotesIcon className="w-3 h-3" />
+                      {user.creditAccount.subscriptionBalance} subscription credits
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 flex gap-2">
@@ -193,7 +451,7 @@ export default function SettingsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="glass-panel rounded-[24px] border border-red-500/10 bg-red-500/[0.02] p-8"
+              className="glass-panel rounded-4xl border border-red-500/10 bg-red-500/[0.02] p-8"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-14 h-14 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">

@@ -1,21 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import { outreachSendSchema } from '@/lib/validators/auth'
+import { rateLimitByKey } from '@/lib/rate-limit'
+import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 
 export async function POST(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
-    if (!userId && false) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
+
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const rl = await rateLimitByKey(`user:${userId}:send`, 10, 60_000)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { code: 'RATE_LIMITED', message: 'Too many requests. Please try again later.' },
+        { status: 429 },
+      )
     }
 
-    const { leadId, subject, body } = await request.json()
-
-    if (!leadId || !subject || !body) {
-      return NextResponse.json({ code: 'BAD_REQUEST', message: 'Missing fields' }, { status: 400 })
+    const raw = await request.json()
+    const parsed = outreachSendSchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      )
     }
 
-    // Upsert UserLeadState and connect the new email
+    const { leadId, subject, body } = parsed.data
+
+    const SEND_COST = 1
+    await creditService.deduct(userId, SEND_COST, 'outreach_send', { leadId, subject })
+
     const userState = await db.userLeadState.upsert({
       where: {
         userId_leadId: {
@@ -45,7 +62,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: email })
 
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json({ code: 'INSUFFICIENT_CREDITS', message: 'Insufficient credits to send outreach', required: error.required }, { status: 400 })
+    }
     console.error('[Send API Error]', error)
     return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to send email' }, { status: 500 })
   }

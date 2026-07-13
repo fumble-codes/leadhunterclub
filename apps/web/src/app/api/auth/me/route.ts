@@ -1,68 +1,119 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, currentUser } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { getAuthUser } from '@/lib/auth'
+import { rateLimitByKey } from '@/lib/rate-limit'
+import { getPlanCredits } from '@/lib/config/plans'
 
 export async function GET(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const rl = await rateLimitByKey(`ip:${ip}`, 30, 60_000)
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { code: 'RATE_LIMITED', message: 'Too many requests. Please try again later.' },
+        { status: 429 },
+      )
+    }
 
-    if (!userId && false) {
+    const authUser = await getAuthUser(request)
+    if (!authUser) {
       return NextResponse.json(
         { code: 'UNAUTHORIZED', message: 'Authentication required' },
         { status: 401 },
       )
     }
 
-    // 1. Check if user already exists in our local database
+    const { uid, email, name, phone } = authUser
+
     let user = await db.user.findUnique({
-      where: { id: userId },
+      where: { id: uid },
+      include: {
+        creditAccount: {
+          select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+        },
+      },
     })
 
-    // 2. If user doesn't exist locally, lazy-sync them from Clerk
     if (!user) {
-      const clerkUser = await currentUser()
-
-      if (!clerkUser) {
-        return NextResponse.json(
-          { code: 'UNAUTHORIZED', message: 'Clerk profile details not found' },
-          { status: 401 },
-        )
-      }
-
-      const email = clerkUser.emailAddresses[0]?.emailAddress || ''
-      const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User'
+      const userCount = await db.user.count()
+      const isFirstUser = userCount === 0
+      const limit = getPlanCredits('FREE')
+      const renewalDate = new Date()
+      renewalDate.setDate(renewalDate.getDate() + 30)
 
       user = await db.user.create({
         data: {
-          id: userId,
-          email,
-          name,
-          credits: 200, // starting credits
-          role: 'user',
+          id: uid,
+          email: email || '',
+          name: name || 'User',
+          phone: phone || null,
+          role: isFirstUser ? 'admin' : 'user',
+          status: isFirstUser ? 'ACTIVE' : 'PENDING',
+          creditAccount: {
+            create: {
+              subscriptionBalance: limit,
+              bonusBalance: 0,
+              renewalDate,
+            },
+          },
+        },
+        include: {
+          creditAccount: {
+            select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+          },
+        },
+      })
+    } else if (email && email !== user.email) {
+      user = await db.user.update({
+        where: { id: uid },
+        data: { email },
+        include: {
+          creditAccount: {
+            select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+          },
         },
       })
     }
+
+    const hasCompletedOnboarding = !!(
+      user.portfolio ||
+      user.website ||
+      user.linkedin ||
+      user.instagram ||
+      user.servicesOffered.length > 0 ||
+      user.preferredLeadCategories.length > 0 ||
+      user.outreachExperience ||
+      user.discoverySource
+    )
+
+    const creditAccount = user.creditAccount
+      ? {
+          subscriptionBalance: user.creditAccount.subscriptionBalance,
+          bonusBalance: user.creditAccount.bonusBalance,
+          total: user.creditAccount.subscriptionBalance + user.creditAccount.bonusBalance,
+          renewalDate: user.creditAccount.renewalDate?.toISOString() || null,
+        }
+      : { subscriptionBalance: 0, bonusBalance: 0, total: 0, renewalDate: null }
 
     return NextResponse.json({
       data: {
         id: user.id,
         email: user.email,
         name: user.name,
+        phone: user.phone || null,
         role: user.role,
-        credits: user.credits,
-        provider: 'email', // client-side compatibility (email/clerk)
-        emailVerified: new Date().toISOString(), // Verified by Clerk
+        creditAccount,
+        status: user.status,
+        provider: email ? 'email' : 'phone',
+        emailVerified: user.emailVerified?.toISOString() || null,
         plan: user.plan,
-        stripeCustomerId: user.stripeCustomerId,
-        stripeSubscriptionId: user.stripeSubscriptionId,
-        stripePriceId: user.stripePriceId,
-        stripeCurrentPeriodEnd: user.stripeCurrentPeriodEnd?.toISOString() || null,
+        hasCompletedOnboarding,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       },
     })
   } catch (error) {
-    console.error('Lazy-sync endpoint error:', error)
+    console.error('[Auth Me API] Error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' },
       { status: 500 },

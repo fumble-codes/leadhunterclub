@@ -290,7 +290,7 @@ export default function WhoItsForGrid() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-[10px] uppercase font-bold tracking-[0.3em] mb-3 block text-text-secondary/40">
+            <span className="text-[10px] uppercase font-bold tracking-ultra mb-3 block text-text-secondary/40">
               Target Audiences
             </span>
           </motion.div>
@@ -316,7 +316,7 @@ export default function WhoItsForGrid() {
 
         {/* Top-Right Interactive horizontal navigation segmented controls */}
         <div className="lg:shrink-0 flex items-center w-full lg:w-auto">
-          <div className="w-full flex flex-wrap gap-2.5 md:gap-3 items-center justify-center lg:justify-end bg-surface p-2 md:p-2.5 border border-white/[0.08] rounded-[28px] md:rounded-[32px] shadow-[0_20px_50px_rgba(var(--rgb-black),0.5)]">
+          <div className="w-full flex flex-wrap gap-2.5 md:gap-3 items-center justify-center lg:justify-end bg-surface p-2 md:p-2.5 border border-white/[0.08] rounded-3xl md:rounded-4xl shadow-[0_20px_50px_rgba(var(--rgb-black),0.5)]">
             {PERSONAS.map(p => {
               const isActive = p.id === activeTab
               const Icon = p.icon
@@ -326,7 +326,7 @@ export default function WhoItsForGrid() {
                   onClick={() => {
                     setActiveTab(p.id)
                   }}
-                  className={`flex flex-col items-center justify-center gap-2 px-3 py-6 md:px-5 md:py-8 rounded-[20px] md:rounded-[24px] transition-all duration-300 relative focus:outline-none cursor-pointer flex-1 sm:flex-initial min-w-[95px] md:min-w-[120px] max-w-[130px] ${
+                  className={`flex flex-col items-center justify-center gap-2 px-3 py-6 md:px-5 md:py-8 rounded-[20px] md:rounded-4xl transition-all duration-300 relative focus:outline-none cursor-pointer flex-1 sm:flex-initial min-w-[95px] md:min-w-[120px] max-w-[130px] ${
                     isActive 
                       ? 'text-text-secondary hover:text-text-primary transition-colors' 
                       : 'text-text-secondary hover:text-text-primary'
@@ -336,7 +336,7 @@ export default function WhoItsForGrid() {
                   {isActive && (
                     <motion.div
                       layoutId="active-tab-glow"
-                      className="absolute inset-0 bg-white/[0.03] border border-white/[0.08] shadow-[0_6px_24px_rgba(var(--rgb-black),0.4)] rounded-[20px] md:rounded-[24px] pointer-events-none"
+                      className="absolute inset-0 bg-white/[0.03] border border-white/[0.08] shadow-[0_6px_24px_rgba(var(--rgb-black),0.4)] rounded-[20px] md:rounded-4xl pointer-events-none"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -356,7 +356,7 @@ export default function WhoItsForGrid() {
         <div 
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-[32px] bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[780px] md:h-[860px] justify-between"
+          className="w-full rounded-4xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[780px] md:h-[860px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">
@@ -396,7 +396,7 @@ export default function WhoItsForGrid() {
               
               {/* BACKGROUND LAYER: The leads feed dashboard (dimmed/blurred when cockpit overlays) */}
               <div className={`w-full h-full flex flex-col justify-start gap-5 transition-all duration-500 ${
-                revealed[activePersona.id] ? 'opacity-30 blur-[3px] scale-[0.98] pointer-events-none' : 'opacity-100 blur-0 scale-100'
+                revealed[activePersona.id] ? 'opacity-30 blur-[3px] scale-98 pointer-events-none' : 'opacity-100 blur-0 scale-100'
               }`}>
                 
                 {/* Leads Feed Dashboard Header */}
@@ -411,7 +411,7 @@ export default function WhoItsForGrid() {
                       <Bars3Icon className={`w-[15px] h-[15px] transition-transform duration-300 ${isSidebarOpen ? 'rotate-90 text-text-secondary' : ''}`} />
                     </button>
                     <h3 className="text-lg font-bold text-text-primary tracking-tight">Lead Feed</h3>
-                    <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-[0.2em] uppercase">
+                    <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-super uppercase">
                       <span className="w-1 h-1 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                       6 Signals
                     </div>

@@ -58,7 +58,7 @@ export default function SneakPeekPage() {
               <div>
                 <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                   Lead Feed
-                  <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-[0.2em] uppercase">
+                  <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-11 font-bold tracking-super uppercase">
                     <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse" />
                     {sneakPeekLeads.length} Signals
                   </div>
@@ -76,14 +76,14 @@ export default function SneakPeekPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.6, ease }}
-                className="group relative p-6 rounded-[28px] bg-surface-secondary/50 border border-white/[0.04] hover:border-white/10 transition-all duration-500 flex flex-col overflow-hidden"
+                className="group relative p-6 rounded-3xl bg-surface-secondary/50 border border-white/[0.04] hover:border-white/10 transition-all duration-500 flex flex-col overflow-hidden"
               >
                 {/* Platform badge */}
                 <div className="flex items-center justify-between mb-5">
-                  <div className={`px-2.5 py-1 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 text-accent-${lead.accent} text-[9px] font-bold uppercase tracking-widest`}>
+                  <div className={`px-2.5 py-1 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 text-accent-${lead.accent} text-9 font-bold uppercase tracking-widest`}>
                     {lead.platform}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-text-secondary/40 font-mono">
+                  <div className="flex items-center gap-1.5 text-xxs text-text-secondary/40 font-mono">
                     <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
                     Live
                   </div>
@@ -96,7 +96,7 @@ export default function SneakPeekPage() {
 
                 {/* Intent bar */}
                 <div className="mb-5">
-                  <div className="flex justify-between text-[10px] mb-1.5">
+                  <div className="flex justify-between text-xxs mb-1.5">
                     <span className="text-text-secondary/50 font-bold uppercase tracking-widest bg-accent-mint">Intent Score</span>
                     <span className={`font-bold text-accent-${lead.accent}`}>{lead.intent}%</span>
                   </div>
@@ -112,8 +112,8 @@ export default function SneakPeekPage() {
 
                 {/* Urgency */}
                 <div className="flex items-center justify-between mb-5">
-                  <span className="text-[10px] text-text-secondary/40 font-bold uppercase tracking-widest bg-accent-mint">Urgency</span>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${
+                  <span className="text-xxs text-text-secondary/40 font-bold uppercase tracking-widest bg-accent-mint">Urgency</span>
+                  <span className={`text-xxs font-bold uppercase tracking-widest ${
                     lead.urgency === 'Critical' ? 'text-text-secondary hover:text-text-primary transition-colors' : lead.urgency === 'High' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary hover:text-text-primary transition-colors'
                   }`}>{lead.urgency}</span>
                 </div>
@@ -124,16 +124,16 @@ export default function SneakPeekPage() {
                   <div className="blur-[6px] select-none pointer-events-none">
                     <div className="flex items-center gap-3 mb-3">
                       <div className={`w-9 h-9 rounded-xl bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 flex items-center justify-center`}>
-                        <span className={`text-[10px] font-bold text-accent-${lead.accent}`}>{lead.initials}</span>
+                        <span className={`text-xxs font-bold text-accent-${lead.accent}`}>{lead.initials}</span>
                       </div>
                       <div>
                         <div className="text-xs font-bold text-text-primary">{lead.name}</div>
-                        <div className="text-[10px] text-text-secondary/50">Founder · E-commerce · $2M ARR</div>
+                        <div className="text-xxs text-text-secondary/50">Founder · E-commerce · $2M ARR</div>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-[9px] font-bold text-text-secondary hover:text-text-primary transition-colors">View Profile</div>
-                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-[9px] font-bold text-text-secondary hover:text-text-primary transition-colors">AI Outreach</div>
+                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">View Profile</div>
+                      <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">AI Outreach</div>
                     </div>
                   </div>
 
@@ -142,7 +142,7 @@ export default function SneakPeekPage() {
                     <div className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-2">
                       <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary/50" />
                     </div>
-                    <span className="text-[10px] font-bold text-text-secondary/60 uppercase tracking-widest">3 Tokens to Reveal</span>
+                    <span className="text-xxs font-bold text-text-secondary/60 uppercase tracking-widest">3 Tokens to Reveal</span>
                   </div>
                 </div>
               </motion.div>
@@ -154,7 +154,7 @@ export default function SneakPeekPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8, ease }}
-            className="mt-16 p-10 rounded-[32px] bg-gradient-to-b from-white/[0.02] to-transparent border border-white/[0.05] text-center relative overflow-hidden"
+            className="mt-16 p-10 rounded-4xl bg-gradient-to-b from-white/[0.02] to-transparent border border-white/[0.05] text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-tab-purple),0.03)_0%,transparent_70%)] pointer-events-none" />
             <div className="relative z-10">

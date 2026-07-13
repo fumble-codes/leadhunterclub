@@ -1,85 +1,149 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useAuth as useClerkAuth, useUser as useClerkUser } from '@clerk/nextjs'
+'use client'
+
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+  auth,
+  onAuthStateChanged,
+  onIdTokenChanged,
+  firebaseSignOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  getFirebaseToken,
+} from '@/lib/firebase'
 import type { User } from '@/lib/types'
 
-export function useAuth() {
-  const { isLoaded: isClerkLoaded, isSignedIn, signOut } = useClerkAuth()
-  const { user: clerkUser } = useClerkUser()
+function setSessionCookie(token: string | null) {
+  if (token) {
+    document.cookie = `__session=${token}; path=/; max-age=3600; SameSite=Lax; secure`
+  } else {
+    document.cookie = '__session=; path=/; max-age=0; SameSite=Lax; secure'
+  }
+}
 
-  const [dbUser, setDbUser] = useState<User | null>(null)
-  const [dbLoading, setDbLoading] = useState(true)
+export function useAuth() {
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [firebaseUser, setFirebaseUser] = useState<import('firebase/auth').User | null>(null)
+  const [lastSynced, setLastSynced] = useState<number | null>(null)
+  const [lastTokenRefresh, setLastTokenRefresh] = useState<number | null>(null)
 
   useEffect(() => {
-    if (!isClerkLoaded) return
-
-    if (!isSignedIn) {
-      setDbUser(null)
-      setDbLoading(false)
-      return
-    }
-
-    // Build a fallback user from Clerk data immediately so the UI never blocks
-    const fallbackUser: User = {
-      id: clerkUser?.id || '',
-      email: clerkUser?.emailAddresses?.[0]?.emailAddress || '',
-      name: clerkUser?.fullName || clerkUser?.firstName || 'User',
-      role: 'user',
-      credits: 200,
-      provider: 'email',
-      emailVerified: new Date().toISOString(),
-      plan: 'FREE',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-
-    // Set fallback immediately so the UI can render right away
-    setDbUser(fallbackUser)
-    setDbLoading(false)
-
-    // Then try to fetch the real DB user in the background (for credits, etc.)
     let isMounted = true
+    let lastSyncCall = 0
 
-    const fetchDbUser = () => {
-      fetch('/api/auth/me')
-        .then((res) => {
-          if (!res.ok) throw new Error('Failed to fetch user profile')
-          return res.json()
+    const syncUser = async (fbUser: import('firebase/auth').User) => {
+      const now = Date.now()
+      if (now - lastSyncCall < 2000) return
+      lastSyncCall = now
+
+      setFirebaseUser(fbUser)
+      setError(null)
+      setLastTokenRefresh(now)
+
+      try {
+        const token = await fbUser.getIdToken()
+        setSessionCookie(token)
+        const res = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` },
         })
-        .then((json) => {
+
+        if (res.ok) {
+          const json = await res.json()
           if (isMounted && json.data) {
-            setDbUser(json.data)
+            setUser(json.data)
+            setLastSynced(Date.now())
+            setLoading(false)
+
+            if (json.data.status === 'SUSPENDED' || json.data.status === 'REJECTED') {
+              setSessionCookie(null)
+              router.push('/pending-approval')
+            }
+            return
           }
-        })
-        .catch((err) => {
-          console.warn('Could not sync DB user (using Clerk fallback):', err.message)
-        })
+
+          if (res.ok && isMounted) {
+            console.error('[useAuth] Unexpected response shape:', json)
+          }
+        }
+
+        throw new Error(`Server returned ${res.status}`)
+      } catch (err) {
+        console.error('[useAuth] Failed to sync user from /api/auth/me:', err)
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : 'Failed to load user data')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
     }
 
-    fetchDbUser()
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('user-refetch', fetchDbUser)
+    const clearAuthState = () => {
+      setFirebaseUser(null)
+      setUser(null)
+      setLoading(false)
+      setError(null)
+      setSessionCookie(null)
     }
+
+    const unsubToken = onIdTokenChanged(auth, (fbUser) => {
+      if (!isMounted) return
+
+      if (!fbUser) {
+        clearAuthState()
+        return
+      }
+
+      syncUser(fbUser)
+    })
+
+    const unsubAuth = onAuthStateChanged(auth, (fbUser) => {
+      if (!isMounted) return
+      if (!fbUser) {
+        clearAuthState()
+      }
+    })
 
     return () => {
       isMounted = false
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('user-refetch', fetchDbUser)
-      }
+      unsubToken()
+      unsubAuth()
     }
-  }, [isClerkLoaded, isSignedIn, clerkUser])
+  }, [router])
 
-  const handleLogout = useCallback(() => {
-    signOut({ redirectUrl: '/login' })
-  }, [signOut])
+  const handleLogout = useCallback(async () => {
+    setSessionCookie(null)
+    await firebaseSignOut(auth)
+    router.push('/login')
+  }, [router])
+
+  const login = useCallback(async (email: string, password: string) => {
+    const result = await signInWithEmailAndPassword(auth, email, password)
+    return result.user
+  }, [])
+
+  const register = useCallback(async (email: string, password: string) => {
+    const result = await createUserWithEmailAndPassword(auth, email, password)
+    return result.user
+  }, [])
 
   return {
-    user: dbUser,
-    loading: !isClerkLoaded,
-    isAuthenticated: !!isSignedIn,
-    login: async () => {}, // Handled by Clerk components
-    register: async () => {}, // Handled by Clerk components
+    user,
+    loading,
+    error,
+    lastSynced,
+    lastTokenRefresh,
+    isAuthenticated: !!firebaseUser,
+    login,
+    register,
     logout: handleLogout,
+    firebaseUser,
+    getToken: getFirebaseToken,
   }
 }
+
 export type AuthContextValue = ReturnType<typeof useAuth>

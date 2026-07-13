@@ -5,8 +5,31 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { BanknotesIcon, BookmarkIcon, PaperAirplaneIcon, Squares2X2Icon, SparklesIcon, ArrowRightIcon, ViewfinderCircleIcon, ChatBubbleLeftRightIcon, BoltIcon, ArrowTopRightOnSquareIcon, CheckCircleIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon, ChartBarSquareIcon, ExclamationTriangleIcon, UserIcon, EllipsisHorizontalIcon, InformationCircleIcon, EyeIcon, ClockIcon } from '@heroicons/react/24/solid'
 import Link from 'next/link'
-import { dashboardStats, activityData } from '@/lib/mock/dashboardData'
-import { getSavedLeads, getOutreachLeads, allLeads } from '@/lib/mock/leadsData'
+const allLeads: Array<{
+  id: string; name: string; email: string; company: string; source: string;
+  category: string; title: string; signalContext: string; role: string;
+  taskScope: string; mustHave: string; nicheBonus: string; buyerType: string;
+  urgency: 'low' | 'medium' | 'high' | 'critical'; winProb: 'low' | 'medium' | 'high'; nicheTags: string[]; hashtags: string[];
+  replyProbability: number; status: 'new' | 'saved' | 'drafting' | 'sent' | 'replied' | 'follow-up'; timestamp: string; niches: string[];
+  accent?: 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'; isActionable?: boolean
+}> = [
+  { id: '1', name: 'Andy Shepard', email: 'a.shepard@gmail.com', company: 'Nexus AI', source: 'LEAD HUNTER CLUB', category: 'SHOPIFY DESIGN', title: 'Shopify Designer - eCommerce Conversion', signalContext: 'Struggling with slow load times and high bounce rates on their current Shopify store.', role: 'Shopify Designer / Freelancer', taskScope: 'Design engaging, high-converting Shopify storefronts for eCommerce brands', mustHave: 'Shopify storefront design expertise + strong UI/UX + conversion focus', nicheBonus: 'eCommerce design expertise + team collaboration + portfolio + proven results', buyerType: 'eCommerce Brand / Shopify Store', urgency: 'high', winProb: 'high', nicheTags: ['Storefront Design', 'High-Converting', 'Freelance'], hashtags: ['#shopify', '#design', '#ecommerce', '#conversion', '#storefront', '#freelance'], replyProbability: 92, status: 'saved', timestamp: '2h ago', niches: ['Web Design', 'Web Dev', 'Design'] },
+  { id: '2', name: 'Emily Thompson', email: 'e.thompson@vanguard.io', company: 'Vanguard Group', source: 'LEAD HUNTER CLUB', category: 'PERFORMANCE MARKETING', title: 'Media Buyer - Meta & TikTok Scaling', signalContext: 'Scaling ad spend for Q4 but CAC is getting wildly unprofitable.', role: 'Performance Marketer / Agency', taskScope: 'Manage and scale paid acquisition across Meta and TikTok for DTC brands', mustHave: 'Proven track record scaling $50k+ monthly ad spend + creative strategy', nicheBonus: 'Experience in health & wellness DTC + UGC sourcing', buyerType: 'DTC Brand / 8-figure Run Rate', urgency: 'medium', winProb: 'medium', nicheTags: ['DTC', 'Paid Ads', 'Scaling'], hashtags: ['#performance', '#media', '#dtc', '#ads', '#scaling', '#tiktok'], replyProbability: 85, status: 'drafting', timestamp: '5h ago', niches: ['Marketing'] },
+  { id: '3', name: 'Michael Carter', email: 'm.carter@stellar.co', company: 'Stellar Co', source: 'LEAD HUNTER CLUB', category: 'BRAND IDENTITY', title: 'Brand Designer - SaaS Rebrand', signalContext: 'Just raised seed round, looking to completely rebrand before product launch.', role: 'Brand Designer / Agency', taskScope: 'End-to-end visual identity revamp including logo, typography, and web assets', mustHave: 'B2B SaaS portfolio + modern minimal aesthetic + strict timeline management', nicheBonus: 'Motion design capabilities + Webflow experience', buyerType: 'Funded SaaS Startup', urgency: 'high', winProb: 'high', nicheTags: ['SaaS', 'Branding', 'Design'], hashtags: ['#saas', '#branding', '#design', '#identity', '#startup'], replyProbability: 88, status: 'saved', timestamp: '1d ago', niches: ['Design'] },
+  { id: '4', name: 'David Anderson', email: 'd.anderson@prism.io', company: 'Prism Labs', source: 'LEAD HUNTER CLUB', category: 'SALES INFRASTRUCTURE', title: 'RevOps Specialist - Outbound Setup', signalContext: 'Just hired 3 new SDRs. Clear indicator they need outbound infrastructure.', role: 'RevOps Consultant / B2B', taskScope: 'Build and automate Apollo/Clay outbound sequences for a new SDR team', mustHave: 'Deep Apollo/Clay knowledge + deliverability setup + CRM integration', nicheBonus: 'Sales coaching experience + customized scripting', buyerType: 'B2B Services / Agency', urgency: 'medium', winProb: 'high', nicheTags: ['B2B', 'Sales', 'Systems'], hashtags: ['#revops', '#sales', '#outbound', '#apollo', '#clay'], replyProbability: 75, status: 'new', timestamp: '3d ago', niches: ['Sales & RevOps', 'AI & Automation'] },
+]
+const getSavedLeads = () => allLeads.filter(l => ['saved', 'drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
+const getOutreachLeads = () => allLeads.filter(l => ['drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
+const dashboardStats = [
+  { label: 'Analyzed Leads', value: '1,284', trend: '+12%', trendUp: true, accent: 'mint' as const },
+  { label: 'Active Conversations', value: '42', trend: '+5', trendUp: true, accent: 'purple' as const },
+  { label: 'Avg. Reply Probability', value: '84%', trend: '+2.4%', trendUp: true, accent: 'cyan' as const },
+  { label: 'Credits Remaining', value: '750', trend: '/ 1,000', accent: 'orange' as const },
+]
+const activityData = [
+  { day: 'Mon', value: 45 }, { day: 'Tue', value: 52 }, { day: 'Wed', value: 38 },
+  { day: 'Thu', value: 65 }, { day: 'Fri', value: 48 }, { day: 'Sat', value: 32 }, { day: 'Sun', value: 28 },
+]
 import LeadCard from '@/app/leads/components/LeadCard'
 
 const ease = [0.16, 1, 0.3, 1] as const
@@ -63,7 +86,7 @@ function LeadsContent() {
             <div>
               <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                 Lead Feed
-                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-[0.2em] uppercase">
+                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-super uppercase">
                   <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse" />
                   4 Signals
                 </div>
@@ -107,7 +130,7 @@ function SavedContent() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="group relative p-6 rounded-[28px] bg-surface-secondary/50 border border-white/[0.05] hover:bg-surface-secondary hover:border-white/10 transition-all duration-300 overflow-hidden"
+              className="group relative p-6 rounded-3xl bg-surface-secondary/50 border border-white/[0.05] hover:bg-surface-secondary hover:border-white/10 transition-all duration-300 overflow-hidden"
             >
               <div className="flex justify-between items-start mb-6">
                 <div className={`p-3 rounded-2xl bg-accent-${card.accent}/10 text-accent-${card.accent} shadow-inner`}>
@@ -164,8 +187,8 @@ function SavedContent() {
         </div>
 
         {/* High-Density Pipeline Table */}
-        <div className="bg-code-header border border-white/[0.05] rounded-[24px] overflow-hidden">
-          <div className="grid grid-cols-12 gap-4 px-8 py-4 border-b border-white/[0.05] text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] min-w-[800px]">
+        <div className="bg-code-header border border-white/[0.05] rounded-4xl overflow-hidden">
+          <div className="grid grid-cols-12 gap-4 px-8 py-4 border-b border-white/[0.05] text-[10px] font-bold text-text-secondary uppercase tracking-super min-w-[800px]">
             <div className="col-span-1">Status</div>
             <div className="col-span-4">Lead</div>
             <div className="col-span-2">Source</div>
@@ -329,7 +352,7 @@ function OutreachContent() {
             <textarea
               value={draft} onChange={(e) => setDraft(e.target.value)}
               placeholder="Draft your socially intelligent outreach..."
-              className="w-full bg-background border border-white/[0.08] rounded-[24px] p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-border-subtle transition-all min-h-[140px] resize-none focus:border-accent-mint/50"
+              className="w-full bg-background border border-white/[0.08] rounded-4xl p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-border-subtle transition-all min-h-[140px] resize-none focus:border-accent-mint/50"
             />
             <button className="absolute bottom-4 right-4 p-4 bg-accent-mint text-text-on-accent rounded-xl font-bold flex items-center gap-2 hover: transition-all">
               Send <PaperAirplaneIcon className="w-4 h-4" />
@@ -342,7 +365,7 @@ function OutreachContent() {
       <div className="w-[300px] lg:w-[340px] shrink-0 border-l border-white/[0.06] bg-background/40 flex flex-col p-8 overflow-y-auto scrollbar-hide">
         <div className="space-y-8">
           <section>
-            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-super mb-4 flex items-center gap-2">
               <InformationCircleIcon className="w-3 h-3" /> Intelligence Brief
             </h4>
             <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
@@ -360,7 +383,7 @@ function OutreachContent() {
           </section>
 
           <section>
-            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.2em] mb-4">Conversion Paths</h4>
+            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-super mb-4">Conversion Paths</h4>
             <div className="space-y-3">
               <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-border-subtle transition-all">
                 <span className="text-xs text-text-secondary group-hover:text-text-primary">Company Website</span>
@@ -429,7 +452,7 @@ function DashboardContent() {
         {/* Header */}
         <div className="mb-12 flex items-end justify-between">
           <div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-[0.3em] mb-3">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors uppercase tracking-ultra mb-3">
               <CheckCircleIcon className="w-[14px] h-[14px]" /> Operational Status: Active
             </div>
             <h1 className="text-4xl font-bold text-text-primary tracking-tight">Operational Overview</h1>
@@ -510,7 +533,7 @@ function DashboardContent() {
 
           {/* Quick Actions & AI Status */}
           <div className="space-y-6">
-            <div className="p-8 rounded-[32px] bg-accent-mint text-text-on-accent relative overflow-hidden group">
+            <div className="p-8 rounded-4xl bg-accent-mint text-text-on-accent relative overflow-hidden group">
               <h3 className="text-xl font-bold mb-2">Ready for Outreach</h3>
               <p className="text-sm opacity-80 mb-8 leading-relaxed">
                 You have 12 high-intent leads waiting for outreach strategy.
@@ -618,7 +641,7 @@ export default function HeroSection() {
             transition={{ duration: 0.7, delay: 0.2, ease }}
             className="flex flex-row items-center justify-center gap-4 w-full relative z-10"
           >
-            <Link href="/dashboard">
+            <Link href="/register">
               <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent-mint text-page-bg font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(var(--rgb-persona-green),0.25)] transition-all hover:bg-surface-secondary hover:bg-accent-mint/90">
                 Start Hunting <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </motion.span>

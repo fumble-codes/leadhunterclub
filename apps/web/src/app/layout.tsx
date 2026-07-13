@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Space_Grotesk as SpaceGrotesk, Inter } from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import { ClerkProvider } from '@clerk/nextjs'
 import ClientLayout from './ClientLayout'
 import './globals.css'
 
@@ -45,40 +44,38 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'LeadHunterClub',
-              url: appUrl,
-              logo: `${appUrl}/logo.svg`,
-              description: 'AI-powered lead generation and outreach platform for modern sales teams.',
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: 'LeadHunterClub',
-              url: appUrl,
-            }),
-          }}
-        />
-      </head>
-      <body
-        className={`${GeistSans.variable} ${GeistMono.variable} ${spaceGrotesk.variable} ${inter.variable} font-sans antialiased bg-page-bg text-white`}
-      >
-        <ClientLayout>{children}</ClientLayout>
-      </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className="dark" suppressHydrationWarning>
+    <head>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'LeadHunterClub',
+            url: appUrl,
+            logo: `${appUrl}/logo.svg`,
+            description: 'AI-powered lead generation and outreach platform for modern sales teams.',
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'LeadHunterClub',
+            url: appUrl,
+          }),
+        }}
+      />
+    </head>
+    <body
+      className={`${GeistSans.variable} ${GeistMono.variable} ${spaceGrotesk.variable} ${inter.variable} font-sans antialiased bg-page-bg text-white`}
+    >
+      <ClientLayout>{children}</ClientLayout>
+    </body>
+    </html>
   )
 }

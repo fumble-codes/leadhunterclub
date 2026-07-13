@@ -34,13 +34,18 @@ export default function AppSidebar({
   const { user, logout } = useAuth()
   const router = useRouter()
 
+  const planLimits: Record<string, number> = { FREE: 50, FREELANCER: 500, AGENCY: 1000 }
+  const planMax = planLimits[user?.plan ?? 'FREE'] ?? 50
+  const creditTotal = user?.creditAccount?.total ?? 0
+  const creditPercentage = Math.min(100, creditTotal / planMax * 100)
+
   return (
     <motion.aside
       initial={false}
       animate={{ width: isCollapsed ? '64px' : (isDemo ? '180px' : '240px') }}
       className={isDemo
         ? "h-full bg-surface/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[24px] overflow-hidden select-none shrink-0"
-        : "h-[calc(100vh-32px)] my-4 ml-4 bg-surface/70 backdrop-blur-[20px] border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-[24px] overflow-hidden"
+        : "h-[calc(100vh-32px)] my-4 ml-4 bg-surface/70 backdrop-blur-lg border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-4xl overflow-hidden"
       }
     >
       {/* Sidebar Header */}
@@ -115,7 +120,7 @@ export default function AppSidebar({
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-crimson),0.15)] z-0"
+                  className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-mint),0.15)] z-0"
                 />
               )}
             </Link>
@@ -136,20 +141,20 @@ export default function AppSidebar({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <BanknotesIcon className="w-[14px] h-[14px] text-accent-mint" />
-                  <span className="text-[10px] font-bold text-text-primary uppercase tracking-widest">Credits</span>
+                  <span className="text-xxs font-bold text-text-primary uppercase tracking-widest">Credits</span>
                 </div>
-                <span className="text-[10px] font-bold text-text-secondary">{user?.credits ?? 0} / 1k</span>
+                <span className="text-xxs font-bold text-text-secondary">{creditTotal} / {planMax}</span>
               </div>
               
               <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
-                  animate={{ width: '75%' }}
-                  className="h-full bg-accent-mint shadow-[0_0_10px_rgba(var(--rgb-crimson),0.5)]" 
+                  animate={{ width: `${creditPercentage}%` }}
+                  className="h-full bg-accent-mint shadow-[0_0_10px_rgba(var(--rgb-accent-mint),0.5)]" 
                 />
               </div>
 
-              <button className="text-[9px] font-bold text-accent-mint uppercase tracking-[0.2em] hover:opacity-80 transition-opacity">
+              <button className="text-9 font-bold text-accent-mint uppercase tracking-super hover:opacity-80 transition-opacity">
                 Refill Pipeline →
               </button>
             </div>
@@ -196,7 +201,7 @@ export default function AppSidebar({
           {pathname === '/settings' && !isSneakPeek && (
             <motion.div
               layoutId="sidebar-active"
-              className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-crimson),0.15)] z-0"
+              className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-mint),0.15)] z-0"
             />
           )}
         </Link>

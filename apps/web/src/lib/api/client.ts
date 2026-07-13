@@ -1,95 +1,7 @@
 import { config } from '@/lib/config'
 import { ApiError, AuthError, NetworkError, ValidationError } from './errors'
-import type { ApiResponse, PaginatedResponse, RequestMethod } from '@/lib/types'
-
-const TOKEN_KEY = config.auth.tokenKey
-const REFRESH_KEY = config.auth.refreshKey
-
-function getStoredToken(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    return localStorage.getItem(TOKEN_KEY)
-  } catch {
-    return null
-  }
-}
-
-function getStoredRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    return localStorage.getItem(REFRESH_KEY)
-  } catch {
-    return null
-  }
-}
-
-export function setTokens(accessToken: string, refreshToken: string): void {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(TOKEN_KEY, accessToken)
-    localStorage.setItem(REFRESH_KEY, refreshToken)
-  } catch {
-    // localStorage unavailable
-  }
-}
-
-export function clearTokens(): void {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(REFRESH_KEY)
-  } catch {
-    // localStorage unavailable
-  }
-}
-
-export function getAccessToken(): string | null {
-  return getStoredToken()
-}
-
-let isRefreshing = false
-let refreshPromise: Promise<string | null> | null = null
-
-async function attemptTokenRefresh(): Promise<string | null> {
-  const refreshToken = getStoredRefreshToken()
-  if (!refreshToken) return null
-
-  try {
-    const res = await fetch(`${config.api.baseUrl}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    })
-
-    if (!res.ok) {
-      clearTokens()
-      return null
-    }
-
-    const data = await res.json()
-    const session = data.data?.session || data.session
-    if (session?.accessToken && session?.refreshToken) {
-      setTokens(session.accessToken, session.refreshToken)
-      return session.accessToken
-    }
-    return null
-  } catch {
-    clearTokens()
-    return null
-  }
-}
-
-async function refreshAccessToken(): Promise<string | null> {
-  if (isRefreshing && refreshPromise) return refreshPromise
-
-  isRefreshing = true
-  refreshPromise = attemptTokenRefresh().finally(() => {
-    isRefreshing = false
-    refreshPromise = null
-  })
-
-  return refreshPromise
-}
+import type { ApiResponse, RequestMethod } from '@/lib/types'
+import { getFirebaseToken } from '@/lib/firebase'
 
 function buildUrl(path: string, params?: Record<string, string | number | undefined>): string {
   const base = config.api.baseUrl
@@ -110,12 +22,11 @@ interface RequestOptions {
   method: RequestMethod
   body?: unknown
   params?: Record<string, string | number | undefined>
-  skipAuth?: boolean
   timeout?: number
 }
 
 export async function request<T>(path: string, options: RequestOptions): Promise<T> {
-  const { method, body, params, skipAuth = false, timeout = config.api.timeout } = options
+  const { method, body, params, timeout = config.api.timeout } = options
 
   const url = buildUrl(path, params)
   const controller = new AbortController()
@@ -127,11 +38,9 @@ export async function request<T>(path: string, options: RequestOptions): Promise
       Accept: 'application/json',
     }
 
-    if (!skipAuth) {
-      const token = getAccessToken()
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
+    const token = await getFirebaseToken()
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
     }
 
     const response = await fetch(url, {
@@ -143,24 +52,7 @@ export async function request<T>(path: string, options: RequestOptions): Promise
 
     clearTimeout(timeoutId)
 
-    if (response.status === 401 && !skipAuth) {
-      const newToken = await refreshAccessToken()
-      if (newToken) {
-        headers['Authorization'] = `Bearer ${newToken}`
-        const retryResponse = await fetch(url, {
-          method,
-          headers,
-          body: body ? JSON.stringify(body) : undefined,
-        })
-
-        if (!retryResponse.ok) {
-          await handleErrorResponse(retryResponse)
-        }
-
-        return parseResponse<T>(retryResponse)
-      }
-
-      clearTokens()
+    if (response.status === 401) {
       throw new AuthError()
     }
 
@@ -229,11 +121,11 @@ async function parseResponse<T>(response: Response): Promise<T> {
 }
 
 export const api = {
-  get: <T>(path: string, params?: Record<string, string | number | undefined>, skipAuth?: boolean) =>
-    request<T>(path, { method: 'GET', params, skipAuth }),
+  get: <T>(path: string, params?: Record<string, string | number | undefined>) =>
+    request<T>(path, { method: 'GET', params }),
 
-  post: <T>(path: string, body?: unknown, skipAuth?: boolean) =>
-    request<T>(path, { method: 'POST', body, skipAuth }),
+  post: <T>(path: string, body?: unknown) =>
+    request<T>(path, { method: 'POST', body }),
 
   put: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'PUT', body }),

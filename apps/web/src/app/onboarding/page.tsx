@@ -1,0 +1,668 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '@/hooks/useAuth'
+import { api } from '@/lib/api/client'
+import { normalizePhone } from '@/lib/phone'
+import { auth, signInWithPhoneNumber, PhoneAuthProvider, RecaptchaVerifier, linkWithCredential, sendEmailVerification, type ConfirmationResult } from '@/lib/firebase'
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+  ArrowPathIcon,
+  ShieldExclamationIcon,
+} from '@heroicons/react/24/solid'
+
+const SERVICES = [
+  'Web Development',
+  'UI/UX Design',
+  'SEO / Growth',
+  'Copywriting',
+  'Marketing Strategy',
+  'Sales Consulting',
+  'Brand Design',
+  'Video Production',
+  'Social Media Management',
+  'Email Marketing',
+  'Paid Ads',
+  'Other',
+]
+
+const LEAD_CATEGORIES = [
+  'SaaS',
+  'E-commerce',
+  'Agency',
+  'Healthcare',
+  'Finance',
+  'Real Estate',
+  'Education',
+  'Enterprise',
+  'B2B Services',
+  'DTC / Consumer',
+  'Marketplaces',
+  'Other',
+]
+
+const EXPERIENCE_LEVELS = [
+  { value: 'none', label: 'No experience yet' },
+  { value: 'beginner', label: 'Beginner (1-3 months)' },
+  { value: 'intermediate', label: 'Intermediate (3-12 months)' },
+  { value: 'advanced', label: 'Advanced (1-3 years)' },
+  { value: 'expert', label: 'Expert (3+ years)' },
+]
+
+const DISCOVERY_SOURCES = [
+  'Twitter / X',
+  'LinkedIn',
+  'Google Search',
+  'Friend / Referral',
+  'YouTube',
+  'Indie Hackers',
+  'Reddit',
+  'Product Hunt',
+  'Other',
+]
+
+const MAX_OTP_ATTEMPTS = 3
+
+function OnboardingSkeleton() {
+  return (
+    <main className="min-h-screen bg-bg-main flex items-center justify-center px-4">
+      <div className="w-full max-w-lg">
+        <div className="flex items-center justify-center gap-2 mb-10">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
+              {s < 3 && <div className="w-12 h-px bg-white/5 animate-pulse" />}
+            </div>
+          ))}
+        </div>
+        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-4xl p-8 md:p-10">
+          <div className="space-y-4">
+            <div className="h-6 w-48 bg-white/5 rounded animate-pulse mx-auto" />
+            <div className="h-4 w-64 bg-white/5 rounded animate-pulse mx-auto" />
+            <div className="h-12 bg-white/5 rounded-xl animate-pulse mt-6" />
+            <div className="h-12 bg-white/5 rounded-xl animate-pulse" />
+            <div className="h-12 bg-white/5 rounded-xl animate-pulse" />
+            <div className="h-12 bg-white/5 rounded-xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+}
+
+export default function OnboardingPage() {
+  const router = useRouter()
+  const { user, loading } = useAuth()
+  const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [submitRetry, setSubmitRetry] = useState(false)
+
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [verificationCode, setVerificationCode] = useState('')
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null)
+  const [phoneError, setPhoneError] = useState('')
+  const [phoneLoading, setPhoneLoading] = useState(false)
+  const [otpCountdown, setOtpCountdown] = useState(0)
+  const [otpAttempts, setOtpAttempts] = useState(0)
+
+  const [portfolio, setPortfolio] = useState('')
+  const [website, setWebsite] = useState('')
+  const [linkedin, setLinkedin] = useState('')
+  const [instagram, setInstagram] = useState('')
+  const [servicesOffered, setServicesOffered] = useState<string[]>([])
+  const [preferredLeadCategories, setPreferredLeadCategories] = useState<string[]>([])
+  const [outreachExperience, setOutreachExperience] = useState('')
+  const [discoverySource, setDiscoverySource] = useState('')
+  const [showPhoneStep, setShowPhoneStep] = useState(true)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('onboarding_step')
+    if (saved) setStep(parseInt(saved))
+  }, [])
+
+  useEffect(() => {
+    if (step < 1 || step > 3) return
+    localStorage.setItem('onboarding_step', step.toString())
+  }, [step])
+
+  useEffect(() => {
+    if (otpCountdown <= 0) return
+    const id = setInterval(() => setOtpCountdown((c) => c - 1), 1000)
+    return () => clearInterval(id)
+  }, [otpCountdown])
+
+  useEffect(() => {
+    if (auth.currentUser?.phoneNumber) {
+      setShowPhoneStep(false)
+    }
+  }, [setShowPhoneStep])
+
+  if (loading) {
+    return <OnboardingSkeleton />
+  }
+
+  if (!user) {
+    router.push('/login')
+    return null
+  }
+
+  const createRecaptchaVerifier = async (): Promise<RecaptchaVerifier | null> => {
+    for (let i = 0; i < 20; i++) {
+      const el = document.getElementById('recaptcha-container')
+      if (el) {
+        return new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' })
+      }
+      await new Promise((r) => setTimeout(r, 100))
+    }
+    return null
+  }
+
+  const handleSendOtp = async () => {
+    if (!phoneNumber.trim()) return
+    setPhoneLoading(true)
+    setPhoneError('')
+    try {
+      const normalized = normalizePhone(phoneNumber.trim())
+      const verifier = await createRecaptchaVerifier()
+      if (!verifier) {
+        setPhoneError('Recaptcha failed to load. You can skip this step and add phone later.')
+        return
+      }
+      const result = await signInWithPhoneNumber(auth, normalized, verifier)
+      setConfirmationResult(result)
+      setOtpCountdown(60)
+    } catch {
+      setPhoneError('Failed to send OTP. Check the phone number and try again.')
+    } finally {
+      setPhoneLoading(false)
+    }
+  }
+
+  const handleResendOtp = async () => {
+    setConfirmationResult(null)
+    setVerificationCode('')
+    setPhoneError('')
+  }
+
+  const handleVerifyOtp = async () => {
+    if (!verificationCode.trim() || !confirmationResult) return
+    setPhoneLoading(true)
+    setPhoneError('')
+    try {
+      const cred = PhoneAuthProvider.credential(confirmationResult.verificationId, verificationCode.trim())
+      await linkWithCredential(auth.currentUser!, cred)
+      setShowPhoneStep(false)
+    } catch {
+      setOtpAttempts((c) => c + 1)
+      setPhoneError('Invalid verification code. Please try again.')
+    } finally {
+      setPhoneLoading(false)
+    }
+  }
+
+  const handleSkipPhone = () => {
+    setShowPhoneStep(false)
+  }
+
+  const toggleArrayItem = (arr: string[], item: string): string[] =>
+    arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]
+
+  const canProceedFromStep2 =
+    servicesOffered.length > 0 &&
+    preferredLeadCategories.length > 0 &&
+    outreachExperience !== ''
+
+  const handleSubmit = async () => {
+    if (!discoverySource) return
+    setIsSubmitting(true)
+    setError('')
+    setSubmitRetry(false)
+
+    try {
+      await api.post(
+        '/onboarding',
+        {
+          portfolio: portfolio || undefined,
+          website: website || undefined,
+          linkedin: linkedin || undefined,
+          instagram: instagram || undefined,
+          servicesOffered,
+          preferredLeadCategories,
+          outreachExperience,
+          discoverySource,
+        },
+      )
+      localStorage.removeItem('onboarding_step')
+      router.push('/pending-approval')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit onboarding')
+      setSubmitRetry(true)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const showOtpSkip = otpAttempts >= MAX_OTP_ATTEMPTS
+
+  return (
+    <main className="min-h-screen bg-bg-main flex flex-col items-center justify-center px-4 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-orange-deep),0.06)_0%,transparent_60%)] pointer-events-none" />
+
+      {step > 1 && (
+        <motion.button
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          onClick={() => setStep(step - 1)}
+          className="absolute top-8 left-8 z-20 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-white transition-colors group"
+        >
+          <ArrowLeftIcon className="w-[14px] h-[14px] group-hover:-translate-x-0.5 transition-transform" />
+          Back
+        </motion.button>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 w-full max-w-lg"
+      >
+        {/* Progress indicator */}
+        <div className="flex items-center justify-center gap-2 mb-10">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="flex items-center gap-2">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                  s < step
+                    ? 'bg-accent-mint text-black'
+                    : s === step
+                      ? 'bg-accent-mint text-white shadow-[0_0_16px_rgba(var(--rgb-orange-deep),0.3)]'
+                      : 'bg-white/5 text-text-secondary/40'
+                }`}
+              >
+                {s < step ? <CheckCircleIcon className="w-4 h-4" /> : s}
+              </div>
+              {s < 3 && (
+                <div
+                  className={`w-12 h-px transition-all duration-300 ${
+                    s < step ? 'bg-accent-mint' : 'bg-white/5'
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-3xl shadow-elevation-4 w-full p-8 md:p-10">
+          {showPhoneStep ? (
+            <div className="flex flex-col gap-5">
+              <div className="text-center mb-2">
+                <h2 className="text-lg font-bold text-text-primary tracking-tight">Add phone number (optional)</h2>
+                <p className="text-sm text-text-secondary mt-1">Secure your account with SMS verification</p>
+              </div>
+
+              <div id="recaptcha-container" />
+
+              {!confirmationResult ? (
+                <>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Phone number</label>
+                    <input
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                    />
+                  </div>
+
+                  {phoneError && (
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">{phoneError}</div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={phoneLoading || !phoneNumber.trim()}
+                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {phoneLoading ? (
+                      <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                    ) : (
+                      'Send OTP'
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSkipPhone}
+                    className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center"
+                  >
+                    Skip &mdash; I&apos;ll do this later
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">6-digit code</label>
+                    <input
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="000000"
+                      maxLength={6}
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3 text-center text-lg tracking-ultra"
+                    />
+                  </div>
+
+                  {phoneError && (
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">{phoneError}</div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleVerifyOtp}
+                    disabled={phoneLoading || verificationCode.length < 6}
+                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {phoneLoading ? (
+                      <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                    ) : (
+                      'Verify & Continue'
+                    )}
+                  </button>
+
+                  {otpCountdown > 0 ? (
+                    <p className="text-xs text-text-secondary/60 text-center">Resend code in {otpCountdown}s</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      className="text-xs text-accent-mint hover:text-accent-mint/80 transition-colors text-center flex items-center justify-center gap-1"
+                    >
+                      <ArrowPathIcon className="w-3 h-3" />
+                      Resend code
+                    </button>
+                  )}
+
+                  {showOtpSkip ? (
+                    <button
+                      type="button"
+                      onClick={handleSkipPhone}
+                      className="text-xs text-text-secondary/60 hover:text-text-secondary transition-colors text-center mt-1"
+                    >
+                      Skip &mdash; I&apos;ll do this later
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSkipPhone}
+                      className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center"
+                    >
+                      Skip &mdash; I&apos;ll do this later
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          ) : (
+          <AnimatePresence mode="wait">
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-center mb-8">
+                  <SparklesIcon className="w-8 h-8 text-accent-mint mx-auto mb-3" />
+                  <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+                    Let&apos;s set up your profile
+                  </h1>
+                  <p className="text-sm text-text-secondary mt-2">
+                    Optional links so leads know who they&apos;re talking to
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Portfolio URL
+                    </label>
+                    <input
+                      value={portfolio}
+                      onChange={(e) => setPortfolio(e.target.value)}
+                      placeholder="https://your-portfolio.com"
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Website
+                    </label>
+                    <input
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://your-company.com"
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      LinkedIn
+                    </label>
+                    <input
+                      value={linkedin}
+                      onChange={(e) => setLinkedin(e.target.value)}
+                      placeholder="https://linkedin.com/in/your-profile"
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Instagram
+                    </label>
+                    <input
+                      value={instagram}
+                      onChange={(e) => setInstagram(e.target.value)}
+                      placeholder="https://instagram.com/your-handle"
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setStep(2)}
+                  className="mt-8 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium"
+                >
+                  Continue
+                </button>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-center mb-8">
+                  <SparklesIcon className="w-8 h-8 text-accent-mint mx-auto mb-3" />
+                  <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+                    What do you offer?
+                  </h1>
+                  <p className="text-sm text-text-secondary mt-2">
+                    Help us match you with the right leads
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Services you offer
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {SERVICES.map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setServicesOffered(toggleArrayItem(servicesOffered, s))}
+                          className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all duration-200 ${
+                            servicesOffered.includes(s)
+                              ? 'bg-accent-mint/20 border-accent-mint/40 text-accent-mint'
+                              : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5'
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Preferred lead categories
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {LEAD_CATEGORIES.map((c) => (
+                        <button
+                          key={c}
+                          onClick={() => setPreferredLeadCategories(toggleArrayItem(preferredLeadCategories, c))}
+                          className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all duration-200 ${
+                            preferredLeadCategories.includes(c)
+                              ? 'bg-accent-mint/20 border-accent-mint/40 text-accent-mint'
+                              : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5'
+                          }`}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      Outreach experience
+                    </label>
+                    <select
+                      value={outreachExperience}
+                      onChange={(e) => setOutreachExperience(e.target.value)}
+                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                    >
+                      <option value="" disabled>
+                        Select your experience level
+                      </option>
+                      {EXPERIENCE_LEVELS.map((el) => (
+                        <option key={el.value} value={el.value}>
+                          {el.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setStep(3)}
+                  disabled={!canProceedFromStep2}
+                  className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-medium ${
+                    canProceedFromStep2
+                      ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)]'
+                      : 'bg-white/5 text-text-secondary/40 cursor-not-allowed'
+                  }`}
+                >
+                  Continue
+                </button>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="text-center mb-8">
+                  <SparklesIcon className="w-8 h-8 text-accent-mint mx-auto mb-3" />
+                  <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+                    Almost there!
+                  </h1>
+                  <p className="text-sm text-text-secondary mt-2">
+                    One last thing — how did you find us?
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {DISCOVERY_SOURCES.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setDiscoverySource(s)}
+                        className={`px-4 py-3 rounded-xl text-sm font-medium border transition-all duration-200 ${
+                          discoverySource === s
+                            ? 'bg-accent-mint/20 border-accent-mint/40 text-accent-mint'
+                            : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+
+                  {error && (
+                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+                      <ShieldExclamationIcon className="w-4 h-4 shrink-0" />
+                      <span>{error}</span>
+                      {submitRetry && (
+                        <button
+                          onClick={handleSubmit}
+                          className="ml-auto shrink-0 px-3 py-1 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 text-[11px] font-medium transition-colors"
+                        >
+                          Retry
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={!discoverySource || isSubmitting}
+                  className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-medium flex items-center justify-center gap-2 ${
+                    discoverySource && !isSubmitting
+                      ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)]'
+                      : 'bg-white/5 text-text-secondary/40 cursor-not-allowed'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    'Submit Application'
+                  )}
+                </button>
+
+                <p className="text-xs text-text-secondary/40 text-center mt-4">
+                  Your application will be reviewed by our team
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          )}
+        </div>
+      </motion.div>
+    </main>
+  )
+}

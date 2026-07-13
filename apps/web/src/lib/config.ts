@@ -12,13 +12,8 @@ export const config = {
     retries: 2,
   },
   app: {
-    url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com',
     name: 'Lead Hunter Club',
-  },
-  auth: {
-    secret: process.env.AUTH_SECRET || 'dev-secret',
-    tokenKey: 'lhc_auth_token',
-    refreshKey: 'lhc_refresh_token',
   },
   pagination: {
     defaultPageSize: 20,

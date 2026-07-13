@@ -9,15 +9,28 @@ generator client {
 }
 
 model User {
-  id                     String    @id // Clerk User ID (e.g., user_2d...)
+  id                     String    @id // Firebase Auth UID
   email                  String    @unique
   name                   String
+  phone                  String?
   role                   String    @default("user")
-  credits                Int       @default(200) // current available credits
-  emailVerified          DateTime? // Synced from Clerk
-  
-  // Subscription management (Stripe integration ready)
-  plan                   String    @default("FREE") // "FREE", "PRO", "ENTERPRISE"
+  emailVerified          DateTime?
+
+  // User status for approval workflow
+  status                 String    @default("PENDING") // "PENDING" | "ACTIVE" | "REJECTED" | "SUSPENDED"
+
+  // Onboarding information
+  portfolio              String?
+  website                String?
+  linkedin               String?
+  instagram              String?
+  servicesOffered        String[]
+  preferredLeadCategories String[]
+  outreachExperience     String?
+  discoverySource        String?
+
+  // Subscription management (Stripe → Razorpay migration future)
+  plan                   String    @default("FREE")
   stripeCustomerId       String?   @unique
   stripeSubscriptionId   String?   @unique
   stripePriceId          String?
@@ -26,7 +39,39 @@ model User {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
+  googleSheetId          String?
+  creditAccount          CreditAccount?
   leadStates             UserLeadState[]
+  auditLogs              AuditLog[]
+  adminNotes             AdminNote[]
+}
+
+model CreditAccount {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  subscriptionBalance Int     @default(0)
+  bonusBalance       Int      @default(0)
+  renewalDate        DateTime?
+
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("credit_accounts")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String   // Target user being acted upon
+  adminId    String   // Admin who performed the action
+  action     String   // 'STATUS_CHANGE' | 'CREDIT_CHANGE' | etc.
+  targetType String   // 'USER', 'LEAD', etc.
+  targetId   String   // Entity ID
+  details    Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Lead {
@@ -44,13 +89,13 @@ model Lead {
   mustHave         String
   nicheBonus       String
   buyerType        String
-  urgency          String          // "low", "medium", "high", "critical"
-  winProb          String          // "low", "medium", "high"
+  urgency          String
+  winProb          String
   nicheTags        String[]
   niches           String[]
   hashtags         String[]
   replyProbability Int
-  accent           String          // "mint", "purple", "cyan", "orange", "pink"
+  accent           String
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -63,7 +108,7 @@ model UserLeadState {
   leadId         String
   isSaved        Boolean   @default(false)
   isRevealed     Boolean   @default(false)
-  status         String    @default("new") // 'new' | 'saved' | 'drafting' | 'sent' | 'replied' | 'follow-up'
+  status         String    @default("new")
   revealedAt     DateTime?
   lastActionDate DateTime? @updatedAt
 
@@ -79,8 +124,38 @@ model EmailMessage {
   userLeadStateId String
   subject         String
   body            String
-  direction       String        // "outbound" | "inbound"
+  direction       String
   sentAt          DateTime      @default(now())
 
   userLeadState   UserLeadState @relation(fields: [userLeadStateId], references: [id], onDelete: Cascade)
+}
+
+model AdminNote {
+  id        String   @id @default(uuid())
+  userId    String
+  adminId   String
+  content   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_notes")
+}
+
+model CrmNote {
+  id        String   @id @default(uuid())
+  userId    String
+  leadId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CrmActivity {
+  id        String   @id @default(uuid())
+  userId    String
+  leadId    String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
 }

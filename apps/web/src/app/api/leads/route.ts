@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import { getPosts, getPost } from '@/lib/external-api/client'
+import type { ExternalPost } from '@/lib/external-api/client'
+import type { AppLead } from '@/types/lead'
 
-function formatTimeAgo(date: Date): string {
-  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
+function formatTimeAgo(dateStr: string): string {
+  const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000)
   if (seconds < 60) return 'Just now'
   const minutes = Math.floor(seconds / 60)
   if (minutes < 60) return `${minutes}m ago`
@@ -14,114 +17,96 @@ function formatTimeAgo(date: Date): string {
   return `${days}d ago`
 }
 
+function extractTags(post: ExternalPost): string[] {
+  const tags: string[] = []
+  if (post.keyword) tags.push(post.keyword.replace(/^watchlist:/, ''))
+  if (post.platform) tags.push(post.platform)
+  return tags
+}
+
+function externalPostToAppLead(post: ExternalPost, userState?: { isSaved: boolean; isRevealed: boolean; status: string } | null): AppLead {
+  const isRevealed = userState?.isRevealed || false
+  const phone = post.contact_info?.phone_numbers?.[0]?.number || null
+  const email = post.email || post.contact_info?.emails?.[0]?.email || ''
+
+  return {
+    id: post.id,
+    name: isRevealed ? (post.author?.name || 'Unknown') : 'Unlocked Contact',
+    email: isRevealed ? email : 'unlocked@leadhunterclub.com',
+    company: post.contact_info?.company_name || post.author?.name || post.platform || '',
+    source: post.platform || 'Unknown',
+    category: post.keyword?.replace(/^watchlist:/, '') || post.platform || 'General',
+    title: post.author?.info || post.keyword || post.platform || 'Lead Signal',
+    signalContext: post.content || '',
+    role: post.author?.info || '',
+    taskScope: '',
+    mustHave: '',
+    nicheBonus: '',
+    buyerType: '',
+    urgency: 'medium',
+    winProb: 'medium',
+    nicheTags: extractTags(post),
+    niches: [],
+    hashtags: [],
+    replyProbability: Math.max(post.ai_score || 0, 60),
+    accent: 'mint',
+    status: (userState?.status || 'new') as AppLead['status'],
+    timestamp: post.posted_at?.postedAgoShort || formatTimeAgo(post.created_at),
+    isSaved: userState?.isSaved || false,
+    isRevealed,
+    hasPhone: !!phone,
+    phone,
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
-    if (!userId && false) {
-      return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
-      )
-    }
-
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
     const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
     const saved = searchParams.get('saved')
     const search = searchParams.get('search')
     const page = parseInt(searchParams.get('page') || '1', 10)
     const pageSize = parseInt(searchParams.get('pageSize') || '20', 10)
 
-    const whereClause: any = {}
+    const externalRes = await getPosts({ page, perPage: pageSize })
 
-    // Status filter (user-specific state)
-    if (status && status !== 'all') {
-      if (status === 'new') {
-        whereClause.OR = [
-          { userStates: { none: { userId } } },
-          { userStates: { some: { userId, status: 'new' } } },
-        ]
-      } else {
-        whereClause.userStates = {
-          some: { userId, status },
-        }
-      }
-    }
+    const externalLeads = externalRes.data
 
-    // Saved state filter
+    const leadIds = externalLeads.map(l => l.id)
+    const userStates = leadIds.length > 0
+      ? await db.userLeadState.findMany({
+          where: {
+            userId,
+            leadId: { in: leadIds },
+          },
+        })
+      : []
+
+    const stateMap = new Map(userStates.map(s => [s.leadId, s]))
+
+    let data = externalLeads.map(lead => externalPostToAppLead(lead, stateMap.get(lead.id)))
+
     if (saved === 'true') {
-      whereClause.userStates = {
-        some: { userId, isSaved: true },
-      }
+      data = data.filter(l => l.isSaved)
     } else if (saved === 'outreach') {
-      whereClause.userStates = {
-        some: {
-          userId,
-          status: { in: ['drafting', 'sent', 'replied', 'follow-up'] },
-        },
-      }
+      data = data.filter(l => ['drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
+    } else {
+      data = data.filter(l => l.status === 'new')
     }
 
-    // Search filter
     if (search) {
-      const q = search
-      whereClause.OR = [
-        { title: { contains: q, mode: 'insensitive' } },
-        { company: { contains: q, mode: 'insensitive' } },
-        { signalContext: { contains: q, mode: 'insensitive' } },
-        { category: { contains: q, mode: 'insensitive' } },
-      ]
+      const q = search.toLowerCase()
+      data = data.filter(l =>
+        l.title.toLowerCase().includes(q) ||
+        l.signalContext.toLowerCase().includes(q) ||
+        l.company.toLowerCase().includes(q) ||
+        l.category.toLowerCase().includes(q) ||
+        l.nicheTags.some(tag => tag.toLowerCase().includes(q))
+      )
     }
 
-    // Paginate and query
-    const total = await db.lead.count({ where: whereClause })
-    const leads = await db.lead.findMany({
-      where: whereClause,
-      include: {
-        userStates: {
-          where: { userId },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    })
-
-    // Process and merge user state, and redact locked contact info
-    const data = leads.map((lead) => {
-      const state = lead.userStates[0] // Since we filtered by userId, there will be at most 1 state
-      const isSaved = state?.isSaved || false
-      const isRevealed = state?.isRevealed || false
-      const leadStatus = state?.status || 'new'
-
-      return {
-        id: lead.id,
-        name: isRevealed ? lead.name : 'Unlocked Contact',
-        email: isRevealed ? lead.email : 'unlocked@leadhunterclub.com',
-        company: lead.company,
-        source: lead.source,
-        category: lead.category,
-        title: lead.title,
-        signalContext: lead.signalContext,
-        role: lead.role,
-        taskScope: lead.taskScope,
-        mustHave: lead.mustHave,
-        nicheBonus: lead.nicheBonus,
-        buyerType: lead.buyerType,
-        urgency: lead.urgency,
-        winProb: lead.winProb,
-        nicheTags: lead.nicheTags,
-        niches: lead.niches,
-        hashtags: lead.hashtags,
-        replyProbability: lead.replyProbability,
-        accent: lead.accent,
-        status: leadStatus,
-        isSaved,
-        isRevealed,
-        hasPhone: lead.phone !== null && lead.phone !== '',
-        timestamp: formatTimeAgo(lead.createdAt),
-      }
-    })
-
+    const total = externalRes.total || data.length
     const totalPages = Math.ceil(total / pageSize)
 
     return NextResponse.json({
@@ -135,7 +120,13 @@ export async function GET(request: NextRequest) {
         hasPrev: page > 1,
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
     console.error('[Leads API] GET error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve leads' },
@@ -144,49 +135,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST endpoint (e.g. for manually adding leads)
-export async function POST(request: NextRequest) {
-  try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
-    if (!userId && false) {
-      return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
-      )
-    }
-
-    const body = await request.json()
-
-    const lead = await db.lead.create({
-      data: {
-        name: body.name || 'Unknown',
-        email: body.email || '',
-        company: body.company || '',
-        source: body.source || 'Manual',
-        category: body.category || 'General',
-        title: body.title || '',
-        signalContext: body.signalContext || '',
-        role: body.role || '',
-        taskScope: body.taskScope || '',
-        mustHave: body.mustHave || '',
-        nicheBonus: body.nicheBonus || '',
-        buyerType: body.buyerType || '',
-        urgency: body.urgency || 'medium',
-        winProb: body.winProb || 'medium',
-        nicheTags: body.nicheTags || [],
-        niches: body.niches || [],
-        hashtags: body.hashtags || [],
-        replyProbability: Math.floor(Math.random() * 30) + 60,
-        accent: (['mint', 'purple', 'cyan', 'orange', 'pink'] as const)[Math.floor(Math.random() * 5)],
-      },
-    })
-
-    return NextResponse.json({ data: lead }, { status: 201 })
-  } catch (error) {
-    console.error('[Leads API] POST error:', error)
-    return NextResponse.json(
-      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to create lead' },
-      { status: 500 },
-    )
-  }
+export async function POST() {
+  return NextResponse.json(
+    { code: 'READ_ONLY', message: 'Lead creation is not supported. Leads are read-only from external source.' },
+    { status: 400 },
+  )
 }

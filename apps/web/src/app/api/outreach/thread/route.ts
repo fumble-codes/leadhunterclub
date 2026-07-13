@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
-    if (!userId && false) {
-      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
-    }
-
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
     const searchParams = request.nextUrl.searchParams
     const leadId = searchParams.get('leadId')
 
@@ -34,7 +31,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: userState?.emails || [] })
 
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
     console.error('[Thread API Error]', error)
     return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to fetch thread' }, { status: 500 })
   }

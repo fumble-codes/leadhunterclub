@@ -1,4 +1,5 @@
 export { leadsService } from './leads'
 export { dashboardService } from './dashboard'
-export { authService } from './auth'
+export { auditService } from './audit'
+export { creditService, InsufficientCreditsError } from './credits'
 export type { LeadListParams } from './leads'

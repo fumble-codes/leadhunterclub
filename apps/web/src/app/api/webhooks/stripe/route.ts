@@ -2,23 +2,43 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { db } from '@/lib/db'
+import { creditService } from '@/lib/services/credits'
+import { getPlanCredits } from '@/lib/config/plans'
 
-// Stripe SDK initialization
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'dummy_stripe_key', {
-  apiVersion: '2024-04-10' as any, // Stable Next API version compatible
-})
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) {
+    throw new Error('STRIPE_SECRET_KEY environment variable is required')
+  }
+  return new Stripe(key, { apiVersion: '2024-04-10' as any })
+}
 
-const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!
+function getWebhookSecret() {
+  return process.env.STRIPE_WEBHOOK_SECRET
+}
 
-// Plan credit allocations
-const PLAN_CREDITS: Record<string, number> = {
-  FREE: 200,
-  PRO: 1000,
-  ENTERPRISE: 10000,
+async function isEventProcessed(eventId: string): Promise<boolean> {
+  const existing = await db.auditLog.findFirst({
+    where: { action: 'WEBHOOK_PROCESSED', targetId: eventId },
+  })
+  return !!existing
+}
+
+async function markEventProcessed(eventId: string, eventType: string) {
+  await db.auditLog.create({
+    data: {
+      userId: 'system',
+      adminId: 'system',
+      action: 'WEBHOOK_PROCESSED',
+      targetType: 'STRIPE_EVENT',
+      targetId: eventId,
+      details: { eventType },
+    },
+  })
 }
 
 export async function POST(req: Request) {
-  const body = await req.text() // raw body required for signature check
+  const body = await req.text()
   const headerList = headers()
   const signature = headerList.get('stripe-signature')
 
@@ -26,21 +46,25 @@ export async function POST(req: Request) {
     return new NextResponse('Missing stripe-signature header', { status: 400 })
   }
 
-  if (!WEBHOOK_SECRET) {
-    console.error('[Stripe Webhook] Missing STRIPE_WEBHOOK_SECRET environment variable.')
+  const webhookSecret = getWebhookSecret()
+  if (!webhookSecret) {
+    console.error('[Stripe Webhook] Missing STRIPE_WEBHOOK_SECRET.')
     return new NextResponse('Stripe Webhook Secret not configured', { status: 500 })
   }
 
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, WEBHOOK_SECRET)
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err: any) {
     console.error(`[Stripe Webhook] Signature verification failed: ${err.message}`)
-    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 })
+    return new NextResponse('Webhook signature verification failed', { status: 400 })
   }
 
-  console.log(`[Stripe Webhook] Received event: ${event.type}`)
+  const alreadyProcessed = await isEventProcessed(event.id)
+  if (alreadyProcessed) {
+    return new NextResponse('Webhook processed successfully (duplicate)', { status: 200 })
+  }
 
   try {
     switch (event.type) {
@@ -50,17 +74,14 @@ export async function POST(req: Request) {
         const customerId = session.customer as string
         const subscriptionId = session.subscription as string
 
-        if (!userId && false) {
-          console.warn('[Stripe Webhook] checkout.session.completed received without client_reference_id (userId)')
+        if (!userId) {
+          console.warn('[Stripe Webhook] checkout.session.completed received without client_reference_id')
           break
         }
 
-        // Fetch subscription info from Stripe to get price/period details
-        const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as any
+        const subscription = (await getStripe().subscriptions.retrieve(subscriptionId)) as any
         const priceId = subscription.items.data[0]?.price.id
-
-        // Map priceId to our local plan names
-        const plan = 'PRO' 
+        const plan = 'FREELANCER'
 
         await db.user.update({
           where: { id: userId },
@@ -70,10 +91,25 @@ export async function POST(req: Request) {
             stripeSubscriptionId: subscriptionId,
             stripePriceId: priceId,
             stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-            credits: PLAN_CREDITS[plan] || 1000, // credit refill upon upgrade
           },
         })
-        console.log(`[Stripe Webhook] Successfully initialized subscription for user: ${userId}`)
+
+        const account = await db.creditAccount.findUnique({ where: { userId } })
+        if (account) {
+          await creditService.assignPlan(userId, plan)
+        } else {
+          const limit = getPlanCredits(plan)
+          const renewalDate = new Date()
+          renewalDate.setDate(renewalDate.getDate() + 30)
+          await db.creditAccount.create({
+            data: {
+              userId,
+              subscriptionBalance: limit,
+              bonusBalance: 0,
+              renewalDate,
+            },
+          })
+        }
         break
       }
 
@@ -82,21 +118,20 @@ export async function POST(req: Request) {
         const subscriptionId = invoice.subscription as string
 
         if (subscriptionId) {
-          const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as any
+          const subscription = (await getStripe().subscriptions.retrieve(subscriptionId)) as any
           const user = await db.user.findUnique({
             where: { stripeSubscriptionId: subscriptionId },
           })
 
           if (user) {
-            const plan = user.plan
             await db.user.update({
               where: { id: user.id },
               data: {
                 stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                credits: PLAN_CREDITS[plan] || 1000, // Refill credits on successful payment cycle
               },
             })
-            console.log(`[Stripe Webhook] Refilled credits for user: ${user.id} on invoice payment success`)
+
+            await creditService.renewSubscription(user.id)
           }
         }
         break
@@ -117,7 +152,7 @@ export async function POST(req: Request) {
               stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
             },
           })
-          console.log(`[Stripe Webhook] Updated subscription status for user: ${user.id}`)
+
         }
         break
       }
@@ -136,17 +171,19 @@ export async function POST(req: Request) {
               stripeSubscriptionId: null,
               stripePriceId: null,
               stripeCurrentPeriodEnd: null,
-              credits: 200, // Demote back to free starter credits
             },
           })
-          console.log(`[Stripe Webhook] Cancelled subscription and demoted user: ${user.id}`)
+
+          await creditService.assignPlan(user.id, 'FREE')
         }
         break
       }
     }
+
+    await markEventProcessed(event.id, event.type)
   } catch (err: any) {
     console.error(`[Stripe Webhook] Error processing event: ${err.message}`)
-    return new NextResponse(`Webhook Handler Error: ${err.message}`, { status: 500 })
+    return new NextResponse('Webhook processing failed', { status: 500 })
   }
 
   return new NextResponse('Webhook processed successfully', { status: 200 })

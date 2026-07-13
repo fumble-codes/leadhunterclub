@@ -16,6 +16,7 @@
     "ws": "^8.20.1"
   },
   "dependencies": {
-    "@heroicons/react": "^2.2.0"
+    "@heroicons/react": "^2.2.0",
+    "firebase": "^12.15.0"
   }
 }

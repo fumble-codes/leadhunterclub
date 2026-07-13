@@ -1,0 +1,89 @@
+'use client'
+
+import { usePathname, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
+import { useEffect } from 'react'
+import {
+  HomeIcon,
+  UsersIcon,
+  CurrencyDollarIcon,
+  ArrowLeftOnRectangleIcon,
+} from '@heroicons/react/24/solid'
+
+const adminNav = [
+  { name: 'Dashboard', href: '/admin', icon: HomeIcon },
+  { name: 'Users', href: '/admin/users', icon: UsersIcon },
+  { name: 'Credits', href: '/admin/credits', icon: CurrencyDollarIcon },
+]
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user, loading, logout } = useAuth()
+
+  useEffect(() => {
+    if (loading) return
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    if (user.status === 'SUSPENDED' || user.status === 'REJECTED') {
+      router.push('/pending-approval')
+      return
+    }
+    if (user.role !== 'admin') {
+      router.push('/dashboard')
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg-main flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user || user.role !== 'admin' || user.status === 'SUSPENDED' || user.status === 'REJECTED') return null
+
+  return (
+    <div className="min-h-screen bg-bg-main flex">
+      <aside className="w-64 border-r border-white/[0.06] bg-surface/30 p-6 flex flex-col">
+        <Link href="/admin" className="text-lg font-bold text-text-primary tracking-tight mb-8">
+          Admin Panel
+        </Link>
+
+        <nav className="flex flex-col gap-1 flex-1">
+          {adminNav.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'bg-accent-mint/10 text-accent-mint border border-accent-mint/20'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
+                }`}
+              >
+                <item.icon className="w-4 h-4" />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <button
+          onClick={() => logout()}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-all duration-200"
+        >
+          <ArrowLeftOnRectangleIcon className="w-4 h-4" />
+          Sign Out
+        </button>
+      </aside>
+
+      <main className="flex-1 overflow-y-auto p-8">{children}</main>
+    </div>
+  )
+}

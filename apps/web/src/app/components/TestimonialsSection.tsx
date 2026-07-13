@@ -350,7 +350,7 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 block text-text-secondary/40">
+          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
             Customer Reviews
           </span>
         </motion.div>
@@ -464,7 +464,7 @@ export default function TestimonialsSection() {
               >
                 {/* Accent glow */}
                 <div
-                  className="absolute top-0 right-0 w-28 h-28 blur-[60px] rounded-full pointer-events-none opacity-25"
+                  className="absolute top-0 right-0 w-28 h-28 blur-xl rounded-full pointer-events-none opacity-25"
                   style={{ background: `var(--color-${active.accentToken})` }}
                 />
 

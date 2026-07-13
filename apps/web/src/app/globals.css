@@ -58,11 +58,11 @@
   }
 
   .hero-glow {
-    background: radial-gradient(circle at 50% 50%, rgba(var(--rgb-crimson), 0.08) 0%, transparent 60%);
+    background: radial-gradient(circle at 50% 50%, rgba(var(--rgb-accent-mint), 0.08) 0%, transparent 60%);
   }
 
   .accent-glow-mint {
-    box-shadow: 0 0 40px -10px rgba(var(--rgb-crimson), 0.3);
+    box-shadow: 0 0 40px -10px rgba(var(--rgb-accent-mint), 0.3);
   }
 
   .rim-light {
@@ -122,57 +122,73 @@
   }
 
   .glow-purple-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.01) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.01) 0%, transparent 70%);
   }
   .glow-purple-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.015) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.015) 0%, transparent 70%);
   }
   .glow-purple-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.02) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.02) 0%, transparent 70%);
   }
   .glow-purple-medium {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.03) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.03) 0%, transparent 70%);
   }
   .glow-purple-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.04) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.04) 0%, transparent 70%);
   }
   .glow-purple-intense {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-purple), 0.05) 0%, transparent 70%);
   }
 
   .glow-cyan-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.02) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-cyan), 0.02) 0%, transparent 70%);
   }
   .glow-cyan-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-cyan), 0.04) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-cyan), 0.04) 0%, transparent 70%);
   }
 
   .glow-mint-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-crimson), 0.015) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-mint), 0.015) 0%, transparent 70%);
   }
   .glow-mint-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-crimson), 0.03) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-mint), 0.03) 0%, transparent 70%);
   }
   .glow-mint-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-crimson), 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-mint), 0.25) 0%, transparent 70%);
   }
 
   .glow-pink-very-faint {
-    background: radial-gradient(circle at center, rgba(var(--rgb-crimson), 0.015) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-pink), 0.015) 0%, transparent 70%);
   }
   .glow-pink-soft {
-    background: radial-gradient(circle at center, rgba(var(--rgb-crimson), 0.02) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-pink), 0.02) 0%, transparent 70%);
   }
   .glow-pink-strong {
-    background: radial-gradient(circle at center, rgba(var(--rgb-crimson), 0.04) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-pink), 0.04) 0%, transparent 70%);
+  }
+
+  .glow-orange-very-faint {
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-orange), 0.015) 0%, transparent 70%);
+  }
+  .glow-orange-soft {
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-orange), 0.02) 0%, transparent 70%);
+  }
+  .glow-orange-strong {
+    background: radial-gradient(circle at center, rgba(var(--rgb-accent-orange), 0.04) 0%, transparent 70%);
   }
 }
 
-.bg-accent-mint-strong { background-color: rgba(var(--rgb-crimson), 0.12); }
-.bg-accent-purple-strong { background-color: rgba(var(--rgb-cyan), 0.12); }
+.bg-accent-mint-strong { background-color: rgba(var(--rgb-accent-mint), 0.12); }
+.bg-accent-purple-strong { background-color: rgba(var(--rgb-accent-purple), 0.12); }
+.bg-accent-cyan-strong { background-color: rgba(var(--rgb-accent-cyan), 0.12); }
+.bg-accent-orange-strong { background-color: rgba(var(--rgb-accent-orange), 0.12); }
+.bg-accent-pink-strong { background-color: rgba(var(--rgb-accent-pink), 0.12); }
 
-.glow-accent { box-shadow: 0 0 30px rgba(var(--rgb-crimson), 0.3); }
-.glow-accent[data-color="purple"] { box-shadow: 0 0 30px rgba(var(--rgb-cyan), 0.3); }
+.glow-accent { box-shadow: 0 0 30px rgba(var(--rgb-accent-mint), 0.3); }
+.glow-accent[data-color="purple"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-purple), 0.3); }
+.glow-accent[data-color="cyan"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-cyan), 0.3); }
+.glow-accent[data-color="orange"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-orange), 0.3); }
+.glow-accent[data-color="pink"] { box-shadow: 0 0 30px rgba(var(--rgb-accent-pink), 0.3); }
 
 .bg-gradient-primary { background: linear-gradient(to bottom right, var(--accent-mint), var(--accent-purple)); }
 

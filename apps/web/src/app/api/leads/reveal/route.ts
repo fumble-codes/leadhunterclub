@@ -1,40 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import { claimPost, getPost } from '@/lib/external-api/client'
+import { leadRevealSchema } from '@/lib/validators/auth'
+import { rateLimitByKey } from '@/lib/rate-limit'
+import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 
 export async function POST(request: NextRequest) {
   try {
-    let { userId } = await auth(); userId = userId || 'demo_user_123'
-    if (!userId && false) {
+    const authUser = await requireActiveUser(request)
+    const userId = authUser.uid
+
+    const rl = await rateLimitByKey(`user:${userId}:reveal`, 30, 60_000)
+    if (!rl.allowed) {
       return NextResponse.json(
-        { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        { status: 401 },
+        { code: 'RATE_LIMITED', message: 'Too many requests. Please try again later.' },
+        { status: 429 },
       )
     }
-
     const body = await request.json()
-    const { leadId } = body
-
-    if (!leadId) {
+    const parsed = leadRevealSchema.safeParse(body)
+    if (!parsed.success) {
       return NextResponse.json(
-        { code: 'BAD_REQUEST', message: 'Missing leadId' },
+        { code: 'VALIDATION_ERROR', message: 'Invalid request', details: parsed.error.flatten().fieldErrors },
         { status: 400 },
       )
     }
 
-    // 1. Fetch the lead to make sure it exists
-    const lead = await db.lead.findUnique({
-      where: { id: leadId },
-    })
+    const { leadId } = parsed.data
 
-    if (!lead) {
-      return NextResponse.json(
-        { code: 'NOT_FOUND', message: 'Lead not found' },
-        { status: 404 },
-      )
-    }
+    const externalLead = await getPost(leadId)
 
-    // 2. Check if the user has already revealed this lead
     const existingState = await db.userLeadState.findUnique({
       where: {
         userId_leadId: {
@@ -45,45 +41,24 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingState?.isRevealed) {
-      // Already unlocked, return direct contact details immediately
       return NextResponse.json({
         success: true,
         isRevealed: true,
-        name: lead.name,
-        email: lead.email,
-        phone: lead.phone,
+        name: externalLead.author?.name || 'Unknown',
+        email: externalLead.email || externalLead.contact_info?.emails?.[0]?.email || '',
+        phone: externalLead.contact_info?.phone_numbers?.[0]?.number || null,
       })
     }
 
-    // 3. Atomically check credits and deduct them in a transaction
-    const hasPhone = lead.phone !== null && lead.phone !== ''
+    const phone = externalLead.contact_info?.phone_numbers?.[0]?.number || null
+    const hasPhone = !!phone
     const CREDIT_COST = hasPhone ? 5 : 3
 
     const txResult = await db.$transaction(async (tx) => {
-      // Fetch user profile with lock
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-      })
+      const result = await creditService.deductInTx(tx, userId, CREDIT_COST, 'lead_reveal', { leadId })
 
-      if (!user) {
-        throw new Error('User record not found')
-      }
+      const claimedLead = await claimPost(leadId)
 
-      if (user.credits < CREDIT_COST) {
-        throw new Error(`Insufficient credits. Required: ${CREDIT_COST}, Available: ${user.credits}`)
-      }
-
-      // Deduct credits
-      const updatedUser = await tx.user.update({
-        where: { id: userId },
-        data: {
-          credits: {
-            decrement: CREDIT_COST,
-          },
-        },
-      })
-
-      // Upsert the revealed state
       const updatedState = await tx.userLeadState.upsert({
         where: {
           userId_leadId: {
@@ -100,36 +75,48 @@ export async function POST(request: NextRequest) {
           leadId,
           isRevealed: true,
           revealedAt: new Date(),
-          status: 'new', // Default status
+          status: 'new',
         },
       })
 
+      const revealedEmail = claimedLead.email || claimedLead.contact_info?.emails?.[0]?.email || ''
+      const revealedPhone = claimedLead.contact_info?.phone_numbers?.[0]?.number || null
+
       return {
-        creditsRemaining: updatedUser.credits,
+        creditsRemaining: result.subscriptionBalance + result.bonusBalance,
         state: updatedState,
+        name: claimedLead.author?.name || 'Unknown',
+        email: revealedEmail,
+        phone: revealedPhone,
       }
     })
 
-    console.log(`[Lead Reveal] User ${userId} successfully spent ${CREDIT_COST} credits to reveal lead: ${leadId}`)
-
-    // 4. Return the unlocked details
     return NextResponse.json({
       success: true,
       isRevealed: true,
-      name: lead.name,
-      email: lead.email,
-      phone: lead.phone,
+      name: txResult.name,
+      email: txResult.email,
+      phone: txResult.phone,
       creditsRemaining: txResult.creditsRemaining,
     })
-  } catch (error: any) {
-    console.error('[Lead Reveal API] Error:', error.message)
-    const isInsufficient = error.message.includes('Insufficient credits')
+  } catch (error: unknown) {
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
+    }
+    if (error instanceof InactiveUserError) {
+      return NextResponse.json({ code: 'INACTIVE', message: 'Your account is not active' }, { status: 403 })
+    }
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json(
+        { code: 'INSUFFICIENT_CREDITS', message: 'Insufficient credits to reveal lead', required: error.required },
+        { status: 400 },
+      )
+    }
+    const errMsg = error instanceof Error ? error.message : 'Failed to reveal lead contact info'
+    console.error('[Lead Reveal API] Error:', errMsg)
     return NextResponse.json(
-      { 
-        code: isInsufficient ? 'INSUFFICIENT_CREDITS' : 'INTERNAL_SERVER_ERROR', 
-        message: error.message || 'Failed to reveal lead contact info' 
-      },
-      { status: isInsufficient ? 400 : 500 },
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to reveal lead contact info' },
+      { status: 500 },
     )
   }
 }

@@ -1,14 +1,24 @@
-export type AuthProvider = 'google' | 'github' | 'email'
+export type AuthProvider = 'google' | 'github' | 'email' | 'phone'
 
 export type UserRole = 'admin' | 'user'
+
+export type UserStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'SUSPENDED'
+
+export interface CreditAccountInfo {
+  subscriptionBalance: number
+  bonusBalance: number
+  total: number
+  renewalDate: string | null
+}
 
 export interface User {
   id: string
   email: string
   name: string
+  phone?: string | null
   avatarUrl?: string
   role: UserRole
-  credits: number
+  creditAccount: CreditAccountInfo
   provider: AuthProvider
   emailVerified: string | null
   plan: string
@@ -16,34 +26,8 @@ export interface User {
   stripeSubscriptionId?: string | null
   stripePriceId?: string | null
   stripeCurrentPeriodEnd?: string | null
+  status?: string
+  hasCompletedOnboarding?: boolean
   createdAt: string
   updatedAt: string
-}
-
-export interface AuthSession {
-  user: User
-  accessToken: string
-  refreshToken: string
-  expiresAt: string
-}
-
-export interface LoginInput {
-  email: string
-  password: string
-}
-
-export interface RegisterInput {
-  name: string
-  email: string
-  password: string
-}
-
-export interface AuthResponse {
-  session: AuthSession
-}
-
-export interface TokenBalance {
-  remaining: number
-  total: number
-  percentageUsed: number
 }
