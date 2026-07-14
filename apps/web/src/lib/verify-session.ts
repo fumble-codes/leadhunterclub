@@ -44,7 +44,21 @@ async function getPublicKey(kid: string): Promise<JsonWebKey | null> {
   return kidKey ?? null
 }
 
+export interface FirebaseIdToken {
+  uid: string
+  email?: string
+  name?: string
+  phone_number?: string
+  picture?: string
+}
+
 export async function verifySession(token: string): Promise<{ uid: string } | null> {
+  const decoded = await verifyFirebaseToken(token)
+  if (!decoded) return null
+  return { uid: decoded.uid }
+}
+
+export async function verifyFirebaseToken(token: string): Promise<FirebaseIdToken | null> {
   try {
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
     if (!projectId) return null
@@ -55,7 +69,7 @@ export async function verifySession(token: string): Promise<{ uid: string } | nu
     const header = parseJwtPart(parts[0])
     if (!header?.kid || typeof header.kid !== 'string') return null
 
-    const payload = parseJwtPart(parts[1])
+    const payload = parseJwtPart(parts[1]) as Record<string, unknown> | null
     if (!payload?.sub || typeof payload.sub !== 'string') return null
     if (!payload.exp || Date.now() / 1000 > (payload.exp as number)) return null
     if (payload.aud !== projectId) return null
@@ -84,7 +98,13 @@ export async function verifySession(token: string): Promise<{ uid: string } | nu
 
     if (!isValid) return null
 
-    return { uid: payload.sub }
+    return {
+      uid: payload.sub,
+      email: typeof payload.email === 'string' ? payload.email : undefined,
+      name: typeof payload.name === 'string' ? payload.name : undefined,
+      phone_number: typeof payload.phone_number === 'string' ? payload.phone_number : undefined,
+      picture: typeof payload.picture === 'string' ? payload.picture : undefined,
+    }
   } catch {
     return null
   }
