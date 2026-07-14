@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const results: Record<string, unknown> = {
+  const results: any = {
     env: {
       FIREBASE_SERVICE_ACCOUNT_KEY_exists: !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY,
       FIREBASE_SERVICE_ACCOUNT_KEY_length: process.env.FIREBASE_SERVICE_ACCOUNT_KEY?.length ?? 0,
