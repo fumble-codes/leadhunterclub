@@ -43,7 +43,8 @@ async function getAdminAuth(): Promise<Auth | null> {
 
     adminAuthInstance = getAuth(app)
     return adminAuthInstance
-  } catch {
+  } catch (err) {
+    console.error('[Firebase Admin] Failed to initialize:', err instanceof Error ? err.message : err)
     return null
   }
 }
@@ -56,7 +57,10 @@ export async function getAdminAuthInstance() {
 
 export async function verifyIdToken(token: string) {
   const authInstance = await getAdminAuth()
-  if (!authInstance) return null
+  if (!authInstance) {
+    console.error('[Firebase Admin] verifyIdToken: no auth instance (getAdminAuth returned null)')
+    return null
+  }
 
   try {
     const decoded = await authInstance.verifyIdToken(token)
@@ -70,7 +74,8 @@ export async function verifyIdToken(token: string) {
     }
 
     return decoded
-  } catch {
+  } catch (err) {
+    console.error('[Firebase Admin] verifyIdToken failed:', err instanceof Error ? err.message : err)
     return null
   }
 }
