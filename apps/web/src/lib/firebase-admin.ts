@@ -7,6 +7,7 @@ let adminAuthInstance: Auth | null = null
 
 function loadServiceAccount(): ServiceAccount {
   const jsonFromEnv = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
+  console.error('[FB] KEY exists=' + !!jsonFromEnv + ' len=' + (jsonFromEnv?.length ?? 0))
   if (jsonFromEnv) {
     try {
       return JSON.parse(jsonFromEnv) as ServiceAccount
@@ -44,7 +45,8 @@ async function getAdminAuth(): Promise<Auth | null> {
     adminAuthInstance = getAuth(app)
     return adminAuthInstance
   } catch (err) {
-    console.error('[Firebase Admin] Failed to initialize:', err instanceof Error ? err.message : err)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[FB] init fail: ' + msg)
     return null
   }
 }
@@ -58,7 +60,7 @@ export async function getAdminAuthInstance() {
 export async function verifyIdToken(token: string) {
   const authInstance = await getAdminAuth()
   if (!authInstance) {
-    console.error('[Firebase Admin] verifyIdToken: no auth instance (getAdminAuth returned null)')
+    console.error('[FB] verify: no auth instance')
     return null
   }
 
@@ -67,15 +69,14 @@ export async function verifyIdToken(token: string) {
 
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
     if (projectId && decoded.aud !== projectId) {
-      console.error(
-        `[Firebase Admin] Token aud claim "${decoded.aud}" does not match project ID "${projectId}". Cross-project token reuse detected.`,
-      )
+      console.error('[FB] aud mismatch: token=' + decoded.aud + ' expect=' + projectId)
       return null
     }
 
     return decoded
   } catch (err) {
-    console.error('[Firebase Admin] verifyIdToken failed:', err instanceof Error ? err.message : err)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[FB] verify fail: ' + msg)
     return null
   }
 }
