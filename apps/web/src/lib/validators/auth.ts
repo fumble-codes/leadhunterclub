@@ -10,13 +10,17 @@ export const adminUserActionSchema = z
     plan: z.enum(['FREE', 'FREELANCER', 'AGENCY']).optional(),
     bonusCredits: z.number().int().min(0).optional(),
     changePlan: z.enum(['FREE', 'FREELANCER', 'AGENCY']).optional(),
+    tags: z.array(z.string()).optional(),
   })
   .refine(
     (data) =>
-      data.action !== undefined || data.bonusCredits !== undefined || data.changePlan !== undefined,
+      data.action !== undefined ||
+      data.bonusCredits !== undefined ||
+      data.changePlan !== undefined ||
+      data.tags !== undefined,
     {
       message:
-        'Provide action (APPROVE/REJECT/SUSPEND/ACTIVATE/RENEW_NOW), bonusCredits, or changePlan',
+        'Provide action (APPROVE/REJECT/SUSPEND/ACTIVATE/RENEW_NOW), bonusCredits, changePlan, or tags',
     },
   )
 

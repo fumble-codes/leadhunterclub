@@ -9,6 +9,7 @@ import {
   UsersIcon,
   CurrencyDollarIcon,
   ClockIcon,
+  UserGroupIcon,
   ArrowLeftOnRectangleIcon,
 } from '@heroicons/react/24/solid'
 
@@ -16,6 +17,7 @@ const adminNav = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Review', href: '/admin/review', icon: ClockIcon },
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
+  { name: 'Contacts', href: '/admin/contacts', icon: UserGroupIcon },
   { name: 'Credits', href: '/admin/credits', icon: CurrencyDollarIcon },
 ]
 

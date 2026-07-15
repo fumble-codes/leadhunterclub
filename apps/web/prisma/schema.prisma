@@ -32,6 +32,7 @@ model User {
   preferredLeadCategories String[] @default([])
   outreachExperience     String?
   discoverySource        String?
+  tags                   String[] @default([])
 
   // Subscription management (Stripe → Razorpay migration future)
   plan                   String    @default("FREE")

@@ -16,15 +16,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const user = await db.user.findUnique({
       where: { id: targetUserId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        status: true,
-        plan: true,
-        portfolio: true,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+          role: true,
+          status: true,
+          plan: true,
+          tags: true,
+          portfolio: true,
         website: true,
         linkedin: true,
         instagram: true,
@@ -257,6 +258,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           },
         },
       })
+    }
+
+    if (body.tags !== undefined) {
+      await db.user.update({
+        where: { id: targetUserId },
+        data: { tags: body.tags },
+      })
+      return NextResponse.json({ data: { id: targetUserId, tags: body.tags } })
     }
 
     if (body.changePlan !== undefined) {

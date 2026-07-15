@@ -19,6 +19,7 @@ interface ReviewUser {
   id: string
   email: string
   name: string
+  phone: string | null
   role: string
   status: string
   plan: string
@@ -143,9 +144,14 @@ export default function AdminReviewPage() {
                     </div>
                     <p className="text-sm text-text-secondary mt-0.5 ml-6">{u.email}</p>
                   </div>
-                  <span className="text-xs text-text-secondary/60 shrink-0">
-                    {new Date(u.createdAt).toLocaleDateString()}
-                  </span>
+                  <div className="text-right shrink-0">
+                    {u.phone && (
+                      <p className="text-xs text-text-secondary">{u.phone}</p>
+                    )}
+                    <span className="text-xs text-text-secondary/60">
+                      {new Date(u.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
