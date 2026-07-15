@@ -24,17 +24,55 @@ import {
 } from '@heroicons/react/24/solid'
 
 const SERVICES = [
+  // Development
   'Web Development',
+  'Mobile App Development',
+  'Software Development',
+  'API Development & Integration',
+  'E-commerce Development',
+  'WordPress Development',
+  'CRM Development & Integration',
+  'Cloud Infrastructure (AWS/GCP/Azure)',
+  'DevOps & CI/CD',
+  'Database Design & Management',
+  'AI / Machine Learning',
+  // Design
   'UI/UX Design',
+  'Graphic Design',
+  'Brand Identity & Logo Design',
+  'Packaging Design',
+  'Print Design',
+  'Motion Graphics',
+  '3D Modeling & Animation',
+  'Product Design',
+  'Presentation Design',
+  'Illustration',
+  // Marketing
   'SEO / Growth',
-  'Copywriting',
-  'Marketing Strategy',
-  'Sales Consulting',
-  'Brand Design',
-  'Video Production',
   'Social Media Management',
   'Email Marketing',
-  'Paid Ads',
+  'Paid Ads (Google/Meta/etc.)',
+  'Content Marketing',
+  'Influencer Marketing',
+  'Affiliate Marketing',
+  'Marketing Automation',
+  'Conversion Rate Optimization (CRO)',
+  // Content
+  'Copywriting',
+  'Video Production',
+  'Photography',
+  'Podcast Production',
+  'Technical Writing',
+  'Scriptwriting',
+  // Business
+  'Marketing Strategy',
+  'Sales Consulting',
+  'Business Consulting',
+  'Lead Generation',
+  'Data Analysis & Analytics',
+  'Project Management',
+  'Brand Strategy',
+  'CRM Setup & Management',
   'Other',
 ]
 
@@ -64,9 +102,17 @@ const EXPERIENCE_LEVELS = [
 const DISCOVERY_SOURCES = [
   'Twitter / X',
   'LinkedIn',
+  'Instagram',
+  'Meta Ads (Facebook/Instagram)',
   'Google Search',
+  'Google Ads',
   'Friend / Referral',
   'YouTube',
+  'TikTok',
+  'Discord',
+  'Podcast',
+  'Newsletter',
+  'Facebook Groups',
   'Indie Hackers',
   'Reddit',
   'Product Hunt',
@@ -122,11 +168,16 @@ export default function OnboardingPage() {
   const [website, setWebsite] = useState('')
   const [linkedin, setLinkedin] = useState('')
   const [instagram, setInstagram] = useState('')
+  const [dribbble, setDribbble] = useState('')
+  const [behance, setBehance] = useState('')
+  const [github, setGithub] = useState('')
+  const [twitter, setTwitter] = useState('')
   const [servicesOffered, setServicesOffered] = useState<string[]>([])
   const [preferredLeadCategories, setPreferredLeadCategories] = useState<string[]>([])
   const [outreachExperience, setOutreachExperience] = useState('')
   const [discoverySource, setDiscoverySource] = useState('')
   const [showPhoneStep, setShowPhoneStep] = useState(true)
+  const [step1Error, setStep1Error] = useState('')
 
   useEffect(() => {
     const saved = localStorage.getItem('onboarding_step')
@@ -238,6 +289,10 @@ export default function OnboardingPage() {
         website: website || undefined,
         linkedin: linkedin || undefined,
         instagram: instagram || undefined,
+        dribbble: dribbble || undefined,
+        behance: behance || undefined,
+        github: github || undefined,
+        twitter: twitter || undefined,
         servicesOffered,
         preferredLeadCategories,
         outreachExperience,
@@ -445,7 +500,10 @@ export default function OnboardingPage() {
                       Let&apos;s set up your profile
                     </h1>
                     <p className="text-sm text-text-secondary mt-2">
-                      Optional links so leads know who they&apos;re talking to
+                      Add your profile links so leads know who they&apos;re talking to
+                    </p>
+                    <p className="text-xs text-accent-mint mt-1 font-medium">
+                      At least one profile link required
                     </p>
                   </div>
 
@@ -456,7 +514,7 @@ export default function OnboardingPage() {
                       </label>
                       <input
                         value={portfolio}
-                        onChange={(e) => setPortfolio(e.target.value)}
+                        onChange={(e) => { setPortfolio(e.target.value); setStep1Error('') }}
                         placeholder="https://your-portfolio.com"
                         className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
                       />
@@ -468,7 +526,7 @@ export default function OnboardingPage() {
                       </label>
                       <input
                         value={website}
-                        onChange={(e) => setWebsite(e.target.value)}
+                        onChange={(e) => { setWebsite(e.target.value); setStep1Error('') }}
                         placeholder="https://your-company.com"
                         className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
                       />
@@ -480,7 +538,7 @@ export default function OnboardingPage() {
                       </label>
                       <input
                         value={linkedin}
-                        onChange={(e) => setLinkedin(e.target.value)}
+                        onChange={(e) => { setLinkedin(e.target.value); setStep1Error('') }}
                         placeholder="https://linkedin.com/in/your-profile"
                         className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
                       />
@@ -492,15 +550,78 @@ export default function OnboardingPage() {
                       </label>
                       <input
                         value={instagram}
-                        onChange={(e) => setInstagram(e.target.value)}
+                        onChange={(e) => { setInstagram(e.target.value); setStep1Error('') }}
                         placeholder="https://instagram.com/your-handle"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Dribbble
+                      </label>
+                      <input
+                        value={dribbble}
+                        onChange={(e) => { setDribbble(e.target.value); setStep1Error('') }}
+                        placeholder="https://dribbble.com/your-handle"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Behance
+                      </label>
+                      <input
+                        value={behance}
+                        onChange={(e) => { setBehance(e.target.value); setStep1Error('') }}
+                        placeholder="https://behance.net/your-profile"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        GitHub
+                      </label>
+                      <input
+                        value={github}
+                        onChange={(e) => { setGithub(e.target.value); setStep1Error('') }}
+                        placeholder="https://github.com/your-handle"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Twitter / X
+                      </label>
+                      <input
+                        value={twitter}
+                        onChange={(e) => { setTwitter(e.target.value); setStep1Error('') }}
+                        placeholder="https://twitter.com/your-handle"
                         className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
                       />
                     </div>
                   </div>
 
+                  {step1Error && (
+                    <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+                      <ShieldExclamationIcon className="w-4 h-4 shrink-0" />
+                      <span>{step1Error}</span>
+                    </div>
+                  )}
+
                   <button
-                    onClick={() => setStep(2)}
+                    onClick={() => {
+                      const hasAnyLink = portfolio || website || linkedin || instagram || dribbble || behance || github || twitter
+                      if (!hasAnyLink) {
+                        setStep1Error('Please provide at least one profile link to continue')
+                        return
+                      }
+                      setStep1Error('')
+                      setStep(2)
+                    }}
                     className="mt-8 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium"
                   >
                     Continue

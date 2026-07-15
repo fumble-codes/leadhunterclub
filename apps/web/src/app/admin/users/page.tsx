@@ -32,6 +32,10 @@ interface AdminUser {
   website: string | null
   linkedin: string | null
   instagram: string | null
+  dribbble: string | null
+  behance: string | null
+  github: string | null
+  twitter: string | null
   outreachExperience: string | null
   discoverySource: string | null
   preferredLeadCategories: string[]
@@ -72,6 +76,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'PENDING')
+  const [serviceFilter, setServiceFilter] = useState('')
   const [page, setPage] = useState(1)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
@@ -85,6 +90,7 @@ export default function AdminUsersPage() {
     params.set('pageSize', '20')
     if (statusFilter !== 'ALL') params.set('status', statusFilter)
     if (search.trim()) params.set('search', search.trim())
+    if (serviceFilter) params.set('service', serviceFilter)
 
     try {
       const res = await fetch(`/api/admin/users?${params}`, {
@@ -98,7 +104,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, statusFilter, search])
+  }, [page, statusFilter, search, serviceFilter])
 
   useEffect(() => {
     fetchUsers()
@@ -160,6 +166,24 @@ export default function AdminUsersPage() {
             placeholder="Search by name or email..."
             className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-10 pr-4 py-2.5 text-sm"
           />
+        </div>
+        <div className="relative">
+          <select
+            value={serviceFilter}
+            onChange={(e) => {
+              setServiceFilter(e.target.value)
+              setPage(1)
+            }}
+            className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2.5 text-sm appearance-none cursor-pointer min-w-[160px]"
+          >
+            <option value="">All Services</option>
+            {users.length > 0 &&
+              [...new Set(users.flatMap((u) => u.servicesOffered))].sort().map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+          </select>
         </div>
         <div className="flex gap-1">
           {STATUS_FILTERS.map((s) => (
@@ -278,13 +302,14 @@ export default function AdminUsersPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           {u.portfolio && (
                             <a
                               href={u.portfolio}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-mint hover:underline flex items-center gap-0.5"
+                              title="Portfolio"
                             >
                               PF <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                             </a>
@@ -295,11 +320,78 @@ export default function AdminUsersPage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-mint hover:underline flex items-center gap-0.5"
+                              title="Website"
                             >
                               Web <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                             </a>
                           )}
-                          {!u.portfolio && !u.website && (
+                          {u.linkedin && (
+                            <a
+                              href={u.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-accent-cyan hover:underline flex items-center gap-0.5"
+                              title="LinkedIn"
+                            >
+                              Li <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                          {u.instagram && (
+                            <a
+                              href={u.instagram}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-accent-purple hover:underline flex items-center gap-0.5"
+                              title="Instagram"
+                            >
+                              Ig <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                          {u.dribbble && (
+                            <a
+                              href={u.dribbble}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-accent-mint hover:underline flex items-center gap-0.5"
+                              title="Dribbble"
+                            >
+                              Dr <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                          {u.behance && (
+                            <a
+                              href={u.behance}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-blue-400 hover:underline flex items-center gap-0.5"
+                              title="Behance"
+                            >
+                              Be <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                          {u.github && (
+                            <a
+                              href={u.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-text-secondary hover:text-white flex items-center gap-0.5"
+                              title="GitHub"
+                            >
+                              Gh <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                          {u.twitter && (
+                            <a
+                              href={u.twitter}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-cyan-400 hover:underline flex items-center gap-0.5"
+                              title="Twitter / X"
+                            >
+                              Tw <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                          {!u.portfolio && !u.website && !u.linkedin && !u.instagram && !u.dribbble && !u.behance && !u.github && !u.twitter && (
                             <span className="text-xs text-text-secondary/40">—</span>
                           )}
                         </div>

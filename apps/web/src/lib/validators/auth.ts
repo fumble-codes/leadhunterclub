@@ -25,11 +25,26 @@ export const onboardingSchema = z.object({
   website: z.string().optional(),
   linkedin: z.string().optional(),
   instagram: z.string().optional(),
+  dribbble: z.string().optional(),
+  behance: z.string().optional(),
+  github: z.string().optional(),
+  twitter: z.string().optional(),
   servicesOffered: z.array(z.string()).min(1, 'Select at least one service'),
   preferredLeadCategories: z.array(z.string()).min(1, 'Select at least one category'),
   outreachExperience: z.string().min(1, 'Tell us about your outreach experience'),
   discoverySource: z.string().min(1, 'Tell us how you found us'),
-})
+}).refine(
+  (data) =>
+    data.portfolio ||
+    data.website ||
+    data.linkedin ||
+    data.instagram ||
+    data.dribbble ||
+    data.behance ||
+    data.github ||
+    data.twitter,
+  { message: 'At least one profile link is required' },
+)
 
 export const leadRevealSchema = z.object({
   leadId: z.string().min(1, 'leadId is required'),

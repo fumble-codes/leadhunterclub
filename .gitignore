@@ -12,22 +12,18 @@ serviceAccountKey.json
 **/serviceAccountKey.json
 .admin-creds.local
 
-# Planning & project docs (not for production)
-AGENTS.md
-AUTH.md
-STATUS.md
-PLAN*.md
-DESIGN_MIGRATION.md
-architecture.md
-issues.md
-plan-*.md
-stitch_design_spec.md
+# Browser automation artifacts (Playwright MCP / DevTools)
+.playwright-mcp/
+**/.playwright-mcp/
+
+# Project docs (all .md files live here, gitignored so nothing valuable leaks)
+docs/
 
 # Scratch / temp
 graphify-out/
-apps/web/docs/
 apps/web/sql.txt
 apps/web/scripts/
 apps/web/prisma/migrate-credits.ts
 
 .vercel
+.codedev-mcp/

@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     const pageSize = Math.min(50, Math.max(1, Number(searchParams.get('pageSize')) || 20))
     const status = searchParams.get('status')
     const search = searchParams.get('search')?.trim()
+    const serviceFilter = searchParams.get('service')?.trim()
 
     const where: Record<string, unknown> = {}
     if (status && ['PENDING', 'ACTIVE', 'REJECTED', 'SUSPENDED'].includes(status)) {
@@ -23,6 +24,9 @@ export async function GET(request: NextRequest) {
         { email: { contains: search, mode: 'insensitive' } },
         { name: { contains: search, mode: 'insensitive' } },
       ]
+    }
+    if (serviceFilter) {
+      where.servicesOffered = { has: serviceFilter }
     }
 
     const [users, total] = await Promise.all([
@@ -40,8 +44,17 @@ export async function GET(request: NextRequest) {
           plan: true,
           createdAt: true,
           servicesOffered: true,
+          preferredLeadCategories: true,
           outreachExperience: true,
           discoverySource: true,
+          portfolio: true,
+          website: true,
+          linkedin: true,
+          instagram: true,
+          dribbble: true,
+          behance: true,
+          github: true,
+          twitter: true,
           creditAccount: {
             select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
           },

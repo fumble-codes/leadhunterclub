@@ -29,6 +29,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const hasAnyLink =
+      parsed.data.portfolio ||
+      parsed.data.website ||
+      parsed.data.linkedin ||
+      parsed.data.instagram ||
+      parsed.data.dribbble ||
+      parsed.data.behance ||
+      parsed.data.github ||
+      parsed.data.twitter
+    if (!hasAnyLink) {
+      return NextResponse.json(
+        { code: 'VALIDATION_ERROR', message: 'At least one profile link is required' },
+        { status: 400 },
+      )
+    }
+
     const existingUser = await db.user.findUnique({ where: { id: authUser.uid } })
     if (!existingUser) {
       return NextResponse.json(

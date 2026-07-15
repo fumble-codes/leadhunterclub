@@ -45,6 +45,10 @@ interface UserDetail {
   website: string | null
   linkedin: string | null
   instagram: string | null
+  dribbble: string | null
+  behance: string | null
+  github: string | null
+  twitter: string | null
   servicesOffered: string[]
   preferredLeadCategories: string[]
   outreachExperience: string | null
@@ -463,6 +467,58 @@ export default function AdminUserDetailPage() {
                       className="text-sm text-accent-mint hover:underline"
                     >
                       {user.linkedin}
+                    </a>
+                  </div>
+                )}
+                {user.dribbble && (
+                  <div>
+                    <p className="text-xs text-text-secondary mb-1">Dribbble</p>
+                    <a
+                      href={user.dribbble}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-accent-mint hover:underline"
+                    >
+                      {user.dribbble}
+                    </a>
+                  </div>
+                )}
+                {user.behance && (
+                  <div>
+                    <p className="text-xs text-text-secondary mb-1">Behance</p>
+                    <a
+                      href={user.behance}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-400 hover:underline"
+                    >
+                      {user.behance}
+                    </a>
+                  </div>
+                )}
+                {user.github && (
+                  <div>
+                    <p className="text-xs text-text-secondary mb-1">GitHub</p>
+                    <a
+                      href={user.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-text-secondary hover:text-white"
+                    >
+                      {user.github}
+                    </a>
+                  </div>
+                )}
+                {user.twitter && (
+                  <div>
+                    <p className="text-xs text-text-secondary mb-1">Twitter / X</p>
+                    <a
+                      href={user.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-cyan-400 hover:underline"
+                    >
+                      {user.twitter}
                     </a>
                   </div>
                 )}
