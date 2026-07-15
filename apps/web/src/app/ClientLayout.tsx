@@ -90,7 +90,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <ToastProvider>
-      {!isAppRoute && !isAdminRoute && <Navbar />}
+      {!isAppRoute && !isAdminRoute && !isOnboardingRoute && <Navbar />}
       {isAppRoute ? (
         <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
           <AppSidebar />

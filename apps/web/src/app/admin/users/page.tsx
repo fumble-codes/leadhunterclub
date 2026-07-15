@@ -61,6 +61,9 @@ interface Pagination {
   hasPrev: boolean
 }
 
+const ensureUrl = (url: string) =>
+  url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`
+
 const STATUS_FILTERS = ['ALL', 'PENDING', 'ACTIVE', 'REJECTED', 'SUSPENDED'] as const
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-yellow-400 bg-yellow-500/10',
@@ -211,7 +214,7 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <>
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/[0.06]">
@@ -305,7 +308,7 @@ export default function AdminUsersPage() {
                         <div className="flex gap-2 flex-wrap">
                           {u.portfolio && (
                             <a
-                              href={u.portfolio}
+                              href={ensureUrl(u.portfolio)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-mint hover:underline flex items-center gap-0.5"
@@ -316,7 +319,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.website && (
                             <a
-                              href={u.website}
+                              href={ensureUrl(u.website)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-mint hover:underline flex items-center gap-0.5"
@@ -327,7 +330,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.linkedin && (
                             <a
-                              href={u.linkedin}
+                              href={ensureUrl(u.linkedin)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-cyan hover:underline flex items-center gap-0.5"
@@ -338,7 +341,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.instagram && (
                             <a
-                              href={u.instagram}
+                              href={ensureUrl(u.instagram)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-purple hover:underline flex items-center gap-0.5"
@@ -349,7 +352,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.dribbble && (
                             <a
-                              href={u.dribbble}
+                              href={ensureUrl(u.dribbble)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-accent-mint hover:underline flex items-center gap-0.5"
@@ -360,7 +363,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.behance && (
                             <a
-                              href={u.behance}
+                              href={ensureUrl(u.behance)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-blue-400 hover:underline flex items-center gap-0.5"
@@ -371,7 +374,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.github && (
                             <a
-                              href={u.github}
+                              href={ensureUrl(u.github)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-text-secondary hover:text-white flex items-center gap-0.5"
@@ -382,7 +385,7 @@ export default function AdminUsersPage() {
                           )}
                           {u.twitter && (
                             <a
-                              href={u.twitter}
+                              href={ensureUrl(u.twitter)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-xs text-cyan-400 hover:underline flex items-center gap-0.5"

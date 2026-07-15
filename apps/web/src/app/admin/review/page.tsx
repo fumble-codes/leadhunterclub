@@ -80,16 +80,19 @@ export default function AdminReviewPage() {
     setActionLoading(null)
   }
 
+  const ensureUrl = (url: string) =>
+    url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`
+
   const socialLinks = (u: ReviewUser) => {
     const links: { url: string; label: string; color: string }[] = []
-    if (u.portfolio) links.push({ url: u.portfolio, label: 'Portfolio', color: 'text-accent-mint' })
-    if (u.website) links.push({ url: u.website, label: 'Website', color: 'text-accent-mint' })
-    if (u.linkedin) links.push({ url: u.linkedin, label: 'LinkedIn', color: 'text-accent-cyan' })
-    if (u.instagram) links.push({ url: u.instagram, label: 'Instagram', color: 'text-accent-purple' })
-    if (u.dribbble) links.push({ url: u.dribbble, label: 'Dribbble', color: 'text-accent-mint' })
-    if (u.behance) links.push({ url: u.behance, label: 'Behance', color: 'text-blue-400' })
-    if (u.github) links.push({ url: u.github, label: 'GitHub', color: 'text-text-secondary' })
-    if (u.twitter) links.push({ url: u.twitter, label: 'Twitter', color: 'text-cyan-400' })
+    if (u.portfolio) links.push({ url: ensureUrl(u.portfolio), label: 'Portfolio', color: 'text-accent-mint' })
+    if (u.website) links.push({ url: ensureUrl(u.website), label: 'Website', color: 'text-accent-mint' })
+    if (u.linkedin) links.push({ url: ensureUrl(u.linkedin), label: 'LinkedIn', color: 'text-accent-cyan' })
+    if (u.instagram) links.push({ url: ensureUrl(u.instagram), label: 'Instagram', color: 'text-accent-purple' })
+    if (u.dribbble) links.push({ url: ensureUrl(u.dribbble), label: 'Dribbble', color: 'text-accent-mint' })
+    if (u.behance) links.push({ url: ensureUrl(u.behance), label: 'Behance', color: 'text-blue-400' })
+    if (u.github) links.push({ url: ensureUrl(u.github), label: 'GitHub', color: 'text-text-secondary' })
+    if (u.twitter) links.push({ url: ensureUrl(u.twitter), label: 'Twitter', color: 'text-cyan-400' })
     return links
   }
 
@@ -129,7 +132,7 @@ export default function AdminReviewPage() {
           {users.map((u) => (
             <div
               key={u.id}
-              className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden"
+              className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl"
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">

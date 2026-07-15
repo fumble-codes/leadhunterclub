@@ -25,6 +25,9 @@ const PLAN_BADGES: Record<string, string> = {
   AGENCY: 'text-accent-purple bg-accent-purple/10',
 }
 
+const ensureUrl = (url: string) =>
+  url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`
+
 interface CreditAccountInfo {
   subscriptionBalance: number
   bonusBalance: number
@@ -435,7 +438,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Portfolio</p>
                     <a
-                      href={user.portfolio}
+                      href={ensureUrl(user.portfolio)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-accent-mint hover:underline"
@@ -448,7 +451,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Website</p>
                     <a
-                      href={user.website}
+                      href={ensureUrl(user.website)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-accent-mint hover:underline"
@@ -461,7 +464,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">LinkedIn</p>
                     <a
-                      href={user.linkedin}
+                      href={ensureUrl(user.linkedin)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-accent-mint hover:underline"
@@ -474,7 +477,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Dribbble</p>
                     <a
-                      href={user.dribbble}
+                      href={ensureUrl(user.dribbble)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-accent-mint hover:underline"
@@ -487,7 +490,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Behance</p>
                     <a
-                      href={user.behance}
+                      href={ensureUrl(user.behance)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-blue-400 hover:underline"
@@ -500,7 +503,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">GitHub</p>
                     <a
-                      href={user.github}
+                      href={ensureUrl(user.github)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-text-secondary hover:text-white"
@@ -513,7 +516,7 @@ export default function AdminUserDetailPage() {
                   <div>
                     <p className="text-xs text-text-secondary mb-1">Twitter / X</p>
                     <a
-                      href={user.twitter}
+                      href={ensureUrl(user.twitter)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-cyan-400 hover:underline"

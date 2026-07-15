@@ -21,6 +21,7 @@ export const adminUserActionSchema = z
   )
 
 export const onboardingSchema = z.object({
+  phone: z.string().min(1, 'Phone number is required'),
   portfolio: z.string().optional(),
   website: z.string().optional(),
   linkedin: z.string().optional(),

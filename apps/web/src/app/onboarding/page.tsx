@@ -176,7 +176,6 @@ export default function OnboardingPage() {
   const [preferredLeadCategories, setPreferredLeadCategories] = useState<string[]>([])
   const [outreachExperience, setOutreachExperience] = useState('')
   const [discoverySource, setDiscoverySource] = useState('')
-  const [showPhoneStep, setShowPhoneStep] = useState(true)
   const [step1Error, setStep1Error] = useState('')
 
   useEffect(() => {
@@ -195,11 +194,8 @@ export default function OnboardingPage() {
     return () => clearInterval(id)
   }, [otpCountdown])
 
-  useEffect(() => {
-    if (auth.currentUser?.phoneNumber) {
-      setShowPhoneStep(false)
-    }
-  }, [setShowPhoneStep])
+  // OTP verification is temporarily disabled
+  // OTP functions below are kept for future re-enablement
 
   if (loading) {
     return <OnboardingSkeleton />
@@ -258,7 +254,6 @@ export default function OnboardingPage() {
         verificationCode.trim(),
       )
       await linkWithCredential(auth.currentUser!, cred)
-      setShowPhoneStep(false)
     } catch {
       setOtpAttempts((c) => c + 1)
       setPhoneError('Invalid verification code. Please try again.')
@@ -267,9 +262,7 @@ export default function OnboardingPage() {
     }
   }
 
-  const handleSkipPhone = () => {
-    setShowPhoneStep(false)
-  }
+  // handleSkipPhone removed — OTP is temporarily disabled
 
   const toggleArrayItem = (arr: string[], item: string): string[] =>
     arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]
@@ -285,6 +278,7 @@ export default function OnboardingPage() {
 
     try {
       await api.post('/onboarding', {
+        phone: phoneNumber,
         portfolio: portfolio || undefined,
         website: website || undefined,
         linkedin: linkedin || undefined,
@@ -308,10 +302,8 @@ export default function OnboardingPage() {
     }
   }
 
-  const showOtpSkip = otpAttempts >= MAX_OTP_ATTEMPTS
-
   return (
-    <main className="min-h-screen bg-bg-main flex flex-col items-center justify-center px-4 relative overflow-hidden">
+    <main className="min-h-dvh bg-bg-main flex flex-col items-center justify-start px-4 relative overflow-y-auto pt-12 pb-8">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-orange-deep),0.06)_0%,transparent_60%)] pointer-events-none" />
 
       {step > 1 && (
@@ -358,133 +350,6 @@ export default function OnboardingPage() {
         </div>
 
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-3xl shadow-elevation-4 w-full p-8 md:p-10">
-          {showPhoneStep ? (
-            <div className="flex flex-col gap-5">
-              <div className="text-center mb-2">
-                <h2 className="text-lg font-bold text-text-primary tracking-tight">
-                  Add phone number (optional)
-                </h2>
-                <p className="text-sm text-text-secondary mt-1">
-                  Secure your account with SMS verification
-                </p>
-              </div>
-
-              <div id="recaptcha-container" />
-
-              {!confirmationResult ? (
-                <>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                      Phone number
-                    </label>
-                    <input
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      type="tel"
-                      placeholder="+1 (555) 123-4567"
-                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
-                    />
-                  </div>
-
-                  {phoneError && (
-                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-                      {phoneError}
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={phoneLoading || !phoneNumber.trim()}
-                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {phoneLoading ? (
-                      <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                    ) : (
-                      'Send OTP'
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleSkipPhone}
-                    className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center"
-                  >
-                    Skip &mdash; I&apos;ll do this later
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                      6-digit code
-                    </label>
-                    <input
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value)}
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="000000"
-                      maxLength={6}
-                      className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3 text-center text-lg tracking-ultra"
-                    />
-                  </div>
-
-                  {phoneError && (
-                    <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-                      {phoneError}
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={phoneLoading || verificationCode.length < 6}
-                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {phoneLoading ? (
-                      <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                    ) : (
-                      'Verify & Continue'
-                    )}
-                  </button>
-
-                  {otpCountdown > 0 ? (
-                    <p className="text-xs text-text-secondary/60 text-center">
-                      Resend code in {otpCountdown}s
-                    </p>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleResendOtp}
-                      className="text-xs text-accent-mint hover:text-accent-mint/80 transition-colors text-center flex items-center justify-center gap-1"
-                    >
-                      <ArrowPathIcon className="w-3 h-3" />
-                      Resend code
-                    </button>
-                  )}
-
-                  {showOtpSkip ? (
-                    <button
-                      type="button"
-                      onClick={handleSkipPhone}
-                      className="text-xs text-text-secondary/60 hover:text-text-secondary transition-colors text-center mt-1"
-                    >
-                      Skip &mdash; I&apos;ll do this later
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleSkipPhone}
-                      className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center"
-                    >
-                      Skip &mdash; I&apos;ll do this later
-                    </button>
-                  )}
-                </>
-              )}
-            </div>
-          ) : (
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div
@@ -603,6 +468,24 @@ export default function OnboardingPage() {
                         className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
                       />
                     </div>
+
+                    <div className="border-t border-white/[0.06] pt-4">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                          Phone number <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                          value={phoneNumber}
+                          onChange={(e) => { setPhoneNumber(e.target.value); setStep1Error('') }}
+                          type="tel"
+                          placeholder="+1 (555) 123-4567"
+                          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        />
+                        <p className="text-xs text-text-secondary/60 mt-0.5">
+                          We need this number to contact you, so provide your real number only
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   {step1Error && (
@@ -619,13 +502,26 @@ export default function OnboardingPage() {
                         setStep1Error('Please provide at least one profile link to continue')
                         return
                       }
+                      if (!phoneNumber.trim()) {
+                        setStep1Error('Phone number is required')
+                        return
+                      }
                       setStep1Error('')
                       setStep(2)
                     }}
-                    className="mt-8 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium"
+                    className="mt-6 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium"
                   >
                     Continue
                   </button>
+
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => router.push('/login')}
+                      className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors"
+                    >
+                      Back to login
+                    </button>
+                  </div>
                 </motion.div>
               )}
 
@@ -726,6 +622,15 @@ export default function OnboardingPage() {
                   >
                     Continue
                   </button>
+
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => router.push('/login')}
+                      className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors"
+                    >
+                      Back to login
+                    </button>
+                  </div>
                 </motion.div>
               )}
 
@@ -802,10 +707,18 @@ export default function OnboardingPage() {
                   <p className="text-xs text-text-secondary/40 text-center mt-4">
                     Your application will be reviewed by our team
                   </p>
+
+                  <div className="mt-4 text-center">
+                    <button
+                      onClick={() => router.push('/login')}
+                      className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors"
+                    >
+                      Back to login
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          )}
         </div>
       </motion.div>
     </main>
