@@ -221,7 +221,7 @@ export default function RegisterPage() {
           <h1 className="text-2xl font-bold text-text-primary tracking-tight">
             Create your account
           </h1>
-          <p className="text-sm text-text-secondary mt-2">Start dominating your outreach today</p>
+          <p className="text-sm text-text-secondary mt-2">Join LeadHunterClub and start closing more deals</p>
         </div>
 
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-3xl shadow-elevation-4 w-full p-8">
@@ -233,6 +233,9 @@ export default function RegisterPage() {
                   <p className="text-xs text-yellow-400/70 mt-1">
                     We sent a verification email to <strong>{auth.currentUser.email}</strong>.
                     Please verify before continuing.
+                  </p>
+                  <p className="text-[11px] text-yellow-400/50 mt-1.5">
+                    Didn&apos;t receive it? Check your spam folder or click Resend.
                   </p>
                 </div>
                 <button

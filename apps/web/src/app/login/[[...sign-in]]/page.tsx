@@ -108,14 +108,14 @@ export default function LoginPage() {
             />
           </Link>
           <h1 className="text-2xl font-bold text-text-primary tracking-tight">Welcome back</h1>
-          <p className="text-sm text-text-secondary mt-2">Sign in to your command center</p>
+          <p className="text-sm text-text-secondary mt-2">Sign in to your account to continue</p>
         </div>
 
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-3xl shadow-elevation-4 w-full p-8">
           <form onSubmit={handleLogin} className="flex flex-col gap-5">
             {resetSent && (
               <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400">
-                Password reset email sent. Check your inbox.
+                Reset link sent! Check your inbox and follow the instructions. Didn&apos;t see it? Check your spam folder.
               </div>
             )}
             {error && (
@@ -179,8 +179,15 @@ export default function LoginPage() {
                   Sign up
                 </Link>
               </p>
-              <p className="text-[11px] text-text-secondary/50 mt-3">
-                Your session persists across browser restarts
+              <p className="text-[11px] text-text-secondary/40 mt-3">
+                By continuing, you agree to our{" "}
+                <a href="/terms" className="underline hover:text-text-secondary">
+                  Terms
+                </a>{" "}
+                and{" "}
+                <a href="/privacy" className="underline hover:text-text-secondary">
+                  Privacy Policy
+                </a>
               </p>
             </div>
           </form>
