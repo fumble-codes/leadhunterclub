@@ -39,6 +39,7 @@ interface ReviewUser {
 }
 
 const PLANS = [
+  { id: 'FREE', label: 'Free', credits: 50 },
   { id: 'FREELANCER', label: 'Freelancer', credits: 500 },
   { id: 'AGENCY', label: 'Agency', credits: 1000 },
 ]
