@@ -67,6 +67,34 @@ export async function POST(request: NextRequest) {
 
       const claimedLead = await claimPost(leadId)
 
+      await tx.lead.upsert({
+        where: { id: leadId },
+        update: {},
+        create: {
+          id: leadId,
+          name: claimedLead.author?.name || 'Unknown',
+          email: claimedLead.email || claimedLead.contact_info?.emails?.[0]?.email || '',
+          phone: claimedLead.contact_info?.phone_numbers?.[0]?.number || null,
+          company: claimedLead.contact_info?.company_name || claimedLead.author?.name || claimedLead.platform || '',
+          source: claimedLead.platform || 'Unknown',
+          category: claimedLead.keyword?.replace(/^watchlist:/, '') || claimedLead.platform || 'General',
+          title: claimedLead.author?.info || claimedLead.keyword || claimedLead.platform || 'Lead Signal',
+          signalContext: claimedLead.content || '',
+          role: claimedLead.author?.info || '',
+          taskScope: '',
+          mustHave: '',
+          nicheBonus: '',
+          buyerType: '',
+          urgency: 'medium',
+          winProb: 'medium',
+          nicheTags: claimedLead.keyword ? [claimedLead.keyword.replace(/^watchlist:/, '')] : [],
+          niches: [],
+          hashtags: [],
+          replyProbability: Math.max(claimedLead.ai_score || 0, 60),
+          accent: 'mint',
+        },
+      })
+
       const updatedState = await tx.userLeadState.upsert({
         where: {
           userId_leadId: {
