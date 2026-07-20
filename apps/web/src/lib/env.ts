@@ -36,7 +36,7 @@ export const env = {
   directUrl: optionalEnv('DIRECT_URL', ''),
 
   // External Lead API
-  externalApiBaseUrl: requireEnv('EXTERNAL_API_BASE_URL'),
+  externalApiBaseUrl: requireEnv('NEXT_PUBLIC_API_URL'),
   externalApiEmail: requireEnv('EXTERNAL_API_EMAIL'),
   externalApiPassword: requireEnv('EXTERNAL_API_PASSWORD'),
 

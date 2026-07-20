@@ -2,12 +2,12 @@ let cachedToken: string | null = null
 let tokenExpiry = 0
 
 function requireCredentials() {
-  const BASE_URL = process.env.EXTERNAL_API_BASE_URL
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL
   const EMAIL = process.env.EXTERNAL_API_EMAIL
   const PASSWORD = process.env.EXTERNAL_API_PASSWORD
   if (!BASE_URL || !EMAIL || !PASSWORD) {
     throw new Error(
-      'External API credentials not configured. Set EXTERNAL_API_BASE_URL, EXTERNAL_API_EMAIL, and EXTERNAL_API_PASSWORD.',
+      'External API credentials not configured. Set NEXT_PUBLIC_API_URL, EXTERNAL_API_EMAIL, and EXTERNAL_API_PASSWORD.',
     )
   }
   return { BASE_URL, EMAIL, PASSWORD }

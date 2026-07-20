@@ -1,19 +1,17 @@
 'use client'
 
 import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   LockClosedIcon,
   BanknotesIcon,
-  CheckCircleIcon,
   ChevronRightIcon,
   ChartBarSquareIcon,
-  EyeIcon,
-  UserIcon,
-  EnvelopeIcon,
+  BookmarkIcon,
   SparklesIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
+import { Card, Badge } from '@/components/ui'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -28,69 +26,14 @@ interface LeadCardData {
   urgency: 'low' | 'medium' | 'high' | 'critical'
   nicheTags: string[]
   replyProbability: number
-  accent: 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'
   isLocked: boolean
 }
 
-const themeMap = {
-  mint: {
-    cardBg: 'bg-accent-mint',
-    text: 'text-text-on-accent',
-    textMuted: 'text-text-on-accent/60',
-    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
-    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
-    button:
-      'bg-text-on-accent hover:bg-black text-text-secondary hover:text-text-primary transition-colors',
-    blurBg: 'bg-text-on-accent/10',
-    blurLine: 'bg-text-on-accent/15',
-    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10',
-  },
-  purple: {
-    cardBg: 'bg-accent-purple',
-    text: 'text-white',
-    textMuted: 'text-white/70',
-    tagBg: 'bg-white/10 border-white/20',
-    matchTag: 'bg-white text-text-on-accent',
-    button: 'bg-white hover:bg-white/90 text-text-on-accent',
-    blurBg: 'bg-white/10',
-    blurLine: 'bg-white/20',
-    buttonReveal: 'bg-white text-white hover:bg-white/10',
-  },
-  cyan: {
-    cardBg: 'bg-accent-cyan',
-    text: 'text-text-on-accent',
-    textMuted: 'text-text-on-accent/60',
-    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
-    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
-    button:
-      'bg-text-on-accent hover:bg-black text-text-secondary hover:text-text-primary transition-colors',
-    blurBg: 'bg-text-on-accent/10',
-    blurLine: 'bg-text-on-accent/15',
-    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10',
-  },
-  orange: {
-    cardBg: 'bg-accent-orange',
-    text: 'text-text-on-accent',
-    textMuted: 'text-text-on-accent/60',
-    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
-    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
-    button: 'bg-text-on-accent hover:bg-text-on-accent/90 text-white',
-    blurBg: 'bg-text-on-accent/10',
-    blurLine: 'bg-text-on-accent/15',
-    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10',
-  },
-  pink: {
-    cardBg: 'bg-accent-pink',
-    text: 'text-text-on-accent',
-    textMuted: 'text-text-on-accent/60',
-    tagBg: 'bg-text-on-accent/10 border-text-on-accent/10',
-    matchTag: 'bg-text-on-accent text-text-secondary hover:text-text-primary transition-colors',
-    button:
-      'bg-text-on-accent hover:bg-black text-text-secondary hover:text-text-primary transition-colors',
-    blurBg: 'bg-text-on-accent/10',
-    blurLine: 'bg-text-on-accent/15',
-    buttonReveal: 'bg-text-on-accent text-text-on-accent hover:bg-black/10',
-  },
+const urgencyColors: Record<string, { badge: 'mint' | 'purple'; topLine: string; dotColor: string }> = {
+  critical: { badge: 'mint', topLine: 'from-transparent via-accent-mint to-transparent', dotColor: 'bg-accent-mint' },
+  high: { badge: 'mint', topLine: 'from-transparent via-accent-mint to-transparent', dotColor: 'bg-accent-mint' },
+  medium: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
+  low: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
 }
 
 export default function TokenSystemSection() {
@@ -113,7 +56,6 @@ export default function TokenSystemSection() {
       urgency: 'high',
       nicheTags: ['E-Commerce', 'Web Dev', 'Shopify'],
       replyProbability: 92,
-      accent: 'orange',
       isLocked: true,
     },
     {
@@ -124,10 +66,9 @@ export default function TokenSystemSection() {
       source: 'Reddit',
       title: 'Brand Identity For —',
       signalContext: 'Just raised seed round, looking to completely rebrand before product launch.',
-      urgency: 'high',
+      urgency: 'medium',
       nicheTags: ['SaaS', 'Branding', 'Design'],
       replyProbability: 88,
-      accent: 'mint',
       isLocked: true,
     },
     {
@@ -141,7 +82,6 @@ export default function TokenSystemSection() {
       urgency: 'critical',
       nicheTags: ['B2B SaaS', 'SEO', 'Content'],
       replyProbability: 95,
-      accent: 'pink',
       isLocked: true,
     },
     {
@@ -153,10 +93,9 @@ export default function TokenSystemSection() {
       title: 'SaaS Platform For —',
       signalContext:
         'Looking for a dedicated Node/React team to refactor their legacy subscription architecture.',
-      urgency: 'high',
+      urgency: 'medium',
       nicheTags: ['SaaS', 'Node.js', 'Refactor'],
       replyProbability: 94,
-      accent: 'purple',
       isLocked: true,
     },
     {
@@ -171,7 +110,6 @@ export default function TokenSystemSection() {
       urgency: 'critical',
       nicheTags: ['Outbound', 'Deliverability', 'SMTP'],
       replyProbability: 91,
-      accent: 'cyan',
       isLocked: true,
     },
   ])
@@ -391,7 +329,6 @@ export default function TokenSystemSection() {
           {/* Layered sheets container */}
           <div className="relative w-full max-w-[420px] h-[340px]">
             {leads.map((lead, idx) => {
-              const theme = themeMap[lead.accent]
               const isActive = lead.id === activeCardId
 
               // Calculate horizontal perspective layout
@@ -475,138 +412,120 @@ export default function TokenSystemSection() {
                       setActiveTab('leads')
                     }
                   }}
-                  className={`absolute top-0 left-0 right-0 text-left flex flex-col p-6 rounded-3xl overflow-hidden min-h-[320px] w-full shadow-[0_30px_100px_rgba(var(--rgb-black),0.6)] border transition-all duration-300 ${theme.cardBg} ${filterClass}`}
+                  className={`absolute top-0 left-0 right-0 w-full ${filterClass}`}
                 >
-                  {/* Decorative card glow */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.05] to-transparent pointer-events-none" />
-
-                  {/* Header: Source & Urgency */}
-                  <div className="flex items-center justify-between mb-5 w-full relative z-10 bg-gradient-to-tr">
-                    <div className="flex items-center gap-2 bg-gradient-to-tr">
-                      <div className={`w-2 h-2 rounded-full bg-current ${theme.text}`} />
-                      <span
-                        className={`text-[10px] font-mono font-bold tracking-super uppercase ${theme.textMuted}`}
-                      >
-                        {lead.source}
-                      </span>
-                    </div>
-
-                    <div
-                      className={`flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider ${theme.textMuted}`}
-                    >
-                      <ChartBarSquareIcon className="w-3 h-3" />
-                      {lead.urgency}
-                    </div>
-                  </div>
-
-                  {/* Small Title */}
-                  <h4
-                    className={`text-11 font-mono font-bold tracking-[0.15em] uppercase mb-2 ${theme.text}`}
+                  <Card
+                    variant="elevated"
+                    padding="md"
+                    hover
+                    className="h-full flex flex-col"
                   >
-                    {lead.title}
-                  </h4>
+                    {/* Top edge highlight */}
+                    <div className={`absolute top-0 left-0 right-0 h-[1px] opacity-25 group-hover:opacity-60 bg-gradient-to-r ${urgencyColors[lead.urgency].topLine}`} />
 
-                  {/* Big context block quotes */}
-                  <h3
-                    className={`text-lg md:text-[20px] font-semibold tracking-tight leading-[1.3] mb-6 flex-grow ${theme.text}`}
-                  >
-                    &quot;{lead.signalContext}&quot;
-                  </h3>
-
-                  {/* Niche tags list */}
-                  <div className="flex flex-wrap gap-1.5 mb-6 relative z-10 bg-gradient-to-tr">
-                    {lead.nicheTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className={`px-2.5 py-1 text-11 font-mono font-bold rounded-lg border ${theme.tagBg} ${theme.text}`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {lead.replyProbability > 90 && (
-                      <span
-                        className={`px-2.5 py-1 text-11 font-mono font-bold rounded-lg border-transparent flex items-center gap-1.5 shadow-sm ${theme.matchTag}`}
-                      >
-                        <CheckCircleIcon className="w-3 h-3" /> {lead.replyProbability}% Match
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Divider */}
-                  <div className="w-full pt-4 flex items-center justify-between shrink-0 border-t border-black/5 relative z-10">
-                    {/* Credentials details section (blurred or unlocked) */}
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center ${theme.blurBg}`}
-                      >
-                        {lead.isLocked ? (
-                          <LockClosedIcon className={`w-[14px] h-[14px] ${theme.textMuted}`} />
-                        ) : (
-                          <UserIcon className={`w-[14px] h-[14px] ${theme.text}`} />
-                        )}
+                    {/* Header: Source badge + Urgency badge + Bookmark */}
+                    <div className="flex items-center justify-between mb-5 w-full shrink-0 select-none">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${urgencyColors[lead.urgency].dotColor}`} />
+                        <Badge size="sm" color="purple">
+                          Lead Hunter Club
+                        </Badge>
                       </div>
-
-                      <div className="flex flex-col">
-                        <AnimatePresence mode="wait">
-                          {lead.isLocked ? (
-                            <motion.div
-                              key="locked"
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              className="flex flex-col gap-1.5"
-                            >
-                              <div className={`h-2.5 w-24 rounded blur-[2px] ${theme.blurLine}`} />
-                              <div className={`h-2.5 w-32 rounded blur-[2px] ${theme.blurBg}`} />
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              key="unlocked"
-                              initial={{ opacity: 0, y: 5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="flex flex-col text-11 leading-tight"
-                            >
-                              <span className={`font-bold ${theme.text}`}>{lead.name}</span>
-                              <span className={`font-mono ${theme.textMuted} text-[10px]`}>
-                                {lead.email}
-                              </span>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                      <div className="flex items-center gap-3">
+                        <Badge size="sm" color={urgencyColors[lead.urgency].badge}>
+                          <ChartBarSquareIcon className="w-[10px] h-[10px] mr-1" />
+                          {lead.urgency}
+                        </Badge>
+                        <div className="p-1.5 rounded-lg border transition-all cursor-pointer bg-white/5 border-transparent text-text-secondary hover:bg-white/10 hover:text-white hover:border-border-subtle">
+                          <BookmarkIcon className="w-[14px] h-[14px] text-text-secondary/30" />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Action Button */}
-                    <div>
-                      {lead.isLocked ? (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (isActive) handleReveal(lead.id)
-                          }}
-                          disabled={isRevealing !== null || !isActive}
-                          className={`flex items-center gap-1 px-4 py-2.5 rounded-xl font-bold text-[12px] shadow-md transition-all active:scale-95 duration-200 border border-black/5 cursor-pointer ${theme.button}`}
+                    {/* Company title as category */}
+                    <h4 className="text-11 font-semibold tracking-[0.18em] text-text-secondary/60 uppercase mb-3 shrink-0">
+                      {lead.company}
+                    </h4>
+
+                    {/* Signal quote */}
+                    <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 flex-grow">
+                      &quot;{lead.signalContext}&quot;
+                    </h3>
+
+                    {/* Tags row + AI Reply Probability */}
+                    <div className="flex flex-wrap gap-2 mb-2 shrink-0">
+                      {lead.replyProbability > 0 && (
+                        <Badge size="sm" color={lead.replyProbability >= 80 ? 'mint' : 'purple'}>
+                          {lead.replyProbability}% Reply Match
+                        </Badge>
+                      )}
+                      {lead.nicheTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2.5 py-1 text-[10px] font-medium rounded-md border bg-white/[0.03] text-text-secondary/50 border-white/[0.05] hover:bg-white/[0.07] hover:text-text-secondary hover:border-white/10 transition-all duration-200 cursor-default"
                         >
-                          {isRevealing === lead.id ? (
-                            <span className="animate-pulse">Decoding...</span>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="w-full pt-5 flex items-center justify-between shrink-0 border-t border-border-subtle mt-auto gap-3">
+                      <div className="flex items-center gap-3 select-none min-w-0 flex-1">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 overflow-hidden shrink-0">
+                          {!lead.isLocked ? (
+                            <span className="text-11 font-bold text-text-primary uppercase">
+                              {lead.name.split(' ').map((n: string) => n[0]).join('')}
+                            </span>
+                          ) : (
+                            <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary" />
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-1.5 pointer-events-none min-w-0">
+                          {!lead.isLocked ? (
+                            <>
+                              <div className="text-sm font-bold text-text-primary truncate">{lead.name}</div>
+                              <div className="text-[10px] text-text-secondary truncate">{lead.email}</div>
+                            </>
                           ) : (
                             <>
-                              Reveal
-                              <span className="flex items-center gap-0.5 opacity-90 text-[10px] uppercase font-mono tracking-widest ml-1 font-bold">
-                                <BanknotesIcon className="w-3 h-3 text-current" /> -3
-                              </span>
+                              <div className="h-2 w-24 rounded-[4px] bg-white/10 blur-[1px]" />
+                              <div className="h-2 w-32 rounded-[4px] bg-white/5 blur-[1px]" />
                             </>
                           )}
-                        </button>
-                      ) : (
-                        <div
-                          className={`flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold border border-black/10 bg-black/10 ${theme.text}`}
-                        >
-                          <CheckCircleIcon className="w-4 h-4 text-current" /> Unlocked
                         </div>
-                      )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {!lead.isLocked ? (
+                          <div className="shrink-0 whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[12px] transition-all cursor-pointer bg-white/5 hover:bg-white/10 border border-transparent hover:border-border-subtle text-text-primary/90">
+                            <SparklesIcon className="w-3 h-3" />
+                            Engage
+                          </div>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (isActive) handleReveal(lead.id)
+                            }}
+                            disabled={isRevealing !== null || !isActive}
+                            className="shrink-0 whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[12px] transition-all cursor-pointer bg-white/5 hover:bg-white/10 border border-transparent hover:border-border-subtle text-text-primary/90"
+                          >
+                            {isRevealing === lead.id ? (
+                              <span className="animate-pulse">Decoding...</span>
+                            ) : (
+                              <>
+                                Reveal
+                                <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
+                                  <BanknotesIcon className="w-3 h-3" /> -3
+                                </span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </Card>
                 </motion.div>
               )
             })}

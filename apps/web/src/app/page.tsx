@@ -833,7 +833,7 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2, ease }}
             className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
           >
-            Pay for intelligence, not access. Tokens reveal lead identities and generate custom
+            Start free, upgrade when you&apos;re ready. Credits reveal lead identities and generate custom
             outreach paths.
           </motion.p>
         </div>
@@ -842,52 +842,51 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-3 gap-6 relative z-10">
           {[
             {
-              name: 'Recon',
-              tokens: '200',
-              price: '₹150',
-              desc: 'Perfect for testing the waters and closing your first high-value client.',
+              name: 'Free',
+              tokens: '50',
+              price: 'Free',
+              desc: 'Experience the platform and start closing your first high-value client.',
               accent: 'mint',
               featured: false,
               features: [
-                '200 Intelligence Tokens',
-                '~66 Lead Reveals',
+                '50 Intelligence Credits',
+                '~16 Lead Reveals',
                 'AI Outreach Writer',
                 'Basic Lead Intelligence',
-                'Email Integration',
               ],
             },
             {
-              name: 'Hunter',
-              tokens: '1,000',
-              price: '₹999',
+              name: 'Freelancer',
+              tokens: '500',
+              price: 'Free',
               desc: 'For serious operators building a consistent, high-quality client pipeline.',
               accent: 'pink',
               featured: true,
               features: [
-                '1,000 Intelligence Tokens',
+                '500 Intelligence Credits',
+                '~166 Lead Reveals',
+                'AI Outreach Writer',
+                'Full Lead Intelligence',
+                'Automated Follow-Ups',
+                'Priority Signal Access',
+                'Credit Rollover',
+              ],
+            },
+            {
+              name: 'Agency',
+              tokens: '1,000',
+              price: 'Free',
+              desc: 'Scale teams requiring massive deal flow and deep market intelligence.',
+              accent: 'purple',
+              featured: false,
+              features: [
+                '1,000 Intelligence Credits',
                 '~333 Lead Reveals',
                 'AI Outreach Writer',
                 'Full Lead Intelligence',
                 'Automated Follow-Ups',
                 'Priority Signal Access',
-                'Token Rollover',
-              ],
-            },
-            {
-              name: 'Syndicate',
-              tokens: '2,000',
-              price: '₹1,600',
-              desc: 'Scale teams requiring massive deal flow and deep market intelligence.',
-              accent: 'purple',
-              featured: false,
-              features: [
-                '2,000 Intelligence Tokens',
-                '~666 Lead Reveals',
-                'AI Outreach Writer',
-                'Full Lead Intelligence',
-                'Automated Follow-Ups',
-                'Priority Signal Access',
-                'Token Rollover',
+                'Credit Rollover',
                 'Team Seats (up to 5)',
               ],
             },
@@ -928,17 +927,17 @@ export default function LandingPage() {
 
                 {/* Price */}
                 <div className="mb-8 pb-8 border-b border-white/[0.04]">
-                  <div className="flex items-end gap-2 mb-3">
+                  <div className="flex items-end gap-3 mb-3">
                     <span className="font-display text-[56px] font-semibold leading-none tracking-tight text-text-primary">
                       {p.price}
                     </span>
-                    <span className="text-text-secondary/60 mb-2 text-sm font-medium">/ month</span>
+                    <span className="text-text-secondary/60 mb-3 text-[10px] font-bold uppercase tracking-widest">during early access</span>
                   </div>
 
                   {/* Token meter bar */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-11">
-                      <span className="text-text-secondary/60">{p.tokens} Tokens</span>
+                      <span className="text-text-secondary/60">{p.tokens} Credits</span>
                       <span className={`font-bold text-accent-${p.accent}`}>{p.tokens} / mo</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
@@ -995,7 +994,7 @@ export default function LandingPage() {
           className="text-center mt-16 relative z-10"
         >
           <p className="text-xs text-text-secondary/40 font-mono uppercase tracking-super">
-            No contracts · Cancel anytime · Unused tokens roll over
+            Free during early access · Credits roll over each month
           </p>
         </motion.div>
       </section>
@@ -1021,8 +1020,8 @@ export default function LandingPage() {
             a="No. Standard scraping is noise. We monitor intent signals across obscure forums, job boards, and community threads where real pain is expressed."
           />
           <FAQItem
-            q="How do tokens work?"
-            a="Tokens fuel the intelligence engine. Revealing a lead identity costs 3 tokens. Generating a custom AI outreach strategy costs 1 token. Unused tokens roll over monthly."
+            q="How do credits work?"
+            a="Credits fuel the intelligence engine. Revealing a lead identity costs 3 credits. Generating a custom AI outreach strategy costs 1 credit. Unused credits roll over monthly."
           />
           <FAQItem
             q="Can I plug this into my cold email tool?"

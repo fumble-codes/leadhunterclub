@@ -40,7 +40,7 @@ const CSP_DIRECTIVES = {
     'https://api.resend.com',
     'https://api.openai.com',
     'https://api.anthropic.com',
-    process.env.EXTERNAL_API_BASE_URL ? process.env.EXTERNAL_API_BASE_URL : '',
+    process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL : '',
     process.env.UPSTASH_REDIS_REST_URL ? process.env.UPSTASH_REDIS_REST_URL : '',
   ].filter(Boolean),
   'frame-src': ["'self'", 'https://www.google.com', 'https://apis.google.com'],

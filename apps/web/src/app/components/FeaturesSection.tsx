@@ -700,14 +700,14 @@ function TokenMeterVisual({
 }) {
   const getValues = () => {
     switch (selectedPersona) {
+      case 'free':
+        return { count: 50, offset: 0.05, label: 'Reveal: 3', label2: 'Outreach: 1' }
       case 'freelancer':
-        return { count: 420, offset: 0.58, label: 'Reveal: 3', label2: 'Outreach: 1' }
+        return { count: 500, offset: 0.02, label: 'Reveal: 3', label2: 'Outreach: 1' }
       case 'agency':
-        return { count: 1250, offset: 0.15, label: 'Deep Intel: 5', label2: 'Enrich: 3' }
-      case 'consultant':
-        return { count: 680, offset: 0.32, label: 'Scores: 2', label2: 'Context: 2' }
+        return { count: 1000, offset: 0.01, label: 'Reveal: 3', label2: 'Outreach: 1' }
       default:
-        return { count: 750, offset: 0.25, label: 'Reveal: 3', label2: 'Outreach: 1' }
+        return { count: 50, offset: 0.05, label: 'Reveal: 3', label2: 'Outreach: 1' }
     }
   }
 
@@ -759,7 +759,7 @@ function TokenMeterVisual({
             {current.count}
           </motion.span>
           <span className="text-[8px] text-text-secondary/50 font-bold uppercase tracking-widest">
-            tokens
+            credits
           </span>
         </div>
       </div>
@@ -795,25 +795,25 @@ function PersonaCardsVisual({
 }) {
   const personas = [
     {
-      id: 'freelancer',
-      role: 'Freelancer',
+      id: 'free',
+      role: 'Free',
       icon: CodeBracketIcon,
       accent: 'accent-mint',
-      desc: 'Land Shopify & SaaS contracts',
+      desc: '50 credits — get started today',
+    },
+    {
+      id: 'freelancer',
+      role: 'Freelancer',
+      icon: PaintBrushIcon,
+      accent: 'accent-pink',
+      desc: '500 credits — build your pipeline',
     },
     {
       id: 'agency',
-      role: 'Studio/Agency',
-      icon: PaintBrushIcon,
-      accent: 'accent-purple',
-      desc: 'Secure high-ticket design deals',
-    },
-    {
-      id: 'consultant',
-      role: 'Consultant',
+      role: 'Agency',
       icon: ChartBarIcon,
-      accent: 'accent-cyan',
-      desc: 'Close retainers with warm intent',
+      accent: 'accent-purple',
+      desc: '1,000 credits — scale operations',
     },
   ]
 
@@ -1123,10 +1123,10 @@ export default function FeaturesSection() {
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
               <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
-                Fair Value System
+                Credit-Based Usage
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
-                Token-Based Usage Perfect for Freelancers & Agencies
+                Credits Based, Not Seat Based
               </h3>
             </div>
             <p className="text-text-secondary text-sm md:text-base leading-relaxed">
@@ -1138,11 +1138,11 @@ export default function FeaturesSection() {
               {[
                 {
                   title: 'Zero Flat Commitments',
-                  desc: 'Spend tokens specifically on what gives you direct client value.',
+                  desc: 'Spend credits specifically on what gives you direct client value.',
                 },
                 {
-                  title: 'Tailored to Your Agency',
-                  desc: 'Add multiple platform profiles or team handles seamlessly.',
+                  title: 'Built for Every Scale',
+                  desc: 'From solo operators to full agencies — pick the credit plan that fits.',
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">
