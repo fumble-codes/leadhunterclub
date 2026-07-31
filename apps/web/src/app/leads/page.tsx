@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from './components/LeadCard'
 import LeadDrawer from './components/LeadDrawer'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 import {
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
@@ -137,7 +139,7 @@ export default function LeadsPage() {
   return (
     <main className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative">
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
-      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-cyan-soft pointer-events-none" />
+      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10 mt-2">
@@ -147,7 +149,7 @@ export default function LeadsPage() {
             </div>
 
             <div className="relative group flex-1 w-full">
-              <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-cyan/20 to-accent-mint/20 rounded-xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-mint/20 to-accent-mint/20 rounded-xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative flex items-center bg-code-bg/80 backdrop-blur-xl border border-white/[0.08] rounded-xl p-1.5 shadow-lg focus-within:ring-1 focus-within:ring-white/20 transition-all">
                 <div className="pl-3 pr-2 text-text-secondary">
                   <MagnifyingGlassIcon className="w-4 h-4 text-current" />
@@ -303,11 +305,8 @@ export default function LeadsPage() {
               }`}
             >
               {loading ? (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center">
-                  <ArrowPathIcon className="w-8 h-8 animate-spin text-accent-purple mb-4" />
-                  <h3 className="text-sm font-medium text-text-secondary">
-                    Loading fresh buyer-intent leads...
-                  </h3>
+                <div className="col-span-full">
+                  <CustomLoader page="leads" />
                 </div>
               ) : filteredLeads.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl backdrop-blur-md">
@@ -339,6 +338,13 @@ export default function LeadsPage() {
                     isSelected={lead.id === selectedLeadId}
                     onClick={() => setSelectedLeadId(lead.id)}
                     onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
+                    onReveal={(leadId, name, email, phone) => {
+                      setLeadsList((prev) =>
+                        prev.map((l) =>
+                          l.id === leadId ? { ...l, isRevealed: true, name, email, phone } : l,
+                        ),
+                      )
+                    }}
                   />
                 ))
               )}

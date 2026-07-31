@@ -6,6 +6,9 @@ import Navbar from '@/components/layout/Navbar'
 import AppSidebar from '@/components/layout/AppSidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { ToastProvider } from '@/components/ui/Toast'
+import { CustomLoader, type LoaderPageType } from '@/components/ui/CustomLoader'
+
+
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -81,11 +84,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }, [isAppRoute])
 
   if (loading && isProtectedRoute && !isAdminRoute) {
-    return (
-      <div className="flex h-screen bg-bg-main items-center justify-center">
-        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-      </div>
-    )
+    let detectedPage: LoaderPageType = 'default'
+    if (pathname.startsWith('/dashboard')) detectedPage = 'dashboard'
+    else if (pathname.startsWith('/leads')) detectedPage = 'leads'
+    else if (pathname.startsWith('/outreach')) detectedPage = 'outreach'
+    else if (pathname.startsWith('/saved')) detectedPage = 'saved'
+    else if (pathname.startsWith('/analytics')) detectedPage = 'analytics'
+    else if (pathname.startsWith('/settings')) detectedPage = 'settings'
+    else if (pathname.startsWith('/admin')) detectedPage = 'admin'
+    else if (pathname.startsWith('/onboarding') || pathname.startsWith('/pending-approval')) detectedPage = 'onboarding'
+
+    return <CustomLoader page={detectedPage} fullscreen />
   }
 
   return (

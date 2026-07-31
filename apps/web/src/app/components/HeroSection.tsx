@@ -48,7 +48,7 @@ const allLeads: Array<{
   status: 'new' | 'saved' | 'drafting' | 'sent' | 'replied' | 'follow-up'
   timestamp: string
   niches: string[]
-  accent?: 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'
+  accent?: 'mint' | 'purple'
   isActionable?: boolean
 }> = [
   {
@@ -169,9 +169,9 @@ const dashboardStats = [
     value: '84%',
     trend: '+2.4%',
     trendUp: true,
-    accent: 'cyan' as const,
+    accent: 'mint' as const,
   },
-  { label: 'Credits Remaining', value: '750', trend: '/ 1,000', accent: 'orange' as const },
+  { label: 'Credits Remaining', value: '750', trend: '/ 1,000', accent: 'purple' as const },
 ]
 const activityData = [
   { day: 'Mon', value: 45 },
@@ -205,14 +205,14 @@ function LeadsContent() {
     <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative w-full scrollbar-hide">
       {/* Ambient Background Glows */}
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
-      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-cyan-soft pointer-events-none" />
+      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header & Command Bar */}
         <div className="flex flex-col items-center justify-center mb-16 mt-4">
           {/* Raycast-style Command Palette */}
           <div className="relative group w-full max-w-2xl mb-12">
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-cyan/20 to-accent-mint/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-mint/10 to-accent-mint/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center bg-surface border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
               <div className="pl-4 pr-3 text-text-secondary">
                 <MagnifyingGlassIcon className="w-5 h-5 text-text-secondary" />
@@ -277,7 +277,7 @@ function SavedContent() {
       label: 'Urgent Follow-up',
       sub: 'SLA window closing',
       count: '2 Urgent',
-      accent: 'orange',
+      accent: 'purple',
       icon: ExclamationTriangleIcon,
     },
     {
@@ -291,7 +291,7 @@ function SavedContent() {
       label: 'High Intent',
       sub: 'AI-verified opportunities',
       count: '8 New',
-      accent: 'cyan',
+      accent: 'mint',
       icon: SparklesIcon,
     },
   ]
@@ -344,7 +344,7 @@ function SavedContent() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all ${
                     activeTab === tab
-                      ? 'bg-accent-orange text-text-on-accent shadow-lg'
+                      ? 'bg-accent-purple text-text-on-accent shadow-lg'
                       : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
@@ -363,7 +363,7 @@ function SavedContent() {
                 className="bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-border-subtle transition-all w-48 lg:w-64"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-accent-orange text-text-on-accent rounded-xl font-bold text-xs hover: transition-all">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-accent-mint text-text-on-accent rounded-xl font-bold text-xs hover: transition-all">
               <SparklesIcon className="w-[14px] h-[14px]" />
               Report
             </button>
@@ -388,7 +388,7 @@ function SavedContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 + i * 0.05 }}
-                className="grid grid-cols-12 gap-4 px-8 py-5 items-center group hover:bg-white/[0.02] transition-colors focus:border-accent-orange/50"
+                className="grid grid-cols-12 gap-4 px-8 py-5 items-center group hover:bg-white/[0.02] transition-colors focus:border-accent-purple/50"
               >
                 <div className="col-span-1 flex items-center">
                   <div
@@ -404,10 +404,10 @@ function SavedContent() {
                       .join('')}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-text-primary group-hover:text-text-secondary hover:text-text-primary transition-colors transition-colors truncate group-hover:text-accent-orange">
+                    <div className="text-sm font-bold text-text-primary group-hover:text-text-secondary hover:text-text-primary transition-colors transition-colors truncate group-hover:text-accent-purple">
                       {lead.name}
                     </div>
-                    <div className="text-[10px] group-hover:text-accent-orange truncate">
+                    <div className="text-[10px] group-hover:text-accent-purple truncate">
                       {lead.email}
                     </div>
                   </div>
@@ -435,11 +435,11 @@ function SavedContent() {
 
                 <div className="col-span-1 text-right">
                   {lead.isActionable ? (
-                    <button className="px-3 py-1.5 bg-text-primary text-bg-main rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-accent-orange transition-colors">
+                    <button className="px-3 py-1.5 bg-text-primary text-bg-main rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-accent-purple transition-colors">
                       Engage
                     </button>
                   ) : (
-                    <button className="p-2 text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-all hover:bg-accent-orange">
+                    <button className="p-2 text-text-secondary hover:text-text-primary opacity-0 group-hover:opacity-100 transition-all hover:bg-accent-purple">
                       <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                     </button>
                   )}
@@ -665,13 +665,13 @@ function DashboardContent() {
       value: '84%',
       trend: '+2.4%',
       trendUp: true,
-      accent: 'cyan' as const,
+      accent: 'mint' as const,
     },
     {
       label: 'Credits Remaining',
       value: '750',
       trend: '/ 1,000',
-      accent: 'orange' as const,
+      accent: 'purple' as const,
     },
   ]
 
@@ -810,7 +810,7 @@ function DashboardContent() {
                 {[
                   { label: 'SaaS', trend: 'High Demand', color: 'mint' },
                   { label: 'Fintech', trend: 'Growing', color: 'purple' },
-                  { label: 'E-commerce', trend: 'Saturating', color: 'orange' },
+                  { label: 'E-commerce', trend: 'Saturating', color: 'purple' },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -847,7 +847,6 @@ export default function HeroSection() {
   return (
     <section
       className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-6"
-      data-color="mint"
     >
       {/* Subtle geometric grid background (Centered under the text, faint mint lines) */}
       <div

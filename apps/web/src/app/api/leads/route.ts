@@ -26,6 +26,23 @@ function extractTags(post: ExternalPost): string[] {
   return tags
 }
 
+function isLeadClaimable(post: ExternalPost): boolean {
+  return post.source === 'seed' || (post.review_status === 'approved' && !!post.intelligence)
+}
+
+function isFeedEligible(post: ExternalPost): boolean {
+  if (post.source === 'seed') return false
+  if (post.review_status !== 'approved') return false
+  return true
+}
+
+function extractSection(text: string, heading: string): string {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`#+\\s*\\?*\\s*${escaped}\\s*\\n+([\\s\\S]*?)(?:\\n#+\\s|$)`, 'i')
+  const match = text.match(regex)
+  return match ? match[1].trim() : ''
+}
+
 function externalPostToAppLead(
   post: ExternalPost,
   userState?: { isSaved: boolean; isRevealed: boolean; status: string } | null,
@@ -33,6 +50,7 @@ function externalPostToAppLead(
   const isRevealed = userState?.isRevealed || false
   const phone = post.contact_info?.phone_numbers?.[0]?.number || null
   const email = post.email || post.contact_info?.emails?.[0]?.email || ''
+  const intel = post.intelligence || ''
 
   return {
     id: post.id,
@@ -40,14 +58,14 @@ function externalPostToAppLead(
     email: isRevealed ? email : 'unlocked@leadhunterclub.com',
     company: post.contact_info?.company_name || post.author?.name || post.platform || '',
     source: post.platform || 'Unknown',
-    category: post.keyword?.replace(/^watchlist:/, '') || post.platform || 'General',
+    category: extractSection(intel, 'One-Liner') || post.author?.info || post.keyword?.replace(/^watchlist:/, '') || post.platform || 'General',
     title: post.author?.info || post.keyword || post.platform || 'Lead Signal',
     signalContext: post.content || '',
-    role: post.author?.info || '',
-    taskScope: '',
-    mustHave: '',
-    nicheBonus: '',
-    buyerType: '',
+    role: post.author?.info || extractSection(intel, 'One-Liner'),
+    taskScope: extractSection(intel, 'Context You Might Miss'),
+    mustHave: extractSection(intel, 'What They Actually Want'),
+    nicheBonus: extractSection(intel, 'How to Win'),
+    buyerType: intel,
     urgency: 'medium',
     winProb: 'medium',
     nicheTags: extractTags(post),
@@ -59,6 +77,7 @@ function externalPostToAppLead(
     timestamp: post.posted_at?.postedAgoShort || formatTimeAgo(post.created_at),
     isSaved: userState?.isSaved || false,
     isRevealed,
+    isClaimable: isLeadClaimable(post),
     hasPhone: !!phone,
     phone,
   }
@@ -74,30 +93,52 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1', 10)
     const pageSize = parseInt(searchParams.get('pageSize') || '20', 10)
 
-    const externalRes = await getPosts({ page, perPage: pageSize })
+    const isSavedView = saved === 'true'
+    const isOutreachView = saved === 'outreach'
+    const showAll = isSavedView || isOutreachView
 
-    const externalLeads = externalRes.data
+    async function asyncMapConcurrent<T, R>(
+      items: T[],
+      fn: (item: T) => Promise<R>,
+      concurrency: number,
+    ): Promise<R[]> {
+      const results: R[] = []
+      for (let i = 0; i < items.length; i += concurrency) {
+        const batch = items.slice(i, i + concurrency)
+        const batchResults = await Promise.allSettled(batch.map(fn))
+        for (const r of batchResults) {
+          if (r.status === 'fulfilled') results.push(r.value)
+        }
+      }
+      return results
+    }
 
-    const leadIds = externalLeads.map((l) => l.id)
-    const userStates =
-      leadIds.length > 0
-        ? await db.userLeadState.findMany({
-            where: {
-              userId,
-              leadId: { in: leadIds },
-            },
-          })
-        : []
+    let data: AppLead[]
 
-    const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
-
-    let data = externalLeads.map((lead) => externalPostToAppLead(lead, stateMap.get(lead.id)))
-
-    if (saved === 'true') {
-      data = data.filter((l) => l.isSaved)
-    } else if (saved === 'outreach') {
-      data = data.filter((l) => ['drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
+    if (isSavedView || isOutreachView) {
+      const userStates = await db.userLeadState.findMany({
+        where: isSavedView
+          ? { userId, isSaved: true }
+          : { userId, status: { in: ['drafting', 'sent', 'replied', 'follow-up'] } },
+      })
+      const results = await asyncMapConcurrent(
+        userStates,
+        (state) => getPost(state.leadId).then((p) => ({ post: p, state })),
+        10,
+      )
+      data = results.map((r) => externalPostToAppLead(r.post, r.state))
     } else {
+      const externalRes = await getPosts({ page, perPage: pageSize, status: 'approved' })
+      const externalLeads = externalRes.data.filter(isFeedEligible)
+      const leadIds = externalLeads.map((l) => l.id)
+      const userStates =
+        leadIds.length > 0
+          ? await db.userLeadState.findMany({
+              where: { userId, leadId: { in: leadIds } },
+            })
+          : []
+      const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
+      data = externalLeads.map((lead) => externalPostToAppLead(lead, stateMap.get(lead.id)))
       data = data.filter((l) => l.status === 'new')
     }
 
@@ -113,7 +154,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const total = externalRes.total || data.length
+    const total = data.length
     const totalPages = Math.ceil(total / pageSize)
 
     return NextResponse.json({

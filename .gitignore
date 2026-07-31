@@ -27,3 +27,7 @@ apps/web/prisma/migrate-credits.ts
 
 .vercel
 .codedev-mcp/
+
+# opencode local tooling (not part of the project)
+.opencode/
+

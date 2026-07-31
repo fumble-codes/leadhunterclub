@@ -7,27 +7,28 @@ import {
   ChatBubbleLeftRightIcon,
   ViewfinderCircleIcon,
   ExclamationTriangleIcon,
-  ArrowTopRightOnSquareIcon,
   BookmarkIcon,
   DocumentArrowDownIcon,
+  ClipboardDocumentListIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { AppLead } from '@/types/lead'
 import { useRouter } from 'next/navigation'
-import { Badge, Button } from '@/components/ui'
+import { Badge, Button, CustomLoader } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
+import { toCsv, toTsv, downloadXlsx, leadsToRows } from '@/lib/csv'
 
 export default function SavedLeadsPage() {
   const [activeTab, setActiveTab] = useState('All Leads')
   const [savedLeads, setSavedLeads] = useState<AppLead[]>([])
   const [loading, setLoading] = useState(true)
   const [isEngaging, setIsEngaging] = useState<string | null>(null)
-  const [exporting, setExporting] = useState(false)
   const [syncing, setSyncing] = useState(false)
-  const [sheetUrl, setSheetUrl] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exporting, setExporting] = useState<'csv' | 'tsv' | 'sheet' | null>(null)
   const router = useRouter()
   const { addToast } = useToast()
 
@@ -54,7 +55,7 @@ export default function SavedLeadsPage() {
       label: 'Active Conversations',
       sub: 'Currently in outreach',
       count: `${activeCount} Active`,
-      accent: 'cyan',
+      accent: 'purple',
       icon: SparklesIcon,
     },
     {
@@ -68,7 +69,7 @@ export default function SavedLeadsPage() {
       label: 'High Priority Targets',
       sub: 'Critical & High Urgency',
       count: `${priorityCount} Urgent`,
-      accent: 'orange',
+      accent: 'purple',
       icon: ExclamationTriangleIcon,
     },
   ]
@@ -113,30 +114,81 @@ export default function SavedLeadsPage() {
     }
   }
 
-  const handleExport = async () => {
-    setExporting(true)
+  const getRows = () => {
+    if (filteredLeads.length === 0) {
+      addToast({ type: 'error', message: 'No leads to export' })
+      return null
+    }
+    return leadsToRows(filteredLeads)
+  }
+
+  const handleExportSheet = () => {
+    const rows = getRows()
+    if (!rows) return
+    setExporting('sheet')
     try {
-      const token = await getFirebaseToken()
-      const res = await fetch('/api/sheets/export', {
-        method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      })
-      const json = await res.json()
-      if (res.ok && json.success) {
-        setSheetUrl(json.data.sheetUrl)
-        addToast({
-          type: 'success',
-          message: `✓ Exported ${json.data.count} leads to Google Sheets`,
-        })
-      } else {
-        addToast({ type: 'error', message: json.message || 'Export failed' })
-      }
-    } catch {
-      addToast({ type: 'error', message: 'Network error during export' })
+      const date = new Date().toISOString().slice(0, 10)
+      downloadXlsx(
+        `leadhunter-leads-${date}.xlsx`,
+        rows,
+        `Exported ${date} | View: ${activeTab} | Count: ${filteredLeads.length}`,
+      )
+      addToast({ type: 'success', message: `✓ Downloaded ${filteredLeads.length} leads as Excel` })
     } finally {
-      setExporting(false)
+      setExporting(null)
+      setExportOpen(false)
     }
   }
+
+  const handleCopyTsv = async () => {
+    const rows = getRows()
+    if (!rows) return
+    setExporting('tsv')
+    try {
+      await navigator.clipboard.writeText(toTsv(rows))
+      addToast({
+        type: 'success',
+        message: `✓ Copied ${filteredLeads.length} leads — paste into Excel/Sheets`,
+      })
+    } catch {
+      addToast({ type: 'error', message: 'Clipboard access blocked' })
+    } finally {
+      setExporting(null)
+      setExportOpen(false)
+    }
+  }
+
+  const handleCopyCsv = async () => {
+    const rows = getRows()
+    if (!rows) return
+    setExporting('csv')
+    try {
+      await navigator.clipboard.writeText(toCsv(rows))
+      addToast({
+        type: 'success',
+        message: `✓ Copied ${filteredLeads.length} leads as CSV`,
+      })
+    } catch {
+      addToast({ type: 'error', message: 'Clipboard access blocked' })
+    } finally {
+      setExporting(null)
+      setExportOpen(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!exportOpen) return
+    const close = () => setExportOpen(false)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExportOpen(false)
+    }
+    window.addEventListener('click', close)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('click', close)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [exportOpen])
 
   const handleSync = async () => {
     setSyncing(true)
@@ -192,12 +244,12 @@ export default function SavedLeadsPage() {
     return true
   })
 
-  const statusBadgeColor: Record<string, 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'> = {
+  const statusBadgeColor: Record<string, 'mint' | 'purple'> = {
     saved: 'mint',
-    drafting: 'cyan',
+    drafting: 'mint',
     sent: 'purple',
-    replied: 'pink',
-    'follow-up': 'orange',
+    replied: 'purple',
+    'follow-up': 'purple',
   }
 
   return (
@@ -248,7 +300,7 @@ export default function SavedLeadsPage() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-11 font-bold uppercase tracking-widest transition-all ${
                     activeTab === tab
-                      ? 'bg-accent-orange text-text-on-accent shadow-lg'
+                      ? 'bg-accent-purple text-text-on-accent shadow-lg'
                       : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
@@ -268,33 +320,62 @@ export default function SavedLeadsPage() {
               />
             </div>
 
-            {sheetUrl && (
-              <a
-                href={sheetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2.5 bg-accent-mint/10 text-accent-mint border border-accent-mint/20 rounded-xl font-bold text-xs hover:bg-accent-mint/20 transition-all"
-              >
-                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-                Open Sheet
-              </a>
-            )}
-
             <Button variant="outline" color="mint" size="sm" onClick={handleSync} loading={syncing}>
               <ArrowPathIcon className="w-3 h-3" />
               Sync from Sheet
             </Button>
 
-            <Button
-              variant="primary"
-              color="mint"
-              size="sm"
-              onClick={handleExport}
-              loading={exporting}
-            >
-              <DocumentArrowDownIcon className="w-3 h-3" />
-              Export to Sheets
-            </Button>
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant="primary"
+                color="mint"
+                size="sm"
+                onClick={() => setExportOpen((o) => !o)}
+              >
+                <DocumentArrowDownIcon className="w-3 h-3" />
+                Export
+                <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                </svg>
+              </Button>
+
+              {exportOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-surface-elevated border border-white/10 shadow-2xl shadow-black/40 overflow-hidden z-50">
+                  <button
+                    onClick={handleCopyCsv}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                  >
+                    <ClipboardDocumentListIcon className="w-4 h-4 text-accent-mint shrink-0" />
+                    <span>
+                      <span className="block text-xs font-bold text-text-primary">Copy as CSV</span>
+                      <span className="block text-[10px] text-text-secondary mt-0.5">Comma-separated — for any app</span>
+                    </span>
+                  </button>
+                  <div className="h-px bg-white/[0.05]" />
+                  <button
+                    onClick={handleCopyTsv}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                  >
+                    <ClipboardDocumentListIcon className="w-4 h-4 text-accent-purple shrink-0" />
+                    <span>
+                      <span className="block text-xs font-bold text-text-primary">Copy as TSV</span>
+                      <span className="block text-[10px] text-text-secondary mt-0.5">Tab-separated — paste into Sheets/Excel</span>
+                    </span>
+                  </button>
+                  <div className="h-px bg-white/[0.05]" />
+                  <button
+                    onClick={handleExportSheet}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors"
+                  >
+                    <DocumentArrowDownIcon className="w-4 h-4 text-accent-mint shrink-0" />
+                    <span>
+                      <span className="block text-xs font-bold text-text-primary">Download Sheet</span>
+                      <span className="block text-[10px] text-text-secondary mt-0.5">Formatted .xlsx — headers, filters, frozen row</span>
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -337,7 +418,7 @@ export default function SavedLeadsPage() {
                       <div
                         className={`w-2.5 h-2.5 rounded-full ${
                           lead.status === 'replied'
-                            ? 'bg-accent-pink'
+                            ? 'bg-accent-purple'
                             : lead.status === 'sent' || lead.status === 'follow-up'
                               ? 'bg-accent-purple'
                               : 'bg-accent-mint'
@@ -347,16 +428,17 @@ export default function SavedLeadsPage() {
 
                     <div className="col-span-3 flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-surface-elevated border border-white/10 flex items-center justify-center text-11 font-bold text-text-primary overflow-hidden shrink-0">
-                        {lead.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')}
+                        {lead.isRevealed
+                          ? lead.name.split(' ').map((n) => n[0]).join('')
+                          : '??'}
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-bold text-text-primary truncate">
-                          {lead.name}
+                          {lead.isRevealed ? lead.name : 'Unlocked Contact'}
                         </div>
-                        <div className="text-xxs text-text-secondary truncate">{lead.email}</div>
+                        <div className="text-xxs text-text-secondary truncate">
+                          {lead.isRevealed ? lead.email : 'unlocked@leadhunterclub.com'}
+                        </div>
                       </div>
                     </div>
 
@@ -411,7 +493,7 @@ export default function SavedLeadsPage() {
                         <>
                           <Button
                             variant="ghost"
-                            color="pink"
+                            color="purple"
                             size="sm"
                             onClick={() => handleMarkStatus(lead.id, 'replied', 'Replied')}
                           >
@@ -419,7 +501,7 @@ export default function SavedLeadsPage() {
                           </Button>
                           <Button
                             variant="ghost"
-                            color="cyan"
+                            color="mint"
                             size="sm"
                             onClick={() => handleEngage(lead.id)}
                             loading={isEngaging === lead.id}
@@ -428,7 +510,7 @@ export default function SavedLeadsPage() {
                           </Button>
                         </>
                       ) : lead.status === 'replied' ? (
-                        <Badge size="sm" color="pink">
+                        <Badge size="sm" color="purple">
                           Done
                         </Badge>
                       ) : null}
@@ -439,11 +521,7 @@ export default function SavedLeadsPage() {
             </>
           )}
 
-          {loading && (
-            <div className="p-8 text-center text-text-secondary text-sm">
-              Loading saved pipeline...
-            </div>
-          )}
+          {loading && <CustomLoader page="saved" />}
           {!loading && savedLeads.length === 0 && (
             <div className="p-12 text-center">
               <p className="text-text-secondary text-sm mb-4">No saved leads yet.</p>

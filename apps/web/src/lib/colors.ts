@@ -1,15 +1,89 @@
-export const core = {
-  background: '#0F1115',
-  'on-background': '#F5F7FA',
+/**
+ * Lead Hunter Club — Design Tokens
+ *
+ * Brand system is intentionally minimal:
+ *  - mint  = primary brand accent (CTAs, active states, signals)
+ *  - purple = secondary brand accent (highlights, secondary CTAs)
+ *  - cyan / orange / pink are SEMANTIC ONLY (persona identity, status, warnings)
+ *
+ * One neutral scale (`canvas`) powers all surfaces. `code-*` are editor
+ * surfaces. `dot-*` / `social-*` are semantic UI chrome.
+ */
+
+// Neutral surface scale — single source of truth for all surfaces
+export const canvas = {
+  DEFAULT: '#0F1115',
+  deeper: '#0A0C10',
+  dim: '#111317',
+  surface: '#11150C',
+  secondary: '#171A20',
+  elevated: '#1E222B',
+  bright: '#37393E',
 } as const
 
+// Code-editor surfaces
+export const code = {
+  bg: '#11151A',
+  'bg-dark': '#0A0C10',
+  header: '#13171C',
+} as const
+
+export const border = {
+  subtle: 'rgba(255, 255, 255, 0.06)',
+} as const
+
+// Brand + semantic accents
+export const accent = {
+  mint: '#B8F36B', // primary brand
+  purple: '#A78BFA', // secondary brand
+  cyan: '#7DD3FC', // semantic: persona-blue / status
+  orange: '#FFB86B', // semantic: warning
+  pink: '#F9A8D4', // semantic: status
+} as const
+
+// Persona identity colors (used to differentiate leads, never decorative)
+export const persona = {
+  green: accent.mint,
+  blue: accent.cyan,
+  pink: accent.pink,
+  orange: '#FB923C',
+  purple: accent.purple,
+} as const
+
+export const status = {
+  amber: '#FFBD2E',
+  'orange-deep': '#F97316',
+} as const
+
+export const dot = {
+  red: '#FF5F57',
+  yellow: '#FEBC2E',
+  green: '#28C840',
+} as const
+
+export const social = {
+  twitter: '#1DA1F2',
+  linkedin: '#0A66C2',
+  reddit: '#FF4500',
+} as const
+
+export const text = {
+  primary: '#F5F7FA',
+  secondary: '#9CA3AF',
+  muted: '#6B7280',
+  'on-accent': '#11150C',
+  'on-surface': '#e2e2e8',
+  'on-surface-variant': '#c2c9b3',
+} as const
+
+// RGB triplets for rgba() usage in inline styles / glows
 export const rgb = {
   white: '255, 255, 255',
   black: '0, 0, 0',
   'accent-mint': '184, 243, 107',
   'accent-purple': '167, 139, 250',
-  'accent-orange': '255, 184, 107',
   'accent-cyan': '125, 211, 252',
+  'accent-orange': '255, 184, 107',
   'accent-pink': '249, 168, 212',
   'persona-green': '184, 243, 107',
   'persona-blue': '125, 211, 252',
@@ -18,162 +92,61 @@ export const rgb = {
   'tab-purple': '167, 139, 250',
   'badge-amber': '255, 189, 46',
   'orange-deep': '249, 115, 22',
+  'social-twitter': '29, 161, 242',
 } as const
 
-export const canvas = {
-  DEFAULT: '#0F1115',
-  surface: '#11150C',
-  secondary: '#171A20',
-  elevated: '#1E222B',
-  dim: '#111317',
-  bright: '#37393e',
-} as const
-
-export const container = {
-  lowest: '#0c0e12',
-  low: '#1a1c20',
-  DEFAULT: '#1e2024',
-  high: '#282a2e',
-  highest: '#333539',
-} as const
-
-export const border = {
-  subtle: 'rgba(255, 255, 255, 0.06)',
-} as const
-
-export const accent = {
-  mint: '#B8F36B',
-  purple: '#A78BFA',
-  orange: '#FFB86B',
-  cyan: '#7DD3FC',
-  pink: '#F9A8D4',
-} as const
-
-export const text = {
-  primary: '#F5F7FA',
-  secondary: '#9CA3AF',
-  muted: '#6B7280',
-  'on-surface': '#e2e2e8',
-  'on-surface-variant': '#c2c9b3',
-} as const
-
-export const material = {
-  primary: '#fdfff2',
-  'on-primary': '#203700',
-  'primary-container': '#b8f36b',
-  'on-primary-container': '#456f00',
-  'primary-fixed': '#b9f46c',
-  'primary-fixed-dim': '#9ed753',
-  'on-primary-fixed': '#102000',
-  'on-primary-fixed-variant': '#304f00',
-  'inverse-primary': '#416900',
-  secondary: '#cebdff',
-  'on-secondary': '#381385',
-  'secondary-container': '#4f319c',
-  'on-secondary-container': '#bea8ff',
-  'secondary-fixed': '#e8ddff',
-  'secondary-fixed-dim': '#cebdff',
-  'on-secondary-fixed': '#21005e',
-  'on-secondary-fixed-variant': '#4f319c',
-  tertiary: '#fdfdff',
-  'on-tertiary': '#003547',
-  'tertiary-container': '#bce7ff',
-  'on-tertiary-container': '#006c8d',
-  'tertiary-fixed': '#c0e8ff',
-  'tertiary-fixed-dim': '#7bd1fa',
-  'on-tertiary-fixed': '#001e2b',
-  'on-tertiary-fixed-variant': '#004d66',
-  error: '#ffb4ab',
-  'on-error': '#690005',
-  'error-container': '#93000a',
-  'on-error-container': '#ffdad6',
-  outline: '#8d937f',
-  'outline-variant': '#434938',
-  'surface-variant': '#333539',
-  'surface-tint': '#9ed753',
-  'inverse-surface': '#e2e2e8',
-  'inverse-on-surface': '#2f3035',
-  'surface-bright': '#37393e',
-  'surface-dim': '#111317',
-} as const
-
+// Tailwind color palette (exposed as bg-/text-/border- utilities)
 export const palette = {
   'bg-main': canvas.DEFAULT,
   'page-bg': canvas.DEFAULT,
   background: canvas.DEFAULT,
+  'on-background': text.primary,
   surface: canvas.surface,
   'surface-secondary': canvas.secondary,
   'surface-elevated': canvas.elevated,
   'surface-dim': canvas.dim,
   'surface-bright': canvas.bright,
-  'container-lowest': container.lowest,
-  'container-low': container.low,
-  container: container.DEFAULT,
-  'container-high': container.high,
-  'container-highest': container.highest,
+  'canvas-deeper': canvas.deeper,
+  'code-bg': code.bg,
+  'code-bg-dark': code['bg-dark'],
+  'code-header': code.header,
   'border-subtle': border.subtle,
   'accent-mint': accent.mint,
   'accent-purple': accent.purple,
   'accent-cyan': accent.cyan,
   'accent-orange': accent.orange,
   'accent-pink': accent.pink,
+  'persona-green': persona.green,
+  'persona-blue': persona.blue,
+  'persona-pink': persona.pink,
+  'persona-orange': persona.orange,
+  'tab-purple': accent.purple,
+  'tab-cyan': accent.cyan,
+  'tab-pink': accent.pink,
+  'badge-amber': status.amber,
+  'orange-deep': status['orange-deep'],
+  'dot-red': dot.red,
+  'dot-yellow': dot.yellow,
+  'dot-green': dot.green,
+  'social-twitter': social.twitter,
+  'social-linkedin': social.linkedin,
+  'social-reddit': social.reddit,
   'text-primary': text.primary,
   'text-secondary': text.secondary,
   'text-muted': text.muted,
-  'text-on-accent': '#11150C',
-  'on-background': core['on-background'],
-  'persona-green': accent.mint,
-  'persona-blue': accent.cyan,
-  'persona-pink': accent.pink,
-  'persona-orange': '#FB923C',
-  'tab-purple': accent.purple,
-  'badge-amber': '#FFBD2E',
-  'orange-deep': '#F97316',
+  'text-on-accent': text['on-accent'],
+  'text-on-surface': text['on-surface'],
+  'text-on-surface-variant': text['on-surface-variant'],
   white: '#FFFFFF',
   black: '#000000',
-  primary: material.primary,
-  'on-primary': material['on-primary'],
-  'primary-container': material['primary-container'],
-  'on-primary-container': material['on-primary-container'],
-  'primary-fixed': material['primary-fixed'],
-  'primary-fixed-dim': material['primary-fixed-dim'],
-  'on-primary-fixed': material['on-primary-fixed'],
-  'on-primary-fixed-variant': material['on-primary-fixed-variant'],
-  'inverse-primary': material['inverse-primary'],
-  secondary: material.secondary,
-  'on-secondary': material['on-secondary'],
-  'secondary-container': material['secondary-container'],
-  'on-secondary-container': material['on-secondary-container'],
-  'secondary-fixed': material['secondary-fixed'],
-  'secondary-fixed-dim': material['secondary-fixed-dim'],
-  'on-secondary-fixed': material['on-secondary-fixed'],
-  'on-secondary-fixed-variant': material['on-secondary-fixed-variant'],
-  tertiary: material.tertiary,
-  'on-tertiary': material['on-tertiary'],
-  'tertiary-container': material['tertiary-container'],
-  'on-tertiary-container': material['on-tertiary-container'],
-  'tertiary-fixed': material['tertiary-fixed'],
-  'tertiary-fixed-dim': material['tertiary-fixed-dim'],
-  'on-tertiary-fixed': material['on-tertiary-fixed'],
-  'on-tertiary-fixed-variant': material['on-tertiary-fixed-variant'],
-  error: material.error,
-  'on-error': material['on-error'],
-  'error-container': material['error-container'],
-  'on-error-container': material['on-error-container'],
-  outline: material.outline,
-  'outline-variant': material['outline-variant'],
-  'surface-variant': material['surface-variant'],
-  'surface-tint': material['surface-tint'],
-  'inverse-surface': material['inverse-surface'],
-  'inverse-on-surface': material['inverse-on-surface'],
 } as const
 
 export const personaColorMap: Record<string, string> = {
-  green: palette['persona-green'],
-  blue: palette['persona-blue'],
-  pink: palette['persona-pink'],
-  purple: palette['tab-purple'],
-  orange: palette['persona-orange'],
+  green: persona.green,
+  blue: persona.blue,
+  pink: persona.pink,
+  purple: persona.purple,
+  orange: persona.orange,
 } as const
 
 export const accentColorMap: Record<string, string> = {
@@ -205,13 +178,14 @@ export const cssVars: Record<string, string> = {
   '--rgb-accent-pink': rgb['accent-pink'],
   '--rgb-white': rgb.white,
   '--rgb-black': rgb.black,
-  '--rgb-orange-deep': rgb['orange-deep'],
-  '--rgb-badge-amber': rgb['badge-amber'],
-  '--rgb-tab-purple': rgb['tab-purple'],
   '--rgb-persona-green': rgb['persona-green'],
   '--rgb-persona-blue': rgb['persona-blue'],
   '--rgb-persona-pink': rgb['persona-pink'],
   '--rgb-persona-orange': rgb['persona-orange'],
+  '--rgb-tab-purple': rgb['tab-purple'],
+  '--rgb-badge-amber': rgb['badge-amber'],
+  '--rgb-orange-deep': rgb['orange-deep'],
+  '--rgb-social-twitter': rgb['social-twitter'],
   '--color-page-bg': canvas.DEFAULT,
   '--color-surface': canvas.surface,
   '--color-surface-secondary': canvas.secondary,
@@ -220,14 +194,14 @@ export const cssVars: Record<string, string> = {
   '--color-text-primary': text.primary,
   '--color-text-secondary': text.secondary,
   '--color-text-muted': text.muted,
-  '--color-text-on-accent': '#11150C',
-  '--color-persona-green': accent.mint,
-  '--color-persona-blue': accent.cyan,
-  '--color-persona-pink': accent.pink,
-  '--color-persona-orange': '#FB923C',
+  '--color-text-on-accent': text['on-accent'],
+  '--color-persona-green': persona.green,
+  '--color-persona-blue': persona.blue,
+  '--color-persona-pink': persona.pink,
+  '--color-persona-orange': persona.orange,
   '--color-tab-purple': accent.purple,
-  '--color-badge-amber': '#FFBD2E',
-  '--color-orange-deep': '#F97316',
+  '--color-badge-amber': status.amber,
+  '--color-orange-deep': status['orange-deep'],
   '--color-white': '#FFFFFF',
   '--color-black': '#000000',
   '--color-metallic-start': '#121214',

@@ -193,7 +193,7 @@ export default function TokenSystemSection() {
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'leads' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'} 'text-accent-pink'`}
+                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'leads' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
                   ● USER INTENT FEEDS
                 </span>
@@ -260,7 +260,7 @@ export default function TokenSystemSection() {
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'outreach' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'} 'text-accent-pink'`}
+                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'outreach' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
                   ○ GENERATE OUTREACH
                 </span>
@@ -295,7 +295,7 @@ export default function TokenSystemSection() {
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'automation' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'} 'text-accent-pink'`}
+                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'automation' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
                   ○ CAMPAIGN AUTOMATION
                 </span>

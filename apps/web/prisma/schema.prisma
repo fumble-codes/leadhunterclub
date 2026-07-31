@@ -164,3 +164,106 @@ model CrmActivity {
   details   String?
   createdAt DateTime @default(now())
 }
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("organizations")
+}
+
+model Role {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  slug         String   @unique
+  description  String?
+  permissions  Json     @default("[]")
+  scopeType    String   @default("organization")
+  isSystemRole Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignments RoleAssignment[]
+
+  @@map("roles")
+}
+
+model ApifyKey {
+  id             String   @id @default(uuid())
+  key            String   @unique
+  label          String?
+  is_active      Boolean  @default(true)
+  is_deleted     Boolean  @default(false)
+  comments_used  Int      @default(0)
+  comments_limit Int      @default(1000)
+  usage_month    String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  deleted_at     DateTime?
+
+  @@map("apify_keys")
+}
+
+model RoleAssignment {
+  id             String    @id @default(uuid())
+  userId         String
+  roleId         String
+  scopeType      String
+  organizationId String?
+  assignedById   String?
+  expiresAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  role           Role      @relation(fields: [roleId], references: [id])
+
+  @@index([userId, scopeType, organizationId])
+  @@map("role_assignments")
+}
+
+model Keyword {
+  id         String   @id @default(uuid())
+  text       String   @unique
+  platforms  Json     @default("[\"linkedin\"]")
+  is_active  Boolean  @default(true)
+  is_deleted Boolean  @default(false)
+  deleted_at DateTime?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("keywords")
+}
+
+model SourceProfile {
+  id                     String    @id @default(uuid())
+  name                   String
+  url                    String    @unique
+  platform               String    @default("linkedin")
+  notes                  String?
+  is_active              Boolean   @default(true)
+  last_scraped_at        DateTime?
+  last_comments_found    Int       @default(0)
+  monthly_comments_found Int       @default(0)
+  usage_month            String?
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @updatedAt
+
+  @@map("source_profiles")
+}
+
+model Setting {
+  id          String    @id @default(uuid())
+  key         String    @unique
+  value       Json
+  description String?
+  is_deleted  Boolean   @default(false)
+  deleted_at  DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@map("settings")
+}

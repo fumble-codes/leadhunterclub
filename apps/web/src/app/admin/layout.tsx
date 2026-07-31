@@ -4,6 +4,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useEffect } from 'react'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 import {
   HomeIcon,
   UsersIcon,
@@ -11,6 +13,11 @@ import {
   ClockIcon,
   UserGroupIcon,
   ArrowLeftOnRectangleIcon,
+  HashtagIcon,
+  EyeIcon,
+  KeyIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/solid'
 
 const adminNav = [
@@ -19,6 +26,11 @@ const adminNav = [
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
   { name: 'Contacts', href: '/admin/contacts', icon: UserGroupIcon },
   { name: 'Credits', href: '/admin/credits', icon: CurrencyDollarIcon },
+  { name: 'Keywords', href: '/admin/keywords', icon: HashtagIcon },
+  { name: 'Watchlist', href: '/admin/targets', icon: EyeIcon },
+  { name: 'Leads', href: '/admin/leads', icon: SparklesIcon },
+  { name: 'Tokens', href: '/admin/tokens', icon: KeyIcon },
+  { name: 'RBAC', href: '/admin/rbac', icon: ShieldCheckIcon },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -38,11 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [user, loading, router])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-bg-main flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-      </div>
-    )
+    return <CustomLoader page="admin" fullscreen />
   }
 
   if (!user || user.role !== 'admin' || user.status === 'SUSPENDED' || user.status === 'REJECTED')

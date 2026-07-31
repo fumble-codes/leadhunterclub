@@ -186,7 +186,7 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-bg-main flex flex-col items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-orange-deep),0.08)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.08)_0%,transparent_60%)] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, x: -10 }}
@@ -215,7 +215,7 @@ export default function RegisterPage() {
               alt="Lead Hunter Club"
               width={48}
               height={48}
-              className="w-12 h-12 rounded-xl mx-auto mb-4 shadow-[0_0_20px_rgba(var(--rgb-orange-deep),0.15)] hover:scale-105 transition-transform duration-300"
+              className="w-12 h-12 rounded-xl mx-auto mb-4 shadow-[0_0_20px_rgba(var(--rgb-accent-mint),0.15)] hover:scale-105 transition-transform duration-300"
             />
           </Link>
           <h1 className="text-2xl font-bold text-text-primary tracking-tight">
@@ -309,7 +309,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={handleSendOtp}
                     disabled={phoneLoading || !phoneNumber.trim()}
-                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {phoneLoading ? (
                       <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
@@ -362,7 +362,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={handleVerifyOtp}
                     disabled={phoneLoading || verificationCode.length < 6}
-                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {phoneLoading ? (
                       <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
@@ -430,7 +430,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2"
+                className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />

@@ -11,6 +11,8 @@ import {
   ArrowTopRightOnSquareIcon,
   ChevronDownIcon,
 } from '@heroicons/react/24/solid'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 
 interface CreditAccountInfo {
   subscriptionBalance: number
@@ -43,7 +45,7 @@ interface AdminUser {
 
 const PLAN_BADGES: Record<string, string> = {
   FREE: 'text-text-secondary bg-white/5',
-  FREELANCER: 'text-accent-cyan bg-accent-cyan/10',
+  FREELANCER: 'text-accent-mint bg-accent-mint/10',
   AGENCY: 'text-accent-purple bg-accent-purple/10',
 }
 
@@ -210,9 +212,7 @@ export default function AdminUsersPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-        </div>
+        <CustomLoader page="admin" />
       ) : (
         <>
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl">
@@ -334,7 +334,7 @@ export default function AdminUsersPage() {
                               href={ensureUrl(u.linkedin)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-xs text-accent-cyan hover:underline flex items-center gap-0.5"
+                              className="text-xs text-accent-purple hover:underline flex items-center gap-0.5"
                               title="LinkedIn"
                             >
                               Li <ArrowTopRightOnSquareIcon className="w-3 h-3" />

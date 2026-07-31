@@ -9,9 +9,6 @@ type TextColor =
   | 'muted'
   | 'accent-mint'
   | 'accent-purple'
-  | 'accent-cyan'
-  | 'accent-orange'
-  | 'accent-pink'
 
 interface TextProps {
   variant?: TextVariant
@@ -35,9 +32,6 @@ const colorStyles: Record<TextColor, string> = {
   muted: 'text-text-muted',
   'accent-mint': 'text-accent-mint',
   'accent-purple': 'text-accent-purple',
-  'accent-cyan': 'text-accent-cyan',
-  'accent-orange': 'text-accent-orange',
-  'accent-pink': 'text-accent-pink',
 }
 
 export function Text({

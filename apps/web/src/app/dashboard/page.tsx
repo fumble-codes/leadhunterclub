@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { getFirebaseToken } from '@/lib/firebase'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 import {
   BoltIcon,
   ViewfinderCircleIcon,
@@ -19,7 +21,7 @@ const iconMap: Record<string, typeof ViewfinderCircleIcon> = {
   'Credits Remaining': BanknotesIcon,
 }
 
-const accentColors = ['mint', 'purple', 'orange', 'cyan', 'pink'] as const
+const accentColors = ['mint', 'purple'] as const
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any[]>([])
@@ -57,7 +59,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="flex-1 flex items-center justify-center">
-        <div className="text-text-secondary text-sm">Loading dashboard...</div>
+        <CustomLoader page="dashboard" />
       </main>
     )
   }

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { getFirebaseToken } from '@/lib/firebase'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 
 interface CreditAccountInfo {
   subscriptionBalance: number
@@ -92,9 +94,7 @@ export default function AdminCreditsPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-        </div>
+        <CustomLoader page="admin" />
       ) : (
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
           <table className="w-full">

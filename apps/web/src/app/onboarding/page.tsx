@@ -304,7 +304,7 @@ export default function OnboardingPage() {
 
   return (
     <main className="min-h-dvh bg-bg-main flex flex-col items-center justify-start px-4 relative overflow-y-auto pt-12 pb-8">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-orange-deep),0.06)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.06)_0%,transparent_60%)] pointer-events-none" />
 
       {step > 1 && (
         <motion.button
@@ -332,7 +332,7 @@ export default function OnboardingPage() {
                   s < step
                     ? 'bg-accent-mint text-black'
                     : s === step
-                      ? 'bg-accent-mint text-white shadow-[0_0_16px_rgba(var(--rgb-orange-deep),0.3)]'
+                      ? 'bg-accent-mint text-white shadow-[0_0_16px_rgba(var(--rgb-accent-mint),0.3)]'
                       : 'bg-white/5 text-text-secondary/40'
                 }`}
               >
@@ -509,7 +509,7 @@ export default function OnboardingPage() {
                       setStep1Error('')
                       setStep(2)
                     }}
-                    className="mt-6 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)] px-4 py-3 font-medium"
+                    className="mt-6 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)] px-4 py-3 font-medium"
                   >
                     Continue
                   </button>
@@ -616,7 +616,7 @@ export default function OnboardingPage() {
                     disabled={!canProceedFromStep2}
                     className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-medium ${
                       canProceedFromStep2
-                        ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)]'
+                        ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)]'
                         : 'bg-white/5 text-text-secondary/40 cursor-not-allowed'
                     }`}
                   >
@@ -690,7 +690,7 @@ export default function OnboardingPage() {
                     disabled={!discoverySource || isSubmitting}
                     className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-medium flex items-center justify-center gap-2 ${
                       discoverySource && !isSubmitting
-                        ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-orange-deep),0.15)]'
+                        ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)]'
                         : 'bg-white/5 text-text-secondary/40 cursor-not-allowed'
                     }`}
                   >

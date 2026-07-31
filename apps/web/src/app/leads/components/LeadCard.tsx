@@ -7,11 +7,9 @@ import {
   LockClosedIcon,
   BanknotesIcon,
   BookmarkIcon,
-  SparklesIcon,
-  ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
-import { Card, Badge, Button } from '@/components/ui'
+import { Card, Badge } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { AppLead } from '@/types/lead'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -30,8 +28,7 @@ const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
     textAccent: 'text-accent-mint',
     dotColor: 'bg-accent-mint',
     glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.10)] hover:border-accent-mint/25',
-    selected:
-      'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.18)] bg-accent-mint/[0.03]',
+    selected: 'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.18)] bg-accent-mint/[0.03]',
     bookmarkActive: 'bg-accent-mint/15 border-accent-mint/30 text-accent-mint',
     topLine: 'from-transparent via-accent-mint to-transparent',
   },
@@ -39,26 +36,23 @@ const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
     textAccent: 'text-accent-mint',
     dotColor: 'bg-accent-mint',
     glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.07)] hover:border-accent-mint/20',
-    selected:
-      'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.12)] bg-accent-mint/[0.02]',
+    selected: 'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.12)] bg-accent-mint/[0.02]',
     bookmarkActive: 'bg-accent-mint/15 border-accent-mint/30 text-accent-mint',
     topLine: 'from-transparent via-accent-mint to-transparent',
   },
   medium: {
     textAccent: 'text-accent-purple',
     dotColor: 'bg-accent-purple',
-    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.07)] hover:border-accent-purple/20',
-    selected:
-      'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.12)] bg-accent-purple/[0.02]',
+    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.07)] hover:border-accent-purple/20',
+    selected: 'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.12)] bg-accent-purple/[0.02]',
     bookmarkActive: 'bg-accent-purple/15 border-accent-purple/30 text-accent-purple',
     topLine: 'from-transparent via-accent-purple to-transparent',
   },
   low: {
     textAccent: 'text-accent-purple',
     dotColor: 'bg-accent-purple',
-    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.05)] hover:border-accent-purple/15',
-    selected:
-      'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-cyan),0.08)] bg-accent-purple/[0.02]',
+    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.05)] hover:border-accent-purple/15',
+    selected: 'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.08)] bg-accent-purple/[0.02]',
     bookmarkActive: 'bg-accent-purple/15 border-accent-purple/30 text-accent-purple',
     topLine: 'from-transparent via-accent-purple to-transparent',
   },
@@ -73,7 +67,7 @@ const urgencyLabel: Record<AppLead['urgency'], string> = {
 
 const urgencyBadgeColor: Record<
   AppLead['urgency'],
-  'mint' | 'purple' | 'cyan' | 'orange' | 'pink'
+  'mint' | 'purple'
 > = {
   critical: 'mint',
   high: 'mint',
@@ -86,20 +80,27 @@ export default function LeadCard({
   isSelected,
   onClick,
   onSaveToggle,
+  onReveal,
 }: {
   lead: AppLead
   isSelected?: boolean
   onClick?: () => void
   onSaveToggle?: (isSaved: boolean) => void
+  onReveal?: (leadId: string, name: string, email: string, phone?: string | null) => void
 }) {
   const theme = urgencyTheme[lead.urgency]
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
+  const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
   const { addToast } = useToast()
   const router = useRouter()
 
   useEffect(() => {
     setIsSaved(lead.status === 'saved')
   }, [lead.status])
+
+  useEffect(() => {
+    setIsRevealed(lead.isRevealed)
+  }, [lead.isRevealed])
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -114,14 +115,45 @@ export default function LeadCard({
     }
   }
 
-  const handleQuickEngage = (e: React.MouseEvent) => {
+  const handleReveal = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    handleRevealOrEngage()
+    if (!lead.isClaimable) {
+      addToast({ type: 'error', message: 'This lead is not yet approved. Intelligence is still being generated.' })
+      return
+    }
+    const token = await getFirebaseToken()
+    try {
+      const res = await fetch('/api/leads/reveal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ leadId: lead.id }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        addToast({ type: 'error', message: json.message || json.code || 'Failed to unlock lead' })
+        return
+      }
+      setIsRevealed(true)
+      if (onReveal) {
+        onReveal(lead.id, json.name, json.email, json.phone)
+      }
+      addToast({ type: 'success', message: '✓ Contact unlocked' })
+    } catch {
+      addToast({ type: 'error', message: 'Network error' })
+    }
   }
 
-  const handleRevealOrEngage = async () => {
+  const handleEngage = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!lead.isClaimable) {
+      addToast({ type: 'error', message: 'This lead is not yet approved. Intelligence is still being generated.' })
+      return
+    }
     const token = await getFirebaseToken()
-    if (!lead.isRevealed) {
+    if (!isRevealed) {
       try {
         const res = await fetch('/api/leads/reveal', {
           method: 'POST',
@@ -131,11 +163,15 @@ export default function LeadCard({
           },
           body: JSON.stringify({ leadId: lead.id }),
         })
+        const json = await res.json()
         if (!res.ok) {
-          addToast({ type: 'error', message: 'Failed to unlock lead' })
+          addToast({ type: 'error', message: json.message || json.code || 'Failed to unlock lead' })
           return
         }
-        addToast({ type: 'success', message: 'Lead unlocked. Redirecting...' })
+        setIsRevealed(true)
+        if (onReveal) {
+          onReveal(lead.id, json.name, json.email, json.phone)
+        }
       } catch {
         addToast({ type: 'error', message: 'Network error' })
         return
@@ -158,15 +194,10 @@ export default function LeadCard({
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={`group relative text-left flex flex-col overflow-hidden h-full col-span-1 transition-all duration-300 ${
-        isSelected ? `${theme.selected} rounded-2xl` : `rounded-2xl ${theme.glow}`
-      }`}
+        isSelected ? `${theme.selected} rounded-2xl` : `rounded-2xl ${theme.glow}`}
+      `}
     >
-      <Card
-        variant="elevated"
-        padding="md"
-        hover
-        className={`h-full flex flex-col ${isSelected ? 'border-transparent' : ''}`}
-      >
+      <Card variant="elevated" padding="md" hover className={`h-full flex flex-col ${isSelected ? 'border-transparent' : ''}`}>
         {/* Top edge highlight */}
         <div
           className={`absolute top-0 left-0 right-0 h-[1px] opacity-25 transition-opacity bg-gradient-to-r ${theme.topLine} ${
@@ -201,9 +232,7 @@ export default function LeadCard({
                   : 'bg-white/5 border-transparent text-text-secondary hover:bg-white/10 hover:text-white hover:border-border-subtle'
               }`}
             >
-              <BookmarkIcon
-                className={`w-[14px] h-[14px] ${isSaved ? 'text-current' : 'text-text-secondary/30'}`}
-              />
+              <BookmarkIcon className={`w-[14px] h-[14px] ${isSaved ? 'text-current' : 'text-text-secondary/30'}`} />
             </div>
           </div>
         </div>
@@ -213,9 +242,9 @@ export default function LeadCard({
           {lead.category}
         </h4>
 
-        {/* Signal quote */}
-        <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 flex-grow">
-          &quot;{lead.signalContext}&quot;
+        {/* Signal quote - clamped to 2 lines */}
+        <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 line-clamp-2 max-h-[4.5rem]">
+          {'"'} {lead.signalContext} {'"'}
         </h3>
 
         {/* Tags row + AI Reply Probability */}
@@ -247,10 +276,7 @@ export default function LeadCard({
             <div className="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 overflow-hidden shrink-0">
               {lead.isRevealed ? (
                 <span className="text-11 font-bold text-text-primary uppercase">
-                  {lead.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
+                  {lead.name.split(' ').map((n) => n[0]).join('')}
                 </span>
               ) : (
                 <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary" />
@@ -261,7 +287,7 @@ export default function LeadCard({
                 <>
                   <div className="text-sm font-bold text-text-primary truncate">{lead.name}</div>
                   <div className="text-[10px] text-text-secondary truncate">
-                    {lead.email}{' '}
+                    {lead.email}
                     {lead.phone && <span className="ml-1 opacity-70">• {lead.phone}</span>}
                   </div>
                 </>
@@ -275,24 +301,23 @@ export default function LeadCard({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <Button variant="ghost" size="sm" color="mint" onClick={handleQuickEngage}>
-              <SparklesIcon className="w-3 h-3" />
-              Engage
-            </Button>
-            <div
-              className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[12px] transition-all cursor-pointer ${
-                isSelected
-                  ? 'bg-white/10 text-white border border-border-subtle'
-                  : 'bg-white/5 hover:bg-white/10 border border-transparent hover:border-border-subtle text-text-primary/90'
-              }`}
-            >
-              {lead.isRevealed ? 'View Details' : 'Reveal'}
-              {!lead.isRevealed && (
-                <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
-                  <BanknotesIcon className="w-3 h-3" /> -{lead.hasPhone ? '5' : '3'}
-                </span>
-              )}
-            </div>
+            {lead.isClaimable || isRevealed ? (
+              <div
+                onClick={isRevealed ? undefined : handleReveal}
+                className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[12px] transition-all cursor-pointer ${
+                  isSelected
+                    ? 'bg-white/10 text-white border border-border-subtle'
+                    : 'bg-white/5 hover:bg-white/10 border border-transparent hover:border-border-subtle text-text-primary/90'
+                }`}
+              >
+                {isRevealed ? 'View Details' : 'Reveal'}
+                {!isRevealed && (
+                  <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
+                    <BanknotesIcon className="w-3 h-3" /> -{lead.hasPhone ? '5' : '3'}
+                  </span>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
       </Card>

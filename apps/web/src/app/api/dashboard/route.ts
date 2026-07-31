@@ -88,14 +88,14 @@ export async function GET(request: NextRequest) {
         nicheCounts.set(tag, (nicheCounts.get(tag) || 0) + 1)
       })
     })
-    const colors = ['mint', 'purple', 'orange', 'cyan', 'pink']
+    const colors = ['mint', 'purple']
     const distribution = [...nicheCounts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
       .map(([label, count], i) => ({
         label,
         count,
-        color: colors[i % colors.length] as 'mint' | 'purple' | 'orange' | 'cyan' | 'pink',
+        color: colors[i % colors.length] as 'mint' | 'purple',
       }))
 
     const stats = [
@@ -118,13 +118,13 @@ export async function GET(request: NextRequest) {
         value: avgReplyProbability > 0 ? `${avgReplyProbability}%` : '--',
         trend: avgReplyProbability > 0 ? `based on ${scores.length} leads` : 'No data',
         trendUp: avgReplyProbability >= 60,
-        accent: 'cyan' as const,
+        accent: 'mint' as const,
       },
       {
         label: 'Credits Remaining',
         value: creditsRemaining.toLocaleString(),
         trend: `/ ${planCredits.toLocaleString()}`,
-        accent: 'orange' as const,
+        accent: 'purple' as const,
       },
     ]
 

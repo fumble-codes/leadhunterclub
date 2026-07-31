@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
+  }
   body {
     @apply bg-page-bg text-text-primary antialiased selection:bg-accent-mint/30;
     font-feature-settings:
@@ -173,17 +180,11 @@
     display: none;
   }
 
-  .glow-purple-faint {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.01) 0%,
-      transparent 70%
-    );
-  }
+  /* ── Ambient glows — brand hues only (mint = primary, purple = secondary) ── */
   .glow-purple-very-faint {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-purple), 0.015) 0%,
+      rgba(var(--rgb-accent-purple), 0.012) 0%,
       transparent 70%
     );
   }
@@ -197,36 +198,21 @@
   .glow-purple-medium {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-purple), 0.03) 0%,
+      rgba(var(--rgb-accent-purple), 0.025) 0%,
       transparent 70%
     );
   }
   .glow-purple-strong {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-purple), 0.04) 0%,
+      rgba(var(--rgb-accent-purple), 0.03) 0%,
       transparent 70%
     );
   }
   .glow-purple-intense {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-purple), 0.05) 0%,
-      transparent 70%
-    );
-  }
-
-  .glow-cyan-soft {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-cyan), 0.02) 0%,
-      transparent 70%
-    );
-  }
-  .glow-cyan-strong {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-cyan), 0.04) 0%,
+      rgba(var(--rgb-accent-purple), 0.04) 0%,
       transparent 70%
     );
   }
@@ -234,100 +220,103 @@
   .glow-mint-very-faint {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-mint), 0.015) 0%,
+      rgba(var(--rgb-accent-mint), 0.012) 0%,
       transparent 70%
     );
   }
   .glow-mint-soft {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-mint), 0.03) 0%,
+      rgba(var(--rgb-accent-mint), 0.02) 0%,
       transparent 70%
     );
   }
   .glow-mint-strong {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-mint), 0.25) 0%,
+      rgba(var(--rgb-accent-mint), 0.06) 0%,
       transparent 70%
     );
   }
 
+  /* Deprecated multi-hue glows — aliased to brand hues so any remaining
+     usage still renders inside the two-color system. */
+  .glow-cyan-soft {
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-mint), 0.02) 0%,
+      transparent 70%
+    );
+  }
+  .glow-cyan-strong {
+    background: radial-gradient(
+      circle at center,
+      rgba(var(--rgb-accent-mint), 0.05) 0%,
+      transparent 70%
+    );
+  }
   .glow-pink-very-faint {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-pink), 0.015) 0%,
+      rgba(var(--rgb-accent-purple), 0.012) 0%,
       transparent 70%
     );
   }
   .glow-pink-soft {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-pink), 0.02) 0%,
+      rgba(var(--rgb-accent-purple), 0.02) 0%,
       transparent 70%
     );
   }
   .glow-pink-strong {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-pink), 0.04) 0%,
+      rgba(var(--rgb-accent-purple), 0.04) 0%,
       transparent 70%
     );
   }
-
   .glow-orange-very-faint {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-orange), 0.015) 0%,
+      rgba(var(--rgb-accent-purple), 0.012) 0%,
       transparent 70%
     );
   }
   .glow-orange-soft {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-orange), 0.02) 0%,
+      rgba(var(--rgb-accent-purple), 0.02) 0%,
       transparent 70%
     );
   }
   .glow-orange-strong {
     background: radial-gradient(
       circle at center,
-      rgba(var(--rgb-accent-orange), 0.04) 0%,
+      rgba(var(--rgb-accent-purple), 0.04) 0%,
       transparent 70%
     );
   }
-}
 
-.bg-accent-mint-strong {
-  background-color: rgba(var(--rgb-accent-mint), 0.12);
-}
-.bg-accent-purple-strong {
-  background-color: rgba(var(--rgb-accent-purple), 0.12);
-}
-.bg-accent-cyan-strong {
-  background-color: rgba(var(--rgb-accent-cyan), 0.12);
-}
-.bg-accent-orange-strong {
-  background-color: rgba(var(--rgb-accent-orange), 0.12);
-}
-.bg-accent-pink-strong {
-  background-color: rgba(var(--rgb-accent-pink), 0.12);
-}
+  @keyframes shake-card {
+    0%, 100% { transform: rotate(0deg) scale(1.02); }
+    20% { transform: rotate(-0.6deg) translate(-1px, 0px) scale(1.02); }
+    40% { transform: rotate(0.4deg) translate(1px, -1px) scale(1.02); }
+    60% { transform: rotate(-0.4deg) translate(-1px, 1px) scale(1.02); }
+    80% { transform: rotate(0.6deg) translate(1px, 0px) scale(1.02); }
+  }
 
-.glow-accent {
-  box-shadow: 0 0 30px rgba(var(--rgb-accent-mint), 0.3);
-}
-.glow-accent[data-color='purple'] {
-  box-shadow: 0 0 30px rgba(var(--rgb-accent-purple), 0.3);
-}
-.glow-accent[data-color='cyan'] {
-  box-shadow: 0 0 30px rgba(var(--rgb-accent-cyan), 0.3);
-}
-.glow-accent[data-color='orange'] {
-  box-shadow: 0 0 30px rgba(var(--rgb-accent-orange), 0.3);
-}
-.glow-accent[data-color='pink'] {
-  box-shadow: 0 0 30px rgba(var(--rgb-accent-pink), 0.3);
+  .review-card-interactive {
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+  }
+
+  .review-card-interactive:hover {
+    animation: shake-card 0.4s ease-in-out infinite;
+    box-shadow: 0 0 35px var(--glow-color, rgba(var(--rgb-accent-mint), 0.25));
+    border-color: var(--border-color, rgba(var(--rgb-accent-mint), 0.20));
+    background-color: var(--bg-hover-color, rgba(var(--rgb-accent-mint), 0.03));
+  }
 }
 
 .bg-gradient-primary {

@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { ArrowRightIcon, StarIcon } from '@heroicons/react/24/solid'
 
 const ease = [0.16, 1, 0.3, 1] as const
@@ -234,140 +234,93 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ]
 
-// ─── Testimonial Card ─────────────────────────────────────────────────────────
+// ─── Review Card ─────────────────────────────────────────────────────────────
 
-function TestimonialCard({
-  testimonial,
-  isActive,
-  onClick,
-}: {
-  testimonial: Testimonial
-  isActive: boolean
-  onClick: () => void
-}) {
+function ReviewCard({ testimonial }: { testimonial: Testimonial }) {
   return (
-    <motion.div
-      layout
-      onClick={onClick}
-      className={`
-        relative flex items-center gap-4 px-5 py-4 rounded-2xl border cursor-pointer
-        transition-colors duration-300 select-none min-w-[240px] max-w-[280px] shrink-0
-        ${
-          isActive
-            ? 'bg-surface border-white/10 shadow-[0_20px_60px_rgba(var(--rgb-black),0.7)]'
-            : 'bg-surface/60 border-white/[0.04] hover:bg-surface-secondary/80'
-        }
-      `}
-      animate={isActive ? { scale: 1, opacity: 1 } : { scale: 0.92, opacity: 0.45 }}
-      whileHover={isActive ? {} : { opacity: 0.72 }}
-      transition={{ duration: 0.4, ease }}
+    <div
+      className="review-card-interactive relative flex flex-col p-6 md:p-8 rounded-2xl border border-white/[0.05] bg-surface/60 overflow-hidden h-full group"
+      style={{
+        '--glow-color': `rgba(var(--rgb-${testimonial.accentToken}), 0.25)`,
+        '--border-color': `rgba(var(--rgb-${testimonial.accentToken}), 0.20)`,
+        '--bg-hover-color': `rgba(var(--rgb-${testimonial.accentToken}), 0.03)`,
+      } as React.CSSProperties}
     >
-      {/* Avatar */}
+      {/* Ambient glow corner on hover */}
       <div
-        className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0 border"
-        style={{
-          background: `rgba(var(--rgb-${testimonial.accentToken}), 0.07)`,
-          borderColor: `rgba(var(--rgb-${testimonial.accentToken}), 0.12)`,
-          color: `var(--color-${testimonial.accentToken})`,
-        }}
-      >
-        {testimonial.initials}
-      </div>
+        className="absolute -top-12 -right-12 w-24 h-24 blur-xl rounded-full pointer-events-none opacity-20 transition-opacity duration-300 group-hover:opacity-45"
+        style={{ background: `var(--color-${testimonial.accentToken})` }}
+      />
 
-      {/* Info */}
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-text-primary truncate">{testimonial.name}</span>
-          <span className="text-[10px] text-text-secondary/40 font-mono shrink-0">
-            {testimonial.handle}
-          </span>
+      {/* Header Info */}
+      <div className="flex items-start justify-between gap-4 mb-5">
+        <div className="flex items-center gap-3 min-w-0">
+          {/* Initials Avatar */}
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border"
+            style={{
+              background: `rgba(var(--rgb-${testimonial.accentToken}), 0.07)`,
+              borderColor: `rgba(var(--rgb-${testimonial.accentToken}), 0.12)`,
+              color: `var(--color-${testimonial.accentToken})`,
+            }}
+          >
+            {testimonial.initials}
+          </div>
+
+          <div className="min-w-0">
+            <div className="text-sm font-bold text-text-primary truncate">{testimonial.name}</div>
+            <div className="text-[10px] text-text-secondary/40 font-mono truncate">{testimonial.handle}</div>
+          </div>
         </div>
-        <span className="text-[11px] text-text-secondary/60">{testimonial.role}</span>
-      </div>
 
-      {/* Active glow ring */}
-      {isActive && (
-        <motion.div
-          layoutId="active-testimonial-ring"
-          className="absolute inset-0 rounded-2xl border pointer-events-none"
-          style={{ borderColor: `rgba(var(--rgb-${testimonial.accentToken}), 0.14)` }}
-          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        />
-      )}
-    </motion.div>
-  )
-}
-
-// ─── Highlight Row ─────────────────────────────────────────────────────────────
-
-function HighlightRow({ highlight, index }: { highlight: Highlight; index: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.35, delay: index * 0.07, ease }}
-      className="flex flex-col sm:flex-row sm:items-start gap-3 py-5 border-b border-white/[0.04] last:border-0"
-    >
-      <div className="sm:w-[140px] shrink-0">
-        <span className="text-[10px] font-mono text-text-secondary/40 uppercase tracking-widest">
-          {highlight.label}:
-        </span>
-      </div>
-      <div className="flex flex-col sm:flex-row sm:items-start gap-3 flex-1">
-        <span
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest shrink-0 ${highlight.tagColor}`}
+        {/* Result Badge */}
+        <div
+          className="inline-flex items-center px-2.5 py-1 rounded-lg border text-[9px] font-bold uppercase tracking-wider shrink-0"
+          style={{
+            background: `rgba(var(--rgb-${testimonial.accentToken}), 0.05)`,
+            borderColor: `rgba(var(--rgb-${testimonial.accentToken}), 0.10)`,
+            color: `var(--color-${testimonial.accentToken})`,
+          }}
         >
-          {highlight.tag}
-        </span>
-        <p className="text-[12px] text-text-secondary/65 leading-relaxed">{highlight.detail}</p>
+          {testimonial.result}
+        </div>
       </div>
-    </motion.div>
+
+      {/* Role / Rating */}
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <span className="text-[11px] text-text-secondary/60 font-medium">{testimonial.role}</span>
+        
+        {/* Stars */}
+        <div className="flex items-center gap-0.5">
+          {[...Array(5)].map((_, i) => (
+            <StarIcon
+              key={i}
+              className="w-[11px] h-[11px]"
+              style={{ color: `var(--color-${testimonial.accentToken})`, opacity: 0.8 }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Quote */}
+      <p className="text-[13px] text-text-primary/95 leading-relaxed font-light mb-6 flex-1">
+        &ldquo;{testimonial.quote}&rdquo;
+      </p>
+
+
+    </div>
   )
 }
 
 // ─── Main Section ─────────────────────────────────────────────────────────────
 
 export default function TestimonialsSection() {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-  const total = TESTIMONIALS.length
-  const active = TESTIMONIALS[activeIndex]
-
-  const goTo = useCallback(
-    (index: number) => {
-      setActiveIndex(((index % total) + total) % total)
-    },
-    [total],
-  )
-
-  // Auto-advance
-  useEffect(() => {
-    if (isPaused) return
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % total)
-    }, 3800)
-    return () => clearInterval(interval)
-  }, [isPaused, total])
-
-  // Only show prev, active, next cards
-  const getPosition = (index: number): 'left' | 'center' | 'right' | 'hidden' => {
-    const prev = (activeIndex - 1 + total) % total
-    const next = (activeIndex + 1) % total
-    if (index === activeIndex) return 'center'
-    if (index === prev) return 'left'
-    if (index === next) return 'right'
-    return 'hidden'
-  }
-
   return (
     <section
       id="testimonials"
-      className="py-36 px-6 max-w-[1100px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      className="py-36 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
-      {/* Ambient glow */}
+      {/* Ambient glow decoration */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] glow-purple-medium pointer-events-none" />
 
       {/* Header */}
@@ -407,153 +360,23 @@ export default function TestimonialsSection() {
         </motion.p>
       </div>
 
-      {/* ── Persona Carousel ── */}
+      {/* Reviews Grid */}
       <div className="relative z-10 mb-14">
-        <div className="relative flex items-center justify-center h-[96px] overflow-visible">
-          {/* Edge fades */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-bg-main to-transparent z-30 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-bg-main to-transparent z-30 pointer-events-none" />
-
-          <div className="flex items-center justify-center gap-4 relative">
-            {TESTIMONIALS.map((t, index) => {
-              const pos = getPosition(index)
-              if (pos === 'hidden') return null
-              return (
-                <TestimonialCard
-                  key={t.id}
-                  testimonial={t}
-                  isActive={pos === 'center'}
-                  onClick={() => {
-                    goTo(index)
-                    setIsPaused(true)
-                    setTimeout(() => setIsPaused(false), 6000)
-                  }}
-                />
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Nav dots */}
-        <div className="flex items-center justify-center gap-2 mt-6">
-          {TESTIMONIALS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                goTo(i)
-                setIsPaused(true)
-                setTimeout(() => setIsPaused(false), 6000)
-              }}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${
-                i === activeIndex
-                  ? 'w-5 h-1.5 bg-white/60'
-                  : 'w-1.5 h-1.5 bg-white/15 hover:bg-white/30'
-              }`}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+          {TESTIMONIALS.map((t, index) => (
+            <motion.div
+              key={t.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6, delay: index * 0.08, ease }}
+              className="h-full"
+            >
+              <ReviewCard testimonial={t} />
+            </motion.div>
           ))}
         </div>
       </div>
-
-      {/* ── Dynamic Content ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease }}
-        className="relative z-10 max-w-[820px] mx-auto"
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-start">
-          {/* Left: Highlight rows */}
-          <div className="lg:col-span-3">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.id + '-rows'}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {active.highlights.map((h, i) => (
-                  <HighlightRow key={h.tag} highlight={h} index={i} />
-                ))}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Right: Quote card */}
-          <div className="lg:col-span-2 flex flex-col justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.id + '-quote'}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.4, ease }}
-                className="p-6 rounded-2xl bg-surface border border-white/[0.05] relative overflow-hidden"
-              >
-                {/* Accent glow */}
-                <div
-                  className="absolute top-0 right-0 w-28 h-28 blur-xl rounded-full pointer-events-none opacity-25"
-                  style={{ background: `var(--color-${active.accentToken})` }}
-                />
-
-                {/* Stars */}
-                <div className="flex items-center gap-0.5 mb-4 relative z-10">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className="w-[11px] h-[11px]"
-                      style={{ color: `var(--color-${active.accentToken})`, opacity: 0.8 }}
-                    />
-                  ))}
-                </div>
-
-                {/* Big quote mark */}
-                <span
-                  className="text-[56px] font-serif leading-none block mb-1 -mt-2 opacity-20"
-                  style={{ color: `var(--color-${active.accentToken})` }}
-                >
-                  &quot;
-                </span>
-
-                <p className="text-[13px] text-text-primary/90 leading-relaxed font-light relative z-10 -mt-3">
-                  {active.quote}
-                </p>
-
-                {/* Result badge */}
-                <div
-                  className="inline-flex items-center gap-1.5 mt-4 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider relative z-10"
-                  style={{
-                    background: `rgba(var(--rgb-${active.accentToken}), 0.05)`,
-                    borderColor: `rgba(var(--rgb-${active.accentToken}), 0.10)`,
-                    color: `var(--color-${active.accentToken})`,
-                  }}
-                >
-                  {active.result}
-                </div>
-
-                {/* Author */}
-                <div className="flex items-center gap-3 mt-4 pt-4 border-t border-white/[0.04] relative z-10">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border shrink-0"
-                    style={{
-                      background: `rgba(var(--rgb-${active.accentToken}), 0.07)`,
-                      borderColor: `rgba(var(--rgb-${active.accentToken}), 0.12)`,
-                      color: `var(--color-${active.accentToken})`,
-                    }}
-                  >
-                    {active.initials}
-                  </div>
-                  <div>
-                    <div className="text-[11px] font-bold text-text-primary">{active.name}</div>
-                    <div className="text-[10px] text-text-secondary/50">{active.role}</div>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </motion.div>
 
       {/* CTA strip */}
       <motion.div

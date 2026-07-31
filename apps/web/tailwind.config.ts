@@ -4,6 +4,11 @@ import { palette, cssVars, accent } from './src/lib/colors'
 const config: Config = {
   darkMode: 'class',
   content: ['./src/**/*.{ts,tsx}'],
+  safelist: [
+    {
+      pattern: /(bg|text|border|ring)-accent-(mint|purple)(\/(10|20|40|50))?/,
+    },
+  ],
   theme: {
     extend: {
       fontFamily: {

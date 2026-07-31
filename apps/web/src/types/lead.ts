@@ -26,6 +26,7 @@ export interface AppLead {
   niches: string[]
   isSaved?: boolean
   isRevealed?: boolean
+  isClaimable?: boolean
   hasPhone?: boolean
   phone?: string | null
   accent?: 'mint' | 'purple' | 'cyan' | 'orange' | 'pink' | string

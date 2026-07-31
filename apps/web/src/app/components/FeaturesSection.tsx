@@ -99,7 +99,7 @@ function FreshLeadsVisual({
             <div
               className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest shrink-0 transition-colors duration-300 ${
                 isPlatformHighlighted
-                  ? 'bg-accent-cyan text-text-on-accent'
+                  ? 'bg-accent-mint text-text-on-accent'
                   : 'bg-white/5 border border-white/[0.06] text-text-secondary/50'
               }`}
             >
@@ -193,7 +193,7 @@ function PlatformNetworkVisual({
   return (
     <div className={`relative aspect-[200/160] w-full max-w-[220px] mx-auto ${className}`}>
       {/* Center hub */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center z-20">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center z-20">
         <AdjustmentsHorizontalIcon className="w-4 h-4 text-text-secondary animate-pulse" />
       </div>
 
@@ -239,7 +239,7 @@ function PlatformNetworkVisual({
             <motion.div
               className={`rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)] ${
                 isHovered
-                  ? 'border-accent-cyan bg-surface-secondary scale-115 '
+                  ? 'border-accent-mint bg-surface-secondary scale-115 '
                   : 'bg-surface border-white/5'
               }`}
               style={{ width: p.size, height: p.size }}
@@ -273,7 +273,7 @@ function PlatformNetworkVisual({
 
       {/* Data pulse traveling along lines */}
       <motion.div
-        className="absolute w-1.5 h-1.5 rounded-full bg-accent-cyan  z-30"
+        className="absolute w-1.5 h-1.5 rounded-full bg-accent-mint z-30"
         animate={{
           x: [0, 30, -40, 10, 0],
           y: [0, -50, 10, 50, 0],
@@ -377,21 +377,21 @@ function LeadIntelVisual({
       label: 'Intent Score',
       value: emailStatus === 'sent' ? '98%' : '94%',
       width: emailStatus === 'sent' ? '98%' : '94%',
-      color: 'accent-mint',
+      color: 'bg-accent-mint/50',
       tip: 'Buyer actively looking for Shopify optimization experts.',
     },
     {
       label: 'Budget Signal',
       value: 'High',
       width: '82%',
-      color: 'accent-purple',
+      color: 'bg-accent-purple/50',
       tip: 'E-commerce brand doing $2M ARR with high Shopify Plus budget.',
     },
     {
       label: 'Urgency Level',
       value: emailStatus === 'sent' ? 'Handled' : 'Critical',
       width: emailStatus === 'sent' ? '100%' : '97%',
-      color: 'accent-pink',
+      color: 'bg-accent-purple/50',
       tip: 'Checkout cart errors causing direct conversion loss.',
     },
   ]
@@ -444,7 +444,7 @@ function LeadIntelVisual({
                     initial={{ width: '10%' }}
                     animate={{ width: m.width }}
                     transition={{ duration: 1.2, delay: 0.1 + i * 0.1, ease }}
-                    className={`h-full bg-${m.color}/50 rounded-full`}
+                    className={`h-full ${m.color} rounded-full`}
                   />
                 </div>
 
@@ -562,7 +562,7 @@ function EmailComposeVisual({
             <>
               Hey Alex, saw your tweet about DTC acquisition costs going up. We recently designed a
               visual checkout flow that lowered cart abandonment by 18%...
-              <span className="inline-block w-1 h-3 ml-0.5 bg-accent-orange animate-pulse align-middle" />
+              <span className="inline-block w-1 h-3 ml-0.5 bg-accent-purple animate-pulse align-middle" />
             </>
           )}
         </div>
@@ -586,7 +586,7 @@ function EmailComposeVisual({
                 ? 'bg-white/10 text-white/40 cursor-wait'
                 : emailStatus === 'sent'
                   ? 'bg-accent-mint text-text-on-accent cursor-default'
-                  : 'bg-accent-orange hover:bg-surface-secondary text-text-on-accent cursor-pointer hover:scale-105 shadow-[0_4px_12px_rgba(var(--rgb-orange-deep),0.15)]'
+                  : 'bg-accent-purple hover:bg-surface-secondary text-text-on-accent cursor-pointer hover:scale-105 shadow-[0_4px_12px_rgba(var(--rgb-accent-purple),0.15)]'
             }`}
           >
             {emailStatus === 'sending' ? (
@@ -627,7 +627,7 @@ function FollowUpTimelineVisual({
       {/* Vertical connecting line */}
       <div className="absolute left-[14px] top-[14px] bottom-[14px] w-px bg-white/[0.06] overflow-hidden">
         <motion.div
-          className="w-full h-1/3 bg-gradient-to-b from-transparent via-accent-cyan to-transparent"
+          className="w-full h-1/3 bg-gradient-to-b from-transparent via-accent-mint to-transparent"
           animate={{ y: ['-100%', '300%'] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
         />
@@ -643,25 +643,25 @@ function FollowUpTimelineVisual({
                 e.stopPropagation()
                 onSelectStep(i)
               }}
-              className="flex items-center gap-3 pl-0.5 cursor-pointer relative bg-gradient-to-b via-accent-cyan"
+              className="flex items-center gap-3 pl-0.5 cursor-pointer relative bg-gradient-to-b via-accent-mint"
             >
               <div
                 className={`w-[8px] h-[8px] rounded-full border shrink-0 flex items-center justify-center transition-all duration-500 ${
                   isSelected
-                    ? 'border-accent-cyan bg-surface-secondary scale-125 '
+                    ? 'border-accent-mint bg-surface-secondary scale-125 '
                     : step.status === 'sent'
-                      ? 'border-accent-cyan bg-surface-secondary '
+                      ? 'border-accent-mint bg-surface-secondary '
                       : step.status === 'pending'
                         ? 'border-border-subtle bg-surface-secondary'
                         : 'border-white/10 bg-white/5'
                 }`}
               >
-                {step.status === 'sent' && <div className="w-1 h-1 rounded-full bg-accent-cyan" />}
+                {step.status === 'sent' && <div className="w-1 h-1 rounded-full bg-accent-mint" />}
               </div>
               <div
                 className={`flex-1 p-2 rounded-xl border transition-all duration-300 ${
                   isSelected
-                    ? 'border-accent-cyan bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.08)] scale-102'
+                    ? 'border-accent-mint bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-accent-mint),0.08)] scale-102'
                     : 'border-white/[0.04] bg-surface hover:bg-surface-secondary hover:border-white/10'
                 }`}
               >
@@ -742,7 +742,7 @@ function TokenMeterVisual({
           />
           <defs>
             <linearGradient id="tokenGradientRow" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--color-persona-pink)" />
+              <stop offset="0%" stopColor="var(--color-accent-mint)" />
               <stop offset="100%" stopColor="var(--color-tab-purple)" />
             </linearGradient>
           </defs>
@@ -805,7 +805,7 @@ function PersonaCardsVisual({
       id: 'freelancer',
       role: 'Freelancer',
       icon: PaintBrushIcon,
-      accent: 'accent-pink',
+      accent: 'accent-purple',
       desc: '500 credits — build your pipeline',
     },
     {
@@ -981,7 +981,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute top-0 left-0 w-40 h-40 glow-cyan-strong pointer-events-none" />
+            <div className="absolute top-0 left-0 w-40 h-40 glow-mint-strong pointer-events-none" />
             <PlatformNetworkVisual
               className="max-w-[200px]"
               hoveredPlatform={hoveredPlatform}
@@ -1086,7 +1086,7 @@ export default function FeaturesSection() {
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">
-                  <span className="w-1.5 h-1.5 bg-accent-cyan rounded-full mt-1.5 shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-accent-mint rounded-full mt-1.5 shrink-0" />
                   <div>
                     <h4 className="text-[12px] font-bold text-text-primary uppercase tracking-wide leading-none mb-1">
                       {item.title}
@@ -1105,7 +1105,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute top-0 right-0 w-40 h-40 glow-cyan-strong pointer-events-none" />
+            <div className="absolute top-0 right-0 w-40 h-40 glow-mint-strong pointer-events-none" />
             <AIWriterVisual selectedStep={selectedStep} />
             <FollowUpTimelineVisual selectedStep={selectedStep} onSelectStep={setSelectedStep} />
           </motion.div>
@@ -1146,7 +1146,7 @@ export default function FeaturesSection() {
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">
-                  <span className="w-1.5 h-1.5 bg-accent-pink rounded-full mt-1.5 shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-accent-purple rounded-full mt-1.5 shrink-0" />
                   <div>
                     <h4 className="text-[12px] font-bold text-text-primary uppercase tracking-wide leading-none mb-1">
                       {item.title}
@@ -1165,7 +1165,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full lg:order-first group relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute bottom-0 left-0 w-40 h-40 glow-pink-strong pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <div className="lg:col-span-5 flex justify-center w-full group-hover:-translate-y-1 transition-transform duration-500">
               <TokenMeterVisual selectedPersona={selectedPersona} />
             </div>

@@ -20,24 +20,31 @@ export async function POST(request: NextRequest) {
       include: { lead: true },
     })
 
-    if (states.length === 0) {
+    const rows: SheetLeadRow[] = []
+    for (const s of states) {
+      if (!s.lead) {
+        console.warn(`[Sheets Export] Skipping state ${s.leadId}: no Lead record`)
+        continue
+      }
+      rows.push({
+        name: s.lead.name,
+        email: s.lead.email,
+        phone: s.lead.phone || '',
+        company: s.lead.company,
+        signalContext: s.lead.signalContext,
+        aiDraft: '',
+        status: s.status.charAt(0).toUpperCase() + s.status.slice(1),
+        urgency: s.lead.urgency.charAt(0).toUpperCase() + s.lead.urgency.slice(1),
+        replyProbability: s.lead.replyProbability,
+      })
+    }
+
+    if (rows.length === 0) {
       return NextResponse.json(
-        { code: 'NO_LEADS', message: 'No saved leads to export' },
+        { code: 'NO_LEADS', message: 'No saved leads with complete data to export' },
         { status: 400 },
       )
     }
-
-    const rows: SheetLeadRow[] = states.map((s) => ({
-      name: s.lead.name,
-      email: s.lead.email,
-      phone: s.lead.phone || '',
-      company: s.lead.company,
-      signalContext: s.lead.signalContext,
-      aiDraft: '',
-      status: s.status.charAt(0).toUpperCase() + s.status.slice(1),
-      urgency: s.lead.urgency.charAt(0).toUpperCase() + s.lead.urgency.slice(1),
-      replyProbability: s.lead.replyProbability,
-    }))
 
     let sheetUrl: string
 
@@ -73,9 +80,10 @@ export async function POST(request: NextRequest) {
         { status: 403 },
       )
     }
-    console.error('[Sheets Export] Error:', error)
+    const errMsg = error instanceof Error ? error.message : String(error)
+    console.error('[Sheets Export] Error:', errMsg)
     return NextResponse.json(
-      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to export to Google Sheets' },
+      { code: 'INTERNAL_SERVER_ERROR', message: `Failed to export to Google Sheets: ${errMsg}` },
       { status: 500 },
     )
   }

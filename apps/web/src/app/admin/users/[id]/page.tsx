@@ -12,6 +12,8 @@ import {
   CreditCardIcon,
   UserIcon,
 } from '@heroicons/react/24/solid'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 
 const PLANS = [
   { id: 'FREE', label: 'Free', credits: 50 },
@@ -21,7 +23,7 @@ const PLANS = [
 
 const PLAN_BADGES: Record<string, string> = {
   FREE: 'text-text-secondary bg-white/5',
-  FREELANCER: 'text-accent-cyan bg-accent-cyan/10',
+  FREELANCER: 'text-accent-mint bg-accent-mint/10',
   AGENCY: 'text-accent-purple bg-accent-purple/10',
 }
 
@@ -230,11 +232,7 @@ export default function AdminUserDetailPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-      </div>
-    )
+    return <CustomLoader page="admin" />
   }
 
   if (!user) {
@@ -585,7 +583,7 @@ export default function AdminUserDetailPage() {
               <button
                 onClick={() => handleAction('RENEW_NOW')}
                 disabled={actionLoading === 'RENEW_NOW'}
-                className="px-4 py-2 rounded-xl bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan text-sm font-medium hover:bg-accent-cyan/20 transition-all disabled:opacity-50"
+                className="px-4 py-2 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-sm font-medium hover:bg-accent-mint/20 transition-all disabled:opacity-50"
               >
                 {actionLoading === 'RENEW_NOW' ? 'Renewing...' : 'Renew Now'}
               </button>
@@ -600,9 +598,7 @@ export default function AdminUserDetailPage() {
             Status History
           </h3>
           {logsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-            </div>
+            <CustomLoader page="admin" />
           ) : auditLogs.length === 0 ? (
             <p className="text-sm text-text-secondary py-8 text-center">
               No status history available
@@ -665,9 +661,7 @@ export default function AdminUserDetailPage() {
               Notes
             </h3>
             {notesLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-              </div>
+              <CustomLoader page="admin" />
             ) : notes.length === 0 ? (
               <p className="text-sm text-text-secondary py-8 text-center">No notes yet</p>
             ) : (

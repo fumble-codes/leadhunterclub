@@ -89,7 +89,7 @@ export default function AdminReviewPage() {
     const links: { url: string; label: string; color: string }[] = []
     if (u.portfolio) links.push({ url: ensureUrl(u.portfolio), label: 'Portfolio', color: 'text-accent-mint' })
     if (u.website) links.push({ url: ensureUrl(u.website), label: 'Website', color: 'text-accent-mint' })
-    if (u.linkedin) links.push({ url: ensureUrl(u.linkedin), label: 'LinkedIn', color: 'text-accent-cyan' })
+    if (u.linkedin) links.push({ url: ensureUrl(u.linkedin), label: 'LinkedIn', color: 'text-accent-purple' })
     if (u.instagram) links.push({ url: ensureUrl(u.instagram), label: 'Instagram', color: 'text-accent-purple' })
     if (u.dribbble) links.push({ url: ensureUrl(u.dribbble), label: 'Dribbble', color: 'text-accent-mint' })
     if (u.behance) links.push({ url: ensureUrl(u.behance), label: 'Behance', color: 'text-blue-400' })

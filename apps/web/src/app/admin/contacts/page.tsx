@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { getFirebaseToken } from '@/lib/firebase'
+import { CustomLoader } from '@/components/ui/CustomLoader'
+
 import {
   MagnifyingGlassIcon,
   UserIcon,
@@ -47,7 +49,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const PLAN_BADGES: Record<string, string> = {
   FREE: 'text-text-secondary bg-white/5',
-  FREELANCER: 'text-accent-cyan bg-accent-cyan/10',
+  FREELANCER: 'text-accent-mint bg-accent-mint/10',
   AGENCY: 'text-accent-purple bg-accent-purple/10',
 }
 
@@ -143,11 +145,7 @@ export default function AdminContactsPage() {
     : users
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-      </div>
-    )
+    return <CustomLoader page="admin" />
   }
 
   return (

@@ -3,7 +3,7 @@
 import type { ReactNode, ButtonHTMLAttributes } from 'react'
 
 type ButtonVariant = 'primary' | 'ghost' | 'outline'
-type ButtonColor = 'mint' | 'purple' | 'cyan' | 'pink' | 'orange'
+type ButtonColor = 'mint' | 'purple'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,27 +18,16 @@ const variantColorStyles: Record<ButtonVariant, Record<ButtonColor, string>> = {
   primary: {
     mint: 'bg-accent-mint text-text-on-accent hover:brightness-110 active:scale-98',
     purple: 'bg-accent-purple text-white hover:brightness-110 active:scale-98',
-    cyan: 'bg-accent-cyan text-black hover:brightness-110 active:scale-98',
-    pink: 'bg-accent-pink text-white hover:brightness-110 active:scale-98',
-    orange: 'bg-accent-orange text-black hover:brightness-110 active:scale-98',
   },
   ghost: {
     mint: 'bg-white/5 text-text-secondary hover:text-accent-mint hover:bg-accent-mint/10 active:scale-98',
     purple:
       'bg-white/5 text-text-secondary hover:text-accent-purple hover:bg-accent-purple/10 active:scale-98',
-    cyan: 'bg-white/5 text-text-secondary hover:text-accent-cyan hover:bg-accent-cyan/10 active:scale-98',
-    pink: 'bg-white/5 text-text-secondary hover:text-accent-pink hover:bg-accent-pink/10 active:scale-98',
-    orange:
-      'bg-white/5 text-text-secondary hover:text-accent-orange hover:bg-accent-orange/10 active:scale-98',
   },
   outline: {
     mint: 'border border-accent-mint/20 text-accent-mint hover:bg-accent-mint/10 active:scale-98',
     purple:
       'border border-accent-purple/20 text-accent-purple hover:bg-accent-purple/10 active:scale-98',
-    cyan: 'border border-accent-cyan/20 text-accent-cyan hover:bg-accent-cyan/10 active:scale-98',
-    pink: 'border border-accent-pink/20 text-accent-pink hover:bg-accent-pink/10 active:scale-98',
-    orange:
-      'border border-accent-orange/20 text-accent-orange hover:bg-accent-orange/10 active:scale-98',
   },
 }
 

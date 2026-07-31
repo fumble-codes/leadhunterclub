@@ -60,6 +60,10 @@ export default function LeadDrawer({
   const tokenCost = lead.hasPhone ? 5 : 3
 
   const handleRevealClick = async () => {
+    if (!lead.isClaimable) {
+      setErrorMsg('This lead is not yet approved. Intelligence is still being generated.')
+      return
+    }
     setShowCreditModal(true)
   }
 
@@ -246,7 +250,7 @@ export default function LeadDrawer({
                 </span>
                 <a
                   href={`mailto:${lead.email}`}
-                  className="text-[12px] font-medium text-accent-cyan hover:underline flex items-center gap-1 truncate"
+                  className="text-[12px] font-medium text-accent-mint hover:underline flex items-center gap-1 truncate"
                 >
                   <EnvelopeIcon className="w-3 h-3 shrink-0" />{' '}
                   <span className="truncate">{lead.email}</span>
@@ -254,24 +258,13 @@ export default function LeadDrawer({
                 {lead.phone && (
                   <a
                     href={`tel:${lead.phone}`}
-                    className="text-[12px] font-medium text-accent-orange hover:underline flex items-center gap-1 mt-1 truncate"
+                    className="text-[12px] font-medium text-accent-purple hover:underline flex items-center gap-1 mt-1 truncate"
                   >
                     <PhoneIcon className="w-3 h-3 shrink-0" />{' '}
                     <span className="truncate">{lead.phone}</span>
                   </a>
                 )}
               </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                variant="primary"
-                color="purple"
-                size="sm"
-                onClick={handleStartOutreach}
-                loading={isStartingOutreach}
-              >
-                Start Outreach
-              </Button>
             </div>
           </div>
         ) : (
