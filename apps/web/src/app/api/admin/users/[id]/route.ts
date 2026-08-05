@@ -5,6 +5,7 @@ import { adminUserActionSchema } from '@/lib/validators/auth'
 import { auditService } from '@/lib/services/audit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 import { emailService } from '@/lib/services/email'
+import { getPlan } from '@/lib/config/plans'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,7 +41,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         createdAt: true,
         updatedAt: true,
         creditAccount: {
-          select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+          select: {
+            subscriptionBalance: true,
+            bonusBalance: true,
+            rolloverBalance: true,
+            rolloverExpiresAt: true,
+            renewalDate: true,
+          },
         },
       },
     })
@@ -55,10 +62,22 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ? {
             subscriptionBalance: user.creditAccount.subscriptionBalance,
             bonusBalance: user.creditAccount.bonusBalance,
-            total: user.creditAccount.subscriptionBalance + user.creditAccount.bonusBalance,
+            rolloverBalance: user.creditAccount.rolloverBalance,
+            rolloverExpiresAt: user.creditAccount.rolloverExpiresAt?.toISOString() || null,
+            total:
+              user.creditAccount.subscriptionBalance +
+              user.creditAccount.bonusBalance +
+              user.creditAccount.rolloverBalance,
             renewalDate: user.creditAccount.renewalDate?.toISOString() || null,
           }
-        : { subscriptionBalance: 0, bonusBalance: 0, total: 0, renewalDate: null },
+        : {
+            subscriptionBalance: 0,
+            bonusBalance: 0,
+            rolloverBalance: 0,
+            rolloverExpiresAt: null,
+            total: 0,
+            renewalDate: null,
+          },
     }
 
     return NextResponse.json({ data: userWithCredit })
@@ -137,7 +156,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           name: true,
           plan: true,
           creditAccount: {
-            select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+            select: {
+              subscriptionBalance: true,
+              bonusBalance: true,
+              rolloverBalance: true,
+              rolloverExpiresAt: true,
+              renewalDate: true,
+            },
           },
         },
       })
@@ -160,7 +185,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       })
 
       if (body.action === 'APPROVE' || body.action === 'ACTIVATE') {
-        emailService.sendApproved({ name: user.name, email: user.email }, body.plan || 'FREE')
+        emailService.sendApproved(
+          { name: user.name, email: user.email },
+          body.plan || 'FREE',
+          getPlan(body.plan || 'FREE')?.credits ?? 0,
+        )
       } else if (body.action === 'REJECT') {
         emailService.sendRejected({ name: user.name, email: user.email })
       } else if (body.action === 'SUSPEND') {
@@ -174,11 +203,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
               ? {
                   subscriptionBalance: updated.creditAccount.subscriptionBalance,
                   bonusBalance: updated.creditAccount.bonusBalance,
+                  rolloverBalance: updated.creditAccount.rolloverBalance,
+                  rolloverExpiresAt:
+                    updated.creditAccount.rolloverExpiresAt?.toISOString() || null,
                   total:
-                    updated.creditAccount.subscriptionBalance + updated.creditAccount.bonusBalance,
+                    updated.creditAccount.subscriptionBalance +
+                    updated.creditAccount.bonusBalance +
+                    updated.creditAccount.rolloverBalance,
                   renewalDate: updated.creditAccount.renewalDate?.toISOString() || null,
                 }
-              : { subscriptionBalance: 0, bonusBalance: 0, total: 0, renewalDate: null },
+              : {
+                  subscriptionBalance: 0,
+                  bonusBalance: 0,
+                  rolloverBalance: 0,
+                  rolloverExpiresAt: null,
+                  total: 0,
+                  renewalDate: null,
+                },
           }
         : null
 
@@ -211,7 +252,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           creditAccount: {
             subscriptionBalance: result.subscriptionBalance,
             bonusBalance: result.bonusBalance,
-            total: result.subscriptionBalance + result.bonusBalance,
+            rolloverBalance: result.rolloverBalance,
+            rolloverExpiresAt: result.rolloverExpiresAt?.toISOString() || null,
+            total:
+              result.subscriptionBalance + result.bonusBalance + result.rolloverBalance,
             renewalDate: result.renewalDate?.toISOString() || null,
           },
         },
@@ -243,7 +287,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
       const updatedAccount = await db.creditAccount.findUnique({
         where: { userId: targetUserId },
-        select: { subscriptionBalance: true, bonusBalance: true },
+        select: {
+          subscriptionBalance: true,
+          bonusBalance: true,
+          rolloverBalance: true,
+          rolloverExpiresAt: true,
+          renewalDate: true,
+        },
       })
 
       return NextResponse.json({
@@ -254,7 +304,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           creditAccount: {
             subscriptionBalance: updatedAccount?.subscriptionBalance ?? 0,
             bonusBalance: updatedAccount?.bonusBalance ?? 0,
-            total: (updatedAccount?.subscriptionBalance ?? 0) + (updatedAccount?.bonusBalance ?? 0),
+            rolloverBalance: updatedAccount?.rolloverBalance ?? 0,
+            rolloverExpiresAt: updatedAccount?.rolloverExpiresAt?.toISOString() || null,
+            total:
+              (updatedAccount?.subscriptionBalance ?? 0) +
+              (updatedAccount?.bonusBalance ?? 0) +
+              (updatedAccount?.rolloverBalance ?? 0),
+            renewalDate: updatedAccount?.renewalDate?.toISOString() || null,
           },
         },
       })
@@ -296,7 +352,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           creditAccount: {
             subscriptionBalance: result.subscriptionBalance,
             bonusBalance: result.bonusBalance,
-            total: result.subscriptionBalance + result.bonusBalance,
+            rolloverBalance: result.rolloverBalance,
+            rolloverExpiresAt: result.rolloverExpiresAt?.toISOString() || null,
+            total:
+              result.subscriptionBalance + result.bonusBalance + result.rolloverBalance,
             renewalDate: result.renewalDate?.toISOString() || null,
           },
         },

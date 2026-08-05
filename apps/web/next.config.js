@@ -75,6 +75,9 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ['firebase-admin'],
+  },
   async headers() {
     return [
       {

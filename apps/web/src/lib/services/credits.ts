@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import type { Prisma } from '@prisma/client'
 import { getPlanCredits } from '@/lib/config/plans'
+import { expireRolloverInTx, rolloverOnRenewal } from '@/lib/services/rollover'
 
 export class InsufficientCreditsError extends Error {
   public required: number
@@ -28,15 +29,26 @@ async function checkAndRenewInTx(tx: Prisma.TransactionClient, userId: string) {
 
   if (!account) return null
 
+  await expireRolloverInTx(tx, userId, account)
+
   if (account.renewalDate && now() >= account.renewalDate) {
     const limit = getPlanCredits(account.user.plan)
+    const rollover = rolloverOnRenewal(account, account.subscriptionBalance)
     const renewed = await tx.creditAccount.update({
       where: { userId },
       data: {
         subscriptionBalance: limit,
         renewalDate: new Date(account.renewalDate.getTime() + 30 * 24 * 60 * 60 * 1000),
+        rolloverBalance: rollover.rolloverBalance,
+        rolloverExpiresAt: rollover.rolloverExpiresAt,
       },
-      select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+      select: {
+        subscriptionBalance: true,
+        bonusBalance: true,
+        rolloverBalance: true,
+        rolloverExpiresAt: true,
+        renewalDate: true,
+      },
     })
 
     await tx.auditLog.create({
@@ -50,6 +62,8 @@ async function checkAndRenewInTx(tx: Prisma.TransactionClient, userId: string) {
           type: 'renewal',
           previousSubscriptionBalance: account.subscriptionBalance,
           newSubscriptionBalance: limit,
+          rolledOver: rollover.rolloverBalance,
+          rolloverExpiresAt: rollover.rolloverExpiresAt?.toISOString(),
           reason: 'auto_renewal',
         },
       },
@@ -76,19 +90,36 @@ async function deductInTx(
 
   if (!account) throw new Error('CreditAccount not found')
 
-  const totalAvailable = account.bonusBalance + account.subscriptionBalance
+  const totalAvailable = account.bonusBalance + account.subscriptionBalance + account.rolloverBalance
   if (totalAvailable < amount) throw new InsufficientCreditsError(amount, totalAvailable)
 
-  let bonusDeduction = Math.min(account.bonusBalance, amount)
-  let subscriptionDeduction = amount - bonusDeduction
+  let remaining = amount
+  const rolloverDeduction = Math.min(account.rolloverBalance, remaining)
+  remaining -= rolloverDeduction
+  const subscriptionDeduction = Math.min(account.subscriptionBalance, remaining)
+  remaining -= subscriptionDeduction
+  const bonusDeduction = remaining
+
+  const data: Prisma.CreditAccountUpdateInput = {
+    rolloverBalance: { decrement: rolloverDeduction },
+    subscriptionBalance: { decrement: subscriptionDeduction },
+    bonusBalance: { decrement: bonusDeduction },
+  }
+
+  if (rolloverDeduction > 0 && account.rolloverBalance - rolloverDeduction === 0) {
+    data.rolloverExpiresAt = null
+  }
 
   const updated = await tx.creditAccount.update({
     where: { userId },
-    data: {
-      bonusBalance: { decrement: bonusDeduction },
-      subscriptionBalance: { decrement: subscriptionDeduction },
+    data,
+    select: {
+      subscriptionBalance: true,
+      bonusBalance: true,
+      rolloverBalance: true,
+      rolloverExpiresAt: true,
+      renewalDate: true,
     },
-    select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
   })
 
   const actingAdminId = (metadata?.adminId as string) ?? userId
@@ -103,11 +134,13 @@ async function deductInTx(
       details: {
         type: 'deduct',
         amount,
-        bonusUsed: bonusDeduction,
+        rolloverUsed: rolloverDeduction,
         subscriptionUsed: subscriptionDeduction,
+        bonusUsed: bonusDeduction,
         reason,
         subscriptionBalanceAfter: updated.subscriptionBalance,
         bonusBalanceAfter: updated.bonusBalance,
+        rolloverBalanceAfter: updated.rolloverBalance,
         ...metadata,
       },
     },
@@ -185,13 +218,24 @@ export const creditService = {
 
     const account = await db.creditAccount.findUnique({
       where: { userId },
-      select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+      select: {
+        subscriptionBalance: true,
+        bonusBalance: true,
+        rolloverBalance: true,
+        rolloverExpiresAt: true,
+        renewalDate: true,
+      },
     })
 
     return {
       subscriptionBalance: account?.subscriptionBalance ?? 0,
       bonusBalance: account?.bonusBalance ?? 0,
-      total: (account?.subscriptionBalance ?? 0) + (account?.bonusBalance ?? 0),
+      rolloverBalance: account?.rolloverBalance ?? 0,
+      rolloverExpiresAt: account?.rolloverExpiresAt ?? null,
+      total:
+        (account?.subscriptionBalance ?? 0) +
+        (account?.bonusBalance ?? 0) +
+        (account?.rolloverBalance ?? 0),
       renewalDate: account?.renewalDate ?? null,
     }
   },
@@ -220,7 +264,13 @@ export const creditService = {
           subscriptionBalance: limit,
           renewalDate,
         },
-        select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+        select: {
+          subscriptionBalance: true,
+          bonusBalance: true,
+          rolloverBalance: true,
+          rolloverExpiresAt: true,
+          renewalDate: true,
+        },
       })
 
       await tx.auditLog.create({
@@ -245,6 +295,8 @@ export const creditService = {
 
   async renewSubscription(userId: string) {
     return db.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT 1 FROM "credit_accounts" WHERE "userId" = ${userId} FOR UPDATE`
+
       const account = await tx.creditAccount.findUnique({
         where: { userId },
         include: { user: { select: { plan: true } } },
@@ -252,7 +304,10 @@ export const creditService = {
 
       if (!account) throw new Error('CreditAccount not found')
 
+      await expireRolloverInTx(tx, userId, account)
+
       const limit = getPlanCredits(account.user.plan)
+      const rollover = rolloverOnRenewal(account, account.subscriptionBalance)
       const renewalDate = new Date()
       renewalDate.setDate(renewalDate.getDate() + 30)
 
@@ -261,8 +316,16 @@ export const creditService = {
         data: {
           subscriptionBalance: limit,
           renewalDate,
+          rolloverBalance: rollover.rolloverBalance,
+          rolloverExpiresAt: rollover.rolloverExpiresAt,
         },
-        select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+        select: {
+          subscriptionBalance: true,
+          bonusBalance: true,
+          rolloverBalance: true,
+          rolloverExpiresAt: true,
+          renewalDate: true,
+        },
       })
 
       await tx.auditLog.create({
@@ -276,6 +339,8 @@ export const creditService = {
             type: 'manual_renewal',
             previousSubscriptionBalance: account.subscriptionBalance,
             newSubscriptionBalance: limit,
+            rolledOver: rollover.rolloverBalance,
+            rolloverExpiresAt: rollover.rolloverExpiresAt?.toISOString(),
             newRenewalDate: renewalDate.toISOString(),
           },
         },

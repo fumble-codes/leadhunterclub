@@ -155,6 +155,9 @@ export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [submitRetry, setSubmitRetry] = useState(false)
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [checkingVerification, setCheckingVerification] = useState(true)
 
   const [phoneNumber, setPhoneNumber] = useState('')
   const [verificationCode, setVerificationCode] = useState('')
@@ -194,6 +197,55 @@ export default function OnboardingPage() {
     return () => clearInterval(id)
   }, [otpCountdown])
 
+  useEffect(() => {
+    let active = true
+    let intervalId: ReturnType<typeof setInterval> | null = null
+
+    const refreshVerification = async () => {
+      if (!auth.currentUser) return
+      try {
+        await auth.currentUser.reload()
+        if (auth.currentUser.emailVerified) {
+          await auth.currentUser.getIdToken(true).catch(() => {})
+          if (active) {
+            setEmailVerified(true)
+            setCheckingVerification(false)
+            if (intervalId) clearInterval(intervalId)
+          }
+        } else if (active) {
+          setCheckingVerification(false)
+        }
+      } catch {
+        // retry next cycle
+      }
+    }
+
+    if (auth.currentUser?.emailVerified) {
+      setEmailVerified(true)
+      setCheckingVerification(false)
+    } else {
+      refreshVerification()
+      intervalId = setInterval(refreshVerification, 2000)
+    }
+
+    return () => {
+      active = false
+      if (intervalId) clearInterval(intervalId)
+    }
+  }, [])
+
+  const handleResendVerification = async () => {
+    if (!auth.currentUser) return
+    setResending(true)
+    try {
+      await sendEmailVerification(auth.currentUser)
+    } catch {
+      // silently fail
+    } finally {
+      setResending(false)
+    }
+  }
+
   // OTP verification is temporarily disabled
   // OTP functions below are kept for future re-enablement
 
@@ -204,6 +256,74 @@ export default function OnboardingPage() {
   if (!user) {
     router.push('/login')
     return null
+  }
+
+  if (checkingVerification) {
+    return <OnboardingSkeleton />
+  }
+
+  if (!emailVerified) {
+    return (
+      <main className="min-h-dvh bg-bg-main flex items-center justify-center px-4 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.06)_0%,transparent_60%)] pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative z-10 w-full max-w-md bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-3xl shadow-elevation-4 p-8 text-center"
+        >
+          <ShieldExclamationIcon className="w-10 h-10 text-accent-mint mx-auto mb-4" />
+          <h1 className="text-xl font-bold text-text-primary tracking-tight">Verify your email</h1>
+          <p className="text-sm text-text-secondary mt-2 leading-relaxed">
+            We sent a verification link to{' '}
+            <strong className="text-text-primary">{auth.currentUser?.email}</strong>. Please verify
+            your email to continue setting up your account.
+          </p>
+          <p className="text-xs text-text-secondary/60 mt-3">
+            Didn&apos;t receive it? Check your spam folder or click Resend.
+          </p>
+
+          <div className="flex flex-col gap-3 mt-6">
+            <button
+              onClick={handleResendVerification}
+              disabled={resending}
+              className="px-5 py-3 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-white text-sm font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {resending ? (
+                <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+              ) : (
+                <>
+                  <ArrowPathIcon className="w-4 h-4" />
+                  Resend verification email
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => {
+                setCheckingVerification(true)
+                if (auth.currentUser) {
+                  auth.currentUser
+                    .reload()
+                    .then(() => {
+                      if (auth.currentUser?.emailVerified) {
+                        setEmailVerified(true)
+                      }
+                    })
+                    .catch(() => {})
+                    .finally(() => setCheckingVerification(false))
+                } else {
+                  setCheckingVerification(false)
+                }
+              }}
+              className="px-5 py-3 rounded-xl border border-white/[0.06] text-text-secondary text-sm font-medium hover:bg-white/[0.04] transition-all"
+            >
+              I&apos;ve verified &mdash; refresh
+            </button>
+          </div>
+        </motion.div>
+      </main>
+    )
   }
 
   const createRecaptchaVerifier = async (): Promise<RecaptchaVerifier | null> => {

@@ -18,6 +18,8 @@ import {
   KeyIcon,
   ShieldCheckIcon,
   SparklesIcon,
+  LifebuoyIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/solid'
 
 const adminNav = [
@@ -31,6 +33,8 @@ const adminNav = [
   { name: 'Leads', href: '/admin/leads', icon: SparklesIcon },
   { name: 'Tokens', href: '/admin/tokens', icon: KeyIcon },
   { name: 'RBAC', href: '/admin/rbac', icon: ShieldCheckIcon },
+  { name: 'Support', href: '/admin/support', icon: LifebuoyIcon },
+  { name: 'Newsletter', href: '/admin/newsletter', icon: EnvelopeIcon },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

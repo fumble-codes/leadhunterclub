@@ -16,6 +16,7 @@ import TokenSystemSection from '@/app/components/TokenSystemSection'
 import WhoItsForGrid from '@/app/components/WhoItsForGrid'
 import FeaturesSection from '@/app/components/FeaturesSection'
 import TestimonialsSection from '@/app/components/TestimonialsSection'
+import { NewsletterSignup } from '@/app/components/NewsletterSignup'
 const ease = [0.16, 1, 0.3, 1] as const
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -685,7 +686,7 @@ export default function LandingPage() {
 
       {/* Conversational Intelligence Section */}
       <section
-        id="conversational"
+        id="features"
         className="py-40 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]"
       >
         {/* Fine background glow */}
@@ -1218,16 +1219,7 @@ export default function LandingPage() {
               <p className="text-sm text-text-secondary/60 font-light leading-relaxed mb-4">
                 Get notified about new features, outreach tactics, and platform updates.
               </p>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="you@company.com"
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-accent-purple/30 focus:bg-white/[0.05] transition-all duration-300 font-light"
-                />
-                <button className="px-5 py-3 rounded-xl bg-white/[0.06] border border-white/[0.08] text-sm font-bold text-text-primary hover:bg-white/[0.1] hover:border-white/15 transition-all duration-300 shrink-0">
-                  Subscribe
-                </button>
-              </div>
+              <NewsletterSignup />
             </div>
           </div>
 

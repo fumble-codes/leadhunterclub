@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import {
+  requireFullyAuthorized,
+  AuthRequiredError,
+  InactiveUserError,
+  EmailNotVerifiedError,
+  OnboardingRequiredError,
+} from '@/lib/auth'
 import { getPosts, getPost } from '@/lib/external-api/client'
 import type { ExternalPost } from '@/lib/external-api/client'
 import type { AppLead } from '@/types/lead'
+import { getLeadRevealCost } from '@/lib/config/coins'
 
 export const dynamic = 'force-dynamic'
 
@@ -79,13 +86,14 @@ function externalPostToAppLead(
     isRevealed,
     isClaimable: isLeadClaimable(post),
     hasPhone: !!phone,
+    revealCost: getLeadRevealCost(post),
     phone,
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const authUser = await requireActiveUser(request)
+    const authUser = await requireFullyAuthorized(request)
     const userId = authUser.uid
     const { searchParams } = new URL(request.url)
     const saved = searchParams.get('saved')
@@ -173,6 +181,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { code: 'UNAUTHORIZED', message: 'Authentication required' },
         { status: 401 },
+      )
+    }
+    if (error instanceof EmailNotVerifiedError) {
+      return NextResponse.json(
+        { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email before continuing' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof OnboardingRequiredError) {
+      return NextResponse.json(
+        { code: 'ONBOARDING_REQUIRED', message: 'Please complete onboarding first' },
+        { status: 403 },
       )
     }
     if (error instanceof InactiveUserError) {

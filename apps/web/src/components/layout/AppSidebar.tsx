@@ -15,6 +15,7 @@ import {
   BookmarkIcon,
   Cog6ToothIcon,
   ArrowLeftStartOnRectangleIcon,
+  LifebuoyIcon,
 } from '@heroicons/react/24/solid'
 
 const navItems = [
@@ -22,6 +23,7 @@ const navItems = [
   { name: 'Saved Leads', href: '/saved', icon: BookmarkIcon },
   { name: 'Outreach', href: '/outreach', icon: PaperAirplaneIcon },
   { name: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
+  { name: 'Support', href: '/support', icon: LifebuoyIcon },
 ]
 
 interface AppSidebarProps {
@@ -179,6 +181,18 @@ export default function AppSidebar({
                   className="h-full bg-accent-mint shadow-[0_0_10px_rgba(var(--rgb-accent-mint),0.5)]"
                 />
               </div>
+
+              {user?.creditAccount?.rolloverBalance ? (
+                <div className="flex items-center justify-between text-xxs">
+                  <span className="text-text-secondary">Rollover</span>
+                  <span className="font-bold text-accent-purple">
+                    {user.creditAccount.rolloverBalance}
+                    {user.creditAccount.rolloverExpiresAt
+                      ? ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                      : ''}
+                  </span>
+                </div>
+              ) : null}
 
               <button className="text-9 font-bold text-accent-mint uppercase tracking-super hover:opacity-80 transition-opacity">
                 Refill Pipeline →

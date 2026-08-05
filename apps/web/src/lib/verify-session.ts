@@ -50,12 +50,15 @@ export interface FirebaseIdToken {
   name?: string
   phone_number?: string
   picture?: string
+  email_verified?: boolean
 }
 
-export async function verifySession(token: string): Promise<{ uid: string } | null> {
+export async function verifySession(
+  token: string,
+): Promise<{ uid: string; email_verified?: boolean } | null> {
   const decoded = await verifyFirebaseToken(token)
   if (!decoded) return null
-  return { uid: decoded.uid }
+  return { uid: decoded.uid, email_verified: decoded.email_verified }
 }
 
 export async function verifyFirebaseToken(token: string): Promise<FirebaseIdToken | null> {
@@ -104,6 +107,7 @@ export async function verifyFirebaseToken(token: string): Promise<FirebaseIdToke
       name: typeof payload.name === 'string' ? payload.name : undefined,
       phone_number: typeof payload.phone_number === 'string' ? payload.phone_number : undefined,
       picture: typeof payload.picture === 'string' ? payload.picture : undefined,
+      email_verified: typeof payload.email_verified === 'boolean' ? payload.email_verified : undefined,
     }
   } catch {
     return null

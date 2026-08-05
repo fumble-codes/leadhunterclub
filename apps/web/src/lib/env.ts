@@ -27,9 +27,12 @@ export const env = {
   firebaseServiceAccountKey: optionalEnv('FIREBASE_SERVICE_ACCOUNT_KEY', ''),
   firebaseServiceAccountPath: optionalEnv('FIREBASE_SERVICE_ACCOUNT_PATH', ''),
 
-  // Stripe
-  stripeSecretKey: requireEnv('STRIPE_SECRET_KEY'),
-  stripeWebhookSecret: requireEnv('STRIPE_WEBHOOK_SECRET'),
+  // Payments (Stripe + Razorpay — both optional, at least one must be configured)
+  stripeSecretKey: optionalEnv('STRIPE_SECRET_KEY', ''),
+  stripeWebhookSecret: optionalEnv('STRIPE_WEBHOOK_SECRET', ''),
+  razorpayKeyId: optionalEnv('RAZORPAY_KEY_ID', ''),
+  razorpayKeySecret: optionalEnv('RAZORPAY_KEY_SECRET', ''),
+  razorpayWebhookSecret: optionalEnv('RAZORPAY_WEBHOOK_SECRET', ''),
 
   // Database
   databaseUrl: requireEnv('DATABASE_URL'),
@@ -40,9 +43,11 @@ export const env = {
   externalApiEmail: requireEnv('EXTERNAL_API_EMAIL'),
   externalApiPassword: requireEnv('EXTERNAL_API_PASSWORD'),
 
-  // Email (Resend)
+  // Email (Resend for transactional, Brevo for marketing/newsletter)
   resendApiKey: requireEnv('RESEND_API_KEY'),
+  brevoApiKey: optionalEnv('BREVO_API_KEY', ''),
   emailFrom: optionalEnv('EMAIL_FROM', 'noreply@leadhunterclub.com'),
+  brevoSenderName: optionalEnv('BREVO_SENDER_NAME', 'Lead Hunter Club'),
   adminNotificationEmail: optionalEnv('ADMIN_NOTIFICATION_EMAIL', ''),
 
   // Admin

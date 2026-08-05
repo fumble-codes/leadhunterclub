@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import {
+  requireFullyAuthorized,
+  AuthRequiredError,
+  InactiveUserError,
+  EmailNotVerifiedError,
+  OnboardingRequiredError,
+} from '@/lib/auth'
 import { outreachGenerateSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
@@ -114,7 +120,7 @@ Angle: ${prompt}`,
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = await requireActiveUser(request)
+    const authUser = await requireFullyAuthorized(request)
     const userId = authUser.uid
 
     const rl = await rateLimitByKey(`user:${userId}:generate`, 10, 60_000)
@@ -208,6 +214,18 @@ export async function POST(request: NextRequest) {
     if (error instanceof InactiveUserError) {
       return NextResponse.json(
         { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof EmailNotVerifiedError) {
+      return NextResponse.json(
+        { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email before continuing' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof OnboardingRequiredError) {
+      return NextResponse.json(
+        { code: 'ONBOARDING_REQUIRED', message: 'Please complete onboarding first' },
         { status: 403 },
       )
     }

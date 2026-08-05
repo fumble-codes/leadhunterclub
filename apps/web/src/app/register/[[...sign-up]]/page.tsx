@@ -55,6 +55,7 @@ export default function RegisterPage() {
       try {
         await auth.currentUser.reload()
         if (auth.currentUser.emailVerified) {
+          await auth.currentUser.getIdToken(true).catch(() => {})
           setEmailVerified(true)
           clearInterval(check)
         }
@@ -135,6 +136,7 @@ export default function RegisterPage() {
 
   const handleVerifyOtp = async () => {
     if (!verificationCode.trim() || !confirmationResult) return
+    if (!emailVerified) return
     setPhoneLoading(true)
     setPhoneError('')
     try {
@@ -152,7 +154,9 @@ export default function RegisterPage() {
   }
 
   const handleSkipPhone = () => {
-    router.push('/onboarding')
+    if (emailVerified) {
+      router.push('/onboarding')
+    }
   }
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -321,9 +325,12 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={handleSkipPhone}
-                    className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center"
+                    disabled={!emailVerified}
+                    className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Skip &mdash; I&apos;ll do this later
+                    {emailVerified
+                      ? 'Skip — I’ll do this later'
+                      : 'Verify your email first to continue'}
                   </button>
                 </>
               )}
@@ -361,7 +368,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={handleVerifyOtp}
-                    disabled={phoneLoading || verificationCode.length < 6}
+                    disabled={phoneLoading || verificationCode.length < 6 || !emailVerified}
                     className="mt-2 bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)] px-4 py-3 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {phoneLoading ? (
@@ -374,9 +381,12 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={handleSkipPhone}
-                    className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center"
+                    disabled={!emailVerified}
+                    className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Skip &mdash; I&apos;ll do this later
+                    {emailVerified
+                      ? 'Skip — I’ll do this later'
+                      : 'Verify your email first to continue'}
                   </button>
                 </>
               )}

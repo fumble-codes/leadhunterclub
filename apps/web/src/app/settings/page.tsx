@@ -446,6 +446,15 @@ export default function SettingsPage() {
                 Credits are consumed when revealing lead identities (3 credits) or generating AI
                 outreach (1 credit).
               </p>
+              {user?.creditAccount?.rolloverBalance ? (
+                <p className="text-xxs text-accent-purple/80 mt-2 flex items-center gap-1">
+                  <ClockIcon className="w-3 h-3" />
+                  {user.creditAccount.rolloverBalance} rollover credits
+                  {user.creditAccount.rolloverExpiresAt
+                    ? ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                    : ''}
+                </p>
+              ) : null}
             </div>
 
             <button className="w-full py-3.5 rounded-xl bg-accent-purple text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-secondary transition-all shadow-[0_0_20px_rgba(var(--rgb-tab-purple),0.15)] hover:bg-accent-purple/90">
@@ -499,6 +508,9 @@ export default function SettingsPage() {
                   <p className="text-xs text-text-secondary flex items-center gap-1.5">
                     <BanknotesIcon className="w-3 h-3" />
                     {user.creditAccount.subscriptionBalance} subscription credits
+                    {user.creditAccount.rolloverBalance
+                      ? ` + ${user.creditAccount.rolloverBalance} rollover`
+                      : ''}
                   </p>
                 )}
               </div>

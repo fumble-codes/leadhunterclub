@@ -7,6 +7,8 @@ export type UserStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'SUSPENDED'
 export interface CreditAccountInfo {
   subscriptionBalance: number
   bonusBalance: number
+  rolloverBalance: number
+  rolloverExpiresAt: string | null
   total: number
   renewalDate: string | null
 }

@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireActiveUser, AuthRequiredError, InactiveUserError } from '@/lib/auth'
+import {
+  requireFullyAuthorized,
+  AuthRequiredError,
+  InactiveUserError,
+  EmailNotVerifiedError,
+  OnboardingRequiredError,
+} from '@/lib/auth'
 import { claimPost, getPost } from '@/lib/external-api/client'
 import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
+import { getLeadRevealCost, leadContactBundle } from '@/lib/config/coins'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = await requireActiveUser(request)
+    const authUser = await requireFullyAuthorized(request)
     const userId = authUser.uid
 
     const rl = await rateLimitByKey(`user:${userId}:reveal`, 30, 60_000)
@@ -37,6 +44,20 @@ export async function POST(request: NextRequest) {
 
     const externalLead = await getPost(leadId)
 
+    const contactBundle = leadContactBundle(externalLead)
+    const CREDIT_COST = getLeadRevealCost(externalLead)
+
+    if (CREDIT_COST === null) {
+      return NextResponse.json(
+        {
+          code: 'NO_CONTACT_INFO',
+          message: 'No contact info found on this lead. Reveal is not available.',
+          contactBundle,
+        },
+        { status: 400 },
+      )
+    }
+
     // Check if already claimed on external API side
     if (externalLead.is_claimed) {
       // Still return the contact info if we have it locally
@@ -47,6 +68,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           isRevealed: true,
+          coinsUsed: 0,
+          contactBundle,
           name: externalLead.author?.name || 'Unknown',
           email: externalLead.email || externalLead.contact_info?.emails?.[0]?.email || '',
           phone: externalLead.contact_info?.phone_numbers?.[0]?.number || null,
@@ -56,6 +79,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         isRevealed: true,
+        coinsUsed: 0,
+        contactBundle,
         name: externalLead.author?.name || 'Unknown',
         email: externalLead.email || externalLead.contact_info?.emails?.[0]?.email || '',
         phone: externalLead.contact_info?.phone_numbers?.[0]?.number || null,
@@ -75,6 +100,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         isRevealed: true,
+        coinsUsed: 0,
+        contactBundle,
         name: externalLead.author?.name || 'Unknown',
         email: externalLead.email || externalLead.contact_info?.emails?.[0]?.email || '',
         phone: externalLead.contact_info?.phone_numbers?.[0]?.number || null,
@@ -82,9 +109,6 @@ export async function POST(request: NextRequest) {
     }
 
     const intel = externalLead.intelligence || ''
-    const phone = externalLead.contact_info?.phone_numbers?.[0]?.number || null
-    const hasPhone = !!phone
-    const CREDIT_COST = hasPhone ? 5 : 3
 
     const balance = await creditService.getTotalBalance(userId)
     if (balance < CREDIT_COST) {
@@ -105,6 +129,8 @@ export async function POST(request: NextRequest) {
       async (tx) => {
         const result = await creditService.deductInTx(tx, userId, CREDIT_COST, 'lead_reveal', {
           leadId,
+          coinsUsed: CREDIT_COST,
+          contactBundle,
         })
 
         await tx.lead.upsert({
@@ -162,11 +188,13 @@ export async function POST(request: NextRequest) {
         const revealedPhone = claimedLead.contact_info?.phone_numbers?.[0]?.number || null
 
         return {
-          creditsRemaining: result.subscriptionBalance + result.bonusBalance,
+          creditsRemaining: result.subscriptionBalance + result.bonusBalance + result.rolloverBalance,
           state: updatedState,
           name: claimedLead.author?.name || 'Unknown',
           email: revealedEmail,
           phone: revealedPhone,
+          coinsUsed: CREDIT_COST,
+          contactBundle,
         }
       },
       { timeout: 15000 },
@@ -179,6 +207,8 @@ export async function POST(request: NextRequest) {
       email: txResult.email,
       phone: txResult.phone,
       creditsRemaining: txResult.creditsRemaining,
+      coinsUsed: CREDIT_COST,
+      contactBundle,
     })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError) {
@@ -190,6 +220,18 @@ export async function POST(request: NextRequest) {
     if (error instanceof InactiveUserError) {
       return NextResponse.json(
         { code: 'INACTIVE', message: 'Your account is not active' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof EmailNotVerifiedError) {
+      return NextResponse.json(
+        { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email before continuing' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof OnboardingRequiredError) {
+      return NextResponse.json(
+        { code: 'ONBOARDING_REQUIRED', message: 'Please complete onboarding first' },
         { status: 403 },
       )
     }

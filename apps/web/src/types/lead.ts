@@ -28,6 +28,7 @@ export interface AppLead {
   isRevealed?: boolean
   isClaimable?: boolean
   hasPhone?: boolean
+  revealCost?: number | null
   phone?: string | null
   accent?: 'mint' | 'purple' | 'cyan' | 'orange' | 'pink' | string
 }

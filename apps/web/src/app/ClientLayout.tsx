@@ -18,7 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const appRoutes = ['/dashboard', '/leads', '/outreach', '/saved', '/analytics', '/settings']
   const adminRoutes = ['/admin']
   const authRoutes = ['/login', '/register']
-  const onboardingRoutes = ['/onboarding', '/pending-approval', '/admin-register']
+  const onboardingRoutes = ['/onboarding', '/verify-email', '/pending-approval', '/admin-register']
   const isPublicRoute =
     pathname === '/' ||
     authRoutes.some((r) => pathname.startsWith(r)) ||
@@ -29,13 +29,26 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const isAppRoute = appRoutes.some((r) => pathname.startsWith(r))
   const isProtectedRoute = appRoutes.some((r) => pathname.startsWith(r))
 
+  const isEmailVerified = !!user?.emailVerified
+
   useEffect(() => {
     if (loading || error || !user) return
 
+    // Step 1: email must be verified before anything else
+    if (!isEmailVerified) {
+      if (pathname !== '/verify-email' && !pathname.startsWith('/login')) {
+        router.push('/verify-email')
+      }
+      return
+    }
+
+    // Step 2: status-based routing
     if (isPublicRoute || isOnboardingRoute || isAdminRoute) {
       if (pathname === '/' && user) {
-        if (user.status === 'ACTIVE') {
+        if (user.status === 'ACTIVE' && user.hasCompletedOnboarding) {
           router.push('/dashboard')
+        } else if (user.status === 'ACTIVE' && !user.hasCompletedOnboarding) {
+          router.push('/onboarding')
         } else if (user.status === 'PENDING') {
           router.push(user.hasCompletedOnboarding ? '/pending-approval' : '/onboarding')
         } else if (user.status === 'REJECTED' || user.status === 'SUSPENDED') {
@@ -45,14 +58,26 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       return
     }
 
-    if (user.status === 'PENDING' && !user.hasCompletedOnboarding) {
+    if (user.status === 'ACTIVE' && !user.hasCompletedOnboarding) {
+      router.push('/onboarding')
+    } else if (user.status === 'PENDING' && !user.hasCompletedOnboarding) {
       router.push('/onboarding')
     } else if (user.status === 'PENDING' && user.hasCompletedOnboarding) {
       router.push('/pending-approval')
     } else if (user.status === 'REJECTED' || user.status === 'SUSPENDED') {
       router.push('/pending-approval')
     }
-  }, [user, loading, error, pathname, router, isPublicRoute, isOnboardingRoute, isAdminRoute])
+  }, [
+    user,
+    loading,
+    error,
+    pathname,
+    router,
+    isPublicRoute,
+    isOnboardingRoute,
+    isAdminRoute,
+    isEmailVerified,
+  ])
 
   useEffect(() => {
     const isLanding = !isAppRoute

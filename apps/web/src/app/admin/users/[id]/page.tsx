@@ -33,6 +33,8 @@ const ensureUrl = (url: string) =>
 interface CreditAccountInfo {
   subscriptionBalance: number
   bonusBalance: number
+  rolloverBalance: number
+  rolloverExpiresAt: string | null
   total: number
   renewalDate: string | null
 }
@@ -555,6 +557,15 @@ export default function AdminUserDetailPage() {
                 </span>
               </div>
             </div>
+            {user.creditAccount?.rolloverBalance ? (
+              <p className="text-xs text-accent-purple flex items-center gap-1.5">
+                <CalendarIcon className="w-3 h-3" />
+                Rollover: {user.creditAccount.rolloverBalance}
+                {user.creditAccount.rolloverExpiresAt
+                  ? ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                  : ''}
+              </p>
+            ) : null}
             {user.creditAccount?.renewalDate && (
               <p className="text-xs text-text-secondary flex items-center gap-1.5">
                 <CalendarIcon className="w-3 h-3" />

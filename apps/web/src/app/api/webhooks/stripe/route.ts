@@ -2,8 +2,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { db } from '@/lib/db'
-import { creditService } from '@/lib/services/credits'
-import { getPlanCredits } from '@/lib/config/plans'
+import { paymentService } from '@/lib/services/payment'
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
@@ -85,33 +84,15 @@ export async function POST(req: Request) {
         const priceId = subscription.items.data[0]?.price.id
         const plan = 'FREELANCER'
 
-        await db.user.update({
-          where: { id: userId },
-          data: {
-            plan,
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            stripePriceId: priceId,
-            stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          },
+        await paymentService.activatePlan({
+          userId,
+          plan,
+          provider: 'stripe',
+          customerId,
+          subscriptionId,
+          priceId,
+          periodEnd: new Date(subscription.current_period_end * 1000),
         })
-
-        const account = await db.creditAccount.findUnique({ where: { userId } })
-        if (account) {
-          await creditService.assignPlan(userId, plan)
-        } else {
-          const limit = getPlanCredits(plan)
-          const renewalDate = new Date()
-          renewalDate.setDate(renewalDate.getDate() + 30)
-          await db.creditAccount.create({
-            data: {
-              userId,
-              subscriptionBalance: limit,
-              bonusBalance: 0,
-              renewalDate,
-            },
-          })
-        }
         break
       }
 
@@ -126,14 +107,7 @@ export async function POST(req: Request) {
           })
 
           if (user) {
-            await db.user.update({
-              where: { id: user.id },
-              data: {
-                stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-              },
-            })
-
-            await creditService.renewSubscription(user.id)
+            await paymentService.renew(user.id, 'stripe', new Date(subscription.current_period_end * 1000))
           }
         }
         break
@@ -165,17 +139,7 @@ export async function POST(req: Request) {
         })
 
         if (user) {
-          await db.user.update({
-            where: { id: user.id },
-            data: {
-              plan: 'FREE',
-              stripeSubscriptionId: null,
-              stripePriceId: null,
-              stripeCurrentPeriodEnd: null,
-            },
-          })
-
-          await creditService.assignPlan(user.id, 'FREE')
+          await paymentService.cancel(user.id, 'stripe')
         }
         break
       }

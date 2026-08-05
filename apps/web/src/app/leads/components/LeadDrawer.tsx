@@ -57,11 +57,15 @@ export default function LeadDrawer({
   const [showCreditModal, setShowCreditModal] = useState(false)
   const router = useRouter()
   const { addToast } = useToast()
-  const tokenCost = lead.hasPhone ? 5 : 3
+  const tokenCost = lead.revealCost ?? null
 
   const handleRevealClick = async () => {
     if (!lead.isClaimable) {
       setErrorMsg('This lead is not yet approved. Intelligence is still being generated.')
+      return
+    }
+    if (tokenCost === null) {
+      setErrorMsg('No contact info found on this lead. Reveal is not available.')
       return
     }
     setShowCreditModal(true)
@@ -84,7 +88,10 @@ export default function LeadDrawer({
       const json = await res.json()
       if (res.ok && json.success) {
         onReveal(json.name, json.email, json.phone)
-        addToast({ type: 'success', message: '✓ Contact information unlocked' })
+        addToast({
+          type: 'success',
+          message: `✓ Contact information unlocked${json.coinsUsed ? ` · ${json.coinsUsed} coins` : ''}`,
+        })
         window.dispatchEvent(new Event('user-refetch'))
       } else {
         setErrorMsg(json.message || 'Failed to unlock lead')
@@ -295,7 +302,7 @@ export default function LeadDrawer({
                 <>
                   Reveal Lead
                   <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
-                    <BanknotesIcon className="w-3 h-3" /> -{tokenCost}
+                    <BanknotesIcon className="w-3 h-3" /> -{tokenCost ?? '–'}
                   </span>
                 </>
               )}

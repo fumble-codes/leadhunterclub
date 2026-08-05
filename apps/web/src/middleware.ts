@@ -38,6 +38,7 @@ export default async function middleware(request: NextRequest) {
     pathname.startsWith('/register/') ||
     pathname.startsWith('/sneak-peek') ||
     pathname === '/onboarding' ||
+    pathname === '/verify-email' ||
     pathname === '/pending-approval' ||
     pathname === '/admin-register'
   const isPublicPrefix = publicPrefixes.some((prefix) => pathname.startsWith(prefix))
@@ -68,6 +69,15 @@ export default async function middleware(request: NextRequest) {
       const loginUrl = new URL('/login', request.url)
       const response = NextResponse.redirect(loginUrl)
       response.cookies.set('__session', '', { maxAge: 0, path: '/' })
+      addSecurityHeaders(response)
+      return response
+    }
+
+    // Email verification gate (JWT-level, no DB hit)
+    if (session.email_verified === false) {
+      const verifyUrl = new URL('/verify-email', request.url)
+      verifyUrl.searchParams.set('redirect', pathname)
+      const response = NextResponse.redirect(verifyUrl)
       addSecurityHeaders(response)
       return response
     }

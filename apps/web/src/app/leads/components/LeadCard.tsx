@@ -313,7 +313,7 @@ export default function LeadCard({
                 {isRevealed ? 'View Details' : 'Reveal'}
                 {!isRevealed && (
                   <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
-                    <BanknotesIcon className="w-3 h-3" /> -{lead.hasPhone ? '5' : '3'}
+                    <BanknotesIcon className="w-3 h-3" /> -{lead.revealCost ?? '–'}
                   </span>
                 )}
               </div>

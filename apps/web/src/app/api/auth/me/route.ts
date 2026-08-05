@@ -25,13 +25,19 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const { uid, email, name, phone } = authUser
+    const { uid, email, name, phone, emailVerified } = authUser
 
     let user = await db.user.findUnique({
       where: { id: uid },
       include: {
         creditAccount: {
-          select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+          select: {
+              subscriptionBalance: true,
+              bonusBalance: true,
+              rolloverBalance: true,
+              rolloverExpiresAt: true,
+              renewalDate: true,
+            },
         },
       },
     })
@@ -46,7 +52,13 @@ export async function GET(request: NextRequest) {
           where: { id: uid },
           include: {
             creditAccount: {
-              select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+              select: {
+              subscriptionBalance: true,
+              bonusBalance: true,
+              rolloverBalance: true,
+              rolloverExpiresAt: true,
+              renewalDate: true,
+            },
             },
           },
         })
@@ -66,7 +78,13 @@ export async function GET(request: NextRequest) {
           },
           include: {
             creditAccount: {
-              select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+              select: {
+              subscriptionBalance: true,
+              bonusBalance: true,
+              rolloverBalance: true,
+              rolloverExpiresAt: true,
+              renewalDate: true,
+            },
             },
           },
         })
@@ -77,7 +95,31 @@ export async function GET(request: NextRequest) {
         data: { email },
         include: {
           creditAccount: {
-            select: { subscriptionBalance: true, bonusBalance: true, renewalDate: true },
+            select: {
+              subscriptionBalance: true,
+              bonusBalance: true,
+              rolloverBalance: true,
+              rolloverExpiresAt: true,
+              renewalDate: true,
+            },
+          },
+        },
+      })
+    }
+
+    if (emailVerified === true && !user.emailVerified) {
+      user = await db.user.update({
+        where: { id: uid },
+        data: { emailVerified: new Date() },
+        include: {
+          creditAccount: {
+            select: {
+              subscriptionBalance: true,
+              bonusBalance: true,
+              rolloverBalance: true,
+              rolloverExpiresAt: true,
+              renewalDate: true,
+            },
           },
         },
       })
@@ -98,10 +140,22 @@ export async function GET(request: NextRequest) {
       ? {
           subscriptionBalance: user.creditAccount.subscriptionBalance,
           bonusBalance: user.creditAccount.bonusBalance,
-          total: user.creditAccount.subscriptionBalance + user.creditAccount.bonusBalance,
+          rolloverBalance: user.creditAccount.rolloverBalance,
+          rolloverExpiresAt: user.creditAccount.rolloverExpiresAt?.toISOString() || null,
+          total:
+            user.creditAccount.subscriptionBalance +
+            user.creditAccount.bonusBalance +
+            user.creditAccount.rolloverBalance,
           renewalDate: user.creditAccount.renewalDate?.toISOString() || null,
         }
-      : { subscriptionBalance: 0, bonusBalance: 0, total: 0, renewalDate: null }
+      : {
+          subscriptionBalance: 0,
+          bonusBalance: 0,
+          rolloverBalance: 0,
+          rolloverExpiresAt: null,
+          total: 0,
+          renewalDate: null,
+        }
 
     return NextResponse.json({
       data: {

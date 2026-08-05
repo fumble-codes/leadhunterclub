@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { getAuthUser } from '@/lib/auth'
+import { requireEmailVerified, AuthRequiredError, EmailNotVerifiedError } from '@/lib/auth'
 import { onboardingSchema } from '@/lib/validators/auth'
 import { emailService } from '@/lib/services/email'
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = await getAuthUser(request)
+    const authUser = await requireEmailVerified(request)
     if (!authUser) {
       return NextResponse.json(
         { code: 'UNAUTHORIZED', message: 'Authentication required' },
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
     })
 
     emailService.sendApplicationReceived({ name: updatedUser.name, email: updatedUser.email })
+    emailService.sendOnboardingComplete({ name: updatedUser.name, email: updatedUser.email })
     emailService.notifyAdmin('New Application', {
       name: updatedUser.name,
       email: updatedUser.email,
@@ -76,6 +77,18 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
+    if (error instanceof EmailNotVerifiedError) {
+      return NextResponse.json(
+        { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email before continuing' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof AuthRequiredError) {
+      return NextResponse.json(
+        { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        { status: 401 },
+      )
+    }
     console.error('[Onboarding API] Error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' },
