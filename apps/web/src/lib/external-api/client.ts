@@ -358,3 +358,179 @@ export async function getIntelligenceSettings(): Promise<IntelSettingsResponse['
   const res = await fetchApi<IntelSettingsResponse>(`/settings/intelligence`)
   return res.data
 }
+
+// --- Watchlist targets (backend proxy) ---
+
+export interface ExternalTarget {
+  id: string
+  name: string
+  url: string
+  platform: string
+  notes: string | null
+  is_active: boolean
+  last_scraped_at: string | null
+  last_comments_found: number
+  monthly_comments_found: number
+  usage_month: string | null
+  created_at: string
+  updated_at: string
+}
+
+interface TargetsResponse {
+  success: boolean
+  count: number
+  data: ExternalTarget[]
+}
+
+interface TargetResponse {
+  success: boolean
+  data: ExternalTarget
+}
+
+export async function getTargets(): Promise<TargetsResponse> {
+  return fetchApi<TargetsResponse>(`/targets`)
+}
+
+export async function getTarget(id: string): Promise<TargetResponse> {
+  return fetchApi<TargetResponse>(`/targets/${id}`)
+}
+
+export async function createTarget(input: {
+  name: string
+  url: string
+  platform: string
+  notes?: string | null
+}): Promise<TargetResponse> {
+  return fetchApi<TargetResponse>(`/targets`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+}
+
+export async function updateTarget(
+  id: string,
+  input: Partial<{ name: string; url: string; platform: string; notes: string | null; is_active: boolean }>,
+): Promise<TargetResponse> {
+  return fetchApi<TargetResponse>(`/targets/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  })
+}
+
+export async function deleteTarget(id: string): Promise<{ success: boolean; data: unknown }> {
+  return fetchApi<{ success: boolean; data: unknown }>(`/targets/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+// --- Keywords (backend proxy) ---
+
+export interface ExternalKeyword {
+  id: string
+  text: string
+  platforms: string[]
+  is_active: boolean
+  is_deleted: boolean
+  deleted_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+interface KeywordsResponse {
+  success: boolean
+  count: number
+  data: ExternalKeyword[]
+}
+
+interface KeywordResponse {
+  success: boolean
+  data: ExternalKeyword
+}
+
+export async function getKeywords(): Promise<KeywordsResponse> {
+  return fetchApi<KeywordsResponse>(`/keywords`)
+}
+
+export async function createKeyword(input: { text: string; platforms: string[] }): Promise<KeywordResponse> {
+  return fetchApi<KeywordResponse>(`/keywords`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+}
+
+export async function updateKeyword(
+  id: string,
+  input: Partial<{ text: string; platforms: string[]; is_active: boolean }>,
+): Promise<KeywordResponse> {
+  return fetchApi<KeywordResponse>(`/keywords/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+  })
+}
+
+export async function deleteKeyword(id: string): Promise<{ success: boolean; data: unknown }> {
+  return fetchApi<{ success: boolean; data: unknown }>(`/keywords/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+// --- Apify keys (backend proxy) ---
+
+export interface ExternalApifyKey {
+  id: string
+  key: string
+  label: string | null
+  is_active: boolean
+  comments_used: number
+  comments_limit: number
+  comments_remaining: number
+  usage_month: string
+  assigned_worker: string | null
+  usage: {
+    status: string
+    exhausted: boolean
+    used: number
+    limit: number
+    remaining: number
+  } | null
+  created_at: string
+}
+
+interface ApifyKeysResponse {
+  success: boolean
+  count: number
+  worker_id: string | null
+  active_leases: unknown[]
+  data: ExternalApifyKey[]
+}
+
+interface ApifyKeyResponse {
+  success: boolean
+  data: ExternalApifyKey
+}
+
+export async function getApifyKeys(): Promise<ApifyKeysResponse> {
+  return fetchApi<ApifyKeysResponse>(`/apify-keys`)
+}
+
+export async function createApifyKey(input: { key: string; label?: string | null }): Promise<ApifyKeyResponse> {
+  return fetchApi<ApifyKeyResponse>(`/apify-keys`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+}
+
+export async function deleteApifyKey(id: string): Promise<{ success: boolean; data: unknown }> {
+  return fetchApi<{ success: boolean; data: unknown }>(`/apify-keys/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+// --- Scrape-all (backend 202) ---
+
+export async function scrapeAllTargets(): Promise<{ success: boolean; message: string; count?: number }> {
+  return fetchApi<{ success: boolean; message: string; count?: number }>(`/targets/scrape-all`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  })
+}

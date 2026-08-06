@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { getFirebaseToken } from '@/lib/firebase'
 import {
   PlusIcon, TrashIcon, MagnifyingGlassIcon, PencilSquareIcon,
-  CheckIcon, XMarkIcon, PlayIcon,
+  CheckIcon, XMarkIcon,
 } from '@heroicons/react/24/solid'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 
@@ -31,7 +31,6 @@ export default function AdminKeywordsPage() {
   const [bulkText, setBulkText] = useState('')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [bulkPlatforms, setBulkPlatforms] = useState<string[]>(['linkedin'])
-  const [scrapingId, setScrapingId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
   const fetchKeywords = async () => {
@@ -111,15 +110,6 @@ export default function AdminKeywordsPage() {
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])
-  }
-
-  const triggerScrape = async (keywordId: string) => {
-    setScrapingId(keywordId)
-    const token = await getFirebaseToken()
-    try {
-      await fetch(`/api/admin/scrapers/keyword/${keywordId}`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } })
-    } catch {}
-    setTimeout(() => setScrapingId(null), 2000)
   }
 
   const filtered = keywords.filter(k => k.text.toLowerCase().includes(search.toLowerCase()))
@@ -258,10 +248,6 @@ export default function AdminKeywordsPage() {
                           <button onClick={() => { setEditingId(k._id || k.id); setEditText(k.text); setEditPlatforms(k.platforms || []) }}
                             className="p-1.5 rounded-lg hover:bg-white/5 text-text-secondary transition-all">
                             <PencilSquareIcon className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => triggerScrape(k._id || k.id)} disabled={scrapingId === (k._id || k.id)}
-                            className="p-1.5 rounded-lg hover:bg-accent-mint/10 text-accent-mint transition-all disabled:opacity-50">
-                            {scrapingId === (k._id || k.id) ? <div className="w-4 h-4 border-2 border-accent-mint/30 border-t-accent-mint rounded-full animate-spin" /> : <PlayIcon className="w-4 h-4" />}
                           </button>
                           <button onClick={() => deleteKeyword(k._id || k.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-all">
                             <TrashIcon className="w-4 h-4" />

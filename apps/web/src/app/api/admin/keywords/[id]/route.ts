@@ -1,21 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 import { requireAdmin, ForbiddenError } from '@/lib/auth'
+import { getKeywords, updateKeyword, deleteKeyword } from '@/lib/external-api/client'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAdmin(request)
     const { id } = await params
-    const kw = await db.keyword.findFirst({ where: { id, is_deleted: false } })
-    if (!kw) {
+    const result = await getKeywords()
+    const item = result.data.find((k) => k.id === id) || result.data.find((k) => (k as unknown as Record<string, unknown>)._id === id)
+    if (!item) {
       return NextResponse.json({ code: 'NOT_FOUND', message: 'Keyword not found' }, { status: 404 })
     }
-    return NextResponse.json({ success: true, data: { ...kw, _id: kw.id } })
+    return NextResponse.json({ success: true, data: item })
   } catch (error: unknown) {
     if (error instanceof ForbiddenError) {
       return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
     }
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' }, { status: 500 })
+    const msg = error instanceof Error ? error.message : 'Keyword not found'
+    return NextResponse.json({ code: 'ERROR', message: msg }, { status: 404 })
   }
 }
 
@@ -24,17 +26,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     await requireAdmin(request)
     const { id } = await params
     const body = await request.json()
-    const kw = await db.keyword.findFirst({ where: { id, is_deleted: false } })
-    if (!kw) {
-      return NextResponse.json({ code: 'NOT_FOUND', message: 'Keyword not found' }, { status: 404 })
-    }
-    const updated = await db.keyword.update({ where: { id }, data: body })
-    return NextResponse.json({ success: true, data: { ...updated, _id: updated.id } })
+    const result = await updateKeyword(id, {
+      text: body.text !== undefined ? body.text.trim() : undefined,
+      platforms: body.platforms,
+      is_active: body.is_active,
+    })
+    return NextResponse.json(result)
   } catch (error: unknown) {
     if (error instanceof ForbiddenError) {
       return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
     }
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' }, { status: 500 })
+    const msg = error instanceof Error ? error.message : 'Failed to update keyword'
+    return NextResponse.json({ code: 'ERROR', message: msg }, { status: 500 })
   }
 }
 
@@ -42,19 +45,13 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   try {
     await requireAdmin(request)
     const { id } = await params
-    const kw = await db.keyword.findUnique({ where: { id } })
-    if (!kw) {
-      return NextResponse.json({ code: 'NOT_FOUND', message: 'Keyword not found' }, { status: 404 })
-    }
-    await db.keyword.update({
-      where: { id },
-      data: { is_deleted: true, deleted_at: new Date(), is_active: false },
-    })
+    await deleteKeyword(id)
     return NextResponse.json({ success: true, data: {} })
   } catch (error: unknown) {
     if (error instanceof ForbiddenError) {
       return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
     }
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' }, { status: 500 })
+    const msg = error instanceof Error ? error.message : 'Failed to delete keyword'
+    return NextResponse.json({ code: 'ERROR', message: msg }, { status: 500 })
   }
 }

@@ -32,7 +32,6 @@ export default function AdminTargetsPage() {
   const [editName, setEditName] = useState('')
   const [editUrl, setEditUrl] = useState('')
   const [editNotes, setEditNotes] = useState('')
-  const [scrapingId, setScrapingId] = useState<string | null>(null)
   const [scrapingAll, setScrapingAll] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -86,16 +85,6 @@ export default function AdminTargetsPage() {
       headers: { Authorization: `Bearer ${token}` },
     })
     fetchTargets()
-  }
-
-  const triggerScrape = async (targetId: string) => {
-    setScrapingId(targetId)
-    const token = await getFirebaseToken()
-    await fetch(`/api/admin/targets/${targetId}/scrape`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    setTimeout(() => setScrapingId(null), 2000)
   }
 
   const triggerScrapeAll = async () => {
@@ -210,11 +199,6 @@ export default function AdminTargetsPage() {
                     <button onClick={() => { setEditingId(t._id || t.id); setEditName(t.name); setEditUrl(t.url); setEditNotes(t.notes || '') }}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/5 text-text-secondary text-xs font-medium transition-all">
                       <PencilSquareIcon className="w-3.5 h-3.5" />Edit
-                    </button>
-                    <button onClick={() => triggerScrape(t._id || t.id)} disabled={scrapingId === (t._id || t.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-accent-mint/10 text-accent-mint text-xs font-medium transition-all disabled:opacity-50">
-                      {scrapingId === (t._id || t.id) ? <div className="w-3.5 h-3.5 border-2 border-accent-mint/30 border-t-accent-mint rounded-full animate-spin" /> : <ArrowPathIcon className="w-3.5 h-3.5" />}
-                      Scrape
                     </button>
                     <button onClick={() => deleteTarget(t._id || t.id)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-red-400 text-xs font-medium transition-all ml-auto">
