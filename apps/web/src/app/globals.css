@@ -11,7 +11,7 @@
     display: none;
   }
   body {
-    @apply bg-page-bg text-text-primary antialiased selection:bg-accent-mint/30;
+    @apply bg-page-bg text-text-primary antialiased selection:bg-primary-container/30;
     font-feature-settings:
       'ss01' on,
       'ss02' on,
@@ -107,13 +107,13 @@
   .hero-glow {
     background: radial-gradient(
       circle at 50% 50%,
-      rgba(var(--rgb-accent-mint), 0.08) 0%,
+      rgba(var(--rgb-primary), 0.08) 0%,
       transparent 60%
     );
   }
 
   .accent-glow-mint {
-    box-shadow: 0 0 40px -10px rgba(var(--rgb-accent-mint), 0.3);
+    box-shadow: 0 0 40px -10px rgba(var(--rgb-secondary), 0.3);
   }
 
   .rim-light {
@@ -180,122 +180,92 @@
     display: none;
   }
 
-  /* ── Ambient glows — brand hues only (mint = primary, purple = secondary) ── */
-  .glow-purple-very-faint {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.012) 0%,
-      transparent 70%
-    );
+  /* ── Ambient glows — Obsidian Kinetic roles ────────────────────────────
+     primary   = kinetic amber (focal, hero)
+     secondary = living mint-green (signals, alive)
+     tertiary  = scan cyan (info)
+     All legacy multi-hue glows alias onto these roles. */
+  .glow-primary-very-faint {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.015) 0%, transparent 70%);
   }
-  .glow-purple-soft {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.02) 0%,
-      transparent 70%
-    );
+  .glow-primary-soft {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.025) 0%, transparent 70%);
   }
-  .glow-purple-medium {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.025) 0%,
-      transparent 70%
-    );
+  .glow-primary-medium {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.04) 0%, transparent 70%);
   }
-  .glow-purple-strong {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.03) 0%,
-      transparent 70%
-    );
+  .glow-primary-strong {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.07) 0%, transparent 70%);
   }
-  .glow-purple-intense {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.04) 0%,
-      transparent 70%
-    );
+  .glow-primary-intense {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary-container), 0.1) 0%, transparent 70%);
   }
 
-  .glow-mint-very-faint {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-mint), 0.012) 0%,
-      transparent 70%
-    );
+  .glow-secondary-very-faint {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.015) 0%, transparent 70%);
   }
-  .glow-mint-soft {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-mint), 0.02) 0%,
-      transparent 70%
-    );
+  .glow-secondary-soft {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.025) 0%, transparent 70%);
+  }
+  .glow-secondary-medium {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.04) 0%, transparent 70%);
+  }
+  .glow-secondary-strong {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.07) 0%, transparent 70%);
+  }
+  .glow-secondary-intense {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary-container), 0.1) 0%, transparent 70%);
+  }
+
+  .glow-tertiary-very-faint {
+    background: radial-gradient(circle at center, rgba(var(--rgb-tertiary), 0.015) 0%, transparent 70%);
+  }
+  .glow-tertiary-soft {
+    background: radial-gradient(circle at center, rgba(var(--rgb-tertiary), 0.025) 0%, transparent 70%);
+  }
+  .glow-tertiary-medium {
+    background: radial-gradient(circle at center, rgba(var(--rgb-tertiary), 0.04) 0%, transparent 70%);
+  }
+  .glow-tertiary-strong {
+    background: radial-gradient(circle at center, rgba(var(--rgb-tertiary), 0.07) 0%, transparent 70%);
+  }
+  .glow-tertiary-intense {
+    background: radial-gradient(circle at center, rgba(var(--rgb-tertiary-container), 0.1) 0%, transparent 70%);
+  }
+
+  /* Legacy aliases → Obsidian roles (mint=secondary, purple=primary, etc.) */
+  .glow-mint-very-faint,
+  .glow-cyan-soft {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.015) 0%, transparent 70%);
+  }
+  .glow-mint-soft,
+  .glow-cyan-strong {
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.025) 0%, transparent 70%);
   }
   .glow-mint-strong {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-mint), 0.06) 0%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at center, rgba(var(--rgb-secondary), 0.07) 0%, transparent 70%);
   }
 
-  /* Deprecated multi-hue glows — aliased to brand hues so any remaining
-     usage still renders inside the two-color system. */
-  .glow-cyan-soft {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-mint), 0.02) 0%,
-      transparent 70%
-    );
-  }
-  .glow-cyan-strong {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-mint), 0.05) 0%,
-      transparent 70%
-    );
-  }
-  .glow-pink-very-faint {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.012) 0%,
-      transparent 70%
-    );
-  }
-  .glow-pink-soft {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.02) 0%,
-      transparent 70%
-    );
-  }
-  .glow-pink-strong {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.04) 0%,
-      transparent 70%
-    );
-  }
+  .glow-purple-very-faint,
+  .glow-pink-very-faint,
   .glow-orange-very-faint {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.012) 0%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.015) 0%, transparent 70%);
   }
+  .glow-purple-soft,
+  .glow-pink-soft,
   .glow-orange-soft {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.02) 0%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.025) 0%, transparent 70%);
   }
+  .glow-purple-medium {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.04) 0%, transparent 70%);
+  }
+  .glow-purple-strong,
+  .glow-pink-strong,
   .glow-orange-strong {
-    background: radial-gradient(
-      circle at center,
-      rgba(var(--rgb-accent-purple), 0.04) 0%,
-      transparent 70%
-    );
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary), 0.07) 0%, transparent 70%);
+  }
+  .glow-purple-intense {
+    background: radial-gradient(circle at center, rgba(var(--rgb-primary-container), 0.1) 0%, transparent 70%);
   }
 
   @keyframes shake-card {
@@ -320,7 +290,7 @@
 }
 
 .bg-gradient-primary {
-  background: linear-gradient(to bottom right, var(--accent-mint), var(--accent-purple));
+  background: linear-gradient(to bottom right, var(--color-primary-container), var(--color-secondary));
 }
 
 html.lenis,

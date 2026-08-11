@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from './components/LeadCard'
+import PipelineLeadCard from './components/PipelineLeadCard'
 import LeadDrawer from './components/LeadDrawer'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 
@@ -39,6 +40,7 @@ export default function LeadsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [activeNiche, setActiveNiche] = useState<string>('All')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
+  const [viewMode, setViewMode] = useState<'grid' | 'pipeline'>('pipeline')
 
   const [leadsList, setLeadsList] = useState<AppLead[]>([])
   const [loading, setLoading] = useState(true)
@@ -179,6 +181,38 @@ export default function LeadsPage() {
           </div>
 
           <div className="relative shrink-0 flex items-center gap-3 w-full md:w-auto justify-end">
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-[#1b1c1d] border border-white/[0.08] rounded-xl p-1 shadow-lg shrink-0">
+              <button
+                onClick={() => setViewMode('grid')}
+                type="button"
+                className={`p-1.5 rounded-lg transition-all ${
+                  viewMode === 'grid'
+                    ? 'bg-white/10 text-white shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                }`}
+                title="Classic Grid View"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('pipeline')}
+                type="button"
+                className={`p-1.5 rounded-lg transition-all ${
+                  viewMode === 'pipeline'
+                    ? 'bg-primary/20 text-primary border border-primary/20 shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                }`}
+                title="Pipeline Card View"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v13.5c0 .621.504 1.125 1.125 1.125Z" />
+                </svg>
+              </button>
+            </div>
+
             <Select
               options={[
                 { label: 'Newest First', value: 'newest' },
@@ -331,22 +365,39 @@ export default function LeadsPage() {
                   )}
                 </div>
               ) : (
-                filteredLeads.map((lead) => (
-                  <LeadCard
-                    key={lead.id}
-                    lead={lead}
-                    isSelected={lead.id === selectedLeadId}
-                    onClick={() => setSelectedLeadId(lead.id)}
-                    onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
-                    onReveal={(leadId, name, email, phone) => {
-                      setLeadsList((prev) =>
-                        prev.map((l) =>
-                          l.id === leadId ? { ...l, isRevealed: true, name, email, phone } : l,
-                        ),
-                      )
-                    }}
-                  />
-                ))
+                filteredLeads.map((lead) =>
+                  viewMode === 'pipeline' ? (
+                    <PipelineLeadCard
+                      key={lead.id}
+                      lead={lead}
+                      isSelected={lead.id === selectedLeadId}
+                      onClick={() => setSelectedLeadId(lead.id)}
+                      onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
+                      onReveal={(leadId, name, email, phone) => {
+                        setLeadsList((prev) =>
+                          prev.map((l) =>
+                            l.id === leadId ? { ...l, isRevealed: true, name, email, phone } : l,
+                          ),
+                        )
+                      }}
+                    />
+                  ) : (
+                    <LeadCard
+                      key={lead.id}
+                      lead={lead}
+                      isSelected={lead.id === selectedLeadId}
+                      onClick={() => setSelectedLeadId(lead.id)}
+                      onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
+                      onReveal={(leadId, name, email, phone) => {
+                        setLeadsList((prev) =>
+                          prev.map((l) =>
+                            l.id === leadId ? { ...l, isRevealed: true, name, email, phone } : l,
+                          ),
+                        )
+                      }}
+                    />
+                  )
+                )
               )}
             </div>
           </div>

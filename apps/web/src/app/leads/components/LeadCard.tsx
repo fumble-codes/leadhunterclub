@@ -25,20 +25,20 @@ type UrgencyTheme = {
 
 const urgencyTheme: Record<AppLead['urgency'], UrgencyTheme> = {
   critical: {
-    textAccent: 'text-accent-mint',
-    dotColor: 'bg-accent-mint',
-    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.10)] hover:border-accent-mint/25',
-    selected: 'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.18)] bg-accent-mint/[0.03]',
-    bookmarkActive: 'bg-accent-mint/15 border-accent-mint/30 text-accent-mint',
-    topLine: 'from-transparent via-accent-mint to-transparent',
+    textAccent: 'text-accent-purple',
+    dotColor: 'bg-accent-purple',
+    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.10)] hover:border-accent-purple/25',
+    selected: 'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.18)] bg-accent-purple/[0.03]',
+    bookmarkActive: 'bg-accent-purple/15 border-accent-purple/30 text-accent-purple',
+    topLine: 'from-transparent via-accent-purple to-transparent',
   },
   high: {
-    textAccent: 'text-accent-mint',
-    dotColor: 'bg-accent-mint',
-    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.07)] hover:border-accent-mint/20',
-    selected: 'ring-1 ring-accent-mint shadow-[0_8px_30px_rgba(var(--rgb-accent-mint),0.12)] bg-accent-mint/[0.02]',
-    bookmarkActive: 'bg-accent-mint/15 border-accent-mint/30 text-accent-mint',
-    topLine: 'from-transparent via-accent-mint to-transparent',
+    textAccent: 'text-accent-purple',
+    dotColor: 'bg-accent-purple',
+    glow: 'hover:shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.07)] hover:border-accent-purple/20',
+    selected: 'ring-1 ring-accent-purple shadow-[0_8px_30px_rgba(var(--rgb-accent-purple),0.12)] bg-accent-purple/[0.02]',
+    bookmarkActive: 'bg-accent-purple/15 border-accent-purple/30 text-accent-purple',
+    topLine: 'from-transparent via-accent-purple to-transparent',
   },
   medium: {
     textAccent: 'text-accent-purple',

@@ -16,18 +16,18 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantColorStyles: Record<ButtonVariant, Record<ButtonColor, string>> = {
   primary: {
-    mint: 'bg-accent-mint text-text-on-accent hover:brightness-110 active:scale-98',
-    purple: 'bg-accent-purple text-white hover:brightness-110 active:scale-98',
+    mint: 'bg-primary-container text-on-primary-container hover:brightness-110 active:scale-98',
+    purple: 'bg-primary-container text-on-primary-container hover:brightness-110 active:scale-98',
   },
   ghost: {
-    mint: 'bg-white/5 text-text-secondary hover:text-accent-mint hover:bg-accent-mint/10 active:scale-98',
+    mint: 'bg-white/5 text-text-secondary hover:text-primary hover:bg-primary/10 active:scale-98',
     purple:
-      'bg-white/5 text-text-secondary hover:text-accent-purple hover:bg-accent-purple/10 active:scale-98',
+      'bg-white/5 text-text-secondary hover:text-primary hover:bg-primary/10 active:scale-98',
   },
   outline: {
-    mint: 'border border-accent-mint/20 text-accent-mint hover:bg-accent-mint/10 active:scale-98',
+    mint: 'border border-primary/25 text-primary hover:bg-primary/10 active:scale-98',
     purple:
-      'border border-accent-purple/20 text-accent-purple hover:bg-accent-purple/10 active:scale-98',
+      'border border-primary/25 text-primary hover:bg-primary/10 active:scale-98',
   },
 }
 

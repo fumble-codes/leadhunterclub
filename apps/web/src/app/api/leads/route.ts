@@ -40,6 +40,7 @@ function isLeadClaimable(post: ExternalPost): boolean {
 function isFeedEligible(post: ExternalPost): boolean {
   if (post.source === 'seed') return false
   if (post.review_status !== 'approved') return false
+  if (!post.intelligence) return false
   return true
 }
 

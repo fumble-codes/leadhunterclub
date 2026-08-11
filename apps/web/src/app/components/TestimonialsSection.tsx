@@ -33,7 +33,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Alex Moreno',
     handle: '@alexmoreno_dev',
     role: 'Freelance Developer',
-    accentToken: 'persona-green',
+    accentToken: 'accent-purple',
     initials: 'AM',
     result: '$4,200 contract in week 1',
     quote:
@@ -48,15 +48,15 @@ const TESTIMONIALS: Testimonial[] = [
       },
       {
         label: 'What changed',
-        tag: 'AI Outreach Writer',
-        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
+        tag: 'Buyer Intent Signals',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
-          'LeadHunter surfaces the exact posts with buyer intent and drafts a personalized pitch in seconds — no guesswork.',
+          'LeadHunter surfaces the exact posts with buyer intent — no guesswork.',
       },
       {
         label: 'Their result',
         tag: '+28% Reply Rate',
-        tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'Went from 4% cold email replies to 28% in under a month. First paid contract landed in week one.',
       },
@@ -67,7 +67,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Priya Sharma',
     handle: '@priyaux',
     role: 'UI/UX Designer',
-    accentToken: 'persona-pink',
+    accentToken: 'accent-purple',
     initials: 'PS',
     result: '3 retainers closed in 30 days',
     quote:
@@ -83,14 +83,14 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Intent Scoring',
-        tagColor: 'bg-persona-pink/10 border-persona-pink/20 text-persona-pink',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           "Every lead is ranked by urgency and budget signal — she pitches only when there's a real buying signal.",
       },
       {
         label: 'Their result',
         tag: '3 Retainers / 30 Days',
-        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'Closed three ongoing monthly design retainers by week four. Zero cold applications sent since.',
       },
@@ -124,7 +124,7 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'Their result',
         tag: '3× Faster Closes',
-        tagColor: 'bg-persona-pink/10 border-persona-pink/20 text-persona-pink',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'Warm intent leads close three times faster than cold applications. Fully replaced job boards within 6 weeks.',
       },
@@ -135,7 +135,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Marcus Tse',
     handle: '@marcustse',
     role: 'Full-Stack Developer',
-    accentToken: 'persona-blue',
+    accentToken: 'accent-purple',
     initials: 'MT',
     result: 'Response rate: 4% → 28%',
     quote:
@@ -151,7 +151,7 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'AI Context Insight',
-        tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'Every outreach is written around the specific signal that triggered the lead — founders respond because it feels personal.',
       },
@@ -169,7 +169,7 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Jade Williams',
     handle: '@jadegrowth',
     role: 'SMMA Owner',
-    accentToken: 'persona-orange',
+    accentToken: 'accent-purple',
     initials: 'JW',
     result: '2 → 8 retainers in 60 days',
     quote:
@@ -185,14 +185,14 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Multi-Platform Feed',
-        tagColor: 'bg-persona-orange/10 border-persona-orange/20 text-persona-orange',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'One feed now aggregates high-intent signals from 5 platforms. The team pitches only when a real buying signal exists.',
       },
       {
         label: 'Their result',
         tag: '4× Revenue in 60 Days',
-        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'Grew from $6k/mo to $24k/mo MRR in two months. Cold outreach budget reduced to zero.',
       },
@@ -219,14 +219,14 @@ const TESTIMONIALS: Testimonial[] = [
       {
         label: 'What changed',
         tag: 'Email Integration',
-        tagColor: 'bg-persona-blue/10 border-persona-blue/20 text-persona-blue',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'LeadHunter now handles lead discovery, enrichment, and outreach sequencing — fully automated with no seat cost.',
       },
       {
         label: 'Their result',
         tag: '80% Cost Reduction',
-        tagColor: 'bg-persona-green/10 border-persona-green/20 text-persona-green',
+        tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
           'Eliminated 3 SDR salaries while hitting the same pipeline targets. Reinvested savings into product and growth.',
       },
@@ -331,7 +331,7 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
+          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
             Customer Reviews
           </span>
         </motion.div>

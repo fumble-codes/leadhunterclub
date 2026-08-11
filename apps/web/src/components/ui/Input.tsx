@@ -35,7 +35,7 @@ export function Input({
       <input
         className={`w-full text-text-primary placeholder:text-text-muted
           font-medium transition-all duration-300
-          focus:outline-none focus:ring-2 focus:ring-accent-mint/40 focus:border-accent-mint/60
+          focus:outline-none focus:ring-2 focus:ring-accent-orange/40 focus:border-accent-orange/60
           ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         {...props}
       />

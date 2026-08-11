@@ -22,9 +22,9 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null)
 
 const typeStyles: Record<ToastType, string> = {
-  success: 'border-accent-mint/30 bg-accent-mint/10 text-accent-mint',
+  success: 'border-accent-orange/30 bg-accent-orange/10 text-accent-orange',
   error: 'border-red-500/30 bg-red-500/10 text-red-400',
-  info: 'border-accent-purple/30 bg-accent-purple/10 text-accent-purple',
+  info: 'border-accent-orange/30 bg-accent-orange/10 text-accent-orange',
 }
 
 const typeIcons: Record<ToastType, string> = {

@@ -48,14 +48,36 @@ async function getToken(): Promise<string> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+export class ExternalApiError extends Error {
+  status: number
+  externalMessage: string
+
+  constructor(status: number, message: string, externalMessage?: string) {
+    super(message)
+    this.name = 'ExternalApiError'
+    this.status = status
+    this.externalMessage = externalMessage || message
+  }
+}
+
+function parseExternalError(status: number, text: string): string {
+  try {
+    const json = JSON.parse(text)
+    return typeof json?.error === 'string' ? json.error : typeof json?.message === 'string' ? json.message : text
+  } catch {
+    return text
+  }
+}
+
 async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3): Promise<T> {
   const { BASE_URL } = requireCredentials()
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
   for (let attempt = 0; attempt < retries; attempt++) {
     const token = await getToken()
     const res = await fetch(`${BASE_URL}${path}`, {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         Authorization: `Bearer ${token}`,
         ...options.headers,
       },
@@ -69,7 +91,12 @@ async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3)
       }
       const errorText = await res.text()
       console.error(`[External API] Server error ${res.status} ${path}:`, errorText)
-      throw new Error(`External API error: ${res.status} - ${errorText}`)
+      const externalMessage = parseExternalError(res.status, errorText)
+      throw new ExternalApiError(
+        res.status,
+        `External API error: ${externalMessage}`,
+        externalMessage,
+      )
     }
 
     if (res.status === 401) {
@@ -87,7 +114,12 @@ async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3)
       if (!retryRes.ok) {
         const errorText = await retryRes.text()
         console.error(`[External API] 401 retry failed ${path}:`, errorText)
-        throw new Error(`External API error: ${retryRes.status} - ${errorText}`)
+        const externalMessage = parseExternalError(retryRes.status, errorText)
+        throw new ExternalApiError(
+          retryRes.status,
+          `External API error: ${externalMessage}`,
+          externalMessage,
+        )
       }
       return retryRes.json()
     }
@@ -95,13 +127,18 @@ async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3)
     if (!res.ok) {
       const errorText = await res.text()
       console.error(`[External API] ${res.status} ${path}:`, errorText)
-      throw new Error(`External API error: ${res.status} - ${errorText}`)
+      const externalMessage = parseExternalError(res.status, errorText)
+      throw new ExternalApiError(
+        res.status,
+        `External API error: ${externalMessage}`,
+        externalMessage,
+      )
     }
 
     return res.json()
   }
 
-  throw new Error('External API request failed after retries')
+  throw new ExternalApiError(500, 'External API request failed after retries')
 }
 
 export interface ExternalAuthor {
@@ -118,14 +155,33 @@ export interface ExternalEngagement {
   shares: number
 }
 
+export interface ExternalEmailEntry {
+  email: string
+  found_by?: string[]
+  email_status?: string
+  email_source?: string
+  find_note?: string
+  verification_note?: string
+  verified_by?: string[]
+  is_primary?: boolean
+}
+
 export interface ExternalContactInfo {
   name: string
-  emails: { email: string; is_primary?: boolean }[]
-  phone_numbers: { number: string; type?: string }[]
+  emails: ExternalEmailEntry[]
+  phone_numbers: { number: string; type?: string; source?: string }[]
   company_name?: string
   title?: string
   headline?: string
   linkedin_public_id?: string
+  email_conflict?: boolean
+  email_status?: string
+  email_source?: string
+  found_by?: string[]
+  verified_by?: string[]
+  find_note?: string
+  verification_note?: string
+  email_verified_at?: string
 }
 
 export interface ExternalPost {
@@ -160,6 +216,9 @@ export interface ExternalPost {
   enriched_at: string | null
   intelligence: string | null
   review_status: string | null
+  reviewed_at: string | null
+  reviewed_by_id: string | null
+  reviewed_by_name: string | null
   is_claimed: boolean
   claimed_count: number
   created_at: string
@@ -197,7 +256,7 @@ export async function getPosts(params?: {
 }): Promise<PostsResponse> {
   const search = new URLSearchParams()
   if (params?.page) search.set('page', String(params.page))
-  if (params?.perPage) search.set('per_page', String(params.perPage))
+  if (params?.perPage) search.set('limit', String(params.perPage))
   if (params?.status) search.set('status', params.status)
   if (params?.search) search.set('search', params.search)
   if (params?.keyword) search.set('keyword', params.keyword)
@@ -251,6 +310,8 @@ interface AiMetricsResponse {
     model_ready?: boolean
     samples?: number
     accuracy?: number
+    relevant_count?: number
+    irrelevant_count?: number
     message?: string
   }
 }
@@ -260,7 +321,37 @@ interface IntelSettingsResponse {
   data: {
     is_configured: boolean
     model: string
+    openrouter_api_key?: string
   }
+}
+
+interface AutomationSettingsResponse {
+  success: boolean
+  data: {
+    auto_scrape_enabled: boolean
+    auto_enrichment_enabled: boolean
+    keep_alive_enabled: boolean
+    keep_alive_configured: boolean
+    scrape_interval_minutes: number
+    keep_alive_interval_minutes: number
+  }
+}
+
+export async function getAutomationSettings(): Promise<AutomationSettingsResponse['data']> {
+  const res = await fetchApi<AutomationSettingsResponse>(`/settings/automation`)
+  return res.data
+}
+
+export async function updateAutomationSettings(settings: {
+  auto_scrape_enabled?: boolean
+  auto_enrichment_enabled?: boolean
+  keep_alive_enabled?: boolean
+}): Promise<AutomationSettingsResponse['data']> {
+  const res = await fetchApi<AutomationSettingsResponse>(`/settings/automation`, {
+    method: 'PATCH',
+    body: JSON.stringify(settings),
+  })
+  return res.data
 }
 
 export async function approvePost(id: string): Promise<ExternalPost> {
@@ -344,6 +435,51 @@ export async function reEnrichPost(id: string): Promise<void> {
   await fetchApi<AdminActionResponse>(`/posts/${id}/re-enrich`, { method: 'POST' })
 }
 
+export async function deletePost(id: string): Promise<void> {
+  await fetchApi<AdminActionResponse>(`/posts/${id}`, { method: 'DELETE' })
+}
+
+export async function updatePostLabel(
+  id: string,
+  data: { status?: string; is_training_data?: boolean },
+): Promise<ExternalPost> {
+  const res = await fetchApi<AdminActionResponse>(`/posts/${id}/label`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+  if (!res.data) throw new Error(`External API: label returned no data for post ${id}`)
+  return res.data
+}
+
+export async function updatePost(id: string, data: Record<string, unknown>): Promise<ExternalPost> {
+  const res = await fetchApi<AdminActionResponse>(`/posts/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+  if (!res.data) throw new Error(`External API: update returned no data for post ${id}`)
+  return res.data
+}
+
+export async function reExtractPost(id: string): Promise<{ message?: string }> {
+  return fetchApi<{ success: boolean; message?: string }>(`/posts/${id}/re-extract`, {
+    method: 'POST',
+  })
+}
+
+export async function trainAiNow(): Promise<AiMetricsResponse['data']> {
+  const res = await fetchApi<AiMetricsResponse>(`/ai/train-now`, { method: 'POST' })
+  return res.data
+}
+
+export async function uploadManualPosts(
+  formData: FormData,
+): Promise<{ success: boolean; count: number; results: unknown[] }> {
+  return fetchApi<{ success: boolean; count: number; results: unknown[] }>(`/posts/upload`, {
+    method: 'POST',
+    body: formData,
+  })
+}
+
 export async function getLeadIntelligenceStats(): Promise<Record<string, number>> {
   const res = await fetchApi<LeadStatsResponse>(`/posts/stats`)
   return res.data
@@ -357,6 +493,75 @@ export async function getAiMetrics(): Promise<AiMetricsResponse['data']> {
 export async function getIntelligenceSettings(): Promise<IntelSettingsResponse['data']> {
   const res = await fetchApi<IntelSettingsResponse>(`/settings/intelligence`)
   return res.data
+}
+
+export async function updateIntelligenceSettings(apiKey: string, model?: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<IntelSettingsResponse>(`/settings/intelligence`, {
+    method: 'POST',
+    body: JSON.stringify({ api_key: apiKey, model }),
+  })
+  return { success: true, message: 'OpenRouter API key updated' }
+}
+
+interface EnrichmentKeyResponse {
+  success: boolean
+  data: {
+    token: string | null
+    is_configured: boolean
+    usage?: Record<string, number>
+  }
+}
+
+export async function getContactCompassToken(): Promise<EnrichmentKeyResponse['data']> {
+  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/contact-compass-token`)
+  return res.data
+}
+
+export async function updateContactCompassToken(token: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/contact-compass-token`, {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  })
+  return res
+}
+
+export async function getHunterApiKey(): Promise<EnrichmentKeyResponse['data']> {
+  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/hunter-api-key`)
+  return res.data
+}
+
+export async function updateHunterApiKey(api_key: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/hunter-api-key`, {
+    method: 'POST',
+    body: JSON.stringify({ api_key }),
+  })
+  return res
+}
+
+export async function getContactOutToken(): Promise<EnrichmentKeyResponse['data']> {
+  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/contactout-api-token`)
+  return res.data
+}
+
+export async function updateContactOutToken(token: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/contactout-api-token`, {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  })
+  return res
+}
+
+export async function getApolloApiKey(): Promise<EnrichmentKeyResponse['data']> {
+  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/apollo-api-key`)
+  return res.data
+}
+
+export async function updateApolloApiKey(api_key: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/apollo-api-key`, {
+    method: 'POST',
+    body: JSON.stringify({ api_key }),
+  })
+  return res
 }
 
 // --- Watchlist targets (backend proxy) ---

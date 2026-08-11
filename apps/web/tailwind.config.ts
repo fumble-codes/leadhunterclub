@@ -1,12 +1,19 @@
 import type { Config } from 'tailwindcss'
-import { palette, cssVars, accent } from './src/lib/colors'
+import { palette, cssVars, accent, primary, secondary, tertiary } from './src/lib/colors'
 
 const config: Config = {
   darkMode: 'class',
   content: ['./src/**/*.{ts,tsx}'],
   safelist: [
     {
-      pattern: /(bg|text|border|ring)-accent-(mint|purple)(\/(10|20|40|50))?/,
+      pattern: /(bg|text|border|ring|from|via|to)-accent-(mint|purple|cyan|orange|pink)(\/(10|15|20|25|30|40|50|60|70|80|90))?/,
+    },
+    {
+      pattern:
+        /(bg|text|border|ring|from|via|to|divide)-(primary|secondary|tertiary|error|surface|outline|background)(-container)?(-(low|lowest|high|highest|variant|dim|bright|tint))?(\/(10|15|20|25|30|40|50|60|70|80|90))?/,
+    },
+    {
+      pattern: /text-(on|inverse)-[a-z-]+/,
     },
   ],
   theme: {
@@ -81,9 +88,9 @@ const config: Config = {
       boxShadow: {
         glowMint: `0 0 12px ${accent.mint}cc`,
         glowPurple: `0 0 12px ${accent.purple}cc`,
-        glowCyan: `0 0 12px ${accent.cyan}cc`,
-        glowOrange: `0 0 12px ${accent.orange}cc`,
-        glowPink: `0 0 12px ${accent.pink}cc`,
+        glowSecondary: `0 0 12px ${secondary.DEFAULT}cc`,
+        glowPrimary: `0 0 12px ${primary.container}cc`,
+        glowTertiary: `0 0 12px ${tertiary.DEFAULT}cc`,
         'elevation-1': '0 1px 2px rgba(var(--rgb-black), 0.3)',
         'elevation-2': '0 4px 8px rgba(var(--rgb-black), 0.4)',
         'elevation-3': '0 8px 24px rgba(var(--rgb-black), 0.5)',

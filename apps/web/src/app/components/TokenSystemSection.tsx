@@ -29,9 +29,9 @@ interface LeadCardData {
   isLocked: boolean
 }
 
-const urgencyColors: Record<string, { badge: 'mint' | 'purple'; topLine: string; dotColor: string }> = {
-  critical: { badge: 'mint', topLine: 'from-transparent via-accent-mint to-transparent', dotColor: 'bg-accent-mint' },
-  high: { badge: 'mint', topLine: 'from-transparent via-accent-mint to-transparent', dotColor: 'bg-accent-mint' },
+const urgencyColors: Record<string, { badge: 'purple'; topLine: string; dotColor: string }> = {
+  critical: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
+  high: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
   medium: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
   low: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
 }
@@ -142,7 +142,7 @@ export default function TokenSystemSection() {
     <section id="tokens" className="py-40 px-6 max-w-[1300px] mx-auto overflow-hidden">
       {/* Centered Header Section with Big Eyebrow */}
       <div className="text-center mb-24 max-w-4xl mx-auto space-y-5">
-        <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+        <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
           Simple Token-Based System
         </span>
         <h2 className="font-display text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-tight text-text-primary leading-[1.1] max-w-3xl mx-auto">
@@ -455,7 +455,7 @@ export default function TokenSystemSection() {
                     {/* Tags row + AI Reply Probability */}
                     <div className="flex flex-wrap gap-2 mb-2 shrink-0">
                       {lead.replyProbability > 0 && (
-                        <Badge size="sm" color={lead.replyProbability >= 80 ? 'mint' : 'purple'}>
+                        <Badge size="sm" color="purple">
                           {lead.replyProbability}% Reply Match
                         </Badge>
                       )}

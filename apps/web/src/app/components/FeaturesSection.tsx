@@ -71,14 +71,14 @@ function FreshLeadsVisual({
             onMouseLeave={() => setHoveredNotif(null)}
             className={`p-3 rounded-2xl bg-surface border transition-all duration-300 flex items-center gap-3 relative overflow-hidden ${
               isSelfHovered
-                ? 'border-border-subtle bg-surface-secondary shadow-[0_12px_30px_rgba(var(--rgb-persona-green),0.12)] -translate-y-0.5'
+                ? 'border-border-subtle bg-surface-secondary shadow-[0_12px_30px_rgba(var(--rgb-accent-purple),0.12)] -translate-y-0.5'
                 : isPlatformHighlighted
-                  ? 'border-border-subtle bg-surface shadow-[0_8px_20px_rgba(var(--rgb-persona-blue),0.1)] scale-102'
+                  ? 'border-border-subtle bg-surface shadow-[0_8px_20px_rgba(var(--rgb-accent-purple),0.1)] scale-102'
                   : 'border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)]'
             }`}
           >
-            <div className="w-8 h-8 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center shrink-0">
-              <span className="text-[10px] font-bold text-accent-mint">
+            <div className="w-8 h-8 rounded-full bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
+              <span className="text-[10px] font-bold text-accent-purple">
                 {notif.name
                   .split(' ')
                   .map((n) => n[0])
@@ -99,7 +99,7 @@ function FreshLeadsVisual({
             <div
               className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest shrink-0 transition-colors duration-300 ${
                 isPlatformHighlighted
-                  ? 'bg-accent-mint text-text-on-accent'
+                  ? 'bg-accent-orange text-text-on-accent'
                   : 'bg-white/5 border border-white/[0.06] text-text-secondary/50'
               }`}
             >
@@ -111,7 +111,7 @@ function FreshLeadsVisual({
               initial={{ x: '100%' }}
               animate={{ x: isSelfHovered ? 0 : '100%' }}
               transition={{ duration: 0.25, ease }}
-              className="absolute inset-y-0 right-0 w-[75px] bg-accent-mint flex items-center justify-center cursor-pointer font-bold text-[8.5px] text-text-on-accent uppercase tracking-wider"
+              className="absolute inset-y-0 right-0 w-[75px] bg-accent-orange flex items-center justify-center cursor-pointer font-bold text-[8.5px] text-text-on-accent uppercase tracking-wider"
             >
               Qualify →
             </motion.div>
@@ -119,8 +119,8 @@ function FreshLeadsVisual({
         )
       })}
       <div className="flex items-center gap-2 mt-1 ml-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
-        <span className="text-[9px] text-accent-mint/60 font-bold uppercase tracking-widest">
+        <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+        <span className="text-[9px] text-accent-purple/60 font-bold uppercase tracking-widest">
           Live Feed
         </span>
       </div>
@@ -193,7 +193,7 @@ function PlatformNetworkVisual({
   return (
     <div className={`relative aspect-[200/160] w-full max-w-[220px] mx-auto ${className}`}>
       {/* Center hub */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center z-20">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center z-20">
         <AdjustmentsHorizontalIcon className="w-4 h-4 text-text-secondary animate-pulse" />
       </div>
 
@@ -214,7 +214,7 @@ function PlatformNetworkVisual({
             y1={line.y1}
             x2={line.x2}
             y2={line.y2}
-            stroke="rgba(var(--rgb-persona-blue), 0.15)"
+            stroke="rgba(var(--rgb-accent-purple), 0.15)"
             strokeWidth="1"
             strokeDasharray="4 4"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -239,7 +239,7 @@ function PlatformNetworkVisual({
             <motion.div
               className={`rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)] ${
                 isHovered
-                  ? 'border-accent-mint bg-surface-secondary scale-115 '
+                  ? 'border-accent-purple bg-surface-secondary scale-115 '
                   : 'bg-surface border-white/5'
               }`}
               style={{ width: p.size, height: p.size }}
@@ -273,7 +273,7 @@ function PlatformNetworkVisual({
 
       {/* Data pulse traveling along lines */}
       <motion.div
-        className="absolute w-1.5 h-1.5 rounded-full bg-accent-mint z-30"
+        className="absolute w-1.5 h-1.5 rounded-full bg-accent-purple z-30"
         animate={{
           x: [0, 30, -40, 10, 0],
           y: [0, -50, 10, 50, 0],
@@ -286,8 +286,8 @@ function PlatformNetworkVisual({
   )
 }
 
-// ─── Card 3: AI Outreach Writer — AI text generation ────────────────────────
-function AIWriterVisual({
+// ─── Card 3: AI Outreach Writer — AI text generation (retained, no longer on the landing) ─
+export function AIWriterVisual({
   className = '',
   selectedStep,
 }: {
@@ -377,7 +377,7 @@ function LeadIntelVisual({
       label: 'Intent Score',
       value: emailStatus === 'sent' ? '98%' : '94%',
       width: emailStatus === 'sent' ? '98%' : '94%',
-      color: 'bg-accent-mint/50',
+      color: 'bg-accent-purple/50',
       tip: 'Buyer actively looking for Shopify optimization experts.',
     },
     {
@@ -416,7 +416,7 @@ function LeadIntelVisual({
           <div
             className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest shrink-0 transition-colors duration-300 ${
               emailStatus === 'sent'
-                ? 'bg-accent-mint text-text-on-accent'
+                ? 'bg-accent-orange text-text-on-accent'
                 : 'bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors'
             }`}
           >
@@ -475,7 +475,7 @@ function LeadIntelVisual({
         transition={{ duration: 0.6, delay: 0.6 }}
         className="p-3 rounded-xl bg-surface-secondary border border-border-subtle shadow-md"
       >
-        <div className="text-[9px] text-accent-mint font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5">
+        <div className="text-[9px] text-accent-purple font-bold uppercase tracking-widest mb-1 flex items-center gap-1.5">
           <GlobeAltIcon className="w-[10px] h-[10px]" /> AI Context
         </div>
         <p className="text-[10px] text-text-secondary/70 leading-snug">
@@ -503,19 +503,19 @@ function EmailComposeVisual({
       <div
         className={`w-full rounded-2xl bg-surface border transition-all duration-500 flex flex-col h-[230px] justify-between ${
           emailStatus === 'sent'
-            ? 'border-border-subtle shadow-[0_12px_30px_rgba(var(--rgb-persona-green),0.05)]'
+            ? 'border-border-subtle shadow-[0_12px_30px_rgba(var(--rgb-accent-purple),0.05)]'
             : 'border-white/[0.04]'
         }`}
       >
         {/* Email header bar */}
-        <div className="px-4 py-2 border-b border-white/[0.04] flex items-center gap-3 text-accent-mint">
-          <div className="flex items-center gap-1 shrink-0 text-accent-mint">
-            <div className="w-1.5 h-1.5 rounded-full bg-dot-red opacity-60 text-accent-mint" />
-            <div className="w-1.5 h-1.5 rounded-full bg-dot-yellow opacity-60 text-accent-mint" />
-            <div className="w-1.5 h-1.5 rounded-full bg-dot-green opacity-60 text-accent-mint" />
+        <div className="px-4 py-2 border-b border-white/[0.04] flex items-center gap-3 text-accent-purple">
+          <div className="flex items-center gap-1 shrink-0 text-accent-purple">
+            <div className="w-1.5 h-1.5 rounded-full bg-dot-red opacity-60 text-accent-purple" />
+            <div className="w-1.5 h-1.5 rounded-full bg-dot-yellow opacity-60 text-accent-purple" />
+            <div className="w-1.5 h-1.5 rounded-full bg-dot-green opacity-60 text-accent-purple" />
           </div>
           <span className="text-[9.5px] text-text-secondary/40 font-mono">New Message</span>
-          <div className="ml-auto flex items-center gap-1.5 text-accent-mint">
+          <div className="ml-auto flex items-center gap-1.5 text-accent-purple">
             <span className="text-text-secondary hover:text-text-primary transition-colors text-[8.5px] font-bold tracking-widest uppercase">
               Connected
             </span>
@@ -585,7 +585,7 @@ function EmailComposeVisual({
               emailStatus === 'sending'
                 ? 'bg-white/10 text-white/40 cursor-wait'
                 : emailStatus === 'sent'
-                  ? 'bg-accent-mint text-text-on-accent cursor-default'
+                  ? 'bg-accent-orange text-text-on-accent cursor-default'
                   : 'bg-accent-purple hover:bg-surface-secondary text-text-on-accent cursor-pointer hover:scale-105 shadow-[0_4px_12px_rgba(var(--rgb-accent-purple),0.15)]'
             }`}
           >
@@ -627,7 +627,7 @@ function FollowUpTimelineVisual({
       {/* Vertical connecting line */}
       <div className="absolute left-[14px] top-[14px] bottom-[14px] w-px bg-white/[0.06] overflow-hidden">
         <motion.div
-          className="w-full h-1/3 bg-gradient-to-b from-transparent via-accent-mint to-transparent"
+          className="w-full h-1/3 bg-gradient-to-b from-transparent via-accent-purple to-transparent"
           animate={{ y: ['-100%', '300%'] }}
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
         />
@@ -643,25 +643,25 @@ function FollowUpTimelineVisual({
                 e.stopPropagation()
                 onSelectStep(i)
               }}
-              className="flex items-center gap-3 pl-0.5 cursor-pointer relative bg-gradient-to-b via-accent-mint"
+              className="flex items-center gap-3 pl-0.5 cursor-pointer relative bg-gradient-to-b via-accent-purple"
             >
               <div
                 className={`w-[8px] h-[8px] rounded-full border shrink-0 flex items-center justify-center transition-all duration-500 ${
                   isSelected
-                    ? 'border-accent-mint bg-surface-secondary scale-125 '
+                    ? 'border-accent-purple bg-surface-secondary scale-125 '
                     : step.status === 'sent'
-                      ? 'border-accent-mint bg-surface-secondary '
+                      ? 'border-accent-purple bg-surface-secondary '
                       : step.status === 'pending'
                         ? 'border-border-subtle bg-surface-secondary'
                         : 'border-white/10 bg-white/5'
                 }`}
               >
-                {step.status === 'sent' && <div className="w-1 h-1 rounded-full bg-accent-mint" />}
+                {step.status === 'sent' && <div className="w-1 h-1 rounded-full bg-accent-purple" />}
               </div>
               <div
                 className={`flex-1 p-2 rounded-xl border transition-all duration-300 ${
                   isSelected
-                    ? 'border-accent-mint bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-accent-mint),0.08)] scale-102'
+                    ? 'border-accent-purple bg-surface-secondary shadow-[0_8px_20px_rgba(var(--rgb-accent-purple),0.08)] scale-102'
                     : 'border-white/[0.04] bg-surface hover:bg-surface-secondary hover:border-white/10'
                 }`}
               >
@@ -742,7 +742,7 @@ function TokenMeterVisual({
           />
           <defs>
             <linearGradient id="tokenGradientRow" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="var(--color-accent-mint)" />
+              <stop offset="0%" stopColor="var(--color-accent-purple)" />
               <stop offset="100%" stopColor="var(--color-tab-purple)" />
             </linearGradient>
           </defs>
@@ -798,7 +798,7 @@ function PersonaCardsVisual({
       id: 'free',
       role: 'Free',
       icon: CodeBracketIcon,
-      accent: 'accent-mint',
+      accent: 'accent-purple',
       desc: '50 credits — get started today',
     },
     {
@@ -886,7 +886,7 @@ export default function FeaturesSection() {
     >
       {/* Ambient backdrop glows */}
       <div className="absolute top-[-5%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-      <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-mint-very-faint pointer-events-none" />
+      <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
       {/* Headline */}
       <div className="text-center mb-28 relative z-10">
@@ -896,7 +896,7 @@ export default function FeaturesSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
+          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
             Product Capabilities
           </span>
         </motion.div>
@@ -938,7 +938,7 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
                 Real-time acquisition
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
@@ -962,7 +962,7 @@ export default function FeaturesSection() {
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">
-                  <span className="w-1.5 h-1.5 bg-accent-mint rounded-full mt-1.5 shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-accent-purple rounded-full mt-1.5 shrink-0" />
                   <div>
                     <h4 className="text-[12px] font-bold text-text-primary uppercase tracking-wide leading-none mb-1">
                       {item.title}
@@ -981,7 +981,7 @@ export default function FeaturesSection() {
             className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute top-0 left-0 w-40 h-40 glow-mint-strong pointer-events-none" />
+            <div className="absolute top-0 left-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <PlatformNetworkVisual
               className="max-w-[200px]"
               hoveredPlatform={hoveredPlatform}
@@ -1002,7 +1002,7 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
                 Lead Enrichment
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
@@ -1051,7 +1051,7 @@ export default function FeaturesSection() {
           </motion.div>
         </motion.div>
 
-        {/* ── ROW 3: AI Outreach Writer + Automated Follow-Ups (Text Left / Visual Right) ── */}
+        {/* ── ROW 3: Automated Follow-Ups (Text Left / Visual Right) ── */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1062,31 +1062,30 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
                 High-converting outreach
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
-                AI Outreach Writer with Automated Follow-Ups
+                Automated Follow-Ups
               </h3>
             </div>
             <p className="text-text-secondary text-sm md:text-base leading-relaxed">
-              Generate highly personalized outreach emails and DMs centered around buyer psychology.
-              Keep deals moving automatically using multi-stage campaign sequences that adjust tone
-              dynamically.
+              Keep deals moving automatically with multi-stage campaign sequences that adjust tone
+              dynamically — and pause the moment a prospect responds.
             </p>
             <ul className="space-y-3 pt-2">
               {[
                 {
-                  title: 'Psychology-Driven Copies',
-                  desc: 'Pitches engineered to highlight specific case value and response hooks.',
+                  title: 'Multi-Stage Sequences',
+                  desc: 'Campaign streams that escalate tone across days until a reply lands.',
                 },
                 {
                   title: 'Adaptive Follow-Ups',
-                  desc: 'Automated campaign streams that pause automatically once the prospect responds.',
+                  desc: 'Automated streams that pause automatically once the prospect responds.',
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">
-                  <span className="w-1.5 h-1.5 bg-accent-mint rounded-full mt-1.5 shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-accent-purple rounded-full mt-1.5 shrink-0" />
                   <div>
                     <h4 className="text-[12px] font-bold text-text-primary uppercase tracking-wide leading-none mb-1">
                       {item.title}
@@ -1098,15 +1097,14 @@ export default function FeaturesSection() {
             </ul>
           </div>
 
-          {/* Combined Visuals */}
+          {/* Visual */}
           <motion.div
             whileHover={{ y: -6, scale: 1.015 }}
             transition={{ duration: 0.4, ease }}
-            className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
+            className="lg:col-span-7 w-full group relative grid grid-cols-1 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
             {/* Orb Glow */}
-            <div className="absolute top-0 right-0 w-40 h-40 glow-mint-strong pointer-events-none" />
-            <AIWriterVisual selectedStep={selectedStep} />
+            <div className="absolute top-0 right-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <FollowUpTimelineVisual selectedStep={selectedStep} onSelectStep={setSelectedStep} />
           </motion.div>
         </motion.div>
@@ -1122,7 +1120,7 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
                 Credit-Based Usage
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">

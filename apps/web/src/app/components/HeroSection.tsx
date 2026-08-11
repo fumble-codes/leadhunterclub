@@ -155,7 +155,7 @@ const dashboardStats = [
     value: '1,284',
     trend: '+12%',
     trendUp: true,
-    accent: 'mint' as const,
+    accent: 'purple' as const,
   },
   {
     label: 'Active Conversations',
@@ -169,7 +169,7 @@ const dashboardStats = [
     value: '84%',
     trend: '+2.4%',
     trendUp: true,
-    accent: 'mint' as const,
+    accent: 'purple' as const,
   },
   { label: 'Credits Remaining', value: '750', trend: '/ 1,000', accent: 'purple' as const },
 ]
@@ -183,6 +183,7 @@ const activityData = [
   { day: 'Sun', value: 28 },
 ]
 import LeadCard from '@/app/leads/components/LeadCard'
+import PipelineLeadCard from '@/app/leads/components/PipelineLeadCard'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -205,14 +206,14 @@ function LeadsContent() {
     <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative w-full scrollbar-hide">
       {/* Ambient Background Glows */}
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
-      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />
+      <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header & Command Bar */}
         <div className="flex flex-col items-center justify-center mb-16 mt-4">
           {/* Raycast-style Command Palette */}
           <div className="relative group w-full max-w-2xl mb-12">
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-mint/10 to-accent-mint/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-purple/10 to-accent-purple/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative flex items-center bg-surface border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
               <div className="pl-4 pr-3 text-text-secondary">
                 <MagnifyingGlassIcon className="w-5 h-5 text-text-secondary" />
@@ -238,8 +239,8 @@ function LeadsContent() {
             <div>
               <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
                 Lead Feed
-                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-super uppercase">
-                  <span className="w-1.5 h-1.5 bg-accent-mint animate-pulse" />4 Signals
+                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-purple bg-gradient-to-r from-accent-purple/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-super uppercase">
+                  <span className="w-1.5 h-1.5 bg-accent-purple animate-pulse" />4 Signals
                 </div>
               </h1>
               <p className="text-text-secondary/80 text-sm">
@@ -250,9 +251,9 @@ function LeadsContent() {
         </div>
 
         {/* Asymmetrical CSS Grid Feed exactly like leads/page.tsx */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 auto-rows-[minmax(340px,auto)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 auto-rows-fr">
           {feedLeads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} />
+            <PipelineLeadCard key={lead.id} lead={lead} />
           ))}
         </div>
       </div>
@@ -284,21 +285,21 @@ function SavedContent() {
       label: 'High Budget',
       sub: 'Whale tier opportunities',
       count: '$10k+ Potential',
-      accent: 'mint',
+      accent: 'purple',
       icon: ViewfinderCircleIcon,
     },
     {
       label: 'High Intent',
       sub: 'AI-verified opportunities',
       count: '8 New',
-      accent: 'mint',
+      accent: 'purple',
       icon: SparklesIcon,
     },
   ]
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide border-accent-mint text-accent-mint bg-gradient-to-r from-accent-mint/10">
-      <div className="max-w-[1400px] mx-auto relative z-10 border-accent-mint text-accent-mint bg-gradient-to-r from-accent-mint/10">
+    <div className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide border-accent-purple text-accent-purple bg-gradient-to-r from-accent-purple/10">
+      <div className="max-w-[1400px] mx-auto relative z-10 border-accent-purple text-accent-purple bg-gradient-to-r from-accent-purple/10">
         {/* Summary Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           {summaryCards.map((card, i) => (
@@ -344,7 +345,7 @@ function SavedContent() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all ${
                     activeTab === tab
-                      ? 'bg-accent-purple text-text-on-accent shadow-lg'
+                      ? 'bg-accent-orange text-text-on-accent shadow-lg'
                       : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
@@ -363,7 +364,7 @@ function SavedContent() {
                 className="bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-border-subtle transition-all w-48 lg:w-64"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-accent-mint text-text-on-accent rounded-xl font-bold text-xs hover: transition-all">
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-accent-orange text-text-on-accent rounded-xl font-bold text-xs hover: transition-all">
               <SparklesIcon className="w-[14px] h-[14px]" />
               Report
             </button>
@@ -392,7 +393,7 @@ function SavedContent() {
               >
                 <div className="col-span-1 flex items-center">
                   <div
-                    className={`w-2.5 h-2.5 rounded-full bg-accent-${lead.accent || 'mint'} ${lead.isActionable ? 'animate-pulse ring-4 ring-accent-purple/20' : 'opacity-40'}`}
+                    className={`w-2.5 h-2.5 rounded-full bg-accent-${lead.accent || 'purple'} ${lead.isActionable ? 'animate-pulse ring-4 ring-accent-purple/20' : 'opacity-40'}`}
                   />
                 </div>
 
@@ -404,10 +405,10 @@ function SavedContent() {
                       .join('')}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-text-primary group-hover:text-text-secondary hover:text-text-primary transition-colors transition-colors truncate group-hover:text-accent-purple">
+                    <div className="text-sm font-bold text-text-primary group-hover:text-text-secondary hover:text-text-primary transition-colors transition-colors truncate group-hover:text-accent-orange">
                       {lead.name}
                     </div>
-                    <div className="text-[10px] group-hover:text-accent-purple truncate">
+                    <div className="text-[10px] group-hover:text-accent-orange truncate">
                       {lead.email}
                     </div>
                   </div>
@@ -534,9 +535,9 @@ function OutreachContent() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide text-accent-mint">
-          <div className="max-w-[80%] mx-auto text-center space-y-4 py-12 text-accent-mint">
-            <div className="w-8 h-8 rounded-md bg-surface-secondary border border-border-subtle flex items-center justify-center mx-auto text-accent-mint">
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide text-accent-purple">
+          <div className="max-w-[80%] mx-auto text-center space-y-4 py-12 text-accent-purple">
+            <div className="w-8 h-8 rounded-md bg-surface-secondary border border-border-subtle flex items-center justify-center mx-auto text-accent-purple">
               <ViewfinderCircleIcon className="w-6 h-6" />
             </div>
             <h4 className="text-sm font-bold text-text-primary uppercase tracking-widest">
@@ -573,9 +574,9 @@ function OutreachContent() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Draft your socially intelligent outreach..."
-              className="w-full bg-background border border-white/[0.08] rounded-4xl p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-border-subtle transition-all min-h-[140px] resize-none focus:border-accent-mint/50"
+              className="w-full bg-background border border-white/[0.08] rounded-4xl p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-border-subtle transition-all min-h-[140px] resize-none focus:border-accent-purple/50"
             />
-            <button className="absolute bottom-4 right-4 p-4 bg-accent-mint text-text-on-accent rounded-xl font-bold flex items-center gap-2 hover: transition-all">
+            <button className="absolute bottom-4 right-4 p-4 bg-accent-orange text-text-on-accent rounded-xl font-bold flex items-center gap-2 hover: transition-all">
               Send <PaperAirplaneIcon className="w-4 h-4" />
             </button>
           </div>
@@ -597,7 +598,7 @@ function OutreachContent() {
                 {['E-commerce', 'High Intent'].map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 rounded-md bg-accent-mint/10 border border-accent-mint/20 text-[9px] font-bold text-accent-mint"
+                    className="px-2 py-1 rounded-md bg-accent-purple/10 border border-accent-purple/20 text-[9px] font-bold text-accent-purple"
                   >
                     {tag}
                   </span>
@@ -627,8 +628,8 @@ function OutreachContent() {
           </section>
 
           <section className="mt-auto">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-accent-mint/10 to-transparent border border-border-subtle mt-8">
-              <h5 className="text-xs font-bold text-accent-mint mb-2">
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-accent-purple/10 to-transparent border border-border-subtle mt-8">
+              <h5 className="text-xs font-bold text-accent-purple mb-2">
                 Socially Intelligent Note:
               </h5>
               <p className="text-[11px] text-text-secondary leading-relaxed italic">
@@ -651,7 +652,7 @@ function DashboardContent() {
       value: '1,284',
       trend: '+12%',
       trendUp: true,
-      accent: 'mint' as const,
+      accent: 'purple' as const,
     },
     {
       label: 'Active Conversations',
@@ -665,7 +666,7 @@ function DashboardContent() {
       value: '84%',
       trend: '+2.4%',
       trendUp: true,
-      accent: 'mint' as const,
+      accent: 'purple' as const,
     },
     {
       label: 'Credits Remaining',
@@ -678,7 +679,7 @@ function DashboardContent() {
   return (
     <div className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       {/* Ambient Background Glows */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-soft pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 
       <div className="max-w-[1400px] mx-auto relative z-10">
@@ -698,7 +699,7 @@ function DashboardContent() {
 
           <div className="flex items-center gap-4">
             <div className="px-4 py-2 rounded-xl bg-surface-secondary border border-subtle flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-accent-mint animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-accent-purple animate-pulse" />
               <span className="text-xs font-medium text-text-secondary uppercase tracking-widest">
                 Live Node: US-EAST
               </span>
@@ -731,7 +732,7 @@ function DashboardContent() {
                 </div>
                 {stat.trend && (
                   <span
-                    className={`text-[11px] font-bold ${stat.trendUp ? 'text-accent-mint' : 'text-text-secondary'} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-md`}
+                    className={`text-[11px] font-bold ${stat.trendUp ? 'text-accent-purple' : 'text-text-secondary'} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-md`}
                   >
                     {stat.trend}
                     {stat.trendUp && <ArrowTopRightOnSquareIcon className="w-3 h-3" />}
@@ -759,7 +760,7 @@ function DashboardContent() {
                 </h3>
                 <p className="text-sm text-text-secondary">Reply momentum over the last 7 days</p>
               </div>
-              <select className="bg-surface-elevated border border-subtle text-xs text-text-primary rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-accent-mint/50">
+              <select className="bg-surface-elevated border border-subtle text-xs text-text-primary rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-accent-purple/50">
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
               </select>
@@ -772,7 +773,7 @@ function DashboardContent() {
                     initial={{ height: 0 }}
                     animate={{ height: `${data.value * 2}px` }}
                     transition={{ duration: 1, delay: i * 0.1, ease: 'circOut' }}
-                    className="w-full max-w-[40px] rounded-t-xl bg-gradient-to-t from-accent-mint/10 to-accent-mint/40 group-hover:to-accent-mint/60 transition-all relative"
+                    className="w-full max-w-[40px] rounded-t-xl bg-gradient-to-t from-accent-purple/10 to-accent-purple/40 group-hover:to-accent-purple/60 transition-all relative"
                   >
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-text-secondary hover:text-text-primary transition-colors bg-surface-elevated px-2 py-1 rounded border border-border-subtle">
                       {data.value}%
@@ -788,7 +789,7 @@ function DashboardContent() {
 
           {/* Quick Actions & AI Status */}
           <div className="space-y-6">
-            <div className="p-8 rounded-4xl bg-accent-mint text-text-on-accent relative overflow-hidden group">
+            <div className="p-8 rounded-4xl bg-accent-orange text-text-on-accent relative overflow-hidden group">
               <h3 className="text-xl font-bold mb-2">Ready for Outreach</h3>
               <p className="text-sm opacity-80 mb-8 leading-relaxed">
                 You have 12 high-intent leads waiting for outreach strategy.
@@ -796,7 +797,7 @@ function DashboardContent() {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full py-4 bg-text-on-accent text-accent-mint font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl"
+                className="w-full py-4 bg-text-on-accent text-accent-purple font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl"
               >
                 Review New Leads <ArrowTopRightOnSquareIcon className="w-[18px] h-[18px]" />
               </motion.button>
@@ -808,7 +809,7 @@ function DashboardContent() {
               </h3>
               <div className="space-y-4">
                 {[
-                  { label: 'SaaS', trend: 'High Demand', color: 'mint' },
+                  { label: 'SaaS', trend: 'High Demand', color: 'purple' },
                   { label: 'Fintech', trend: 'Growing', color: 'purple' },
                   { label: 'E-commerce', trend: 'Saturating', color: 'purple' },
                 ].map((item) => (
@@ -853,8 +854,8 @@ export default function HeroSection() {
         className="absolute inset-0 pointer-events-none z-0 opacity-100"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(var(--rgb-persona-green), 0.015) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(var(--rgb-persona-green), 0.015) 1px, transparent 1px)
+            linear-gradient(to right, rgba(var(--rgb-accent-purple), 0.015) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(var(--rgb-accent-purple), 0.015) 1px, transparent 1px)
           `,
           backgroundSize: '48px 48px',
           maskImage: 'radial-gradient(circle at 50% 30%, black 10%, transparent 60%)',
@@ -867,7 +868,7 @@ export default function HeroSection() {
         className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[600px] h-[350px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-70"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 50%, rgba(var(--rgb-persona-green),0.03) 0%, rgba(var(--rgb-tab-purple),0.02) 50%, transparent 70%)',
+            'radial-gradient(ellipse at 50% 50%, rgba(var(--rgb-accent-purple),0.03) 0%, rgba(var(--rgb-tab-purple),0.02) 50%, transparent 70%)',
         }}
       />
 
@@ -883,7 +884,7 @@ export default function HeroSection() {
           >
             Stop looking for clients
             <br />
-            <span className="text-accent-mint">Start intercepting them.</span>
+            <span className="text-accent-orange">Start intercepting them.</span>
           </motion.h1>
 
           {/* Centered Description */}
@@ -908,7 +909,7 @@ export default function HeroSection() {
               <motion.span
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent-mint text-page-bg font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(var(--rgb-persona-green),0.25)] transition-all hover:bg-surface-secondary hover:bg-accent-mint/90"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary-container text-on-primary-container font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(var(--rgb-primary-container),0.3)] transition-all hover:bg-primary-container/90"
               >
                 Start Hunting <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </motion.span>
@@ -923,11 +924,11 @@ export default function HeroSection() {
             </Link>
           </motion.div>
 
-          {/* Concentrated green backlight aura directly behind the button */}
-          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] glow-mint-strong pointer-events-none z-0" />
+          {/* Concentrated amber backlight aura directly behind the button */}
+          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] glow-primary-strong pointer-events-none z-0" />
 
           {/* Larger ambient backlight glow under button and behind mockup top edge */}
-          <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] glow-mint-strong pointer-events-none z-0" />
+          <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] glow-primary-strong pointer-events-none z-0" />
         </div>
       </div>
 
@@ -950,7 +951,7 @@ export default function HeroSection() {
             className="absolute top-[-25%] left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-[100%] pointer-events-none -z-10 mix-blend-screen"
             style={{
               background:
-                'radial-gradient(circle, rgba(var(--rgb-persona-green),0.06) 0%, transparent 70%)',
+                'radial-gradient(circle, rgba(var(--rgb-accent-purple),0.06) 0%, transparent 70%)',
             }}
           />
 
@@ -959,12 +960,12 @@ export default function HeroSection() {
             className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 w-2/3 h-24 rounded-full"
             style={{
               background:
-                'radial-gradient(ellipse, rgba(var(--rgb-persona-green),0.07) 0%, transparent 75%)',
+                'radial-gradient(ellipse, rgba(var(--rgb-accent-purple),0.07) 0%, transparent 75%)',
               filter: 'blur(20px)',
             }}
           />
 
-          <div className="rim-light rounded-t-[24px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(var(--rgb-black),0.9)] border border-white/[0.04] border-t-accent-mint/20 border-b-0 relative">
+          <div className="rim-light rounded-t-[24px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(var(--rgb-black),0.9)] border border-white/[0.04] border-t-accent-purple/20 border-b-0 relative">
             {/* Glass reflection sheen overlay */}
             <div className="absolute inset-0 pointer-events-none z-20 bg-gradient-to-tr from-transparent via-white/[0.015] to-white/[0.05] mix-blend-overlay" />
             {/* macOS chrome */}
@@ -1001,12 +1002,12 @@ export default function HeroSection() {
                       <button
                         key={t.id}
                         onClick={() => setActiveTab(t.id)}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left relative ${isActive ? 'text-accent-mint' : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'}`}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left relative ${isActive ? 'text-accent-purple' : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'}`}
                       >
                         {isActive && (
                           <motion.div
                             layoutId="hero-sidebar-active"
-                            className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-persona-green),0.1)]"
+                            className="absolute inset-0 bg-accent-purple/10 border border-accent-purple/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-purple),0.1)]"
                           />
                         )}
                         <t.icon className="w-4 h-4 relative z-10" />
@@ -1030,7 +1031,7 @@ export default function HeroSection() {
                         initial={{ width: 0 }}
                         animate={{ width: '75%' }}
                         transition={{ duration: 1 }}
-                        className="h-full bg-accent-mint rounded-full shadow-[0_0_8px_rgba(var(--rgb-persona-green),0.4)]"
+                        className="h-full bg-accent-purple rounded-full shadow-[0_0_8px_rgba(var(--rgb-accent-purple),0.4)]"
                       />
                     </div>
                   </div>

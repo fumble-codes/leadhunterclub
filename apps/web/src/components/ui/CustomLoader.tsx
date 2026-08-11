@@ -31,10 +31,10 @@ function classNames(...classes: any[]) {
 const SolidWolfIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-purple" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       {/* Expanding backdrop ring */}
       <motion.div
-        className="absolute inset-0 rounded-full bg-accent-purple/5 border border-accent-purple/10"
+        className="absolute inset-0 rounded-full bg-accent-orange/5 border border-accent-orange/10"
         animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
         transition={{ repeat: Infinity, duration: 2.2, ease: 'easeOut' }}
       />
@@ -86,7 +86,7 @@ const SolidWolfIcon = ({ isSmall }: { isSmall: boolean }) => {
 const RadarScannerIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-mint" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         <circle cx="12" cy="12" r="10" className="opacity-10" />
         <circle cx="12" cy="12" r="7" className="opacity-20" />
@@ -126,7 +126,7 @@ const RadarScannerIcon = ({ isSmall }: { isSmall: boolean }) => {
 const PipelineFlowIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-purple" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         {/* Three solid columns showing a progression pipeline (funnel flow) */}
         <motion.rect
@@ -170,7 +170,7 @@ const PipelineFlowIcon = ({ isSmall }: { isSmall: boolean }) => {
 const HuntingSpearIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-purple" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <motion.svg
         viewBox="0 0 24 24"
         className="w-full h-full fill-current"
@@ -190,7 +190,7 @@ const HuntingSpearIcon = ({ isSmall }: { isSmall: boolean }) => {
 const TrailTrackingIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-mint" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         {/* Solid animal tracks representing trail telemetry */}
         <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 0 }}>
@@ -219,7 +219,7 @@ const TrailTrackingIcon = ({ isSmall }: { isSmall: boolean }) => {
 const TargetScopeIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-mint" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         <circle cx="12" cy="12" r="10" className="opacity-15" />
         {/* Scope outer frame */}
@@ -241,12 +241,12 @@ const TargetScopeIcon = ({ isSmall }: { isSmall: boolean }) => {
 const HunterShieldIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-mint" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         {/* Solid shield */}
         <path d="M12 1L3 4v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V4l-9-3z" />
         {/* Crossed axes details */}
-        <path d="M7 8l10 8M17 8L7 16" stroke="#0F1115" strokeWidth="2" strokeLinecap="round" />
+        <path d="M7 8l10 8M17 8L7 16" stroke="#121314" strokeWidth="2" strokeLinecap="round" />
         <path d="M6 7l2 2" stroke="currentColor" strokeWidth="2.5" />
         <path d="M18 7l-2 2" stroke="currentColor" strokeWidth="2.5" />
       </svg>
@@ -260,12 +260,12 @@ const HunterShieldIcon = ({ isSmall }: { isSmall: boolean }) => {
 const MembershipBadgeIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-purple" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         <rect x="3" y="3" width="18" height="18" rx="2" />
         {/* Avatar cutout representation */}
-        <circle cx="12" cy="9" r="3" fill="#0F1115" />
-        <path d="M6 18c0-3 3-4 6-4s6 1 6 4" fill="#0F1115" />
+        <circle cx="12" cy="9" r="3" fill="#121314" />
+        <path d="M6 18c0-3 3-4 6-4s6 1 6 4" fill="#121314" />
         {/* Scan line overlay */}
         <motion.rect
           x="3"
@@ -287,18 +287,18 @@ const MembershipBadgeIcon = ({ isSmall }: { isSmall: boolean }) => {
 const DefaultHunterIcon = ({ isSmall }: { isSmall: boolean }) => {
   const size = isSmall ? 32 : 48
   return (
-    <div className="relative flex items-center justify-center text-accent-mint" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         <circle cx="12" cy="12" r="10" />
         {/* Compass needle cutout */}
         <motion.polygon
           points="12,4 14,12 12,14 10,12"
-          fill="#0F1115"
+          fill="#121314"
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 6, ease: 'linear' }}
           style={{ transformOrigin: '12px 12px' }}
         />
-        <circle cx="12" cy="12" r="1.5" className="fill-current text-accent-mint" />
+        <circle cx="12" cy="12" r="1.5" className="fill-current text-accent-orange" />
       </svg>
     </div>
   )
@@ -319,56 +319,56 @@ const pageConfigs: Record<
   leads: {
     icon: SolidWolfIcon,
     message: 'Hold up we are gathering some prey to hunt...',
-    colorClass: 'text-accent-purple',
+    colorClass: 'text-accent-orange',
     glowClass: 'glow-purple-soft',
   },
   dashboard: {
     icon: RadarScannerIcon,
     message: 'Intercepting buyer-intent signals and calibrating radar...',
-    colorClass: 'text-accent-mint',
-    glowClass: 'glow-mint-soft',
+    colorClass: 'text-accent-orange',
+    glowClass: 'glow-purple-soft',
   },
   saved: {
     icon: PipelineFlowIcon,
     message: 'Counting the trophy bag and organizing your pipeline...',
-    colorClass: 'text-accent-purple',
+    colorClass: 'text-accent-orange',
     glowClass: 'glow-purple-soft',
   },
   outreach: {
     icon: HuntingSpearIcon,
     message: 'Sharpening outreach spears and preparing bait...',
-    colorClass: 'text-accent-purple',
+    colorClass: 'text-accent-orange',
     glowClass: 'glow-purple-soft',
   },
   analytics: {
     icon: TrailTrackingIcon,
     message: 'Decoding hunt telemetry and mapping conversion velocity...',
-    colorClass: 'text-accent-mint',
-    glowClass: 'glow-mint-soft',
+    colorClass: 'text-accent-orange',
+    glowClass: 'glow-purple-soft',
   },
   settings: {
     icon: TargetScopeIcon,
     message: 'Fine-tuning hunting gear and configuring your environment...',
-    colorClass: 'text-accent-mint',
-    glowClass: 'glow-mint-soft',
+    colorClass: 'text-accent-orange',
+    glowClass: 'glow-purple-soft',
   },
   admin: {
     icon: HunterShieldIcon,
     message: 'Accessing the hunter control deck and verifying clearance...',
-    colorClass: 'text-accent-mint',
-    glowClass: 'glow-mint-soft',
+    colorClass: 'text-accent-orange',
+    glowClass: 'glow-purple-soft',
   },
   onboarding: {
     icon: MembershipBadgeIcon,
     message: 'Verifying your hunter credentials and polishing your badge...',
-    colorClass: 'text-accent-purple',
+    colorClass: 'text-accent-orange',
     glowClass: 'glow-purple-soft',
   },
   default: {
     icon: DefaultHunterIcon,
     message: 'Preparing the hunt...',
-    colorClass: 'text-accent-mint',
-    glowClass: 'glow-mint-soft',
+    colorClass: 'text-accent-orange',
+    glowClass: 'glow-purple-soft',
   },
 }
 
@@ -436,14 +436,14 @@ export function CustomLoader({
               className={classNames(
                 'absolute top-0 bottom-0 left-0 w-1/3 rounded-full',
                 page === 'leads'
-                  ? 'bg-accent-purple shadow-[0_0_8px_#a855f7]'
+                  ? 'bg-accent-orange shadow-[0_0_8px_#ffb800]'
                   : page === 'saved'
-                  ? 'bg-accent-purple shadow-[0_0_8px_#a855f7]'
+                  ? 'bg-accent-orange shadow-[0_0_8px_#ffb800]'
                   : page === 'outreach'
-                  ? 'bg-accent-purple shadow-[0_0_8px_#a855f7]'
+                  ? 'bg-accent-orange shadow-[0_0_8px_#ffb800]'
                   : page === 'analytics'
-                  ? 'bg-accent-mint shadow-[0_0_8px_#b8f36b]'
-                  : 'bg-accent-mint shadow-[0_0_8px_#b8f36b]'
+                  ? 'bg-accent-orange shadow-[0_0_8px_#ffb800]'
+                  : 'bg-accent-orange shadow-[0_0_8px_#ffb800]'
               )}
               animate={{ left: ['-30%', '100%'] }}
               transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
@@ -478,14 +478,14 @@ export function CustomLoader({
             className={classNames(
               'absolute top-0 bottom-0 left-0 w-1/3 rounded-full',
               page === 'leads'
-                ? 'bg-accent-purple/75'
+                ? 'bg-accent-orange/75'
                 : page === 'saved'
-                ? 'bg-accent-purple/75'
+                ? 'bg-accent-orange/75'
                 : page === 'outreach'
-                ? 'bg-accent-purple/75'
+                ? 'bg-accent-orange/75'
                 : page === 'analytics'
-                ? 'bg-accent-mint/75'
-                : 'bg-accent-mint/75'
+                ? 'bg-accent-orange/75'
+                : 'bg-accent-orange/75'
             )}
             animate={{ left: ['-30%', '100%'] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}

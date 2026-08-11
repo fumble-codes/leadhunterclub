@@ -21,6 +21,7 @@ import {
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from '@/app/leads/components/LeadCard'
+import PipelineLeadCard from '@/app/leads/components/PipelineLeadCard'
 import { AppLead } from '@/types/lead'
 
 interface PersonaData {
@@ -42,7 +43,7 @@ interface PersonaData {
     urgency: 'low' | 'medium' | 'high' | 'critical'
     nicheTags: string[]
     replyProbability: number
-    accent: 'mint' | 'purple' | 'cyan' | 'orange' | 'pink'
+    accent: 'purple'
     actionPitch: string
     outreachSubject: string
     outreachBody: string
@@ -61,7 +62,7 @@ const mockLead1 = {
   urgency: 'critical',
   nicheTags: ['B2B SaaS', 'SEO', 'Content'],
   replyProbability: 95,
-  accent: 'pink',
+  accent: 'purple',
   status: 'new',
   timestamp: '4h ago',
 } as AppLead
@@ -103,7 +104,7 @@ const PERSONAS: PersonaData[] = [
       urgency: 'high',
       nicheTags: ['E-Commerce', 'Web Dev', 'Shopify'],
       replyProbability: 98,
-      accent: 'mint',
+      accent: 'purple',
       actionPitch: 'Curiosity Loop',
       outreachSubject: 'Quick Webflow/Shopify performance speed audit',
       outreachBody:
@@ -129,7 +130,7 @@ const PERSONAS: PersonaData[] = [
       urgency: 'critical',
       nicheTags: ['E-Commerce', 'UI/UX', 'Conversion'],
       replyProbability: 97,
-      accent: 'pink',
+      accent: 'purple',
       actionPitch: 'Authority Play',
       outreachSubject: 'DTC Checkout Page: 3 Conversion Leakage Fixes',
       outreachBody:
@@ -182,7 +183,7 @@ const PERSONAS: PersonaData[] = [
       urgency: 'critical',
       nicheTags: ['Next.js', 'Core Web Vitals', 'SEO'],
       replyProbability: 99,
-      accent: 'cyan',
+      accent: 'purple',
       actionPitch: 'Technical Audit',
       outreachSubject: 'Next.js bundle chunk audit for Stellar Co',
       outreachBody:
@@ -209,7 +210,7 @@ const PERSONAS: PersonaData[] = [
       urgency: 'high',
       nicheTags: ['DTC Ads', 'Meta', 'TikTok'],
       replyProbability: 95,
-      accent: 'orange',
+      accent: 'purple',
       actionPitch: 'Authority Play',
       outreachSubject: 'Meta/TikTok creative testing library framework',
       outreachBody:
@@ -318,7 +319,7 @@ export default function WhoItsForGrid() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-[10px] uppercase font-bold tracking-ultra mb-3 block text-text-secondary/40">
+            <span className="text-[10px] uppercase font-bold tracking-ultra mb-3 block text-accent-purple">
               Target Audiences
             </span>
           </motion.div>
@@ -455,8 +456,8 @@ export default function WhoItsForGrid() {
                     <h3 className="text-lg font-bold text-text-primary tracking-tight">
                       Lead Feed
                     </h3>
-                    <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-mint bg-gradient-to-r from-accent-mint/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-super uppercase">
-                      <span className="w-1 h-1 bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
+                    <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-purple bg-gradient-to-r from-accent-purple/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-super uppercase">
+                      <span className="w-1 h-1 bg-accent-purple animate-pulse shadow-[0_0_8px_currentColor]" />
                       6 Signals
                     </div>
                   </div>
@@ -483,17 +484,17 @@ export default function WhoItsForGrid() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 items-stretch overflow-hidden">
                   {/* Card 1: Secondary mock lead (SEO optimization signal) */}
                   <div className="hidden xl:flex items-stretch h-full opacity-45 hover:opacity-75 transition-opacity duration-300">
-                    <LeadCard lead={mockLead1} />
+                    <PipelineLeadCard lead={mockLead1} />
                   </div>
 
                   {/* Card 2: THE PRIMARY ACTIVE PERSONA LEAD CARD (clickable to reveal) */}
                   <div className="flex items-stretch h-full">
-                    <LeadCard lead={appLead} onClick={() => handleReveal(activePersona.id)} />
+                    <PipelineLeadCard lead={appLead} onClick={() => handleReveal(activePersona.id)} />
                   </div>
 
                   {/* Card 3: CRM migration signal */}
                   <div className="hidden md:flex items-stretch h-full opacity-45 hover:opacity-75 transition-opacity duration-300">
-                    <LeadCard lead={mockLead2} />
+                    <PipelineLeadCard lead={mockLead2} />
                   </div>
                 </div>
               </div>
@@ -581,7 +582,7 @@ export default function WhoItsForGrid() {
                         <p className="text-[11px] md:text-xs text-text-primary/90 leading-relaxed font-light whitespace-pre-line overflow-y-auto max-h-[220px] md:max-h-[280px] pr-1">
                           {displayedText}
                           {isTyping && (
-                            <span className="inline-block w-1 h-3 ml-0.5 bg-accent-mint animate-pulse align-middle" />
+                            <span className="inline-block w-1 h-3 ml-0.5 bg-accent-purple animate-pulse align-middle" />
                           )}
                         </p>
                       </div>
@@ -592,7 +593,7 @@ export default function WhoItsForGrid() {
                           Ready to dispatch SMTP
                         </span>
 
-                        <button className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-mint text-text-on-accent rounded-lg font-bold text-[9px] md:text-[10px] hover: transition-all">
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-orange text-text-on-accent rounded-lg font-bold text-[9px] md:text-[10px] hover: transition-all">
                           Send Intercept
                           <PaperAirplaneIcon className="w-[10px] h-[10px]" />
                         </button>
@@ -612,7 +613,7 @@ export default function WhoItsForGrid() {
           {/* Window status footer */}
           <div className="h-10 bg-white/[0.01] border-t border-white/[0.04] flex items-center px-6 justify-between text-[9px] font-mono text-text-secondary/40 shrink-0 select-none">
             <div className="flex items-center gap-1.5">
-              <CheckCircleIcon className="w-[11px] h-[11px] text-accent-mint" />
+              <CheckCircleIcon className="w-[11px] h-[11px] text-accent-purple" />
               <span>Product pipeline integrity verified</span>
             </div>
             <div className="flex items-center gap-1">

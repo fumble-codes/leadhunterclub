@@ -120,7 +120,7 @@ export default function AppSidebar({
                 whileHover={{ x: isActive || isBlurred ? 0 : 4 }}
                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 ${
                   isActive
-                    ? 'text-accent-mint'
+                    ? 'text-accent-orange'
                     : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
                 }`}
               >
@@ -144,7 +144,7 @@ export default function AppSidebar({
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active"
-                  className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-mint),0.15)] z-0"
+                  className="absolute inset-0 bg-accent-orange/10 border border-accent-orange/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-orange),0.15)] z-0"
                 />
               )}
             </Link>
@@ -164,7 +164,7 @@ export default function AppSidebar({
             <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <BanknotesIcon className="w-[14px] h-[14px] text-accent-mint" />
+                  <BanknotesIcon className="w-[14px] h-[14px] text-accent-orange" />
                   <span className="text-xxs font-bold text-text-primary uppercase tracking-widest">
                     Credits
                   </span>
@@ -178,14 +178,14 @@ export default function AppSidebar({
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${creditPercentage}%` }}
-                  className="h-full bg-accent-mint shadow-[0_0_10px_rgba(var(--rgb-accent-mint),0.5)]"
+                  className="h-full bg-accent-orange shadow-[0_0_10px_rgba(var(--rgb-accent-orange),0.5)]"
                 />
               </div>
 
               {user?.creditAccount?.rolloverBalance ? (
                 <div className="flex items-center justify-between text-xxs">
                   <span className="text-text-secondary">Rollover</span>
-                  <span className="font-bold text-accent-purple">
+                  <span className="font-bold text-accent-orange">
                     {user.creditAccount.rolloverBalance}
                     {user.creditAccount.rolloverExpiresAt
                       ? ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
@@ -194,7 +194,7 @@ export default function AppSidebar({
                 </div>
               ) : null}
 
-              <button className="text-9 font-bold text-accent-mint uppercase tracking-super hover:opacity-80 transition-opacity">
+              <button className="text-9 font-bold text-accent-orange uppercase tracking-super hover:opacity-80 transition-opacity">
                 Refill Pipeline →
               </button>
             </div>
@@ -220,7 +220,7 @@ export default function AppSidebar({
             whileHover={{ x: pathname === '/settings' || isSneakPeek ? 0 : 4 }}
             className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 ${
               pathname === '/settings'
-                ? 'text-accent-mint'
+                ? 'text-accent-orange'
                 : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
             }`}
           >
@@ -241,7 +241,7 @@ export default function AppSidebar({
           {pathname === '/settings' && !isSneakPeek && (
             <motion.div
               layoutId="sidebar-active"
-              className="absolute inset-0 bg-accent-mint/10 border border-accent-mint/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-mint),0.15)] z-0"
+              className="absolute inset-0 bg-accent-orange/10 border border-accent-orange/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-orange),0.15)] z-0"
             />
           )}
         </Link>

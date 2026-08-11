@@ -27,7 +27,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between text-left group focus:outline-none"
       >
-        <h4 className="font-display text-xl text-text-primary group-hover:text-accent-purple transition-colors duration-300">
+        <h4 className="font-display text-xl text-text-primary group-hover:text-accent-orange transition-colors duration-300">
           {q}
         </h4>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.4, ease }}>
@@ -288,7 +288,7 @@ function OutreachPreviewUI() {
             <div>
               <div className="text-[10px] text-text-secondary/50 mb-0.5">Spam Score</div>
               <div className="text-xs font-medium text-text-primary uppercase tracking-wide flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500 bg-accent-mint" />{' '}
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500 bg-accent-purple" />{' '}
                 {selected.spamScore}
               </div>
             </div>
@@ -322,7 +322,7 @@ export default function LandingPage() {
       <section id="funnel" className="py-40 px-6 max-w-[1200px] mx-auto relative">
         {/* Ambient section glows */}
         <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] glow-mint-very-faint pointer-events-none" />
+        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
         <div className="text-center mb-24 relative z-10">
           <motion.div
@@ -331,7 +331,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
+            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
               How It Works
             </span>
           </motion.div>
@@ -374,18 +374,18 @@ export default function LandingPage() {
             {/* Visual Radar Container */}
             <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 overflow-hidden pointer-events-none flex items-center justify-center">
               {/* Concentric circles - slightly more visible */}
-              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-accent-mint/[0.15] flex items-center justify-center shadow-[inset_0_0_40px_rgba(var(--rgb-persona-green),0.05)]">
-                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-accent-mint/[0.2] flex items-center justify-center shadow-[inset_0_0_20px_rgba(var(--rgb-persona-green),0.05)]">
-                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-accent-mint/[0.3]" />
+              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-accent-purple/[0.15] flex items-center justify-center shadow-[inset_0_0_40px_rgba(var(--rgb-accent-purple),0.05)]">
+                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-accent-purple/[0.2] flex items-center justify-center shadow-[inset_0_0_20px_rgba(var(--rgb-accent-purple),0.05)]">
+                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-accent-purple/[0.3]" />
                 </div>
               </div>
 
               {/* Eye-catching Hero Radar Sweep */}
               <div className="absolute w-[300px] h-[300px] animate-[spin_4s_linear_infinite] rounded-full overflow-hidden">
                 {/* Radar sweep cone */}
-                <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[conic-gradient(from_180deg_at_0_100%,rgba(var(--rgb-persona-green),0)_0deg,rgba(var(--rgb-persona-green),0.25)_90deg)]" />
+                <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[conic-gradient(from_180deg_at_0_100%,rgba(var(--rgb-accent-purple),0)_0deg,rgba(var(--rgb-accent-purple),0.25)_90deg)]" />
                 {/* Leading edge line */}
-                <div className="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-accent-mint origin-left -translate-y-1/2" />
+                <div className="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-accent-orange origin-left -translate-y-1/2 shadow-[0_0_12px_rgba(var(--rgb-accent-orange),0.6)]" />
               </div>
 
               {/* Glowing cinematic intercept logos */}
@@ -435,7 +435,7 @@ export default function LandingPage() {
             </div>
 
             <div className="relative z-10 pointer-events-none">
-              <span className="text-xs font-mono text-accent-mint uppercase tracking-widest mb-3 block">
+              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
                 Step 01
               </span>
               <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
@@ -515,7 +515,7 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* CARD 3: AI Outreach Writer (1/3 width) */}
+          {/* CARD 3: Lead Intelligence Builder (1/3 width) */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -602,14 +602,14 @@ export default function LandingPage() {
                   name: 'Sarah K.',
                   signal: 'Needs Shopify dev',
                   score: '96%',
-                  accent: 'mint',
+                  accent: 'purple',
                   delay: 0,
                 },
                 {
                   name: 'James T.',
                   signal: 'Conversion audit',
                   score: '91%',
-                  accent: 'cyan',
+                  accent: 'purple',
                   delay: 120,
                 },
                 {
@@ -625,10 +625,8 @@ export default function LandingPage() {
                   className="p-3.5 rounded-xl bg-code-bg-dark/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(var(--rgb-black),0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-border-subtle group-hover:bg-surface-secondary group-hover:shadow-[0_4px_16px_rgba(var(--rgb-black),0.6)] group-hover:translate-x-2"
                   style={{ transitionDelay: `${lead.delay}ms` }}
                 >
-                  <div
-                    className={`w-8 h-8 rounded-lg bg-accent-${lead.accent}/10 border border-accent-${lead.accent}/20 flex items-center justify-center shrink-0`}
-                  >
-                    <span className={`text-[9px] font-bold text-accent-${lead.accent}`}>
+<div className="w-8 h-8 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
+                    <span className="text-[9px] font-bold text-accent-purple">
                       {lead.name
                         .split(' ')
                         .map((n) => n[0])
@@ -641,13 +639,13 @@ export default function LandingPage() {
                   </div>
                   <div className="flex flex-col items-end gap-1 shrink-0">
                     <span
-                      className={`text-[9px] font-bold text-accent-${lead.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                      className="text-[9px] font-bold text-accent-purple opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{ transitionDelay: `${lead.delay + 200}ms` }}
                     >
                       {lead.score}
                     </span>
                     <span
-                      className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{ transitionDelay: `${lead.delay + 300}ms` }}
                     />
                   </div>
@@ -659,8 +657,8 @@ export default function LandingPage() {
                 className="flex items-center justify-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 style={{ transitionDelay: '400ms' }}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
-                <span className="text-[9px] text-accent-mint font-bold uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+                <span className="text-[9px] text-accent-purple font-bold uppercase tracking-widest">
                   Ready to Hunt
                 </span>
               </div>
@@ -675,9 +673,8 @@ export default function LandingPage() {
               </h3>
               <p className="text-text-secondary text-sm leading-relaxed">
                 Qualified, intelligence-loaded leads land directly in your dashboard — ready to act
-                on. Use our AI outreach writer to craft the perfect first touch, or engage with your
-                own strategy. Either way, you&apos;re reaching warm buyers while the opportunity is
-                still fresh.
+                on. Craft the perfect first touch or engage with your own strategy. Either way,
+                you&apos;re reaching warm buyers while the opportunity is still fresh.
               </p>
             </div>
           </motion.div>
@@ -690,7 +687,7 @@ export default function LandingPage() {
         className="py-40 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]"
       >
         {/* Fine background glow */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-mint/[0.015] blur-2xl rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-purple/[0.015] blur-2xl rounded-full pointer-events-none" />
 
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column - Copy Breakdown */}
@@ -758,7 +755,7 @@ export default function LandingPage() {
                     'Significantly higher actual reply probability',
                   ].map((item) => (
                     <li key={item} className="text-xs text-text-primary flex items-center gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-mint shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-purple shrink-0" />
                       <span className="font-light">{item}</span>
                     </li>
                   ))}
@@ -812,7 +809,7 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-text-secondary/40">
+            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
               Pricing Plans
             </span>
           </motion.div>
@@ -847,12 +844,11 @@ export default function LandingPage() {
               tokens: '50',
               price: 'Free',
               desc: 'Experience the platform and start closing your first high-value client.',
-              accent: 'mint',
+              accent: 'purple',
               featured: false,
               features: [
                 '50 Intelligence Credits',
                 '~16 Lead Reveals',
-                'AI Outreach Writer',
                 'Basic Lead Intelligence',
               ],
             },
@@ -861,12 +857,11 @@ export default function LandingPage() {
               tokens: '500',
               price: 'Free',
               desc: 'For serious operators building a consistent, high-quality client pipeline.',
-              accent: 'pink',
+              accent: 'purple',
               featured: true,
               features: [
                 '500 Intelligence Credits',
                 '~166 Lead Reveals',
-                'AI Outreach Writer',
                 'Full Lead Intelligence',
                 'Automated Follow-Ups',
                 'Priority Signal Access',
@@ -883,7 +878,6 @@ export default function LandingPage() {
               features: [
                 '1,000 Intelligence Credits',
                 '~333 Lead Reveals',
-                'AI Outreach Writer',
                 'Full Lead Intelligence',
                 'Automated Follow-Ups',
                 'Priority Signal Access',
@@ -910,7 +904,7 @@ export default function LandingPage() {
               <div className="relative z-10 p-8 md:p-10 flex flex-col flex-1">
                 {/* Popular badge */}
                 {p.featured && (
-                  <span className="absolute top-6 right-6 text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+                  <span className="absolute top-6 right-6 text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
                     Most Popular
                   </span>
                 )}
@@ -918,7 +912,7 @@ export default function LandingPage() {
                 {/* Plan name & description */}
                 <div className="mb-8">
                   <div
-                    className={`w-8 h-8 rounded-md bg-accent-${p.accent}/10 border border-accent-${p.accent}/20 flex items-center justify-center text-accent-${p.accent} mb-5`}
+                    className={`w-8 h-8 rounded-md ${p.featured ? 'bg-accent-purple/10 border border-accent-purple/20 text-accent-purple' : 'bg-white/5 border border-white/5 text-text-secondary/60'} flex items-center justify-center mb-5`}
                   >
                     <SparklesIcon className="w-[18px] h-[18px]" />
                   </div>
@@ -939,7 +933,7 @@ export default function LandingPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-11">
                       <span className="text-text-secondary/60">{p.tokens} Credits</span>
-                      <span className={`font-bold text-accent-${p.accent}`}>{p.tokens} / mo</span>
+                      <span className={`font-bold ${p.featured ? 'text-accent-purple' : 'text-text-secondary/60'}`}>{p.tokens} / mo</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                       <motion.div
@@ -975,7 +969,7 @@ export default function LandingPage() {
                   href="/register"
                   className={`block w-full py-4 rounded-2xl font-bold text-sm tracking-tight text-center transition-all duration-500 ${
                     p.featured
-                      ? `bg-accent-${p.accent} text-text-on-accent`
+                      ? 'bg-accent-orange text-text-on-accent'
                       : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] text-text-primary hover:bg-white/[0.07]'
                   }`}
                 >
@@ -1045,7 +1039,7 @@ export default function LandingPage() {
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
-          <span className="text-[10px] font-bold tracking-ultra uppercase text-text-secondary/40">
+          <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
             Exclusive Syndicate Access
           </span>
 
@@ -1061,7 +1055,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 font-mono text-sm text-text-secondary/70">
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-mint" />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
               Spend less time scraping.
             </span>
             <span className="flex items-center gap-2">
@@ -1078,7 +1072,7 @@ export default function LandingPage() {
             >
               <Link
                 href="/register"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-text-primary text-bg-main font-bold text-sm hover: transition-all duration-500 group"
+                className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-accent-orange text-text-on-accent font-bold text-sm shadow-[0_8px_30px_rgba(var(--rgb-accent-orange),0.35)] hover: transition-all duration-500 group"
               >
                 Start Finding Leads
                 <ArrowRightIcon className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-1" />

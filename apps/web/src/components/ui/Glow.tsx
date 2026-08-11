@@ -9,11 +9,11 @@ interface GlowProps {
 
 const glowClassMap: Record<GlowColor, Record<GlowIntensity, string>> = {
   mint: {
-    'very-faint': 'glow-mint-very-faint',
-    soft: 'glow-mint-soft',
-    medium: 'glow-mint-soft',
-    strong: 'glow-mint-strong',
-    intense: 'glow-mint-strong',
+    'very-faint': 'glow-purple-very-faint',
+    soft: 'glow-purple-soft',
+    medium: 'glow-purple-soft',
+    strong: 'glow-purple-strong',
+    intense: 'glow-purple-strong',
   },
   purple: {
     'very-faint': 'glow-purple-very-faint',

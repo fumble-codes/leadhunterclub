@@ -7,8 +7,7 @@ type TextColor =
   | 'primary'
   | 'secondary'
   | 'muted'
-  | 'accent-mint'
-  | 'accent-purple'
+  | 'accent-orange'
 
 interface TextProps {
   variant?: TextVariant
@@ -30,8 +29,7 @@ const colorStyles: Record<TextColor, string> = {
   primary: 'text-text-primary',
   secondary: 'text-text-secondary',
   muted: 'text-text-muted',
-  'accent-mint': 'text-accent-mint',
-  'accent-purple': 'text-accent-purple',
+  'accent-orange': 'text-accent-orange',
 }
 
 export function Text({

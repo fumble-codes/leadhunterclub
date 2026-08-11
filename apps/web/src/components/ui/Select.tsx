@@ -28,7 +28,7 @@ export function Select({
       onChange={(e) => onChange(e.target.value)}
       className={`glass-panel appearance-none cursor-pointer text-text-primary
         font-medium transition-all duration-300
-        focus:outline-none focus:ring-2 focus:ring-accent-mint/40 focus:border-accent-mint/60
+        focus:outline-none focus:ring-2 focus:ring-accent-orange/40 focus:border-accent-orange/60
         hover:bg-surface/90
         ${sizeStyles[size]} ${className}`}
       style={{

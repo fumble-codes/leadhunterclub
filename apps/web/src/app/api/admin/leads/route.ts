@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
+import { ExternalApiError } from '@/lib/external-api/client'
 import {
   getPosts,
   bulkApprove,
@@ -8,6 +9,7 @@ import {
   bulkDeletePosts,
   bulkReanalyse,
   bulkReEnrich,
+  trainAiNow,
 } from '@/lib/external-api/client'
 
 export const dynamic = 'force-dynamic'
@@ -26,6 +28,9 @@ export async function GET(request: NextRequest) {
     const result = await getPosts({ page, perPage, status, search, keyword, platform })
     return NextResponse.json(result)
   } catch (error: unknown) {
+    if (error instanceof ExternalApiError) {
+      return NextResponse.json({ code: 'EXTERNAL_ERROR', message: error.externalMessage }, { status: error.status })
+    }
     const msg = error instanceof Error ? error.message : 'Failed to fetch leads'
     return NextResponse.json({ code: 'ERROR', message: msg }, { status: 500 })
   }
@@ -65,10 +70,18 @@ export async function POST(request: NextRequest) {
         const reEnrichResult = await bulkReEnrich(filters)
         return NextResponse.json(reEnrichResult)
 
+      case 'train-ai': {
+        const trainResult = await trainAiNow()
+        return NextResponse.json(trainResult)
+      }
+
       default:
         return NextResponse.json({ code: 'UNKNOWN_ACTION', message: `Unknown action: ${action}` }, { status: 400 })
     }
   } catch (error: unknown) {
+    if (error instanceof ExternalApiError) {
+      return NextResponse.json({ code: 'EXTERNAL_ERROR', message: error.externalMessage }, { status: error.status })
+    }
     const msg = error instanceof Error ? error.message : 'Failed to process action'
     return NextResponse.json({ code: 'ERROR', message: msg }, { status: 500 })
   }

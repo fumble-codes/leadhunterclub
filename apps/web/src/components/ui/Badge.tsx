@@ -13,8 +13,8 @@ interface BadgeProps {
 }
 
 const colorStyles: Record<BadgeColor, string> = {
-  mint: 'bg-accent-mint/10 border border-accent-mint/20 text-accent-mint',
-  purple: 'bg-accent-purple/10 border border-accent-purple/20 text-accent-purple',
+  mint: 'bg-accent-orange/10 border border-accent-orange/20 text-accent-orange',
+  purple: 'bg-accent-orange/10 border border-accent-orange/20 text-accent-orange',
 }
 
 const sizeStyles: Record<BadgeSize, string> = {

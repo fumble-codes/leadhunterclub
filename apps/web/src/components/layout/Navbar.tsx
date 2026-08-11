@@ -122,7 +122,7 @@ export default function Navbar() {
               className="w-8 h-8 rounded-xl"
             />
             {/* Show brand name on desktop, or if not scrolled on mobile */}
-            <span className={`font-display text-[16px] font-semibold tracking-tight text-text-primary group-hover:opacity-80 transition-opacity duration-300 ${
+            <span className={`font-display text-[16px] font-semibold tracking-tight text-text-primary group-hover:opacity-80 transition-opacity duration-300 whitespace-nowrap ${
               isScrolled ? 'hidden sm:block' : 'block'
             }`}>
               Lead Hunter Club
@@ -130,17 +130,17 @@ export default function Navbar() {
           </Link>
 
           {/* Center: Links (Desktop) */}
-          <div className="hidden md:flex items-center">
-            <div className="flex items-center gap-1">
+          <div className="hidden md:flex items-center shrink-0 flex-nowrap">
+            <div className="flex items-center gap-1 flex-nowrap">
               {navLinks.map((link) => {
                 const isActive = activeHash === link.href
                 return (
                   <a
                     key={link.name}
                     href={link.href}
-                    className={`relative px-4 py-2 text-[13px] font-medium transition-all duration-300 tracking-wide rounded-lg ${
+                    className={`relative px-4 py-2 text-[13px] font-medium transition-all duration-300 tracking-wide rounded-lg whitespace-nowrap ${
                       isActive
-                        ? 'text-accent-mint bg-accent-mint/[0.04]'
+                        ? 'text-accent-orange bg-accent-orange/[0.04]'
                         : 'text-text-secondary/70 hover:text-text-primary hover:bg-white/[0.04]'
                     }`}
                   >
@@ -152,13 +152,13 @@ export default function Navbar() {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 flex-nowrap">
             {showDashboard ? (
               <>
                 {/* Desktop Dashboard Link */}
                 <a
                   href="/dashboard"
-                  className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-mint hover:accent-glow-mint transition-all duration-500 hover:scale-[1.03] active:scale-95 group"
+                  className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-primary hover:accent-glow-primary transition-all duration-500 hover:scale-[1.03] active:scale-95 group shrink-0"
                 >
                   <span>Go to Dashboard</span>
                   <ArrowRightIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -167,7 +167,7 @@ export default function Navbar() {
                 {/* Compact Mobile Dashboard Link */}
                 <a
                   href="/dashboard"
-                  className="md:hidden flex items-center justify-center px-4 py-2 rounded-full bg-text-primary text-bg-main text-[12px] font-bold transition-all duration-300 active:scale-95 shadow-[0_4px_12px_rgba(var(--rgb-white),0.1)]"
+                  className="md:hidden flex items-center justify-center px-4 py-2 rounded-full bg-text-primary text-bg-main text-[12px] font-bold transition-all duration-300 active:scale-95 shadow-[0_4px_12px_rgba(var(--rgb-white),0.1)] shrink-0"
                 >
                   Dashboard
                 </a>
@@ -175,7 +175,7 @@ export default function Navbar() {
             ) : (
               <>
                 {/* Desktop Guest Actions */}
-                <div className="hidden md:flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-3 shrink-0 flex-nowrap">
                   <AnimatePresence>
                     {showLogin && (
                       <motion.a
@@ -194,7 +194,7 @@ export default function Navbar() {
                   {!isScrolled && (
                     <a
                       href="/sneak-peek"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03] text-text-secondary hover:text-text-primary text-[13px] font-medium transition-all duration-300"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-accent-orange/20 hover:bg-accent-orange/[0.03] text-text-secondary hover:text-text-primary text-[13px] font-medium transition-all duration-300"
                     >
                       <span>Sneak Peek</span>
                     </a>
@@ -202,7 +202,7 @@ export default function Navbar() {
 
                   <a
                     href="/register"
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-mint hover:accent-glow-mint transition-all duration-500 hover:scale-[1.03] active:scale-95 group"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-primary hover:accent-glow-primary transition-all duration-500 hover:scale-[1.03] active:scale-95 group"
                   >
                     <span>Start Hunting</span>
                     <ArrowRightIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -292,7 +292,7 @@ export default function Navbar() {
                     <a
                       href="/sneak-peek"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-[14px] font-medium text-text-secondary hover:text-text-primary border border-white/[0.06] hover:border-accent-purple/20 hover:bg-accent-purple/[0.03] transition-all duration-300"
+                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-[14px] font-medium text-text-secondary hover:text-text-primary border border-white/[0.06] hover:border-accent-orange/20 hover:bg-accent-orange/[0.03] transition-all duration-300"
                     >
                       Sneak Peek
                     </a>
