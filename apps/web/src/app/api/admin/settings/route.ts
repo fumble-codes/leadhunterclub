@@ -1,55 +1,96 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 import { requireAdmin, ForbiddenError } from '@/lib/auth'
+import { ExternalApiError } from '@/lib/external-api/client'
+import {
+  getIntelligenceSettings,
+  updateIntelligenceSettings,
+  getContactCompassToken,
+  updateContactCompassToken,
+  getHunterApiKey,
+  updateHunterApiKey,
+  getContactOutToken,
+  updateContactOutToken,
+  getApolloApiKey,
+  updateApolloApiKey,
+  getAutomationSettings,
+  updateAutomationSettings,
+} from '@/lib/external-api/client'
 
 export const dynamic = 'force-dynamic'
+
+const GETTERS = {
+  intelligence: getIntelligenceSettings,
+  'contact-compass': getContactCompassToken,
+  hunter: getHunterApiKey,
+  contactout: getContactOutToken,
+  apollo: getApolloApiKey,
+  automation: getAutomationSettings,
+} as const
+
+type ServiceKey = keyof typeof GETTERS
+
+function errorResponse(error: unknown, fallback: string) {
+  if (error instanceof ForbiddenError) {
+    return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
+  }
+  if (error instanceof ExternalApiError) {
+    return NextResponse.json({ code: 'ERROR', message: error.externalMessage }, { status: error.status })
+  }
+  const msg = error instanceof Error ? error.message : fallback
+  return NextResponse.json({ code: 'ERROR', message: msg }, { status: 500 })
+}
 
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request)
     const { searchParams } = new URL(request.url)
-    const key = searchParams.get('key')
-    if (!key) {
-      return NextResponse.json({ code: 'BAD_REQUEST', message: 'key query param required' }, { status: 400 })
+    const service = searchParams.get('service')
+    if (!service || !(service in GETTERS)) {
+      return NextResponse.json({ code: 'BAD_REQUEST', message: `Unknown settings service: ${service}` }, { status: 400 })
     }
-    const setting = await db.setting.findUnique({ where: { key } })
-    if (!setting || setting.is_deleted) {
-      return NextResponse.json({ success: true, data: { is_configured: false } })
-    }
-    return NextResponse.json({
-      success: true,
-      data: {
-        ...setting.value as Record<string, unknown>,
-        is_configured: true,
-        _id: setting.id,
-      },
-    })
+    const data = await GETTERS[service as ServiceKey]()
+    return NextResponse.json({ success: true, data })
   } catch (error: unknown) {
-    if (error instanceof ForbiddenError) {
-      return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
-    }
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' }, { status: 500 })
+    return errorResponse(error, 'Failed to fetch settings')
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin(request)
+    const { searchParams } = new URL(request.url)
+    const service = searchParams.get('service')
     const body = await request.json()
-    const { key, value, description } = body
-    if (!key) {
-      return NextResponse.json({ code: 'BAD_REQUEST', message: 'key is required' }, { status: 400 })
+
+    let data: unknown
+    switch (service) {
+      case 'intelligence':
+        data = await updateIntelligenceSettings(body?.api_key, body?.model)
+        break
+      case 'contact-compass':
+        data = await updateContactCompassToken(body?.token)
+        break
+      case 'hunter':
+        data = await updateHunterApiKey(body?.api_key)
+        break
+      case 'contactout':
+        data = await updateContactOutToken(body?.token)
+        break
+      case 'apollo':
+        data = await updateApolloApiKey(body?.api_key)
+        break
+      case 'automation':
+        data = await updateAutomationSettings({
+          auto_scrape_enabled: body?.auto_scrape_enabled,
+          auto_enrichment_enabled: body?.auto_enrichment_enabled,
+          keep_alive_enabled: body?.keep_alive_enabled,
+        })
+        break
+      default:
+        return NextResponse.json({ code: 'BAD_REQUEST', message: `Unknown settings service: ${service}` }, { status: 400 })
     }
-    const setting = await db.setting.upsert({
-      where: { key },
-      create: { key, value, description: description || null },
-      update: { value, description: description || undefined, is_deleted: false, deleted_at: null },
-    })
-    return NextResponse.json({ success: true, data: { ...setting, _id: setting.id } })
+    return NextResponse.json({ success: true, data })
   } catch (error: unknown) {
-    if (error instanceof ForbiddenError) {
-      return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
-    }
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' }, { status: 500 })
+    return errorResponse(error, 'Failed to update settings')
   }
 }

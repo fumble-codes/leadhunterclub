@@ -8,20 +8,6 @@ import {
 } from '@heroicons/react/24/solid'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 import { useToast } from '@/components/ui/Toast'
-import {
-  getIntelligenceSettings,
-  updateIntelligenceSettings,
-  getContactCompassToken,
-  updateContactCompassToken,
-  getHunterApiKey,
-  updateHunterApiKey,
-  getContactOutToken,
-  updateContactOutToken,
-  getApolloApiKey,
-  updateApolloApiKey,
-  getAutomationSettings,
-  updateAutomationSettings,
-} from '@/lib/external-api/client'
 
 interface ApifyKey {
   _id: string
@@ -35,11 +21,13 @@ interface ApifyKey {
   assigned_worker: string | null
 }
 
-interface EnrichmentKey {
-  token?: string | null
-  openrouter_api_key?: string | null
-  is_configured: boolean
-  usage?: Record<string, number>
+interface AutomationSettings {
+  auto_scrape_enabled: boolean
+  auto_enrichment_enabled: boolean
+  keep_alive_enabled: boolean
+  keep_alive_configured: boolean
+  scrape_interval_minutes: number
+  keep_alive_interval_minutes: number
 }
 
 export default function AdminTokensPage() {
@@ -50,16 +38,26 @@ export default function AdminTokensPage() {
   const { addToast } = useToast()
 
   const [enrichmentKeys, setEnrichmentKeys] = useState<Record<string, { is_configured: boolean; value: string }>>({})
-  const [automationSettings, setAutomationSettings] = useState<{
-    auto_scrape_enabled: boolean
-    auto_enrichment_enabled: boolean
-    keep_alive_enabled: boolean
-    keep_alive_configured: boolean
-    scrape_interval_minutes: number
-    keep_alive_interval_minutes: number
-  } | null>(null)
+  const [automationSettings, setAutomationSettings] = useState<AutomationSettings | null>(null)
+  const [automationLoading, setAutomationLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)
   const [showValues, setShowValues] = useState<Record<string, boolean>>({})
+
+  const apiCall = useCallback(async (path: string, init?: RequestInit) => {
+    const token = await getFirebaseToken()
+    if (!token) throw new Error('Not authenticated')
+    const res = await fetch(path, {
+      ...init,
+      headers: {
+        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        Authorization: `Bearer ${token}`,
+        ...init?.headers,
+      },
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(json?.message || `Request failed: ${res.status}`)
+    return json
+  }, [])
 
   const fetchTokens = useCallback(async () => {
     const token = await getFirebaseToken()
@@ -75,33 +73,52 @@ export default function AdminTokensPage() {
   const fetchEnrichmentKeys = useCallback(async () => {
     try {
       const [intel, compass, hunter, contactout, apollo] = await Promise.all([
-        getIntelligenceSettings(),
-        getContactCompassToken(),
-        getHunterApiKey(),
-        getContactOutToken(),
-        getApolloApiKey(),
+        apiCall('/api/admin/settings?service=intelligence'),
+        apiCall('/api/admin/settings?service=contact-compass'),
+        apiCall('/api/admin/settings?service=hunter'),
+        apiCall('/api/admin/settings?service=contactout'),
+        apiCall('/api/admin/settings?service=apollo'),
       ])
+      const d = (r: { data?: Record<string, unknown> }) => r?.data || {}
       const newStates = {
-        'OpenRouter API Key': { is_configured: intel.is_configured, value: intel.openrouter_api_key || '' },
-        'Contact Compass Token': { is_configured: compass.is_configured, value: compass.token || '' },
-        'Hunter.io API Key': { is_configured: hunter.is_configured, value: hunter.token || '' },
-        'ContactOut API Token': { is_configured: contactout.is_configured, value: contactout.token || '' },
-        'Apollo.io API Key': { is_configured: apollo.is_configured, value: apollo.token || '' },
+        'OpenRouter API Key': {
+          is_configured: Boolean(d(intel).is_configured),
+          value: (d(intel).openrouter_api_key as string) || '',
+        },
+        'Contact Compass Token': {
+          is_configured: Boolean(d(compass).is_configured),
+          value: (d(compass).token as string) || '',
+        },
+        'Hunter.io API Key': {
+          is_configured: Boolean(d(hunter).is_configured),
+          value: (d(hunter).token as string) || '',
+        },
+        'ContactOut API Token': {
+          is_configured: Boolean(d(contactout).is_configured),
+          value: (d(contactout).token as string) || '',
+        },
+        'Apollo.io API Key': {
+          is_configured: Boolean(d(apollo).is_configured),
+          value: (d(apollo).token as string) || '',
+        },
       }
       setEnrichmentKeys(newStates)
     } catch (error) {
       console.error('Failed to load enrichment keys:', error)
     }
-  }, [])
+  }, [apiCall])
 
   const fetchAutomationSettings = useCallback(async () => {
+    setAutomationLoading(true)
     try {
-      const data = await getAutomationSettings()
-      setAutomationSettings(data)
+      const res = await apiCall('/api/admin/settings?service=automation')
+      if (res?.data) setAutomationSettings(res.data as AutomationSettings)
     } catch (error) {
       console.error('Failed to load automation settings:', error)
+    } finally {
+      setAutomationLoading(false)
     }
-  }, [])
+  }, [apiCall])
 
   useEffect(() => {
     fetchTokens()
@@ -132,27 +149,28 @@ export default function AdminTokensPage() {
     fetchTokens()
   }
 
-  const handleEnrichmentSave = async (label: string, updater: (key: string) => Promise<{ success: boolean; message?: string }>, getter: () => Promise<EnrichmentKey>) => {
-    const currentValue = enrichmentKeys[label]?.value
-    if (!currentValue?.trim()) {
+  const handleEnrichmentSave = async (service: string, label: string, value: string) => {
+    if (!value?.trim()) {
       addToast({ type: 'error', message: 'Please enter a value' })
       return
     }
     setSaving(label)
     try {
-      const result = await updater(currentValue.trim())
-      if (result.success) {
-        addToast({ type: 'success', message: result.message || `${label} updated successfully` })
-        const newData = await getter()
-        setEnrichmentKeys(prev => ({
-          ...prev,
-          [label]: { is_configured: newData.is_configured, value: currentValue },
-        }))
-      } else {
-        addToast({ type: 'error', message: result.message || 'Failed to update' })
-      }
+      const body = service === 'intelligence' ? { api_key: value.trim() } : { token: value.trim() }
+      await apiCall(`/api/admin/settings?service=${service}`, { method: 'POST', body: JSON.stringify(body) })
+      addToast({ type: 'success', message: `${label} updated successfully` })
+      const fresh = await apiCall(`/api/admin/settings?service=${service}`)
+      const data = fresh?.data || {}
+      setEnrichmentKeys(prev => ({
+        ...prev,
+        [label]: {
+          is_configured: Boolean(data.is_configured),
+          value: value.trim(),
+        },
+      }))
     } catch (error) {
-      addToast({ type: 'error', message: 'Failed to update setting' })
+      const msg = error instanceof Error ? error.message : 'Failed to update setting'
+      addToast({ type: 'error', message: msg })
     } finally {
       setSaving(null)
     }
@@ -163,15 +181,15 @@ export default function AdminTokensPage() {
     const newValue = !automationSettings[key]
     setSaving(key)
     try {
-      const result = await updateAutomationSettings({ [key]: newValue })
-      if (result) {
-        addToast({ type: 'success', message: 'Automation setting updated' })
-        setAutomationSettings(result)
-      } else {
-        addToast({ type: 'error', message: 'Failed to update' })
-      }
+      const res = await apiCall('/api/admin/settings?service=automation', {
+        method: 'POST',
+        body: JSON.stringify({ [key]: newValue }),
+      })
+      if (res?.data) setAutomationSettings(res.data as AutomationSettings)
+      addToast({ type: 'success', message: 'Automation setting updated' })
     } catch (error) {
-      addToast({ type: 'error', message: 'Failed to update setting' })
+      const msg = error instanceof Error ? error.message : 'Failed to update setting'
+      addToast({ type: 'error', message: msg })
     } finally {
       setSaving(null)
     }
@@ -179,44 +197,39 @@ export default function AdminTokensPage() {
 
   const enrichmentFields = [
     {
+      service: 'intelligence',
       label: 'OpenRouter API Key',
       description: 'Required for AI intelligence reports and outreach generation. Get a key at openrouter.ai/keys',
       placeholder: 'sk-or-v1-...',
       icon: Cog6ToothIcon,
-      getter: getIntelligenceSettings,
-      updater: (key: string) => updateIntelligenceSettings(key),
     },
     {
+      service: 'contact-compass',
       label: 'Contact Compass Token',
       description: 'Primary email finder service. Used for discovering contact emails from LinkedIn profiles.',
       placeholder: 'cc_...',
       icon: KeyIcon,
-      getter: getContactCompassToken,
-      updater: updateContactCompassToken,
     },
     {
+      service: 'hunter',
       label: 'Hunter.io API Key',
       description: 'Email verification and domain search service. Used to verify discovered email addresses.',
       placeholder: 'hunter_...',
       icon: ShieldCheckIcon,
-      getter: getHunterApiKey,
-      updater: updateHunterApiKey,
     },
     {
+      service: 'contactout',
       label: 'ContactOut API Token',
       description: 'Additional contact discovery service for emails and phone numbers.',
       placeholder: 'co_...',
       icon: KeyIcon,
-      getter: getContactOutToken,
-      updater: updateContactOutToken,
     },
     {
+      service: 'apollo',
       label: 'Apollo.io API Key',
       description: 'B2B contact and company database. Used for enrichment and lead discovery.',
       placeholder: 'apollo_...',
       icon: KeyIcon,
-      getter: getApolloApiKey,
-      updater: updateApolloApiKey,
     },
   ]
 
@@ -350,7 +363,7 @@ export default function AdminTokensPage() {
                         </button>
                       </div>
                       <button
-                        onClick={() => handleEnrichmentSave(field.label, field.updater, field.getter)}
+                        onClick={() => handleEnrichmentSave(field.service, field.label, state?.value || '')}
                         disabled={isSaving || !state?.value?.trim()}
                         className="h-10 px-5 rounded-lg bg-accent-mint text-black font-medium text-sm hover:bg-accent-mint/80 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                       >
@@ -379,7 +392,12 @@ export default function AdminTokensPage() {
             </h2>
             <p className="text-sm text-text-secondary mb-6">Configure background jobs for scraping, enrichment, and service keep-alive</p>
 
-            {automationSettings && (
+            {automationLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <ArrowPathIcon className="w-6 h-6 animate-spin text-accent-mint mr-2" />
+                <span className="text-text-secondary">Loading automation settings...</span>
+              </div>
+            ) : automationSettings ? (
               <div className="space-y-4">
                 {automationItems.map((item) => (
                   <div key={item.key} className="bg-surface-elevated/30 border border-white/[0.03] rounded-xl p-4">
@@ -435,6 +453,12 @@ export default function AdminTokensPage() {
                     )}
                   </div>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-text-secondary">
+                <ShieldExclamationIcon className="w-8 h-8 mx-auto mb-2 text-red-400/50" />
+                <p>Failed to load automation settings</p>
+                <p className="text-[10px] mt-1">Check backend connectivity or authentication</p>
               </div>
             )}
           </div>
