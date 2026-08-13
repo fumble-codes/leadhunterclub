@@ -83,7 +83,7 @@ export default function AdminTokensPage() {
       const newStates = {
         'OpenRouter API Key': {
           is_configured: Boolean(d(intel).is_configured),
-          value: (d(intel).openrouter_api_key as string) || '',
+          value: (d(intel).model as string) || '',
         },
         'Contact Compass Token': {
           is_configured: Boolean(d(compass).is_configured),
@@ -91,7 +91,7 @@ export default function AdminTokensPage() {
         },
         'Hunter.io API Key': {
           is_configured: Boolean(d(hunter).is_configured),
-          value: (d(hunter).token as string) || '',
+          value: (d(hunter).api_key as string) || '',
         },
         'ContactOut API Token': {
           is_configured: Boolean(d(contactout).is_configured),
@@ -99,7 +99,7 @@ export default function AdminTokensPage() {
         },
         'Apollo.io API Key': {
           is_configured: Boolean(d(apollo).is_configured),
-          value: (d(apollo).token as string) || '',
+          value: (d(apollo).api_key as string) || '',
         },
       }
       setEnrichmentKeys(newStates)
@@ -154,9 +154,11 @@ export default function AdminTokensPage() {
       addToast({ type: 'error', message: 'Please enter a value' })
       return
     }
+    // Real backend payloads: token-based services vs api_key-based services.
+    const body =
+      service === 'hunter' || service === 'apollo' ? { api_key: value.trim() } : { token: value.trim() }
     setSaving(label)
     try {
-      const body = service === 'intelligence' ? { api_key: value.trim() } : { token: value.trim() }
       await apiCall(`/api/admin/settings?service=${service}`, { method: 'POST', body: JSON.stringify(body) })
       addToast({ type: 'success', message: `${label} updated successfully` })
       const fresh = await apiCall(`/api/admin/settings?service=${service}`)
@@ -199,9 +201,10 @@ export default function AdminTokensPage() {
     {
       service: 'intelligence',
       label: 'OpenRouter API Key',
-      description: 'Required for AI intelligence reports and outreach generation. Get a key at openrouter.ai/keys',
+      description: 'Used for AI intelligence reports and outreach generation. Configured on the backend (no API route to change it).',
       placeholder: 'sk-or-v1-...',
       icon: Cog6ToothIcon,
+      readOnly: true,
     },
     {
       service: 'contact-compass',
@@ -341,7 +344,20 @@ export default function AdminTokensPage() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    {field.readOnly ? (
+                      <div className="flex items-center justify-between bg-surface-elevated border border-white/[0.08] rounded-lg px-4 py-2.5">
+                        <div>
+                          <p className="text-sm text-text-primary">
+                            {state?.is_configured ? `Model: ${state.value || 'default'}` : 'Not configured'}
+                          </p>
+                          <p className="text-[10px] text-text-secondary mt-0.5">
+                            Set via backend env (config.openRouter). This page is read-only for this key.
+                          </p>
+                        </div>
+                        {state?.is_configured && <ShieldCheckIcon className="w-5 h-5 text-green-400" />}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3">
                       <div className="relative flex-1">
                         <input
                           type={show ? 'text' : 'password'}
@@ -380,6 +396,7 @@ export default function AdminTokensPage() {
                         )}
                       </button>
                     </div>
+                    )}
                   </div>
                 )
               })}

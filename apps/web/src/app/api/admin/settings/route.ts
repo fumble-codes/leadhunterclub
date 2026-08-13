@@ -3,7 +3,6 @@ import { requireAdmin, ForbiddenError } from '@/lib/auth'
 import { ExternalApiError } from '@/lib/external-api/client'
 import {
   getIntelligenceSettings,
-  updateIntelligenceSettings,
   getContactCompassToken,
   updateContactCompassToken,
   getHunterApiKey,
@@ -18,6 +17,8 @@ import {
 
 export const dynamic = 'force-dynamic'
 
+// Read-only services: intelligence has NO write route on the backend (OpenRouter
+// key is set via backend env), so GET only. Enrichment keys + automation are writable.
 const GETTERS = {
   intelligence: getIntelligenceSettings,
   'contact-compass': getContactCompassToken,
@@ -26,6 +27,25 @@ const GETTERS = {
   apollo: getApolloApiKey,
   automation: getAutomationSettings,
 } as const
+
+const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknown>> = {
+  'contact-compass': (body) => updateContactCompassToken(String(body?.token ?? '').trim()),
+  hunter: (body) => updateHunterApiKey(String(body?.api_key ?? '').trim()),
+  contactout: (body) => updateContactOutToken(String(body?.token ?? '').trim()),
+  apollo: (body) => updateApolloApiKey(String(body?.api_key ?? '').trim()),
+  automation: (body) => {
+    const b = body as {
+      auto_scrape_enabled?: boolean
+      auto_enrichment_enabled?: boolean
+      keep_alive_enabled?: boolean
+    }
+    return updateAutomationSettings({
+      auto_scrape_enabled: b.auto_scrape_enabled,
+      auto_enrichment_enabled: b.auto_enrichment_enabled,
+      keep_alive_enabled: b.keep_alive_enabled,
+    })
+  },
+}
 
 type ServiceKey = keyof typeof GETTERS
 
@@ -62,33 +82,13 @@ export async function POST(request: NextRequest) {
     const service = searchParams.get('service')
     const body = await request.json()
 
-    let data: unknown
-    switch (service) {
-      case 'intelligence':
-        data = await updateIntelligenceSettings(body?.api_key, body?.model)
-        break
-      case 'contact-compass':
-        data = await updateContactCompassToken(body?.token)
-        break
-      case 'hunter':
-        data = await updateHunterApiKey(body?.api_key)
-        break
-      case 'contactout':
-        data = await updateContactOutToken(body?.token)
-        break
-      case 'apollo':
-        data = await updateApolloApiKey(body?.api_key)
-        break
-      case 'automation':
-        data = await updateAutomationSettings({
-          auto_scrape_enabled: body?.auto_scrape_enabled,
-          auto_enrichment_enabled: body?.auto_enrichment_enabled,
-          keep_alive_enabled: body?.keep_alive_enabled,
-        })
-        break
-      default:
-        return NextResponse.json({ code: 'BAD_REQUEST', message: `Unknown settings service: ${service}` }, { status: 400 })
+    if (!service || !UPDATERS[service]) {
+      return NextResponse.json(
+        { code: 'BAD_REQUEST', message: `Unknown or read-only settings service: ${service}` },
+        { status: 400 },
+      )
     }
+    const data = await UPDATERS[service](body)
     return NextResponse.json({ success: true, data })
   } catch (error: unknown) {
     return errorResponse(error, 'Failed to update settings')

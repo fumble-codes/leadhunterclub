@@ -321,7 +321,6 @@ interface IntelSettingsResponse {
   data: {
     is_configured: boolean
     model: string
-    openrouter_api_key?: string
   }
 }
 
@@ -495,15 +494,11 @@ export async function getIntelligenceSettings(): Promise<IntelSettingsResponse['
   return res.data
 }
 
-export async function updateIntelligenceSettings(apiKey: string, model?: string): Promise<{ success: boolean; message: string }> {
-  const res = await fetchApi<IntelSettingsResponse>(`/settings/intelligence`, {
-    method: 'POST',
-    body: JSON.stringify({ api_key: apiKey, model }),
-  })
-  return { success: true, message: 'OpenRouter API key updated' }
-}
+// NOTE: There is NO write route for intelligence settings on the backend —
+// only `GET /settings/intelligence`. The OpenRouter key is configured via the
+// backend's own environment (config.openRouter.apiKey), not through the API.
 
-interface EnrichmentKeyResponse {
+interface TokenSettingResponse {
   success: boolean
   data: {
     token: string | null
@@ -512,8 +507,17 @@ interface EnrichmentKeyResponse {
   }
 }
 
-export async function getContactCompassToken(): Promise<EnrichmentKeyResponse['data']> {
-  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/contact-compass-token`)
+interface ApiKeySettingResponse {
+  success: boolean
+  data: {
+    api_key: string | null
+    is_configured: boolean
+    usage?: Record<string, number>
+  }
+}
+
+export async function getContactCompassToken(): Promise<TokenSettingResponse['data']> {
+  const res = await fetchApi<TokenSettingResponse>(`/settings/contact-compass-token`)
   return res.data
 }
 
@@ -525,8 +529,8 @@ export async function updateContactCompassToken(token: string): Promise<{ succes
   return res
 }
 
-export async function getHunterApiKey(): Promise<EnrichmentKeyResponse['data']> {
-  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/hunter-api-key`)
+export async function getHunterApiKey(): Promise<ApiKeySettingResponse['data']> {
+  const res = await fetchApi<ApiKeySettingResponse>(`/settings/hunter-api-key`)
   return res.data
 }
 
@@ -538,8 +542,8 @@ export async function updateHunterApiKey(api_key: string): Promise<{ success: bo
   return res
 }
 
-export async function getContactOutToken(): Promise<EnrichmentKeyResponse['data']> {
-  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/contactout-api-token`)
+export async function getContactOutToken(): Promise<TokenSettingResponse['data']> {
+  const res = await fetchApi<TokenSettingResponse>(`/settings/contactout-api-token`)
   return res.data
 }
 
@@ -551,8 +555,8 @@ export async function updateContactOutToken(token: string): Promise<{ success: b
   return res
 }
 
-export async function getApolloApiKey(): Promise<EnrichmentKeyResponse['data']> {
-  const res = await fetchApi<EnrichmentKeyResponse>(`/settings/apollo-api-key`)
+export async function getApolloApiKey(): Promise<ApiKeySettingResponse['data']> {
+  const res = await fetchApi<ApiKeySettingResponse>(`/settings/apollo-api-key`)
   return res.data
 }
 
