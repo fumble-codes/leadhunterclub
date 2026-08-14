@@ -35,6 +35,7 @@ const SolidWolfIcon = ({ isSmall }: { isSmall: boolean }) => {
       {/* Expanding backdrop ring */}
       <motion.div
         className="absolute inset-0 rounded-full bg-accent-orange/5 border border-accent-orange/10"
+        initial={false}
         animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
         transition={{ repeat: Infinity, duration: 2.2, ease: 'easeOut' }}
       />
@@ -42,6 +43,7 @@ const SolidWolfIcon = ({ isSmall }: { isSmall: boolean }) => {
       <motion.svg
         viewBox="0 0 1080 1080"
         className="w-full h-full fill-current"
+        initial={false}
         animate={{
           scale: [1, 1.12, 1.12, 0.95, 1],
           rotate: [0, -6, -6, 12, 0],
@@ -65,6 +67,7 @@ const SolidWolfIcon = ({ isSmall }: { isSmall: boolean }) => {
         {/* Animated Lower Jaw / Chin that snaps down to bite */}
         <motion.path
           d="m541.72,987.53c-15.09-3.86-31.09-6.24-45.4-12.49-5.46-2.38-8.65-13.41-9.7-20.94-.49-3.5,5.83-9.64,10.38-11.83,11.71-5.62,24-10.18,36.39-14.14,4.95-1.58,11.12-1.75,16.11-.34,10.86,3.08,21.67,6.86,31.8,11.8,6.23,3.04,15.94,9,15.72,13.23-.55,11-1.7,24.05-18.12,26.17-12.24,1.58-24.18,5.47-37.17,8.54Z"
+          initial={false}
           animate={{
             y: [0, 45, 0, 15, 0],
           }}
@@ -94,6 +97,7 @@ const RadarScannerIcon = ({ isSmall }: { isSmall: boolean }) => {
         <motion.path
           d="M12 12 L12 2 A10 10 0 0 1 22 12 Z"
           className="opacity-30"
+          initial={false}
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
           style={{ transformOrigin: '12px 12px' }}
@@ -105,6 +109,7 @@ const RadarScannerIcon = ({ isSmall }: { isSmall: boolean }) => {
           cx="17"
           cy="7"
           r="1.2"
+          initial={false}
           animate={{ opacity: [0, 1, 0] }}
           transition={{ repeat: Infinity, duration: 3, delay: 0.5 }}
         />
@@ -112,6 +117,7 @@ const RadarScannerIcon = ({ isSmall }: { isSmall: boolean }) => {
           cx="7"
           cy="15"
           r="1"
+          initial={false}
           animate={{ opacity: [0, 1, 0] }}
           transition={{ repeat: Infinity, duration: 3, delay: 1.8 }}
         />
@@ -135,6 +141,7 @@ const PipelineFlowIcon = ({ isSmall }: { isSmall: boolean }) => {
           width="4"
           height="8"
           rx="1.2"
+          initial={false}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5, delay: 0 }}
         />
@@ -144,6 +151,7 @@ const PipelineFlowIcon = ({ isSmall }: { isSmall: boolean }) => {
           width="4"
           height="12"
           rx="1.2"
+          initial={false}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5, delay: 0.5 }}
         />
@@ -153,6 +161,7 @@ const PipelineFlowIcon = ({ isSmall }: { isSmall: boolean }) => {
           width="4"
           height="16"
           rx="1.2"
+          initial={false}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5, delay: 1 }}
         />
@@ -174,6 +183,7 @@ const HuntingSpearIcon = ({ isSmall }: { isSmall: boolean }) => {
       <motion.svg
         viewBox="0 0 24 24"
         className="w-full h-full fill-current"
+        initial={false}
         animate={{ y: [-1.5, 1.5, -1.5] }}
         transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
       >
@@ -193,17 +203,17 @@ const TrailTrackingIcon = ({ isSmall }: { isSmall: boolean }) => {
     <div className="relative flex items-center justify-center text-accent-orange" style={{ width: size, height: size }}>
       <svg viewBox="0 0 24 24" className="w-full h-full fill-current">
         {/* Solid animal tracks representing trail telemetry */}
-        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 0 }}>
+        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 0 }} initial={false}>
           {/* Paw 1 */}
           <circle cx="5" cy="17" r="1" />
           <ellipse cx="5" cy="14" r="1.5" rx="1.2" />
         </motion.g>
-        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 0.6 }}>
+        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 0.6 }} initial={false}>
           {/* Paw 2 */}
           <circle cx="12" cy="11" r="1" />
           <ellipse cx="12" cy="8" r="1.5" rx="1.2" />
         </motion.g>
-        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 1.2 }}>
+        <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 2, delay: 1.2 }} initial={false}>
           {/* Paw 3 */}
           <circle cx="19" cy="7" r="1" />
           <ellipse cx="19" cy="4" r="1.5" rx="1.2" />
@@ -273,6 +283,7 @@ const MembershipBadgeIcon = ({ isSmall }: { isSmall: boolean }) => {
           width="18"
           height="1.5"
           className="fill-current text-white"
+          initial={false}
           animate={{ y: [0, 16, 0] }}
           transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
         />
@@ -294,6 +305,7 @@ const DefaultHunterIcon = ({ isSmall }: { isSmall: boolean }) => {
         <motion.polygon
           points="12,4 14,12 12,14 10,12"
           fill="#121314"
+          initial={false}
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 6, ease: 'linear' }}
           style={{ transformOrigin: '12px 12px' }}
@@ -446,6 +458,7 @@ export function CustomLoader({
                   : 'bg-accent-orange shadow-[0_0_8px_#ffb800]'
               )}
               animate={{ left: ['-30%', '100%'] }}
+              initial={false}
               transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
             />
           </div>
@@ -488,6 +501,7 @@ export function CustomLoader({
                 : 'bg-accent-orange/75'
             )}
             animate={{ left: ['-30%', '100%'] }}
+            initial={false}
             transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
           />
         </div>
