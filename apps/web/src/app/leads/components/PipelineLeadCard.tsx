@@ -5,58 +5,11 @@ import { motion } from 'framer-motion'
 import {
   BookmarkIcon,
   LockClosedIcon,
-  BanknotesIcon,
 } from '@heroicons/react/24/solid'
-import {
-  PaperClipIcon,
-  FolderIcon,
-} from '@heroicons/react/24/outline'
+import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import { AppLead } from '@/types/lead'
 import { getFirebaseToken } from '@/lib/firebase'
-
-type BannerConfig = {
-  bg: string
-  text: string
-  label: string
-}
-
-const bannerTheme: Record<AppLead['urgency'], BannerConfig> = {
-  critical: {
-    bg: 'bg-[#c53030]', // red
-    text: 'text-white',
-    label: 'EMERGENCY',
-  },
-  high: {
-    bg: 'bg-[#c53030]', // red
-    text: 'text-white',
-    label: 'EMERGENCY',
-  },
-  medium: {
-    bg: 'bg-[#dd6b20]', // orange
-    text: 'text-white',
-    label: 'MODERATE PRIORITY',
-  },
-  low: {
-    bg: 'bg-[#38a169]', // green
-    text: 'text-white',
-    label: 'LOW PRIORITY',
-  },
-}
-
-const AGENTS = {
-  AR: { initials: 'AR', name: 'AI Researcher Agent' },
-  LA: { initials: 'LA', name: 'Lead Analyzer Agent' },
-  CS: { initials: 'CS', name: 'Contact Scraper Agent' },
-}
-
-function getAgentsForLead(lead: AppLead) {
-  const list = [AGENTS.AR, AGENTS.LA]
-  if (lead.isRevealed) {
-    list.push(AGENTS.CS)
-  }
-  return list
-}
 
 export default function PipelineLeadCard({
   lead,
@@ -71,7 +24,9 @@ export default function PipelineLeadCard({
   onSaveToggle?: (isSaved: boolean) => void
   onReveal?: (leadId: string, name: string, email: string, phone?: string | null) => void
 }) {
+  const router = useRouter()
   const { addToast } = useToast()
+
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
 
@@ -127,153 +82,190 @@ export default function PipelineLeadCard({
     }
   }
 
-  // Choose banner theme based on urgency
-  const banner = bannerTheme[lead.urgency] || bannerTheme.medium
+  const handleEngage = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!lead.isClaimable) {
+      addToast({ type: 'error', message: 'This lead is not yet approved. Intelligence is still being generated.' })
+      return
+    }
+    const token = await getFirebaseToken()
+    if (!isRevealed) {
+      try {
+        const res = await fetch('/api/leads/reveal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ leadId: lead.id }),
+        })
+        const json = await res.json()
+        if (!res.ok) {
+          addToast({ type: 'error', message: json.message || json.code || 'Failed to unlock lead' })
+          return
+        }
+        setIsRevealed(true)
+        if (onReveal) {
+          onReveal(lead.id, json.name, json.email, json.phone)
+        }
+      } catch {
+        addToast({ type: 'error', message: 'Network error' })
+        return
+      }
+    }
+    await fetch(`/api/leads/${lead.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ isSaved: true, status: 'drafting' }),
+    })
+    router.push(`/outreach?leadId=${lead.id}&autoGenerate=true`)
+  }
 
-  // Format clean title: Replace "For —" with details if present
-  const displayTitle = lead.title
-    ? lead.title.replace('For —', `For ${lead.company || lead.name}`)
-    : lead.company || 'Lead Signals'
-
-  // Pick active AI Agents based on lead processing status
-  const selectedAgents = getAgentsForLead(lead)
-
-  // Compute functional stats based on actual lead data:
-  // 1. Channels Detected: LinkedIn, Twitter, Email, Phone, Website
-  const channelsCount = (lead.email ? 1 : 0) + (lead.phone ? 1 : 0) + (lead.niches ? lead.niches.length : 0) + 1
-  // 2. AI Signals Intercepted: triggers, requirements, pain points parsed
-  const signalsCount = (lead.taskScope ? 1 : 0) + (lead.mustHave ? 1 : 0) + (lead.nicheBonus ? 1 : 0) + 2
+  // Resolve accent color matching sneak peek page
+  const leadAccent =
+    lead.urgency === 'critical'
+      ? 'pink'
+      : lead.urgency === 'high'
+        ? 'mint'
+        : lead.urgency === 'medium'
+          ? 'purple'
+          : 'cyan'
 
   return (
-    <motion.button
+    <motion.div
       onClick={onClick}
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`group relative text-left flex flex-col overflow-hidden h-full w-full transition-all duration-300 rounded-[20px] bg-[#141415] border border-white/[0.06] shadow-[0_8px_30px_rgba(0,0,0,0.5)] ${
+      className={`group relative p-6 rounded-3xl transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer ${
         isSelected
-          ? 'ring-1 ring-primary/60 shadow-[0_8px_30px_rgba(var(--rgb-primary),0.12)] bg-[#171719]'
-          : 'hover:border-white/10 hover:bg-[#181819]'
+          ? 'bg-surface-secondary border border-primary/50 shadow-[0_8px_30px_rgba(var(--rgb-primary),0.12)]'
+          : 'bg-surface-secondary/50 border border-white/[0.04] hover:border-white/10 hover:bg-surface-secondary/70 shadow-lg'
       }`}
     >
-      {/* Top Banner */}
-      <div className={`w-full py-2 px-4 text-center ${banner.bg} ${banner.text} select-none`}>
-        <span className="text-[10px] font-extrabold tracking-[0.25em] uppercase">
-          {banner.label}
+      {/* Top row: Bookmark & Live Indicator */}
+      <div className="flex items-center justify-between mb-5 w-full select-none">
+        <button
+          onClick={handleSave}
+          type="button"
+          className={`p-1 rounded-md border transition-all shrink-0 ${
+            isSaved
+              ? 'bg-primary/20 border-primary/30 text-primary'
+              : 'bg-white/5 border-transparent text-text-secondary hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          <BookmarkIcon className={`w-3.5 h-3.5 ${isSaved ? 'text-current' : 'text-text-secondary/35'}`} />
+        </button>
+        <div className="flex items-center gap-1.5 text-xxs text-text-secondary/40 font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse shadow-[0_0_8px_currentColor]" />
+          Live
+        </div>
+      </div>
+
+      {/* Signal Context Quote */}
+      <p className="text-sm text-text-primary/90 leading-relaxed mb-5 flex-1 font-light">
+        &quot;{lead.signalContext}&quot;
+      </p>
+
+      {/* Intent Score Bar */}
+      <div className="mb-5 w-full select-none">
+        <div className="flex justify-between text-xxs mb-1.5">
+          <span className="text-text-secondary/50 font-bold uppercase tracking-widest">
+            Intent Score
+          </span>
+          <span className={`font-bold text-accent-${leadAccent}`}>{lead.replyProbability}%</span>
+        </div>
+        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${lead.replyProbability}%` }}
+            className={`h-full bg-accent-${leadAccent}/50 rounded-full`}
+          />
+        </div>
+      </div>
+
+      {/* Urgency */}
+      <div className="flex items-center justify-between mb-5 w-full select-none">
+        <span className="text-xxs text-text-secondary/40 font-bold uppercase tracking-widest">
+          Urgency
+        </span>
+        <span className="text-xxs font-bold uppercase tracking-widest text-text-secondary">
+          {lead.urgency}
         </span>
       </div>
 
-      {/* Body Area */}
-      <div className="pt-2 px-2 pb-2.5 flex-1 flex flex-col w-full justify-between">
-        
-        {/* Dashed Border Box */}
-        <div className="flex-1 border border-dashed border-white/[0.08] rounded-xl p-4 flex flex-col justify-between bg-transparent">
-          
-          {/* Header Row: Title & Bookmark */}
-          <div>
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <h3 className="text-[15px] font-semibold text-white tracking-tight leading-snug group-hover:text-primary transition-colors line-clamp-1">
-                {displayTitle}
-              </h3>
-              <button
-                onClick={handleSave}
-                type="button"
-                className={`p-1 rounded-md border transition-all shrink-0 ${
-                  isSaved
-                    ? 'bg-primary/20 border-primary/30 text-primary'
-                    : 'bg-white/5 border-transparent text-text-secondary/70 hover:bg-white/10 hover:text-white'
-                }`}
+      {/* Locked / Revealed Identity Box */}
+      {!isRevealed ? (
+        <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 overflow-hidden w-full">
+          {/* Blurred Content Underneath */}
+          <div className="blur-[6px] select-none pointer-events-none">
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className={`w-9 h-9 rounded-xl bg-accent-${leadAccent}/10 border border-accent-${leadAccent}/20 flex items-center justify-center`}
               >
-                <BookmarkIcon className={`w-3.5 h-3.5 ${isSaved ? 'text-current' : 'text-text-secondary/35'}`} />
-              </button>
+                <span className={`text-xxs font-bold text-accent-${leadAccent}`}>??</span>
+              </div>
+              <div>
+                <div className="text-xs font-bold text-text-primary">Contact Locked</div>
+                <div className="text-xxs text-text-secondary/50">Founder · E-commerce</div>
+              </div>
             </div>
-
-            {/* Description */}
-            <p className="text-[12px] text-text-secondary/60 line-clamp-2 leading-relaxed mt-1.5 font-normal">
-              {lead.signalContext}
-            </p>
-
-            {/* Tags Row */}
-            <div className="flex flex-wrap gap-1.5 mt-3 select-none">
-              {lead.replyProbability > 0 && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-badge-amber/40 bg-transparent text-badge-amber font-bold text-[9px] uppercase tracking-wider">
-                  {lead.replyProbability}% Reply Match
-                </span>
-              )}
-              {lead.niches &&
-                lead.niches.map((niche) => (
-                  <span
-                    key={niche}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-white/10 bg-white/5 text-text-secondary text-[9px] font-medium"
-                  >
-                    {niche}
-                  </span>
-                ))}
-              {lead.nicheTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full border border-white/5 bg-white/[0.02] text-text-secondary/50 text-[9px] font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="flex gap-2">
+              <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary">
+                View Profile
+              </div>
+              <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary">
+                View Context
+              </div>
             </div>
           </div>
 
-          {/* Middle Row: AI Agents Avatars & Action Badge */}
-          <div className="flex items-center justify-between mt-5">
-            {/* Overlapping AI Agents Stack */}
-            <div className="flex -space-x-1.5 overflow-hidden">
-              {selectedAgents.map((member, idx) => (
-                <div
-                  key={idx}
-                  title={member.name}
-                  className={`w-7 h-7 rounded-full bg-[#222324] border border-[#141415] flex items-center justify-center text-[9px] font-semibold text-[#a1a1aa] shadow-sm select-none`}
-                >
-                  {member.initials}
+          {/* Lock Overlay trigger handleReveal */}
+          <button
+            onClick={handleReveal}
+            type="button"
+            className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-[2px] rounded-2xl cursor-pointer hover:bg-background/50 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-2">
+              <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary/50" />
+            </div>
+            <span className="text-xxs font-bold text-text-secondary/60 uppercase tracking-widest">
+              {lead.revealCost ?? 3} Tokens to Reveal
+            </span>
+          </button>
+        </div>
+      ) : (
+        <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 overflow-hidden w-full select-none">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`w-9 h-9 rounded-xl bg-accent-${leadAccent}/10 border border-accent-${leadAccent}/20 flex items-center justify-center shrink-0`}
+              >
+                <span className={`text-xs font-bold text-accent-${leadAccent} uppercase`}>
+                  {lead.name.split(' ').map((n) => n[0]).join('')}
+                </span>
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-text-primary truncate">{lead.name}</div>
+                <div className="text-xxs text-text-secondary/50 truncate">
+                  {lead.email} {lead.phone && `• ${lead.phone}`}
                 </div>
-              ))}
+              </div>
             </div>
 
-            {/* Action / Status Button */}
-            <div className="shrink-0">
-              {!isRevealed ? (
-                <button
-                  onClick={handleReveal}
-                  type="button"
-                  className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-[10px] font-extrabold text-[#11150C] bg-[#43ed9e] hover:bg-[#43ed9e]/90 transition-all border border-transparent shadow-[0_2px_8px_rgba(67,237,158,0.25)] hover:shadow-[0_2px_12px_rgba(67,237,158,0.4)] cursor-pointer uppercase tracking-wider"
-                >
-                  REVEAL -{lead.revealCost ?? 10}CR
-                </button>
-              ) : (
-                <span className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-[10px] font-extrabold text-white bg-white/5 border border-white/10 uppercase tracking-wider">
-                  DETAILS
-                </span>
-              )}
-            </div>
+            {/* Engage Trigger Button */}
+            <button
+              onClick={handleEngage}
+              type="button"
+              className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white font-extrabold text-[10px] tracking-wider uppercase transition-all shrink-0 cursor-pointer"
+            >
+              Engage
+            </button>
           </div>
         </div>
-
-        {/* Bottom Row (Outside Dashed Box) */}
-        <div className="flex items-center justify-between mt-2.5 px-2 text-[#88888b] text-[11px] font-medium w-full select-none">
-          {/* Stats count */}
-          <div className="flex items-center gap-4">
-            {/* Social channels count */}
-            <div className="flex items-center gap-1.5 cursor-help" title={`${channelsCount} communication channels detected`}>
-              <PaperClipIcon className="w-3.5 h-3.5 text-[#88888b]/80 rotate-45" />
-              <span>{channelsCount}</span>
-            </div>
-            {/* AI intelligence signals count */}
-            <div className="flex items-center gap-1.5 cursor-help" title={`${signalsCount} AI trigger signals parsed`}>
-              <FolderIcon className="w-3.5 h-3.5 text-[#88888b]/80" />
-              <span>{signalsCount}</span>
-            </div>
-          </div>
-
-          {/* Date / Timestamp */}
-          <div className="text-[#88888b]/75">{lead.timestamp || '17/09/2024'}</div>
-        </div>
-
-      </div>
-    </motion.button>
+      )}
+    </motion.div>
   )
 }
