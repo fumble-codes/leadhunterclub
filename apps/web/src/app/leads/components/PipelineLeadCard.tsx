@@ -8,11 +8,9 @@ import {
   BanknotesIcon,
 } from '@heroicons/react/24/solid'
 import {
-  ChatBubbleLeftIcon,
   PaperClipIcon,
   FolderIcon,
 } from '@heroicons/react/24/outline'
-import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import { AppLead } from '@/types/lead'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -49,15 +47,11 @@ const bannerTheme: Record<AppLead['urgency'], BannerConfig> = {
 const AGENTS = {
   AR: { initials: 'AR', name: 'AI Researcher Agent' },
   LA: { initials: 'LA', name: 'Lead Analyzer Agent' },
-  OS: { initials: 'OS', name: 'Outreach Specialist Agent' },
   CS: { initials: 'CS', name: 'Contact Scraper Agent' },
 }
 
 function getAgentsForLead(lead: AppLead) {
   const list = [AGENTS.AR, AGENTS.LA]
-  if (lead.status !== 'new') {
-    list.push(AGENTS.OS)
-  }
   if (lead.isRevealed) {
     list.push(AGENTS.CS)
   }
@@ -77,9 +71,7 @@ export default function PipelineLeadCard({
   onSaveToggle?: (isSaved: boolean) => void
   onReveal?: (leadId: string, name: string, email: string, phone?: string | null) => void
 }) {
-  const router = useRouter()
   const { addToast } = useToast()
-
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
 
@@ -135,48 +127,6 @@ export default function PipelineLeadCard({
     }
   }
 
-  const handleEngage = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!lead.isClaimable) {
-      addToast({ type: 'error', message: 'This lead is not yet approved. Intelligence is still being generated.' })
-      return
-    }
-    const token = await getFirebaseToken()
-    if (!isRevealed) {
-      try {
-        const res = await fetch('/api/leads/reveal', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ leadId: lead.id }),
-        })
-        const json = await res.json()
-        if (!res.ok) {
-          addToast({ type: 'error', message: json.message || json.code || 'Failed to unlock lead' })
-          return
-        }
-        setIsRevealed(true)
-        if (onReveal) {
-          onReveal(lead.id, json.name, json.email, json.phone)
-        }
-      } catch {
-        addToast({ type: 'error', message: 'Network error' })
-        return
-      }
-    }
-    await fetch(`/api/leads/${lead.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ isSaved: true, status: 'drafting' }),
-    })
-    router.push(`/outreach?leadId=${lead.id}&autoGenerate=true`)
-  }
-
   // Choose banner theme based on urgency
   const banner = bannerTheme[lead.urgency] || bannerTheme.medium
 
@@ -189,11 +139,9 @@ export default function PipelineLeadCard({
   const selectedAgents = getAgentsForLead(lead)
 
   // Compute functional stats based on actual lead data:
-  // 1. AI Drafts: 2 personalized templates if revealed, 1 preview draft if locked
-  const draftsCount = isRevealed ? 2 : 1
-  // 2. Channels Detected: LinkedIn, Twitter, Email, Phone, Website
+  // 1. Channels Detected: LinkedIn, Twitter, Email, Phone, Website
   const channelsCount = (lead.email ? 1 : 0) + (lead.phone ? 1 : 0) + (lead.niches ? lead.niches.length : 0) + 1
-  // 3. AI Signals Intercepted: triggers, requirements, pain points parsed
+  // 2. AI Signals Intercepted: triggers, requirements, pain points parsed
   const signalsCount = (lead.taskScope ? 1 : 0) + (lead.mustHave ? 1 : 0) + (lead.nicheBonus ? 1 : 0) + 2
 
   return (
@@ -297,13 +245,9 @@ export default function PipelineLeadCard({
                   REVEAL -{lead.revealCost ?? 10}CR
                 </button>
               ) : (
-                <button
-                  onClick={handleEngage}
-                  type="button"
-                  className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-[10px] font-extrabold text-white bg-white/5 hover:bg-white/10 transition-all border border-white/10 hover:border-white/20 cursor-pointer uppercase tracking-wider"
-                >
-                  ENGAGE
-                </button>
+                <span className="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-[10px] font-extrabold text-white bg-white/5 border border-white/10 uppercase tracking-wider">
+                  DETAILS
+                </span>
               )}
             </div>
           </div>
@@ -313,11 +257,6 @@ export default function PipelineLeadCard({
         <div className="flex items-center justify-between mt-2.5 px-2 text-[#88888b] text-[11px] font-medium w-full select-none">
           {/* Stats count */}
           <div className="flex items-center gap-4">
-            {/* Outreach Drafts count */}
-            <div className="flex items-center gap-1.5 cursor-help" title={`${draftsCount} AI outreach drafts ready`}>
-              <ChatBubbleLeftIcon className="w-3.5 h-3.5 text-[#88888b]/80" />
-              <span>{draftsCount}</span>
-            </div>
             {/* Social channels count */}
             <div className="flex items-center gap-1.5 cursor-help" title={`${channelsCount} communication channels detected`}>
               <PaperClipIcon className="w-3.5 h-3.5 text-[#88888b]/80 rotate-45" />

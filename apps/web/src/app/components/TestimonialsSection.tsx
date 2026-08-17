@@ -58,7 +58,7 @@ const TESTIMONIALS: Testimonial[] = [
         tag: '+28% Reply Rate',
         tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
-          'Went from 4% cold email replies to 28% in under a month. First paid contract landed in week one.',
+          'Went from a 4% reply rate to 28% in under a month. First paid contract landed in week one.',
       },
     ],
   },
@@ -71,7 +71,7 @@ const TESTIMONIALS: Testimonial[] = [
     initials: 'PS',
     result: '3 retainers closed in 30 days',
     quote:
-      "LeadHunter surfaces clients I'd never find cold emailing. Every lead already wants design help — it's that good.",
+      "LeadHunter surfaces clients I'd never find on my own. Every lead already wants design help — it's that good.",
     highlights: [
       {
         label: 'Before LeadHunter',
@@ -116,10 +116,10 @@ const TESTIMONIALS: Testimonial[] = [
       },
       {
         label: 'What changed',
-        tag: 'Automated Follow-Ups',
+        tag: 'Verified Buyer Contacts',
         tagColor: 'bg-tab-purple/10 border-tab-purple/20 text-tab-purple',
         detail:
-          "Multi-stage sequences now run in the background. Deals move forward even when he's heads-down on client work.",
+          'Every lead arrives with verified contact info and clear buying intent. Deals move forward even when he\'s heads-down on client work.',
       },
       {
         label: 'Their result',
@@ -139,21 +139,21 @@ const TESTIMONIALS: Testimonial[] = [
     initials: 'MT',
     result: 'Response rate: 4% → 28%',
     quote:
-      'The AI drafts outreach that actually sounds like me. Response rates went from 4% to 28% without touching my email setup.',
+      'The buyer context on every lead is spot on. My response rates went from 4% to 28%.',
     highlights: [
       {
         label: 'Before LeadHunter',
-        tag: 'Generic cold templates',
+        tag: 'Generic cold outreach',
         tagColor: 'bg-white/5 border-white/10 text-text-secondary/60',
         detail:
-          'Using the same copy-paste cold email template for every prospect. Felt spammy and landed in inboxes maybe half the time.',
+          'Reaching out to the same kind of prospects with no idea who was actually ready to buy.',
       },
       {
         label: 'What changed',
         tag: 'AI Context Insight',
         tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
-          'Every outreach is written around the specific signal that triggered the lead — founders respond because it feels personal.',
+          'Every lead comes with the exact signal that triggered it — founders respond because the timing feels personal.',
       },
       {
         label: 'Their result',
@@ -194,7 +194,7 @@ const TESTIMONIALS: Testimonial[] = [
         tag: '4× Revenue in 60 Days',
         tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
-          'Grew from $6k/mo to $24k/mo MRR in two months. Cold outreach budget reduced to zero.',
+          'Grew from $6k/mo to $24k/mo MRR in two months. Paid lead-gen budget reduced to zero.',
       },
     ],
   },
@@ -207,7 +207,7 @@ const TESTIMONIALS: Testimonial[] = [
     initials: 'DK',
     result: 'Replaced entire SDR stack',
     quote:
-      'We replaced our entire outbound SDR stack with LeadHunter. Same pipeline at 20% of the cost. I wish I found it sooner.',
+      'We replaced our SDR research stack with LeadHunter. Same pipeline at 20% of the cost. I wish I found it sooner.',
     highlights: [
       {
         label: 'Before LeadHunter',
@@ -218,10 +218,10 @@ const TESTIMONIALS: Testimonial[] = [
       },
       {
         label: 'What changed',
-        tag: 'Email Integration',
+        tag: 'Verified Contacts',
         tagColor: 'bg-accent-purple/10 border-accent-purple/20 text-accent-purple',
         detail:
-          'LeadHunter now handles lead discovery, enrichment, and outreach sequencing — fully automated with no seat cost.',
+          'LeadHunter now handles lead discovery, enrichment, and pipeline tracking — no seat cost.',
       },
       {
         label: 'Their result',

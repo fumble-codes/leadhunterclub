@@ -13,7 +13,6 @@ import {
   PhoneIcon,
 } from '@heroicons/react/24/solid'
 import { AppLead } from '@/types/lead'
-import { useRouter } from 'next/navigation'
 import { Badge, Modal, Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -53,9 +52,7 @@ export default function LeadDrawer({
   const theme = themeMap[(lead.accent as keyof typeof themeMap) || 'mint']
   const [isRevealing, setIsRevealing] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [isStartingOutreach, setIsStartingOutreach] = useState(false)
   const [showCreditModal, setShowCreditModal] = useState(false)
-  const router = useRouter()
   const { addToast } = useToast()
   const tokenCost = lead.revealCost ?? null
 
@@ -100,25 +97,6 @@ export default function LeadDrawer({
       setErrorMsg('An unexpected network error occurred')
     } finally {
       setIsRevealing(false)
-    }
-  }
-
-  const handleStartOutreach = async () => {
-    setIsStartingOutreach(true)
-    try {
-      const token = await getFirebaseToken()
-      await fetch(`/api/leads/${lead.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ status: 'drafting' }),
-      })
-      router.push(`/outreach?leadId=${lead.id}`)
-    } catch {
-      console.error('Failed to start outreach')
-      setIsStartingOutreach(false)
     }
   }
 

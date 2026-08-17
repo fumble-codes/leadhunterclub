@@ -12,6 +12,7 @@ import {
   updatePost,
   reExtractPost,
   claimPost,
+  type ExternalPost,
 } from '@/lib/external-api/client'
 
 export const dynamic = 'force-dynamic'
@@ -46,15 +47,41 @@ export async function POST(
 
     switch (action) {
       case 'approve': {
-        const approved = await approvePost(id)
-        let mode: string | undefined
+        // Gate approval on intelligence existing: a lead must have a completed
+        // intel report before it is released to the user feed (the feed only
+        // shows leads with `approved` + `intelligence`). Generate first, confirm,
+        // then approve. If intel is not ready, we do NOT approve.
+        let intelResult: { post: ExternalPost; mode: string }
         try {
-          const intelResult = await regenerateIntel(id)
-          mode = intelResult.mode
+          intelResult = await regenerateIntel(id)
         } catch {
-          // intel generation is best-effort on approve
+          return NextResponse.json(
+            { success: false, message: 'Intelligence generation failed. Lead was NOT approved — retry to generate intel and approve.' },
+            { status: 422 },
+          )
         }
-        return NextResponse.json({ success: true, data: approved, mode, message: 'Lead approved. Intelligence report generation queued.' })
+
+        const hasIntel = () => !!intelResult.post.intelligence
+
+        let post = intelResult.post
+        if (intelResult.mode === 'queued' || !hasIntel()) {
+          let attempts = 0
+          while (!post.intelligence && attempts < 8) {
+            await new Promise((r) => setTimeout(r, 1500))
+            post = await getPost(id)
+            attempts++
+          }
+        }
+
+        if (!post.intelligence) {
+          return NextResponse.json(
+            { success: false, message: 'Intel report is still generating. Lead was NOT approved — retry shortly to approve with a completed report.' },
+            { status: 409 },
+          )
+        }
+
+        const approved = await approvePost(id)
+        return NextResponse.json({ success: true, data: approved, mode: intelResult.mode, message: 'Lead approved and released to the feed with intelligence report.' })
       }
       case 'reject': {
         await rejectPost(id)

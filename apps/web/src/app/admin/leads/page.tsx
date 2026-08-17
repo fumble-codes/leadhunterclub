@@ -1061,7 +1061,9 @@ export default function AdminLeadsPage() {
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <CheckCircle2 size={12} className="text-green-400" />
                           <span className="text-[10px] font-black uppercase tracking-widest text-green-400">
-                            Approved — visible on Strategic Leads
+                            {lead.intelligence
+                              ? 'Approved — visible on Lead Feed'
+                              : 'Approved — not on feed until intel is ready'}
                           </span>
                           {!lead.intelligence && (
                             <span className="text-[9px] font-black uppercase tracking-widest text-accent-mint flex items-center gap-1">
@@ -1164,18 +1166,32 @@ export default function AdminLeadsPage() {
                               Contact Enrichment{lead.enrichment_status ? `: ${getEnrichmentStatusLabel(lead.enrichment_status)}` : ''}
                             </span>
                           </div>
-                          <button
-                            onClick={() => handleReEnrichLead(lead.id)}
-                            disabled={enrichingIds.includes(lead.id)}
-                            className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-accent-mint/10 text-accent-mint border border-accent-mint/30 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
-                          >
-                            {enrichingIds.includes(lead.id) ? (
-                              <Loader2 size={12} className="animate-spin" />
-                            ) : (
-                              <RefreshCw size={12} />
-                            )}
-                            {enrichingIds.includes(lead.id) ? 'Queueing...' : getEnrichButtonLabel(lead)}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleRegenerateIntel(lead.id)}
+                              disabled={intelActionIds.includes(lead.id)}
+                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+                            >
+                              {intelActionIds.includes(lead.id) ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <BrainCircuit size={12} />
+                              )}
+                              {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
+                            </button>
+                            <button
+                              onClick={() => handleReEnrichLead(lead.id)}
+                              disabled={enrichingIds.includes(lead.id)}
+                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-accent-mint/10 text-accent-mint border border-accent-mint/30 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
+                            >
+                              {enrichingIds.includes(lead.id) ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <RefreshCw size={12} />
+                              )}
+                              {enrichingIds.includes(lead.id) ? 'Queueing...' : getEnrichButtonLabel(lead)}
+                            </button>
+                          </div>
                         </div>
                         {(!lead.enrichment_status || lead.enrichment_status === 'pending') && (
                           <p className="text-xs text-zinc-500">

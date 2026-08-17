@@ -15,7 +15,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const router = useRouter()
   const { user, loading, error } = useAuth()
 
-  const appRoutes = ['/dashboard', '/leads', '/outreach', '/saved', '/analytics', '/settings']
+  const appRoutes = ['/dashboard', '/leads', '/saved', '/analytics', '/settings']
   const adminRoutes = ['/admin']
   const authRoutes = ['/login', '/register']
   const onboardingRoutes = ['/onboarding', '/verify-email', '/pending-approval', '/admin-register']
@@ -112,7 +112,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     let detectedPage: LoaderPageType = 'default'
     if (pathname.startsWith('/dashboard')) detectedPage = 'dashboard'
     else if (pathname.startsWith('/leads')) detectedPage = 'leads'
-    else if (pathname.startsWith('/outreach')) detectedPage = 'outreach'
     else if (pathname.startsWith('/saved')) detectedPage = 'saved'
     else if (pathname.startsWith('/analytics')) detectedPage = 'analytics'
     else if (pathname.startsWith('/settings')) detectedPage = 'settings'

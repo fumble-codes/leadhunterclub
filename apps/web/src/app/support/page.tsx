@@ -94,7 +94,7 @@ export default function SupportPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-8 py-10 relative">
+    <main className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide">
       <div className="max-w-[1400px] mx-auto relative z-10">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">

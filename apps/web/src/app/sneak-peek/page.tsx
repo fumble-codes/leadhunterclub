@@ -84,7 +84,7 @@ export default function SneakPeekPage() {
     <div className="flex h-screen bg-bg-main overflow-hidden font-sans relative">
       <AppSidebar isSneakPeek={true} />
 
-      <main className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative">
+      <main className="flex-1 overflow-y-auto px-6 py-8 pb-32 relative scrollbar-hide">
         {/* Ambient Background Glows */}
         <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
         <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />
@@ -223,7 +223,7 @@ export default function SneakPeekPage() {
                         View Profile
                       </div>
                       <div className="px-3 py-1.5 rounded-lg bg-surface-secondary text-9 font-bold text-text-secondary hover:text-text-primary transition-colors">
-                        AI Outreach
+                        View Context
                       </div>
                     </div>
                   </div>
@@ -257,7 +257,7 @@ export default function SneakPeekPage() {
               </h3>
               <p className="text-sm text-text-secondary/70 font-light max-w-md mx-auto mb-6 leading-relaxed">
                 These are real signals captured in the last 24 hours. Get tokens to reveal
-                identities, generate AI outreach, and start closing.
+                identities, save them to your pipeline, and start closing.
               </p>
               <Link
                 href="/#pricing"

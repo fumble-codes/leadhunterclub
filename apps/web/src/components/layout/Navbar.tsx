@@ -92,6 +92,7 @@ export default function Navbar() {
 
   const showDashboard = !loading && user
   const showLogin = !isScrolled || isHovered
+  const showSneakPeek = !isScrolled || isHovered
 
   return (
     <>
@@ -108,7 +109,9 @@ export default function Navbar() {
         <div
           className={`flex items-center justify-between w-full transition-all duration-500 ease-out ${
             isScrolled
-              ? 'max-w-[760px] bg-background/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] rounded-full px-5 py-2.5'
+              ? isHovered
+                ? 'max-w-[1200px] bg-background/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] rounded-2xl px-5 py-3'
+                : 'max-w-[760px] bg-background/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] rounded-full px-5 py-2.5'
               : 'max-w-[1200px] bg-transparent border border-transparent rounded-2xl px-5 py-3'
           }`}
         >
@@ -191,14 +194,20 @@ export default function Navbar() {
                     )}
                   </AnimatePresence>
                   
-                  {!isScrolled && (
-                    <a
-                      href="/sneak-peek"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-accent-orange/20 hover:bg-accent-orange/[0.03] text-text-secondary hover:text-text-primary text-[13px] font-medium transition-all duration-300"
-                    >
-                      <span>Sneak Peek</span>
-                    </a>
-                  )}
+                  <AnimatePresence>
+                    {showSneakPeek && (
+                      <motion.a
+                        initial={isScrolled ? { opacity: 0, width: 0, scale: 0.95 } : false}
+                        animate={{ opacity: 1, width: 'auto', scale: 1 }}
+                        exit={{ opacity: 0, width: 0, scale: 0.95 }}
+                        transition={{ duration: 0.25, ease }}
+                        href="/sneak-peek"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-accent-orange/20 hover:bg-accent-orange/[0.03] text-text-secondary hover:text-text-primary text-[13px] font-medium transition-all duration-300 overflow-hidden whitespace-nowrap"
+                      >
+                        <span>Sneak Peek</span>
+                      </motion.a>
+                    )}
+                  </AnimatePresence>
 
                   <a
                     href="/register"

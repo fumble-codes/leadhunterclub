@@ -38,7 +38,7 @@ const urgencyColors: Record<string, { badge: 'purple'; topLine: string; dotColor
 
 export default function TokenSystemSection() {
   const [tokens, setTokens] = useState(750)
-  const [activeTab, setActiveTab] = useState<'leads' | 'outreach' | 'automation'>('leads')
+  const [activeTab, setActiveTab] = useState<'leads' | 'contacts' | 'pipeline'>('leads')
   const [activeCardId, setActiveCardId] = useState<string>('card-2')
   const [isRevealing, setIsRevealing] = useState<string | null>(null)
 
@@ -104,11 +104,11 @@ export default function TokenSystemSection() {
       email: 's.jenkins@elevateops.net',
       company: 'Elevate Ops',
       source: 'Threads',
-      title: 'Cold Outreach For —',
+      title: 'Growth Marketing For —',
       signalContext:
-        'Struggling with 1% open rates on cold outbound campaigns, seeking deliverability expert.',
+        'Scaling outbound campaigns and looking for a reliable growth partner.',
       urgency: 'critical',
-      nicheTags: ['Outbound', 'Deliverability', 'SMTP'],
+      nicheTags: ['Growth', 'GTM', 'B2B'],
       replyProbability: 91,
       isLocked: true,
     },
@@ -150,7 +150,7 @@ export default function TokenSystemSection() {
         </h2>
         <p className="text-base md:text-lg text-text-secondary font-light leading-relaxed max-w-3xl mx-auto">
           Every subscription includes monthly tokens. Use them however you want—unlock qualified
-          leads, generate personalized AI outreach, and access real-time intent intelligence. No
+          leads, reveal verified contact details, and access real-time intent intelligence. No
           bloated pricing tiers, and no paying for features you never use.
         </p>
       </div>
@@ -251,25 +251,25 @@ export default function TokenSystemSection() {
 
             {/* Accordion Item 2 */}
             <div
-              onClick={() => setActiveTab('outreach')}
+              onClick={() => setActiveTab('contacts')}
               className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
-                activeTab === 'outreach'
+                activeTab === 'contacts'
                   ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]'
                   : 'bg-transparent border-transparent hover:bg-white/[0.01]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'outreach' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
+                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'contacts' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
-                  ○ GENERATE OUTREACH
+                  ○ VERIFIED CONTACTS
                 </span>
                 <ChevronRightIcon
-                  className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'outreach' ? 'rotate-90' : ''}`}
+                  className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'contacts' ? 'rotate-90' : ''}`}
                 />
               </div>
 
-              {activeTab === 'outreach' && (
+              {activeTab === 'contacts' && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -277,8 +277,8 @@ export default function TokenSystemSection() {
                   className="mt-3 overflow-hidden text-xs text-text-secondary pl-3"
                 >
                   <p className="leading-relaxed">
-                    Custom outreach writes personalized copy based on targeted intent signals.
-                    Connect your SMTP directly inside the LH console to dispatch.
+                    Revealing a lead decrypts the verified email address, phone, and profile link —
+                    export anytime as CSV or Excel.
                   </p>
                 </motion.div>
               )}
@@ -286,25 +286,25 @@ export default function TokenSystemSection() {
 
             {/* Accordion Item 3 */}
             <div
-              onClick={() => setActiveTab('automation')}
+              onClick={() => setActiveTab('pipeline')}
               className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer ${
-                activeTab === 'automation'
+                activeTab === 'pipeline'
                   ? 'bg-white/[0.03] border-white/10 shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]'
                   : 'bg-transparent border-transparent hover:bg-white/[0.01]'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span
-                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'automation' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
+                  className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'pipeline' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
-                  ○ CAMPAIGN AUTOMATION
+                  ○ PIPELINE TRACKING
                 </span>
                 <ChevronRightIcon
-                  className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'automation' ? 'rotate-90' : ''}`}
+                  className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'pipeline' ? 'rotate-90' : ''}`}
                 />
               </div>
 
-              {activeTab === 'automation' && (
+              {activeTab === 'pipeline' && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -312,8 +312,8 @@ export default function TokenSystemSection() {
                   className="mt-3 overflow-hidden text-xs text-text-secondary pl-3"
                 >
                   <p className="leading-relaxed">
-                    Automate context‑aware follow‑up branches directly inside your campaigns to
-                    maximize conversions while maintaining high personal fidelity.
+                    Keep your saved pipeline moving — mark when you reach out, when a prospect
+                    replies, and watch every deal progress to close.
                   </p>
                 </motion.div>
               )}

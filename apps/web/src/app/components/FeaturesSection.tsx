@@ -420,7 +420,7 @@ function LeadIntelVisual({
                 : 'bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors'
             }`}
           >
-            {emailStatus === 'sent' ? 'Outreached' : 'Verified'}
+            {emailStatus === 'sent' ? 'Contacted' : 'Verified'}
           </div>
         </div>
 
@@ -480,7 +480,7 @@ function LeadIntelVisual({
         </div>
         <p className="text-[10px] text-text-secondary/70 leading-snug">
           {emailStatus === 'sent'
-            ? '"Direct outreach draft sent successfully. Conversation logs opened with Alex K."'
+            ? '"Lead revealed — verified email and phone unlocked. Saved to your pipeline."'
             : '"Posted about high Shopify acquisition costs on Twitter 2h ago. Actively seeking conversion assistance."'}
         </p>
       </motion.div>
@@ -488,7 +488,7 @@ function LeadIntelVisual({
   )
 }
 
-// ─── Card 5: Email Integration — Email compose mockup ────────────────
+// ─── Card 5: Revealed Contact — Save to pipeline mockup ─────────────
 function EmailComposeVisual({
   className = '',
   emailStatus,
@@ -507,25 +507,25 @@ function EmailComposeVisual({
             : 'border-white/[0.04]'
         }`}
       >
-        {/* Email header bar */}
+        {/* Card header bar */}
         <div className="px-4 py-2 border-b border-white/[0.04] flex items-center gap-3 text-accent-purple">
           <div className="flex items-center gap-1 shrink-0 text-accent-purple">
             <div className="w-1.5 h-1.5 rounded-full bg-dot-red opacity-60 text-accent-purple" />
             <div className="w-1.5 h-1.5 rounded-full bg-dot-yellow opacity-60 text-accent-purple" />
             <div className="w-1.5 h-1.5 rounded-full bg-dot-green opacity-60 text-accent-purple" />
           </div>
-          <span className="text-[9.5px] text-text-secondary/40 font-mono">New Message</span>
+          <span className="text-[9.5px] text-text-secondary/40 font-mono">Contact Revealed</span>
           <div className="ml-auto flex items-center gap-1.5 text-accent-purple">
             <span className="text-text-secondary hover:text-text-primary transition-colors text-[8.5px] font-bold tracking-widest uppercase">
-              Connected
+              Verified
             </span>
           </div>
         </div>
 
-        {/* Email fields */}
+        {/* Contact fields */}
         <div className="px-4 py-1.5 border-b border-white/[0.03]">
           <div className="flex items-center gap-2 text-[10px]">
-            <span className="text-text-secondary/40 font-medium w-8 shrink-0">To:</span>
+            <span className="text-text-secondary/40 font-medium w-8 shrink-0">Email:</span>
             <span className="text-text-secondary hover:text-text-primary transition-colors truncate">
               alex.k@shopifybrand.com
             </span>
@@ -533,14 +533,14 @@ function EmailComposeVisual({
         </div>
         <div className="px-4 py-1.5 border-b border-white/[0.03]">
           <div className="flex items-center gap-2 text-[10px]">
-            <span className="text-text-secondary/40 font-medium w-8 shrink-0">Subj:</span>
+            <span className="text-text-secondary/40 font-medium w-8 shrink-0">Phone:</span>
             <span className="text-text-primary/80 truncate">
-              Quick question about checkout flow
+              +1 (555) 012-3456
             </span>
           </div>
         </div>
 
-        {/* Email body */}
+        {/* Intel body */}
         <div className="flex-1 px-4 py-2.5 text-[9.5px] text-text-primary/80 leading-relaxed overflow-hidden relative">
           {emailStatus === 'sent' ? (
             <motion.div
@@ -552,27 +552,27 @@ function EmailComposeVisual({
                 ✓
               </span>
               <span className="text-[10px] text-text-primary font-bold">
-                Email Sent to Alex K.!
+                Saved to Pipeline!
               </span>
               <span className="text-[8px] text-text-secondary/60">
-                Campaign started successfully.
+                Export anytime as CSV or Excel.
               </span>
             </motion.div>
           ) : (
             <>
-              Hey Alex, saw your tweet about DTC acquisition costs going up. We recently designed a
-              visual checkout flow that lowered cart abandonment by 18%...
+              High buyer intent detected — posted about rising Shopify acquisition costs 2h ago.
+              Email and phone unlocked. Ready to save and reach out on your own terms.
               <span className="inline-block w-1 h-3 ml-0.5 bg-accent-purple animate-pulse align-middle" />
             </>
           )}
         </div>
 
-        {/* Send bar */}
+        {/* Save bar */}
         <div className="px-4 py-2 border-t border-white/[0.04] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <EnvelopeIcon className="w-3 h-3 text-text-secondary/30" />
             <span className="text-[8.5px] text-text-secondary/30 font-mono">
-              {emailStatus === 'sending' ? 'Sending...' : emailStatus === 'sent' ? 'Sent' : 'Draft'}
+              {emailStatus === 'sending' ? 'Saving...' : emailStatus === 'sent' ? 'Saved' : 'New'}
             </span>
           </div>
           <button
@@ -592,10 +592,10 @@ function EmailComposeVisual({
             {emailStatus === 'sending' ? (
               <span className="w-2.5 h-2.5 rounded-full border border-t-transparent border-white animate-spin" />
             ) : emailStatus === 'sent' ? (
-              'Sent ✓'
+              'Saved ✓'
             ) : (
               <>
-                <PaperAirplaneIcon className="w-[9px] h-[9px]" /> Send
+                <PaperAirplaneIcon className="w-[9px] h-[9px]" /> Save
               </>
             )}
           </button>
@@ -605,7 +605,7 @@ function EmailComposeVisual({
   )
 }
 
-// ─── Card 6: Automated Follow-Ups — Vertical timeline ───────────────────────
+// ─── Card 6: Pipeline Tracking — Vertical timeline ───────────────────────
 function FollowUpTimelineVisual({
   className = '',
   selectedStep,
@@ -616,10 +616,10 @@ function FollowUpTimelineVisual({
   onSelectStep: (idx: number) => void
 }) {
   const steps = [
-    { day: 'Day 1', action: 'Value Hook', status: 'sent' },
-    { day: 'Day 3', action: 'Case Study', status: 'sent' },
-    { day: 'Day 5', action: 'Direct Ask', status: 'pending' },
-    { day: 'Day 7', action: 'Final Nudge', status: 'scheduled' },
+    { day: 'Revealed', action: 'Contact Unlocked', status: 'sent' },
+    { day: 'Saved', action: 'Added to Pipeline', status: 'sent' },
+    { day: 'Contacted', action: 'Reached Out', status: 'pending' },
+    { day: 'Replied', action: 'Conversation Open', status: 'scheduled' },
   ]
 
   return (
@@ -701,13 +701,13 @@ function TokenMeterVisual({
   const getValues = () => {
     switch (selectedPersona) {
       case 'free':
-        return { count: 50, offset: 0.05, label: 'Reveal: 3', label2: 'Outreach: 1' }
+        return { count: 50, offset: 0.05, label: 'Reveal: 3', label2: 'Email: 2' }
       case 'freelancer':
-        return { count: 500, offset: 0.02, label: 'Reveal: 3', label2: 'Outreach: 1' }
+        return { count: 500, offset: 0.02, label: 'Reveal: 3', label2: 'Email: 2' }
       case 'agency':
-        return { count: 1000, offset: 0.01, label: 'Reveal: 3', label2: 'Outreach: 1' }
+        return { count: 1000, offset: 0.01, label: 'Reveal: 3', label2: 'Email: 2' }
       default:
-        return { count: 50, offset: 0.05, label: 'Reveal: 3', label2: 'Outreach: 1' }
+        return { count: 50, offset: 0.05, label: 'Reveal: 3', label2: 'Email: 2' }
     }
   }
 
@@ -1006,13 +1006,13 @@ export default function FeaturesSection() {
                 Lead Enrichment
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
-                Lead Intelligence with Email Integration
+                Lead Intelligence with Revealed Contacts
               </h3>
             </div>
             <p className="text-text-secondary text-sm md:text-base leading-relaxed">
               Analyze and enrich prospect profiles instantly to understand exactly who you are
-              speaking to. See urgency levels, budget cues, and comprehensive context alongside
-              secure, integrated direct sending.
+              speaking to. See urgency levels, budget cues, and comprehensive buyer context with
+              verified contact details ready to act on.
             </p>
             <ul className="space-y-3 pt-2">
               {[
@@ -1021,8 +1021,8 @@ export default function FeaturesSection() {
                   desc: 'See clear qualifying signals like budget and context analyzed dynamically.',
                 },
                 {
-                  title: 'One-Click Inboxing',
-                  desc: 'Draft and send messages immediately with built-in mail support.',
+                  title: 'Verified Contact Data',
+                  desc: 'Email and phone unlocked the moment you reveal a lead.',
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">
@@ -1063,25 +1063,25 @@ export default function FeaturesSection() {
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
               <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-                High-converting outreach
+                Pipeline momentum
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
-                Automated Follow-Ups
+                Track Every Touch
               </h3>
             </div>
             <p className="text-text-secondary text-sm md:text-base leading-relaxed">
-              Keep deals moving automatically with multi-stage campaign sequences that adjust tone
-              dynamically — and pause the moment a prospect responds.
+              Keep your pipeline moving by logging every interaction. Reveal a lead, save it, mark
+              when you reach out — and see where each conversation stands at a glance.
             </p>
             <ul className="space-y-3 pt-2">
               {[
                 {
-                  title: 'Multi-Stage Sequences',
-                  desc: 'Campaign streams that escalate tone across days until a reply lands.',
+                  title: 'Stage Tracking',
+                  desc: 'Move leads from Revealed to Contacted to Replied as you close in.',
                 },
                 {
-                  title: 'Adaptive Follow-Ups',
-                  desc: 'Automated streams that pause automatically once the prospect responds.',
+                  title: 'Reply Flags',
+                  desc: 'Mark when a prospect replies so nothing slips through the cracks.',
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">

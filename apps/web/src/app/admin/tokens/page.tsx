@@ -73,7 +73,7 @@ export default function AdminTokensPage() {
   const fetchEnrichmentKeys = useCallback(async () => {
     try {
       const [intel, compass, hunter, contactout, apollo] = await Promise.all([
-        apiCall('/api/admin/settings?service=intelligence'),
+        apiCall('/api/admin/settings?service=openrouter'),
         apiCall('/api/admin/settings?service=contact-compass'),
         apiCall('/api/admin/settings?service=hunter'),
         apiCall('/api/admin/settings?service=contactout'),
@@ -83,7 +83,7 @@ export default function AdminTokensPage() {
       const newStates = {
         'OpenRouter API Key': {
           is_configured: Boolean(d(intel).is_configured),
-          value: (d(intel).model as string) || '',
+          value: (d(intel).api_key as string) || '',
         },
         'Contact Compass Token': {
           is_configured: Boolean(d(compass).is_configured),
@@ -156,7 +156,9 @@ export default function AdminTokensPage() {
     }
     // Real backend payloads: token-based services vs api_key-based services.
     const body =
-      service === 'hunter' || service === 'apollo' ? { api_key: value.trim() } : { token: value.trim() }
+      service === 'hunter' || service === 'apollo' || service === 'openrouter'
+        ? { api_key: value.trim() }
+        : { token: value.trim() }
     setSaving(label)
     try {
       await apiCall(`/api/admin/settings?service=${service}`, { method: 'POST', body: JSON.stringify(body) })
@@ -199,12 +201,11 @@ export default function AdminTokensPage() {
 
   const enrichmentFields = [
     {
-      service: 'intelligence',
+      service: 'openrouter',
       label: 'OpenRouter API Key',
-      description: 'Used for AI intelligence reports and outreach generation. Configured on the backend (no API route to change it).',
+      description: 'Used for AI intelligence reports and lead enrichment. Editable from this page.',
       placeholder: 'sk-or-v1-...',
       icon: Cog6ToothIcon,
-      readOnly: true,
     },
     {
       service: 'contact-compass',
@@ -344,20 +345,7 @@ export default function AdminTokensPage() {
                       </span>
                     </div>
 
-                    {field.readOnly ? (
-                      <div className="flex items-center justify-between bg-surface-elevated border border-white/[0.08] rounded-lg px-4 py-2.5">
-                        <div>
-                          <p className="text-sm text-text-primary">
-                            {state?.is_configured ? `Model: ${state.value || 'default'}` : 'Not configured'}
-                          </p>
-                          <p className="text-[10px] text-text-secondary mt-0.5">
-                            Set via backend env (config.openRouter). This page is read-only for this key.
-                          </p>
-                        </div>
-                        {state?.is_configured && <ShieldCheckIcon className="w-5 h-5 text-green-400" />}
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                       <div className="relative flex-1">
                         <input
                           type={show ? 'text' : 'password'}
@@ -396,7 +384,6 @@ export default function AdminTokensPage() {
                         )}
                       </button>
                     </div>
-                    )}
                   </div>
                 )
               })}

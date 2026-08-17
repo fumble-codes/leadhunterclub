@@ -35,7 +35,7 @@ export async function consumeCredits(amount: number, description: string) {
 
     revalidatePath('/dashboard')
     revalidatePath('/leads')
-    revalidatePath('/outreach')
+    revalidatePath('/saved')
     revalidatePath('/settings')
 
     const balances = await creditService.getBalances(userId)

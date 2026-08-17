@@ -33,6 +33,13 @@ function extractTags(post: ExternalPost): string[] {
   return tags
 }
 
+const EMAIL_REGEX = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g
+const PHONE_REGEX = /(\+?\d[\d\s\-()\/.]{6,}\d)/g
+
+function redactContact(content: string): string {
+  return content.replace(EMAIL_REGEX, '[email hidden]').replace(PHONE_REGEX, '[phone hidden]')
+}
+
 function isLeadClaimable(post: ExternalPost): boolean {
   return post.source === 'seed' || (post.review_status === 'approved' && !!post.intelligence)
 }
@@ -68,7 +75,7 @@ function externalPostToAppLead(
     source: post.platform || 'Unknown',
     category: extractSection(intel, 'One-Liner') || post.author?.info || post.keyword?.replace(/^watchlist:/, '') || post.platform || 'General',
     title: post.author?.info || post.keyword || post.platform || 'Lead Signal',
-    signalContext: post.content || '',
+    signalContext: isRevealed ? post.content || '' : redactContact(post.content || ''),
     role: post.author?.info || extractSection(intel, 'One-Liner'),
     taskScope: extractSection(intel, 'Context You Might Miss'),
     mustHave: extractSection(intel, 'What They Actually Want'),

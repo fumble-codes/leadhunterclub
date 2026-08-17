@@ -129,7 +129,7 @@ export default function SupportThreadPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-8 py-10 relative">
+    <main className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide">
       <div className="max-w-[900px] mx-auto relative z-10">
         <button
           onClick={() => router.push('/support')}

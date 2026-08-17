@@ -69,7 +69,7 @@ function parseExternalError(status: number, text: string): string {
   }
 }
 
-async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3): Promise<T> {
+export async function fetchApi<T>(path: string, options: RequestInit = {}, retries = 3): Promise<T> {
   const { BASE_URL } = requireCredentials()
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
   for (let attempt = 0; attempt < retries; attempt++) {
@@ -494,9 +494,27 @@ export async function getIntelligenceSettings(): Promise<IntelSettingsResponse['
   return res.data
 }
 
-// NOTE: There is NO write route for intelligence settings on the backend —
-// only `GET /settings/intelligence`. The OpenRouter key is configured via the
-// backend's own environment (config.openRouter.apiKey), not through the API.
+interface OpenRouterSettingResponse {
+  success: boolean
+  data: {
+    api_key: string | null
+    is_configured: boolean
+    model?: string
+  }
+}
+
+export async function getOpenRouterApiKey(): Promise<OpenRouterSettingResponse['data']> {
+  const res = await fetchApi<OpenRouterSettingResponse>(`/settings/openrouter-api-key`)
+  return res.data
+}
+
+export async function updateOpenRouterApiKey(api_key: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/openrouter-api-key`, {
+    method: 'POST',
+    body: JSON.stringify({ api_key }),
+  })
+  return res
+}
 
 interface TokenSettingResponse {
   success: boolean

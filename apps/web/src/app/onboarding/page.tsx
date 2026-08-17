@@ -423,7 +423,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-bg-main flex flex-col items-center justify-start px-4 relative overflow-y-auto pt-12 pb-8">
+    <main className="min-h-dvh bg-bg-main flex flex-col items-center justify-start px-4 relative overflow-y-auto pt-12 pb-8 scrollbar-hide">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.06)_0%,transparent_60%)] pointer-events-none" />
 
       {step > 1 && (

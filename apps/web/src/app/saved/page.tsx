@@ -15,7 +15,6 @@ import {
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { AppLead } from '@/types/lead'
-import { useRouter } from 'next/navigation'
 import { Badge, Button, CustomLoader } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -25,11 +24,9 @@ export default function SavedLeadsPage() {
   const [activeTab, setActiveTab] = useState('All Leads')
   const [savedLeads, setSavedLeads] = useState<AppLead[]>([])
   const [loading, setLoading] = useState(true)
-  const [isEngaging, setIsEngaging] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
   const [exporting, setExporting] = useState<'csv' | 'tsv' | 'sheet' | null>(null)
-  const router = useRouter()
   const { addToast } = useToast()
 
   const readyCount = savedLeads.filter(
@@ -53,13 +50,13 @@ export default function SavedLeadsPage() {
     },
     {
       label: 'Active Conversations',
-      sub: 'Currently in outreach',
+      sub: 'Currently being contacted',
       count: `${activeCount} Active`,
       accent: 'purple',
       icon: SparklesIcon,
     },
     {
-      label: 'Ready for Outreach',
+      label: 'Ready to Contact',
       sub: 'Unlocked & waiting',
       count: `${readyCount} Ready`,
       accent: 'mint',
@@ -73,24 +70,6 @@ export default function SavedLeadsPage() {
       icon: ExclamationTriangleIcon,
     },
   ]
-
-  const handleEngage = async (leadId: string) => {
-    setIsEngaging(leadId)
-    try {
-      const token = await getFirebaseToken()
-      await fetch(`/api/leads/${leadId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ status: 'drafting' }),
-      })
-      router.push(`/outreach?leadId=${leadId}`)
-    } catch {
-      setIsEngaging(null)
-    }
-  }
 
   const handleMarkStatus = async (leadId: string, status: string, label: string) => {
     try {
@@ -253,7 +232,7 @@ export default function SavedLeadsPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-8 py-10 relative">
+    <main className="flex-1 overflow-y-auto px-8 py-10 relative scrollbar-hide">
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Summary Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
@@ -470,45 +449,23 @@ export default function SavedLeadsPage() {
 
                     <div className="col-span-3 text-right flex items-center justify-end gap-2">
                       {lead.status === 'saved' || lead.status === 'new' ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            color="mint"
-                            size="sm"
-                            onClick={() => handleMarkStatus(lead.id, 'sent', 'Sent')}
-                          >
-                            Mark Sent
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            color="purple"
-                            size="sm"
-                            onClick={() => handleEngage(lead.id)}
-                            loading={isEngaging === lead.id}
-                          >
-                            Draft
-                          </Button>
-                        </>
+                        <Button
+                          variant="ghost"
+                          color="mint"
+                          size="sm"
+                          onClick={() => handleMarkStatus(lead.id, 'sent', 'Sent')}
+                        >
+                          Mark Sent
+                        </Button>
                       ) : lead.status === 'sent' || lead.status === 'follow-up' ? (
-                        <>
-                          <Button
-                            variant="ghost"
-                            color="purple"
-                            size="sm"
-                            onClick={() => handleMarkStatus(lead.id, 'replied', 'Replied')}
-                          >
-                            Replied
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            color="mint"
-                            size="sm"
-                            onClick={() => handleEngage(lead.id)}
-                            loading={isEngaging === lead.id}
-                          >
-                            Follow-up
-                          </Button>
-                        </>
+                        <Button
+                          variant="ghost"
+                          color="purple"
+                          size="sm"
+                          onClick={() => handleMarkStatus(lead.id, 'replied', 'Replied')}
+                        >
+                          Replied
+                        </Button>
                       ) : lead.status === 'replied' ? (
                         <Badge size="sm" color="purple">
                           Done

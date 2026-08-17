@@ -20,17 +20,17 @@ const inter = Inter({
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com'
 
 export const metadata: Metadata = {
-  title: 'LeadHunterClub — AI-Powered Lead Generation & Outreach',
+  title: 'LeadHunterClub — AI-Powered Lead Generation & Sales Intelligence',
   description:
-    'Find and close more deals with AI-powered lead generation, smart outreach, and advanced analytics. The all-in-one platform for modern sales teams.',
+    'Find and close more deals with AI-powered lead generation, buyer-intent signals, and advanced analytics. The all-in-one platform for modern sales teams.',
   icons: {
     icon: '/logo.svg',
     apple: '/logo.svg',
   },
   openGraph: {
-    title: 'LeadHunterClub — AI-Powered Lead Generation & Outreach',
+    title: 'LeadHunterClub — AI-Powered Lead Generation & Sales Intelligence',
     description:
-      'Find and close more deals with AI-powered lead generation, smart outreach, and advanced analytics.',
+      'Find and close more deals with AI-powered lead generation, buyer-intent signals, and advanced analytics.',
     url: appUrl,
     siteName: 'LeadHunterClub',
     images: [{ url: `${appUrl}/logo.svg`, width: 1080, height: 1080 }],
@@ -38,9 +38,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LeadHunterClub — AI-Powered Lead Generation & Outreach',
+    title: 'LeadHunterClub — AI-Powered Lead Generation & Sales Intelligence',
     description:
-      'Find and close more deals with AI-powered lead generation, smart outreach, and advanced analytics.',
+      'Find and close more deals with AI-powered lead generation, buyer-intent signals, and advanced analytics.',
     images: [`${appUrl}/logo.svg`],
   },
 }
@@ -59,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               url: appUrl,
               logo: `${appUrl}/logo.svg`,
               description:
-                'AI-powered lead generation and outreach platform for modern sales teams.',
+                'AI-powered lead generation and sales intelligence platform for modern sales teams.',
             }),
           }}
         />

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
@@ -6,7 +6,6 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import {
   BanknotesIcon,
   BookmarkIcon,
-  PaperAirplaneIcon,
   Squares2X2Icon,
   SparklesIcon,
   ArrowRightIcon,
@@ -147,8 +146,6 @@ const allLeads: Array<{
 ]
 const getSavedLeads = () =>
   allLeads.filter((l) => ['saved', 'drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
-const getOutreachLeads = () =>
-  allLeads.filter((l) => ['drafting', 'sent', 'replied', 'follow-up'].includes(l.status))
 const dashboardStats = [
   {
     label: 'Analyzed Leads',
@@ -190,7 +187,7 @@ const ease = [0.16, 1, 0.3, 1] as const
 const tabs = [
   { id: 'leads', label: 'Lead Feed', icon: BanknotesIcon },
   { id: 'saved', label: 'Saved Leads', icon: BookmarkIcon },
-  { id: 'outreach', label: 'Outreach', icon: PaperAirplaneIcon },
+  { id: 'pipeline', label: 'Pipeline', icon: ChartBarSquareIcon },
   { id: 'dashboard', label: 'Dashboard', icon: Squares2X2Icon },
 ]
 
@@ -454,196 +451,6 @@ function SavedContent() {
   )
 }
 
-// ─── Real Outreach content (100% precise to outreach/page.tsx) ───────────────
-function OutreachContent() {
-  const outreachLeads = getOutreachLeads()
-  const [selectedLead, setSelectedLead] = useState(outreachLeads[0])
-  const [draft, setDraft] = useState('')
-
-  if (!selectedLead) return null
-
-  return (
-    <div className="flex-1 flex overflow-hidden">
-      {/* Left Column: Thread List */}
-      <div className="w-[320px] shrink-0 border-r border-white/[0.06] bg-background/40 flex flex-col">
-        <div className="p-6 border-b border-white/[0.06]">
-          <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
-            <ChatBubbleLeftRightIcon className="w-[18px] h-[18px] text-text-secondary" />
-            Conversations
-          </h2>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide">
-          {outreachLeads.map((lead) => (
-            <button
-              key={lead.id}
-              onClick={() => setSelectedLead(lead)}
-              className={`w-full text-left p-4 rounded-2xl transition-all relative group ${
-                selectedLead.id === lead.id
-                  ? 'bg-surface-secondary border border-white/[0.08] shadow-lg'
-                  : 'hover:bg-white/[0.03] border border-transparent'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-1">
-                <span className="text-sm font-bold text-text-primary truncate">{lead.name}</span>
-                <span className="text-[10px] text-text-secondary font-mono ml-2 shrink-0">
-                  {lead.timestamp}
-                </span>
-              </div>
-              <div className="text-[10px] text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest font-bold mb-2">
-                {lead.company}
-              </div>
-              <p className="text-xs text-text-secondary line-clamp-1 italic">
-                {lead.signalContext}
-              </p>
-              {selectedLead.id === lead.id && (
-                <motion.div
-                  layoutId="outreach-active-hero"
-                  className="absolute inset-0 border border-border-subtle rounded-2xl pointer-events-none"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Center Column: Messaging Cockpit */}
-      <div className="flex-1 flex flex-col bg-background relative min-w-0">
-        <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div
-              className={`w-8 h-8 rounded-md bg-accent-${selectedLead.accent}/10 border border-accent-${selectedLead.accent}/20 flex items-center justify-center`}
-            >
-              <UserIcon className={`w-5 h-5 text-accent-${selectedLead.accent}`} />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-base font-bold text-text-primary leading-tight truncate">
-                {selectedLead.name}
-              </h3>
-              <span className="text-xs text-text-secondary opacity-60 truncate block">
-                Conversation Thread
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0 ml-4">
-            <button className="p-2 hover:bg-white/5 rounded-lg text-text-secondary transition-colors">
-              <ClockIcon className="w-[18px] h-[18px]" />
-            </button>
-            <button className="p-2 hover:bg-white/5 rounded-lg text-text-secondary transition-colors">
-              <EllipsisHorizontalIcon className="w-[18px] h-[18px]" />
-            </button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide text-accent-purple">
-          <div className="max-w-[80%] mx-auto text-center space-y-4 py-12 text-accent-purple">
-            <div className="w-8 h-8 rounded-md bg-surface-secondary border border-border-subtle flex items-center justify-center mx-auto text-accent-purple">
-              <ViewfinderCircleIcon className="w-6 h-6" />
-            </div>
-            <h4 className="text-sm font-bold text-text-primary uppercase tracking-widest">
-              Initial Intercept Sent
-            </h4>
-            <p className="text-xs text-text-secondary italic">
-              &quot;Hey Alex, saw your Shopify store load times are a bit sluggish. Just worked with
-              a similar DTC brand to shave 2s off their LCP. Any interest in a quick audit?&quot;
-            </p>
-          </div>
-        </div>
-
-        <div className="p-6 border-t border-white/[0.06] bg-background">
-          <div className="flex items-center gap-3 mb-4 overflow-x-auto pb-2 scrollbar-hide">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
-              <SparklesIcon className="w-3 h-3" /> AI Angles:
-            </div>
-            {[
-              { label: 'Curiosity Loop', icon: BoltIcon },
-              { label: 'Authority Play', icon: InformationCircleIcon },
-              { label: 'Subtle Humor', icon: ChatBubbleLeftRightIcon },
-            ].map((angle) => (
-              <button
-                key={angle.label}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-text-secondary hover:text-text-primary hover:border-white/20 transition-all whitespace-nowrap"
-              >
-                <angle.icon className="w-3 h-3" /> {angle.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative group">
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="Draft your socially intelligent outreach..."
-              className="w-full bg-background border border-white/[0.08] rounded-4xl p-6 pr-24 text-sm text-text-primary placeholder:text-text-secondary/30 focus:outline-none focus:border-border-subtle transition-all min-h-[140px] resize-none focus:border-accent-purple/50"
-            />
-            <button className="absolute bottom-4 right-4 p-4 bg-accent-orange text-text-on-accent rounded-xl font-bold flex items-center gap-2 hover: transition-all">
-              Send <PaperAirplaneIcon className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column: Intelligence Summary */}
-      <div className="w-[300px] lg:w-[340px] shrink-0 border-l border-white/[0.06] bg-background/40 flex flex-col p-8 overflow-y-auto scrollbar-hide">
-        <div className="space-y-8">
-          <section>
-            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-super mb-4 flex items-center gap-2">
-              <InformationCircleIcon className="w-3 h-3" /> Intelligence Brief
-            </h4>
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
-              <div className="text-xs text-text-primary leading-relaxed font-medium">
-                &quot;{selectedLead.signalContext}&quot;
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['E-commerce', 'High Intent'].map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 rounded-md bg-accent-purple/10 border border-accent-purple/20 text-[9px] font-bold text-accent-purple"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h4 className="text-[10px] font-bold text-text-secondary uppercase tracking-super mb-4">
-              Conversion Paths
-            </h4>
-            <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-border-subtle transition-all">
-                <span className="text-xs text-text-secondary group-hover:text-text-primary">
-                  Company Website
-                </span>
-                <ArrowTopRightOnSquareIcon className="w-[14px] h-[14px] text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group cursor-pointer hover:border-border-subtle transition-all">
-                <span className="text-xs text-text-secondary group-hover:text-text-primary">
-                  LinkedIn Profile
-                </span>
-                <ArrowTopRightOnSquareIcon className="w-[14px] h-[14px] text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-auto">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-accent-purple/10 to-transparent border border-border-subtle mt-8">
-              <h5 className="text-xs font-bold text-accent-purple mb-2">
-                Socially Intelligent Note:
-              </h5>
-              <p className="text-[11px] text-text-secondary leading-relaxed italic">
-                &quot;Alex likes direct, no-BS communication. Avoid fluff and focus on the technical
-                Shopify metric improvement.&quot;
-              </p>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ─── Real Dashboard content (100% precise to dashboard/page.tsx) ─────────
 function DashboardContent() {
   const staticStats = [
@@ -790,9 +597,9 @@ function DashboardContent() {
           {/* Quick Actions & AI Status */}
           <div className="space-y-6">
             <div className="p-8 rounded-4xl bg-accent-orange text-text-on-accent relative overflow-hidden group">
-              <h3 className="text-xl font-bold mb-2">Ready for Outreach</h3>
+              <h3 className="text-xl font-bold mb-2">Revealed Leads</h3>
               <p className="text-sm opacity-80 mb-8 leading-relaxed">
-                You have 12 high-intent leads waiting for outreach strategy.
+                You have 12 high-intent leads revealed and ready to work.
               </p>
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -827,6 +634,169 @@ function DashboardContent() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Real Pipeline content (tracking flow: Saved → Contacted → Replied → Closed) ──
+const pipelineStages = [
+  { id: 'saved', label: 'Saved', desc: 'Unlocked & in your pipeline', icon: BookmarkIcon },
+  {
+    id: 'contacted',
+    label: 'Contacted',
+    desc: 'You reached out',
+    icon: ArrowTopRightOnSquareIcon,
+  },
+  {
+    id: 'replied',
+    label: 'Replied',
+    desc: 'Conversation started',
+    icon: ChatBubbleLeftRightIcon,
+  },
+  { id: 'closed', label: 'Closed', desc: 'Deal won', icon: CheckCircleIcon },
+]
+
+function pipelineStageFor(status: string) {
+  if (status === 'replied') return 'replied'
+  if (status === 'sent' || status === 'follow-up') return 'contacted'
+  return 'saved'
+}
+
+function PipelineContent() {
+  const savedLeads = getSavedLeads().map((lead) => ({
+    ...lead,
+    stage: pipelineStageFor(lead.status),
+  }))
+
+  const stageCounts = pipelineStages.reduce(
+    (acc, stage) => ({
+      ...acc,
+      [stage.id]: savedLeads.filter((l) => l.stage === stage.id).length,
+    }),
+    {} as Record<string, number>,
+  )
+
+  const stageIndex = (stage: string) => pipelineStages.findIndex((s) => s.id === stage)
+
+  return (
+    <div className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
+      {/* Ambient Background Glows */}
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-soft pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
+
+      <div className="max-w-[1400px] mx-auto relative z-10">
+        {/* Header */}
+        <div className="mb-12">
+          <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary uppercase tracking-ultra mb-3">
+            <AdjustmentsHorizontalIcon className="w-[14px] h-[14px]" /> Live Pipeline
+          </div>
+          <h1 className="text-4xl font-bold text-text-primary tracking-tight">Pipeline</h1>
+          <p className="text-text-secondary mt-2">
+            Track every interaction from reveal to close — mark when you reach out, when they
+            reply.
+          </p>
+        </div>
+
+        {/* Stage Flow Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {pipelineStages.map((stage, i) => (
+            <motion.div
+              key={stage.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              className="group metallic-card p-6 relative overflow-hidden"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-3 rounded-xl bg-accent-purple/10 text-accent-purple">
+                  <stage.icon className="w-5 h-5" />
+                </div>
+                <span className="text-3xl font-bold text-text-primary">
+                  {stageCounts[stage.id]}
+                </span>
+              </div>
+              <h3 className="text-sm font-bold text-text-primary tracking-tight">{stage.label}</h3>
+              <p className="text-xs text-text-secondary mt-1">{stage.desc}</p>
+              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-accent-purple/20 group-hover:bg-accent-purple/40 transition-all" />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Pipeline Rows */}
+        <div className="bg-code-header border border-white/[0.05] rounded-4xl overflow-hidden">
+          <div className="grid grid-cols-12 gap-4 px-8 py-4 border-b border-white/[0.05] text-[10px] font-bold text-text-secondary uppercase tracking-super min-w-[800px]">
+            <div className="col-span-5">Lead</div>
+            <div className="col-span-2">Source</div>
+            <div className="col-span-4">Stage</div>
+            <div className="col-span-1 text-right">Score</div>
+          </div>
+
+          <div className="divide-y divide-white/[0.03] min-w-[800px] overflow-x-auto">
+            {savedLeads.map((lead, i) => (
+              <motion.div
+                key={lead.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 + i * 0.05 }}
+                className="grid grid-cols-12 gap-4 px-8 py-5 items-center group hover:bg-white/[0.02] transition-colors"
+              >
+                <div className="col-span-5 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-surface-elevated border border-white/10 flex items-center justify-center text-[11px] font-bold text-text-primary overflow-hidden shrink-0">
+                    {lead.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-text-primary truncate group-hover:text-accent-orange">
+                      {lead.name}
+                    </div>
+                    <div className="text-[10px] text-text-secondary truncate">{lead.email}</div>
+                  </div>
+                </div>
+
+                <div className="col-span-2">
+                  <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest text-text-secondary">
+                    {lead.source}
+                  </span>
+                </div>
+
+                <div className="col-span-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 flex-1">
+                      {pipelineStages.map((s, si) => {
+                        const filled = si <= stageIndex(lead.stage)
+                        return (
+                          <div
+                            key={s.id}
+                            className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden"
+                          >
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: filled ? '100%' : '0%' }}
+                              transition={{ duration: 0.6, delay: 0.2 + si * 0.05 }}
+                              className="h-full bg-accent-purple/60 rounded-full"
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-accent-purple shrink-0">
+                      {lead.stage}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="col-span-1 text-right">
+                  <span className="text-[11px] font-bold text-text-secondary">
+                    {lead.replyProbability}%
+                  </span>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
@@ -895,7 +865,8 @@ export default function HeroSection() {
             className="text-[15px] md:text-[17px] text-text-secondary font-light leading-relaxed mb-10 max-w-2xl mx-auto antialiased"
           >
             Lead Hunter Club monitors active service demand in real-time, compiles deep social
-            intelligence, and drafts personalized outreach that actually gets replies.
+            intelligence, and unlocks verified contact details — so you can close deals while the
+            demand is hot.
           </motion.p>
 
           {/* Centered CTA Row */}
@@ -1051,7 +1022,7 @@ export default function HeroSection() {
                   >
                     {activeTab === 'leads' && <LeadsContent />}
                     {activeTab === 'saved' && <SavedContent />}
-                    {activeTab === 'outreach' && <OutreachContent />}
+                    {activeTab === 'pipeline' && <PipelineContent />}
                     {activeTab === 'dashboard' && <DashboardContent />}
                   </motion.div>
                 </AnimatePresence>

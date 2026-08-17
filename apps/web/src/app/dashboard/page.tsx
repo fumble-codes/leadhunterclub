@@ -29,7 +29,7 @@ export default function DashboardPage() {
   const [distribution, setDistribution] = useState<
     { label: string; count: number; color: string }[]
   >([])
-  const [outreachCount, setOutreachCount] = useState(0)
+  const [readyLeadCount, setReadyLeadCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function DashboardPage() {
           if (json.data.activity) setActivity(json.data.activity)
           if (json.data.distribution) setDistribution(json.data.distribution)
           if (json.data.readyForOutreachCount !== undefined)
-            setOutreachCount(json.data.readyForOutreachCount)
+            setReadyLeadCount(json.data.readyForOutreachCount)
         }
       } catch (err) {
         console.error('Failed to load dashboard data:', err)
@@ -65,7 +65,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-10 py-12 relative">
+    <main className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 
@@ -162,10 +162,10 @@ export default function DashboardPage() {
 
           <div className="space-y-6">
             <div className="p-8 rounded-4xl bg-accent-mint text-text-on-accent relative overflow-hidden group">
-              <h3 className="text-xl font-bold mb-2">Ready for Outreach</h3>
+              <h3 className="text-xl font-bold mb-2">Revealed Leads</h3>
               <p className="text-sm opacity-80 mb-8 leading-relaxed">
-                You have {outreachCount} high-intent lead{outreachCount === 1 ? '' : 's'} waiting
-                for outreach strategy.
+                You have {readyLeadCount} high-intent lead{readyLeadCount === 1 ? '' : 's'} revealed
+                and ready to work. Save them to your pipeline or export as CSV/Excel.
               </p>
               <Link href="/leads">
                 <motion.button

@@ -9,7 +9,6 @@ import { useAuth } from '@/hooks/useAuth'
 import {
   Squares2X2Icon,
   BanknotesIcon,
-  PaperAirplaneIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
   BookmarkIcon,
@@ -21,7 +20,6 @@ import {
 const navItems = [
   { name: 'Lead Feed', href: '/leads', icon: BanknotesIcon },
   { name: 'Saved Leads', href: '/saved', icon: BookmarkIcon },
-  { name: 'Outreach', href: '/outreach', icon: PaperAirplaneIcon },
   { name: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
   { name: 'Support', href: '/support', icon: LifebuoyIcon },
 ]

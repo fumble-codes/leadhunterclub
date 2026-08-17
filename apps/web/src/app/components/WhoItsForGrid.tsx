@@ -13,7 +13,6 @@ import {
   MagnifyingGlassIcon,
   BoltIcon,
   BookmarkIcon,
-  PaperAirplaneIcon,
   LockClosedIcon,
   InformationCircleIcon,
   Bars3Icon,
@@ -44,9 +43,6 @@ interface PersonaData {
     nicheTags: string[]
     replyProbability: number
     accent: 'purple'
-    actionPitch: string
-    outreachSubject: string
-    outreachBody: string
   }
 }
 
@@ -105,10 +101,6 @@ const PERSONAS: PersonaData[] = [
       nicheTags: ['E-Commerce', 'Web Dev', 'Shopify'],
       replyProbability: 98,
       accent: 'purple',
-      actionPitch: 'Curiosity Loop',
-      outreachSubject: 'Quick Webflow/Shopify performance speed audit',
-      outreachBody:
-        'Hey Andy, saw your post regarding Shopify speed issues. Built a quick local copy of your checkout optimizing LCP shifts and load metrics (boosting conversion by 15%). Happy to send over the preview link?',
     },
   },
   {
@@ -131,10 +123,6 @@ const PERSONAS: PersonaData[] = [
       nicheTags: ['E-Commerce', 'UI/UX', 'Conversion'],
       replyProbability: 97,
       accent: 'purple',
-      actionPitch: 'Authority Play',
-      outreachSubject: 'DTC Checkout Page: 3 Conversion Leakage Fixes',
-      outreachBody:
-        'Hey Alex, saw your post about the checkout page conversion drops. Spatially analyzed your desktop checkout mobile layout shifts and spotted three minor trust gaps. Recorded a brief 90-second video teardown of the fix. Mind if I send it over?',
     },
   },
   {
@@ -158,10 +146,6 @@ const PERSONAS: PersonaData[] = [
       nicheTags: ['Branding', 'Vector Art', 'Figma'],
       replyProbability: 96,
       accent: 'purple',
-      actionPitch: 'Authority Play',
-      outreachSubject: 'Brand identity overhaul roadmap for Vanguard',
-      outreachBody:
-        "Hi Sarah, noticed you are planning to redesign Vanguard's visual identity guidelines. Our design team recently refreshed growth brand aesthetics for three similar startups, resulting in 40% higher customer trust metrics. Can I send over our 3-step design transition framework?",
     },
   },
   {
@@ -184,10 +168,6 @@ const PERSONAS: PersonaData[] = [
       nicheTags: ['Next.js', 'Core Web Vitals', 'SEO'],
       replyProbability: 99,
       accent: 'purple',
-      actionPitch: 'Technical Audit',
-      outreachSubject: 'Next.js bundle chunk audit for Stellar Co',
-      outreachBody:
-        'Hi Michael, saw your post regarding Next.js LCP bottlenecks. We recently optimized a mid-market SaaS site, bringing PageSpeed from 34 to 92 using chunk splitting and dynamic imports. Happy to share a quick bundle analyzer report of your site?',
     },
   },
   {
@@ -211,17 +191,13 @@ const PERSONAS: PersonaData[] = [
       nicheTags: ['DTC Ads', 'Meta', 'TikTok'],
       replyProbability: 95,
       accent: 'purple',
-      actionPitch: 'Authority Play',
-      outreachSubject: 'Meta/TikTok creative testing library framework',
-      outreachBody:
-        'Hi Marcus, saw you are looking to scale paid ads. We recently scaled an apparel brand to 3.2x ROAS by implementing a structured visual hook testing library. Outlined three ad testing concepts specifically for your apparel line. Can I email you the deck?',
     },
   },
   {
     id: 'agency-owners',
     title: 'Agency Owners',
     copyTitle: 'Agency Owners',
-    description: 'Scale outreach operations and land high-ticket retainer clients easily.',
+    description: 'Land high-ticket retainer clients with verified buyer-intent leads.',
     icon: CheckCircleIcon,
     accentColor: 'text-text-secondary hover:text-text-primary transition-colors',
     accentBg: 'bg-surface-secondary',
@@ -231,17 +207,13 @@ const PERSONAS: PersonaData[] = [
       email: 'david@gtmpartners.co',
       company: 'GTM Partners',
       source: 'Twitter',
-      title: 'Outbound Infrastructure For —',
+      title: 'B2B Demand Gen For —',
       signalContext:
-        'Need an agency with proven experience setting up cold email deliverability at scale.',
+        'Need an agency with proven experience in B2B demand gen and scalable pipelines.',
       urgency: 'high',
-      nicheTags: ['Deliverability', 'Outbound', 'Cold Email'],
+      nicheTags: ['Demand Gen', 'GTM', 'B2B'],
       replyProbability: 97,
       accent: 'purple',
-      actionPitch: 'Sniper Outreach',
-      outreachSubject: 'High-volume deliverability checklist for GTM Partners',
-      outreachBody:
-        'Hey David, saw you are expanding your outbound outreach channels. We recently designed email infrastructures that set up 200 secondary domains with zero spam-foldering, landing high-ticket bookings for B2B SaaS firms. Mind if I send our deliverability scaling checklist?',
     },
   },
 ]
@@ -284,7 +256,7 @@ export default function WhoItsForGrid() {
       setDisplayedText('')
 
       let index = 0
-      const fullText = activePersona.lead.outreachBody
+      const fullText = `Verified contact unlocked: ${activePersona.lead.email} · phone and profile link included. Saved to your pipeline — export anytime as CSV or Excel.`
       const interval = setInterval(() => {
         if (index < fullText.length) {
           setDisplayedText(fullText.substring(0, index + 2))
@@ -414,11 +386,11 @@ export default function WhoItsForGrid() {
             >
               <AppSidebar
                 isDemo={true}
-                activePathOverride={revealed[activePersona.id] ? '/outreach' : '/leads'}
+                activePathOverride={revealed[activePersona.id] ? '/saved' : '/leads'}
                 onNavItemClick={(href) => {
                   if (href === '/leads') {
                     setRevealed((prev) => ({ ...prev, [activePersona.id]: false }))
-                  } else if (href === '/outreach') {
+                  } else if (href === '/saved') {
                     setRevealed((prev) => ({ ...prev, [activePersona.id]: true }))
                   } else {
                     setRevealed((prev) => ({
@@ -499,7 +471,7 @@ export default function WhoItsForGrid() {
                 </div>
               </div>
 
-              {/* FOREGROUND LAYER: Messaging Outreach Cockpit floats on top like a Slack conversation card */}
+              {/* FOREGROUND LAYER: Revealed Lead Panel floats on top like a Slack conversation card */}
               <AnimatePresence>
                 {revealed[activePersona.id] && (
                   <motion.div
@@ -560,19 +532,19 @@ export default function WhoItsForGrid() {
                         <div className="flex items-center gap-2 mb-3 select-none overflow-x-auto pb-1">
                           <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-[8px] font-bold uppercase tracking-wider">
                             <SparklesIcon className="w-2 h-2 animate-pulse" />
-                            <span>AI Strategy:</span>
+                            <span>Buyer Context:</span>
                           </div>
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-secondary border border-border-subtle text-[8px] font-bold text-text-secondary hover:text-text-primary transition-colors">
                             <BoltIcon className="w-2 h-2" />
-                            <span>{activePersona.lead.actionPitch}</span>
+                            <span>{activePersona.lead.title}</span>
                           </div>
                         </div>
 
-                        {/* Subject block */}
+                        {/* Signal block */}
                         <div className="text-[11px] text-text-secondary flex items-center gap-1.5 mb-2 select-none">
-                          <span className="text-text-secondary/50 font-medium">Subject:</span>
+                          <span className="text-text-secondary/50 font-medium">Signal:</span>
                           <span className="text-text-primary font-semibold">
-                            {activePersona.lead.outreachSubject}
+                            {activePersona.lead.signalContext}
                           </span>
                         </div>
 
@@ -590,12 +562,12 @@ export default function WhoItsForGrid() {
                       {/* Sending controls footer */}
                       <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.03] select-none shrink-0">
                         <span className="text-[8px] font-mono text-text-secondary/40 tracking-wider">
-                          Ready to dispatch SMTP
+                          Contact verified · export anytime
                         </span>
 
                         <button className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-orange text-text-on-accent rounded-lg font-bold text-[9px] md:text-[10px] hover: transition-all">
-                          Send Intercept
-                          <PaperAirplaneIcon className="w-[10px] h-[10px]" />
+                          Save to Pipeline
+                          <CheckCircleIcon className="w-[10px] h-[10px]" />
                         </button>
                       </div>
                     </div>

@@ -49,7 +49,7 @@ export default function LeadsPage() {
     try {
       setLoading(true)
       const token = await getFirebaseToken()
-      const res = await fetch('/api/leads', {
+      const res = await fetch('/api/leads?pageSize=100', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       const json = await res.json()
@@ -139,7 +139,7 @@ export default function LeadsPage() {
   const selectedLead = leadsList.find((l) => l.id === selectedLeadId)
 
   return (
-    <main className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative">
+    <main className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative scrollbar-hide">
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
       <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />
 

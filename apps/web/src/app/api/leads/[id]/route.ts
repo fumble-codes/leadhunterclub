@@ -32,6 +32,13 @@ function extractSection(text: string, heading: string): string {
   return match ? match[1].trim() : ''
 }
 
+const EMAIL_REGEX = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g
+const PHONE_REGEX = /(\+?\d[\d\s\-()\/.]{6,}\d)/g
+
+function redactContact(content: string): string {
+  return content.replace(EMAIL_REGEX, '[email hidden]').replace(PHONE_REGEX, '[phone hidden]')
+}
+
 function extractTags(keyword: string | null, platform: string): string[] {
   const tags: string[] = []
   if (keyword) tags.push(keyword.replace(/^watchlist:/, ''))
@@ -77,7 +84,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         extractSection(intel, 'One-Liner') || externalLead.author?.info || externalLead.keyword?.replace(/^watchlist:/, '') || externalLead.platform || 'General',
       title:
         externalLead.author?.info || externalLead.keyword || externalLead.platform || 'Lead Signal',
-      signalContext: externalLead.content || '',
+      signalContext: isRevealed ? externalLead.content || '' : redactContact(externalLead.content || ''),
       role: externalLead.author?.info || '',
       taskScope: '',
       mustHave: '',

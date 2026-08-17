@@ -8,7 +8,6 @@ import {
   BanknotesIcon,
   BookmarkIcon,
 } from '@heroicons/react/24/solid'
-import { useRouter } from 'next/navigation'
 import { Card, Badge } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { AppLead } from '@/types/lead'
@@ -92,7 +91,6 @@ export default function LeadCard({
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
   const { addToast } = useToast()
-  const router = useRouter()
 
   useEffect(() => {
     setIsSaved(lead.status === 'saved')
@@ -144,48 +142,6 @@ export default function LeadCard({
     } catch {
       addToast({ type: 'error', message: 'Network error' })
     }
-  }
-
-  const handleEngage = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!lead.isClaimable) {
-      addToast({ type: 'error', message: 'This lead is not yet approved. Intelligence is still being generated.' })
-      return
-    }
-    const token = await getFirebaseToken()
-    if (!isRevealed) {
-      try {
-        const res = await fetch('/api/leads/reveal', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ leadId: lead.id }),
-        })
-        const json = await res.json()
-        if (!res.ok) {
-          addToast({ type: 'error', message: json.message || json.code || 'Failed to unlock lead' })
-          return
-        }
-        setIsRevealed(true)
-        if (onReveal) {
-          onReveal(lead.id, json.name, json.email, json.phone)
-        }
-      } catch {
-        addToast({ type: 'error', message: 'Network error' })
-        return
-      }
-    }
-    await fetch(`/api/leads/${lead.id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify({ isSaved: true, status: 'drafting' }),
-    })
-    router.push(`/outreach?leadId=${lead.id}&autoGenerate=true`)
   }
 
   return (

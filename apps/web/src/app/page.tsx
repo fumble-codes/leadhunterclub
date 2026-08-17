@@ -1,14 +1,21 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useInView } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDownIcon,
   CheckCircleIcon,
   GlobeAltIcon,
   SparklesIcon,
   ArrowRightIcon,
+  LockClosedIcon,
+  EyeIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  BookmarkIcon,
+  BoltIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import HeroSection from '@/app/components/HeroSection'
@@ -51,262 +58,204 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   )
 }
 
-const OUTREACH_ANGLES = [
+const SIGNAL_LEADS = [
   {
-    id: 'curiosity',
-    name: 'Curiosity Loop',
-    pitch:
-      'Hey Alex, saw your tweet about DTC acquisition costs going up. We recently designed a visual checkout flow for a similar brand that lowered cart abandonment by 18% with zero extra ad spend. Built a quick interactive mockup of how this could look on your Shopify storefront. Mind if I drop a link over?',
-    replyProbability: '96%',
-    spamScore: 'Safe (0.01)',
-    tone: 'Empathetic & Direct',
+    id: 'checkout',
+    name: 'Alex K.',
+    company: 'DTC Brands',
+    source: 'Twitter',
+    signal:
+      '"Our current checkout page is ugly and conversions are dropping drastically. Need help fast."',
+    urgency: 'Critical',
+    tags: ['E-Commerce', 'UI/UX', 'Conversion'],
+    email: 'alex.k@dtcbrands.co',
+    phone: '+1 (555) 012-3456',
+    replyProbability: '97%',
   },
   {
-    id: 'audit',
-    name: 'Technical Audit',
-    pitch:
-      'Hey Alex, spotted a minor layout shift on your checkout page that is currently causing some conversion leakage (around 4% estimated drop-offs based on standard mobile speed scores). Fixed it in a local sandbox copy to show your dev team. Happy to send over the screen recording and direct fix code if you want?',
-    replyProbability: '98%',
-    spamScore: 'Safe (0.00)',
-    tone: 'Highly Valuable',
+    id: 'shopify',
+    name: 'Andy S.',
+    company: 'Nexus AI',
+    source: 'Reddit',
+    signal:
+      '"Struggling with slow load times and high bounce rates on our Shopify store — losing sales."',
+    urgency: 'High',
+    tags: ['Shopify', 'Web Dev'],
+    email: 'a.shepard@nexus.ai',
+    phone: '+1 (555) 017-8892',
+    replyProbability: '92%',
   },
   {
-    id: 'case_study',
-    name: 'Case Study Offer',
-    pitch:
-      "Hey Alex, saw you're pushing hard on organic DTC growth this quarter. Our team just published a tactical breakdown of how we scaled an e-commerce brand to $80k/mo using high-intent buyer signals without spending a single dollar on Google/FB ads. Can I send you the direct case study link?",
-    replyProbability: '93%',
-    spamScore: 'Safe (0.02)',
-    tone: 'Professional & Contextual',
+    id: 'rebrand',
+    name: 'Michael C.',
+    company: 'Stellar Co',
+    source: 'LinkedIn',
+    signal:
+      '"Just raised a seed round and need a full rebrand before our product launch in 6 weeks."',
+    urgency: 'High',
+    tags: ['SaaS', 'Branding'],
+    email: 'm.carter@stellar.co',
+    phone: '+1 (555) 019-2045',
+    replyProbability: '88%',
   },
 ]
 
-const ACCENT_COLORS: Record<
-  string,
-  {
-    text: string
-    bg: string
-    border: string
-    glow: string
-    dot: string
-  }
-> = {
-  curiosity: {
-    text: 'text-tab-purple',
-    bg: 'bg-white/5',
-    border: 'border-white/[0.08]',
-    glow: 'bg-accent-purple/[0.005]',
-    dot: 'bg-tab-purple',
-  },
-  audit: {
-    text: 'text-tab-purple',
-    bg: 'bg-white/5',
-    border: 'border-white/[0.08]',
-    glow: 'bg-accent-purple/[0.005]',
-    dot: 'bg-tab-purple',
-  },
-  case_study: {
-    text: 'text-tab-purple',
-    bg: 'bg-white/5',
-    border: 'border-white/[0.08]',
-    glow: 'bg-accent-purple/[0.005]',
-    dot: 'bg-tab-purple',
-  },
-}
-
-function OutreachPreviewUI() {
-  const [selected, setSelected] = useState(OUTREACH_ANGLES[0])
-  const [displayedText, setDisplayedText] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true })
-
-  const activeColor = ACCENT_COLORS[selected.id] || ACCENT_COLORS.curiosity
-
-  useEffect(() => {
-    if (!isInView) return
-
-    setIsTyping(true)
-    setDisplayedText('')
-
-    let index = 0
-    const fullText = selected.pitch
-    const interval = setInterval(() => {
-      if (index < fullText.length) {
-        setDisplayedText(fullText.substring(0, index + 2))
-        index += 2
-      } else {
-        setIsTyping(false)
-        clearInterval(interval)
-      }
-    }, 15)
-
-    return () => clearInterval(interval)
-  }, [selected, isInView])
+// ─── Signal Reveal UI — the right-hand visual for the Philosophy section ──
+function SignalPreviewUI() {
+  const [selectedId, setSelectedId] = useState(SIGNAL_LEADS[0].id)
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({})
+  const selected = SIGNAL_LEADS.find((l) => l.id === selectedId)!
 
   return (
-    <div
-      ref={sectionRef}
-      className="w-full rounded-3xl bg-code-bg border border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden text-left transition-all duration-500 hover:border-white/15 hover:shadow-[0_40px_100px_rgba(var(--rgb-black),0.7)] shadow-[0_40px_100px_rgba(var(--rgb-black),0.6)]"
-    >
-      {/* Decorative top window bar for macOS chrome */}
-      <div className="absolute top-0 left-0 right-0 h-10 border-b border-white/[0.04] bg-white/[0.01] flex items-center px-6">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-dot-red transition-colors duration-500" />
-          <div className="w-2 h-2 rounded-full bg-dot-yellow transition-colors duration-500" />
-          <div className="w-2 h-2 rounded-full bg-dot-green transition-colors duration-500" />
+    <div className="w-full overflow-hidden">
+      <div className="w-full rounded-2xl bg-surface border border-white/[0.06] shadow-[0_30px_90px_rgba(var(--rgb-black),0.5)] overflow-hidden">
+        {/* Window chrome */}
+        <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center gap-3">
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="w-2 h-2 rounded-full bg-dot-red opacity-70" />
+            <span className="w-2 h-2 rounded-full bg-dot-yellow opacity-70" />
+            <span className="w-2 h-2 rounded-full bg-dot-green opacity-70" />
+          </div>
+          <span className="text-[9.5px] font-mono text-text-secondary/40 tracking-wider">
+            live-signal-feed
+          </span>
+          <div className="ml-auto flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+            <span className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary">
+              Intent Monitor
+            </span>
+          </div>
         </div>
-        <div className="mx-auto text-11 font-medium tracking-tight text-text-secondary/50">
-          Outreach Editor
+
+        {/* Lead selector pills */}
+        <div className="flex items-center gap-1.5 px-4 pt-3">
+          {SIGNAL_LEADS.map((lead) => (
+            <button
+              key={lead.id}
+              onClick={() => setSelectedId(lead.id)}
+              className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-widest transition-all ${
+                selectedId === lead.id
+                  ? 'bg-accent-purple/15 text-accent-purple border border-accent-purple/25'
+                  : 'bg-white/[0.03] text-text-secondary/60 border border-white/[0.06] hover:text-text-primary'
+              }`}
+            >
+              {lead.company}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Subtle Dynamic Ambient Background Glow */}
-      <div
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 blur-2xl rounded-full pointer-events-none transition-all duration-1000 ${activeColor.glow}`}
-      />
-
-      {/* Editor Column */}
-      <div className="flex-1 flex flex-col justify-between relative z-10 pt-6">
-        <div>
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/[0.04] pb-4 mb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center text-xs font-bold text-text-primary">
-                LH
+        {/* Signal body */}
+        <div className="p-4 pt-3">
+          {/* Lead identity */}
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center text-[11px] font-bold text-accent-purple shrink-0">
+              {selected.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[12px] font-bold text-text-primary truncate">
+                {selected.name}
               </div>
-              <div>
-                <h4 className="font-semibold text-xs tracking-tight text-text-primary">
-                  Alex • Founder
-                </h4>
-                <p className="text-[10px] text-text-secondary/60">Source: Twitter/X signal</p>
+              <div className="text-[9.5px] text-text-secondary/70 truncate">
+                {selected.company} · {selected.source}
               </div>
             </div>
-
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg border text-[9px] font-bold uppercase tracking-wider transition-all duration-500 bg-surface-secondary border-border-subtle text-text-secondary hover:text-text-primary transition-colors">
-              Verified Signal
-            </div>
+            <span className="px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-[8.5px] font-bold uppercase tracking-widest text-orange-400 shrink-0">
+              {selected.urgency}
+            </span>
           </div>
 
-          {/* Angle Tabs */}
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {OUTREACH_ANGLES.map((angle) => {
-              const isSelected = selected.id === angle.id
-              const tabAccent = ACCENT_COLORS[angle.id] || ACCENT_COLORS.curiosity
-
-              let activeTabClass =
-                'bg-white/10 border-white/20 text-text-primary shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.05)]'
-              if (isSelected) {
-                if (angle.id === 'curiosity') {
-                  activeTabClass = 'bg-surface-secondary border-border-subtle text-tab-purple'
-                } else if (angle.id === 'audit') {
-                  activeTabClass = 'bg-surface-secondary border-border-subtle text-tab-purple'
-                } else if (angle.id === 'case_study') {
-                  activeTabClass = 'bg-surface-secondary border-border-subtle text-tab-purple'
-                }
-              }
-
-              return (
-                <button
-                  key={angle.id}
-                  onClick={() => setSelected(angle)}
-                  className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all duration-300 ${isSelected ? activeTabClass : 'bg-white/[0.02] border-white/[0.04] text-text-secondary hover:text-text-primary hover:bg-white/5'}`}
-                >
-                  {angle.name}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Email Body Area */}
-          <div className="min-h-[160px] p-5 rounded-2xl bg-black/30 border border-white/[0.04] text-xs text-text-primary leading-relaxed relative shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.5)] transition-colors duration-500">
-            {isTyping && (
-              <div className="absolute top-4 right-4 flex items-center gap-1 text-[10px] text-text-secondary/40 font-bold uppercase tracking-wider">
-                <SparklesIcon className="w-[10px] h-[10px] animate-spin" /> writing...
-              </div>
-            )}
-            <div className="text-11 text-text-secondary flex items-center gap-2">
-              <span className="text-text-secondary/50 font-medium">Subject:</span>
-              <span className="text-text-primary/90 font-medium">
-                Quick question about mobile checkout flow
-              </span>
+          {/* Buyer signal quote */}
+          <div className="rounded-xl bg-white/[0.03] border border-white/[0.05] px-3 py-2.5 mb-3">
+            <div className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary/50 mb-1 flex items-center gap-1.5">
+              <GlobeAltIcon className="w-[10px] h-[10px] text-accent-purple" /> Buyer Signal
             </div>
-            <div className="h-px bg-white/[0.04] my-2.5" />
-            <p className="whitespace-pre-line text-text-primary/95 leading-relaxed font-light font-sans">
-              {displayedText}
-              {isTyping && (
-                <span
-                  className={`inline-block w-1.5 h-3.5 ml-0.5 animate-pulse align-middle transition-colors duration-500 ${activeColor.dot}`}
-                />
-              )}
+            <p className="text-[10.5px] text-text-primary/85 leading-relaxed font-light">
+              {selected.signal}
             </p>
           </div>
-        </div>
 
-        {/* Action button */}
-        <div className="mt-6 flex items-center justify-between">
-          <span className="text-[10px] text-text-secondary/40 font-medium tracking-tight">
-            Draft Sandbox
-          </span>
+          {/* Tags */}
+          <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+            {selected.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.06] text-[8px] font-bold uppercase tracking-widest text-text-secondary"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
 
-          <button className="px-5 py-2.5 rounded-xl bg-white hover:bg-white/95 text-black font-semibold text-xs shadow-[0_4px_20px_rgba(var(--rgb-white),0.1)] transition-all duration-300">
-            Generate Pitch
-          </button>
-        </div>
-      </div>
-
-      {/* AI Scorecard Column (HUD Style divider) */}
-      <div className="w-full md:w-[180px] border-t md:border-t-0 md:border-l border-white/[0.04] pt-6 md:pt-0 md:pl-6 flex flex-col justify-between relative z-10 text-left">
-        <div>
-          <h5 className="text-11 font-semibold text-text-secondary/60 tracking-tight mb-4 flex items-center gap-1.5">
-            <GlobeAltIcon className="w-[13px] h-[13px] text-text-secondary/80" /> Analysis Metrics
-          </h5>
-
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-11 mb-1 text-text-secondary/70">
-                <span>Reply Probability</span>
-                <span className="text-text-primary font-semibold">{selected.replyProbability}</span>
+          {/* Reveal / Contact section */}
+          <div className="rounded-xl bg-surface-secondary/50 border border-white/[0.05] p-3">
+            {revealed[selected.id] ? (
+              <>
+                <div className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary/50 mb-2 flex items-center gap-1.5">
+                  <CheckCircleIcon className="w-[10px] h-[10px] text-accent-purple" /> Contact
+                  Unlocked
+                </div>
+                <div className="space-y-1.5 mb-3">
+                  <div className="flex items-center gap-2 text-[10px]">
+                    <EnvelopeIcon className="w-3 h-3 text-accent-purple shrink-0" />
+                    <span className="text-text-primary truncate">{selected.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px]">
+                    <PhoneIcon className="w-3 h-3 text-accent-purple shrink-0" />
+                    <span className="text-text-primary">{selected.phone}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-accent-purple text-text-on-accent font-bold text-[8.5px] uppercase tracking-widest flex-1 justify-center">
+                    <BookmarkIcon className="w-[9px] h-[9px]" /> Save to Pipeline
+                  </button>
+                  <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-text-secondary font-bold text-[8.5px] uppercase tracking-widest">
+                    <ArrowDownTrayIcon className="w-[9px] h-[9px]" /> Export
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[9px] font-bold text-text-primary">Contact Locked</div>
+                  <div className="text-[8.5px] text-text-secondary/60">
+                    Reveal email, phone & profile link
+                  </div>
+                </div>
+                <button
+                  onClick={() => setRevealed((prev) => ({ ...prev, [selected.id]: true }))}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-accent-purple text-text-on-accent font-bold text-[8.5px] uppercase tracking-widest hover:bg-accent-purple/90 transition-all"
+                >
+                  <EyeIcon className="w-[10px] h-[10px]" /> Reveal · 3 Credits
+                </button>
               </div>
-              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden relative">
+            )}
+          </div>
+
+          {/* Reply probability meter */}
+          <div className="mt-3 flex items-center gap-3">
+            <div className="flex-1">
+              <div className="flex justify-between text-[8px] text-text-secondary/60 mb-1">
+                <span>Reply Probability</span>
+                <span className="text-accent-purple font-bold">{selected.replyProbability}</span>
+              </div>
+              <div className="h-1 w-full bg-white/[0.06] rounded-full overflow-hidden">
                 <motion.div
+                  key={selected.id}
                   initial={{ width: 0 }}
                   animate={{ width: selected.replyProbability }}
                   transition={{ duration: 0.6, ease }}
-                  className="h-full bg-white/60 rounded-full"
-                />
-                <motion.span
-                  className={`absolute top-0 bottom-0 w-1.5 rounded-full transition-colors duration-500 ${activeColor.dot}`}
-                  animate={{ left: selected.replyProbability }}
-                  transition={{ duration: 0.6, ease }}
+                  className="h-full bg-accent-purple/70 rounded-full"
                 />
               </div>
             </div>
-
-            <div className="h-px bg-white/[0.04]" />
-
-            <div>
-              <div className="text-[10px] text-text-secondary/50 mb-0.5">Spam Score</div>
-              <div className="text-xs font-medium text-text-primary uppercase tracking-wide flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-500 bg-accent-purple" />{' '}
-                {selected.spamScore}
-              </div>
-            </div>
-
-            <div className="h-px bg-white/[0.04]" />
-
-            <div>
-              <div className="text-[10px] text-text-secondary/50 mb-0.5">Tone Analysis</div>
-              <div className="text-xs font-medium text-text-primary tracking-wide">
-                {selected.tone}
-              </div>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.03] border border-white/[0.06] shrink-0">
+              <BoltIcon className="w-[10px] h-[10px] text-accent-purple" />
+              <span className="text-[8px] font-bold text-text-secondary">High Intent</span>
             </div>
           </div>
-        </div>
-
-        <div className="mt-8 pt-4 border-t border-white/[0.03] text-[10px] text-text-secondary/50 leading-relaxed">
-          <div className="font-semibold text-text-secondary/60 mb-1">AI Insights:</div>
-          &quot;Angle utilizes specific friction context to minimize sales resistance.&quot;
         </div>
       </div>
     </div>
@@ -585,7 +534,7 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* CARD 4: Automated Follow-Ups (2/3 width) */}
+          {/* CARD 4: Released to the Hunters (2/3 width) */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -702,18 +651,17 @@ export default function LandingPage() {
               02 / Philosophy
             </span>
             <h2 className="font-display text-[42px] md:text-[48px] font-bold tracking-tight mb-6 leading-[1.1] text-text-primary">
-              Most outreach tools{' '}
+              Most lead tools{' '}
               <span className="text-text-secondary hover:text-text-primary transition-colors">
-                optimize
+                chase
               </span>{' '}
               volume.
               <br />
-              <span className="text-text-secondary font-light">We optimize replies.</span>
+              <span className="text-text-secondary font-light">We deliver intent.</span>
             </h2>
             <p className="text-text-secondary text-sm leading-relaxed mb-10 max-w-sm font-light">
-              Anyone can blast 1,000 cold emails. But when they sound robotic and desperate,
-              you&apos;re just burning your domain reputation. We prioritize quality conversation
-              over bulk noise.
+              Anyone can chase thousands of raw contacts. But without context, most get ignored.
+              We prioritize high-intent signals over bulk noise.
             </p>
 
             {/* Noise vs Signal Minimal Matrix */}
@@ -750,7 +698,7 @@ export default function LandingPage() {
                   {[
                     'High-value, direct conversations',
                     'Hyper-targeted buyer context personalization',
-                    'Ultra-low resistance outreach framing',
+                    'Ultra-low resistance messaging angles',
                     'Strong, psychologically sound messaging angles',
                     'Significantly higher actual reply probability',
                   ].map((item) => (
@@ -768,7 +716,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          {/* Right Column - Real-time Interactive UI Widget */}
+          {/* Right Column - Live Signal Reveal Widget */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -776,7 +724,7 @@ export default function LandingPage() {
             transition={{ duration: 0.9, delay: 0.15, ease }}
             className="lg:col-span-7"
           >
-            <OutreachPreviewUI />
+            <SignalPreviewUI />
           </motion.div>
         </div>
       </section>
@@ -831,8 +779,8 @@ export default function LandingPage() {
             transition={{ duration: 0.8, delay: 0.2, ease }}
             className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
           >
-            Start free, upgrade when you&apos;re ready. Credits reveal lead identities and generate custom
-            outreach paths.
+            Start free, upgrade when you&apos;re ready. Credits reveal lead identities so you can build
+            your pipeline.
           </motion.p>
         </div>
 
@@ -863,7 +811,7 @@ export default function LandingPage() {
                 '500 Intelligence Credits',
                 '~166 Lead Reveals',
                 'Full Lead Intelligence',
-                'Automated Follow-Ups',
+                'CSV/Excel Exports',
                 'Priority Signal Access',
                 'Credit Rollover',
               ],
@@ -879,7 +827,7 @@ export default function LandingPage() {
                 '1,000 Intelligence Credits',
                 '~333 Lead Reveals',
                 'Full Lead Intelligence',
-                'Automated Follow-Ups',
+                'CSV/Excel Exports',
                 'Priority Signal Access',
                 'Credit Rollover',
                 'Team Seats (up to 5)',
@@ -1008,7 +956,7 @@ export default function LandingPage() {
         <div className="border-t border-white/[0.03]">
           <FAQItem
             q="Do you book clients for me?"
-            a="NO. We provide warm fresh leads actively looking for your service, plus personalized AI-powered outreach angles for the best closing opportunity. You own the relationship."
+            a="NO. We provide warm, fresh leads actively looking for your service, with AI-scored buyer context so you know exactly how to approach them. You own the relationship."
           />
           <FAQItem
             q="Are these leads scraped from LinkedIn?"
@@ -1016,11 +964,11 @@ export default function LandingPage() {
           />
           <FAQItem
             q="How do credits work?"
-            a="Credits fuel the intelligence engine. Revealing a lead identity costs 3 credits. Generating a custom AI outreach strategy costs 1 credit. Unused credits roll over monthly."
+            a="Credits fuel the intelligence engine. Revealing a lead identity costs between 2 and 10 credits depending on the contact data available (phone, email, or profile link). Unused credits roll over monthly."
           />
           <FAQItem
-            q="Can I plug this into my cold email tool?"
-            a="We explicitly discourage bulk cold email. This platform is designed for sniper-level 1-on-1 outreach. Quality conversation is the ultimate leverage."
+            q="Can I contact these leads myself?"
+            a="Yes. You get the verified contact info and intelligence, and you reach out however you prefer — from your own email, LinkedIn, or phone. We focus on high-intent, quality conversations."
           />
         </div>
       </section>
@@ -1088,11 +1036,11 @@ export default function LandingPage() {
             </motion.div>
           </div>
 
-          {/* Supporting Text from copy.md */}
+          {/* Supporting Text from docs/PRODUCT.md */}
           <div className="mt-8 font-mono text-11 tracking-super uppercase text-text-secondary/50 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <span>Fresh buyer-intent leads</span>
             <span className="text-accent-purple/40">•</span>
-            <span>Smarter outreach</span>
+            <span>Smarter targeting</span>
             <span className="text-accent-purple/40">•</span>
             <span>Less wasted time</span>
           </div>
@@ -1211,7 +1159,7 @@ export default function LandingPage() {
                 Stay Updated
               </h5>
               <p className="text-sm text-text-secondary/60 font-light leading-relaxed mb-4">
-                Get notified about new features, outreach tactics, and platform updates.
+                Get notified about new features, lead-hunting tactics, and platform updates.
               </p>
               <NewsletterSignup />
             </div>

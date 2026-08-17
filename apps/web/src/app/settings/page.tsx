@@ -154,7 +154,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-10 py-12 relative">
+    <main className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
 
       <div className="max-w-[1000px] mx-auto relative z-10">
@@ -443,8 +443,8 @@ export default function SettingsPage() {
                 />
               </div>
               <p className="text-xxs text-text-secondary/50 mt-3">
-                Credits are consumed when revealing lead identities (3 credits) or generating AI
-                outreach (1 credit).
+                Credits are consumed when revealing lead identities — the exact cost depends on the
+                contact data available (phone, email, or profile link).
               </p>
               {user?.creditAccount?.rolloverBalance ? (
                 <p className="text-xxs text-accent-purple/80 mt-2 flex items-center gap-1">

@@ -3,6 +3,8 @@ import { requireAdmin, ForbiddenError } from '@/lib/auth'
 import { ExternalApiError } from '@/lib/external-api/client'
 import {
   getIntelligenceSettings,
+  getOpenRouterApiKey,
+  updateOpenRouterApiKey,
   getContactCompassToken,
   updateContactCompassToken,
   getHunterApiKey,
@@ -17,10 +19,11 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-// Read-only services: intelligence has NO write route on the backend (OpenRouter
-// key is set via backend env), so GET only. Enrichment keys + automation are writable.
+// Enrichment keys + automation are writable. Intelligence is display-only;
+// the OpenRouter key is editable via the dedicated `openrouter` service.
 const GETTERS = {
   intelligence: getIntelligenceSettings,
+  'openrouter': getOpenRouterApiKey,
   'contact-compass': getContactCompassToken,
   hunter: getHunterApiKey,
   contactout: getContactOutToken,
@@ -29,6 +32,7 @@ const GETTERS = {
 } as const
 
 const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknown>> = {
+  'openrouter': (body) => updateOpenRouterApiKey(String(body?.api_key ?? '').trim()),
   'contact-compass': (body) => updateContactCompassToken(String(body?.token ?? '').trim()),
   hunter: (body) => updateHunterApiKey(String(body?.api_key ?? '').trim()),
   contactout: (body) => updateContactOutToken(String(body?.token ?? '').trim()),

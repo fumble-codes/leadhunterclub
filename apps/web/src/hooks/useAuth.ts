@@ -54,12 +54,13 @@ export function useAuth() {
 
         if (res.ok) {
           const json = await res.json()
-          if (isMounted && json.data) {
-            setUser(json.data)
+          const userData = json.data?.data ?? json.data
+          if (isMounted && userData) {
+            setUser(userData)
             setLastSynced(Date.now())
             setLoading(false)
 
-            if (json.data.status === 'SUSPENDED' || json.data.status === 'REJECTED') {
+            if (userData.status === 'SUSPENDED' || userData.status === 'REJECTED') {
               setSessionCookie(null)
               router.push('/pending-approval')
             }
