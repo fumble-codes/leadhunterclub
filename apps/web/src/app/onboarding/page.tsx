@@ -184,12 +184,45 @@ export default function OnboardingPage() {
   useEffect(() => {
     const saved = localStorage.getItem('onboarding_step')
     if (saved) setStep(parseInt(saved))
+    const savedData = localStorage.getItem('onboarding_data')
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData)
+        setPortfolio(data.portfolio || '')
+        setWebsite(data.website || '')
+        setLinkedin(data.linkedin || '')
+        setInstagram(data.instagram || '')
+        setDribbble(data.dribbble || '')
+        setBehance(data.behance || '')
+        setGithub(data.github || '')
+        setTwitter(data.twitter || '')
+        setServicesOffered(data.servicesOffered || [])
+        setPreferredLeadCategories(data.preferredLeadCategories || [])
+        setOutreachExperience(data.outreachExperience || '')
+        setDiscoverySource(data.discoverySource || '')
+      } catch {}
+    }
   }, [])
 
   useEffect(() => {
     if (step < 1 || step > 3) return
     localStorage.setItem('onboarding_step', step.toString())
-  }, [step])
+    const data = {
+      portfolio,
+      website,
+      linkedin,
+      instagram,
+      dribbble,
+      behance,
+      github,
+      twitter,
+      servicesOffered,
+      preferredLeadCategories,
+      outreachExperience,
+      discoverySource,
+    }
+    localStorage.setItem('onboarding_data', JSON.stringify(data))
+  }, [step, portfolio, website, linkedin, instagram, dribbble, behance, github, twitter, servicesOffered, preferredLeadCategories, outreachExperience, discoverySource])
 
   useEffect(() => {
     if (otpCountdown <= 0) return
@@ -392,6 +425,14 @@ export default function OnboardingPage() {
 
   const handleSubmit = async () => {
     if (!discoverySource) return
+    if (!phoneNumber.trim()) { setError('Phone number is required'); return }
+    if (!portfolio && !website && !linkedin && !instagram && !dribbble && !behance && !github && !twitter) {
+      setError('At least one profile link is required'); return
+    }
+    if (servicesOffered.length === 0) { setError('Select at least one service'); return }
+    if (preferredLeadCategories.length === 0) { setError('Select at least one lead category'); return }
+    if (!outreachExperience) { setError('Select your outreach experience'); return }
+
     setIsSubmitting(true)
     setError('')
     setSubmitRetry(false)
@@ -413,6 +454,7 @@ export default function OnboardingPage() {
         discoverySource,
       })
       localStorage.removeItem('onboarding_step')
+      localStorage.removeItem('onboarding_data')
       router.push('/pending-approval')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to submit onboarding')
