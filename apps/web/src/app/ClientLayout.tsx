@@ -13,7 +13,7 @@ import { CustomLoader, type LoaderPageType } from '@/components/ui/CustomLoader'
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, loading, error } = useAuth()
+  const { user, loading, error, firebaseUser } = useAuth()
 
   const appRoutes = ['/dashboard', '/leads', '/saved', '/analytics', '/settings']
   const adminRoutes = ['/admin']
@@ -29,7 +29,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const isAppRoute = appRoutes.some((r) => pathname.startsWith(r))
   const isProtectedRoute = appRoutes.some((r) => pathname.startsWith(r))
 
-  const isEmailVerified = !!user?.emailVerified
+  const isEmailVerified = firebaseUser?.emailVerified ?? !!user?.emailVerified
 
   useEffect(() => {
     if (loading || error || !user) return
