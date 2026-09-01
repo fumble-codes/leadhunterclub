@@ -1,18 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireActiveUser, ForbiddenError, AuthRequiredError } from '@/lib/auth'
-import { fetchApi } from '@/lib/external-api/client'
 
 export const dynamic = 'force-dynamic'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL!
 
 export async function POST(request: NextRequest) {
   try {
     await requireActiveUser(request)
+
+    const authHeader = request.headers.get('Authorization') || ''
     const body = await request.json()
-    const data = await fetchApi('/payments/razorpay/verify', {
+
+    const res = await fetch(`${API_URL}/payments/razorpay/verify`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: authHeader,
+      },
       body: JSON.stringify(body),
     })
-    return NextResponse.json(data)
+
+    const data = await res.json()
+    return NextResponse.json(data, { status: res.status })
   } catch (error: unknown) {
     if (error instanceof AuthRequiredError || error instanceof ForbiddenError) {
       return NextResponse.json({ code: 'UNAUTHORIZED', message: 'Authentication required' }, { status: 401 })
