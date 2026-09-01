@@ -59,14 +59,6 @@ export default function AdminCreditsPage() {
     }
 
     try {
-      // Grant tokens via our Oracle backend
-      const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/tokens`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
-      })
-
-      // Also update Yash's credit account so UI stays in sync
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
