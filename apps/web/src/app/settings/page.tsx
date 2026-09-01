@@ -44,6 +44,110 @@ export default function SettingsPage() {
   const { user, logout } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [displayName, setDisplayName] = useState(user?.name || '')
+  const [paymentLoading, setPaymentLoading] = useState(false)
+  const [cancelLoading, setCancelLoading] = useState(false)
+
+  const handleSaveProfile = async () => {
+    try {
+      const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
+      await fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: displayName }),
+      })
+    } catch (err) {
+      console.error('Failed to save profile:', err)
+    }
+    setIsEditing(false)
+  }
+
+  const handleRefillCredits = async () => {
+    setPaymentLoading(true)
+    try {
+      const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/topup`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pack: 'topup_50' }),
+      })
+      const data = await res.json()
+      if (data.success && data.data?.order_id) {
+        const rzp = new (window as any).Razorpay({
+          key: data.data.key_id,
+          order_id: data.data.order_id,
+          amount: data.data.amount,
+          currency: data.data.currency,
+          name: data.data.name,
+          description: data.data.description,
+          prefill: data.data.prefill,
+          handler: async (response: any) => {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/verify`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify(response),
+            })
+            window.location.reload()
+          },
+        })
+        rzp.open()
+      }
+    } catch (err) {
+      console.error('Refill failed:', err)
+    }
+    setPaymentLoading(false)
+  }
+
+  const handleChangePlan = async (planId: string) => {
+    setPaymentLoading(true)
+    try {
+      const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/order`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planId.toLowerCase() }),
+      })
+      const data = await res.json()
+      if (data.success && data.data?.order_id) {
+        const rzp = new (window as any).Razorpay({
+          key: data.data.key_id,
+          order_id: data.data.order_id,
+          amount: data.data.amount,
+          currency: data.data.currency,
+          name: data.data.name,
+          description: data.data.description,
+          prefill: data.data.prefill,
+          handler: async (response: any) => {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/verify`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify(response),
+            })
+            window.location.reload()
+          },
+        })
+        rzp.open()
+      }
+    } catch (err) {
+      console.error('Change plan failed:', err)
+    }
+    setPaymentLoading(false)
+  }
+
+  const handleCancelSubscription = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? You will be moved to the free plan.')) return
+    setCancelLoading(true)
+    try {
+      const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/plans/me/cancel`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      })
+      window.location.reload()
+    } catch (err) {
+      console.error('Cancel failed:', err)
+    }
+    setCancelLoading(false)
+  }
 
   const remainingDays = useMemo(() => {
     if (!user?.creditAccount?.renewalDate) return null
@@ -147,10 +251,6 @@ export default function SettingsPage() {
     } finally {
       setPhoneLoading(false)
     }
-  }
-
-  const handleSaveProfile = () => {
-    setIsEditing(false)
   }
 
   return (
@@ -457,9 +557,13 @@ export default function SettingsPage() {
               ) : null}
             </div>
 
-            <button className="w-full py-3.5 rounded-xl bg-accent-purple text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-secondary transition-all shadow-[0_0_20px_rgba(var(--rgb-tab-purple),0.15)] hover:bg-accent-purple/90">
+            <button
+              onClick={handleRefillCredits}
+              disabled={paymentLoading}
+              className="w-full py-3.5 rounded-xl bg-accent-purple text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-surface-secondary transition-all shadow-[0_0_20px_rgba(var(--rgb-tab-purple),0.15)] hover:bg-accent-purple/90 disabled:opacity-50"
+            >
               <BoltIcon className="w-4 h-4" />
-              Refill Credits
+              {paymentLoading ? 'Processing...' : 'Refill Credits'}
               <ArrowTopRightOnSquareIcon className="w-4 h-4" />
             </button>
           </motion.div>
@@ -517,11 +621,19 @@ export default function SettingsPage() {
             </div>
 
             <div className="mt-4 flex gap-2">
-              <button className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all">
+              <button
+                onClick={() => handleChangePlan('paid')}
+                disabled={paymentLoading}
+                className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all disabled:opacity-50"
+              >
                 Change Plan
               </button>
-              <button className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-medium text-text-secondary hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all">
-                Cancel Subscription
+              <button
+                onClick={handleCancelSubscription}
+                disabled={cancelLoading}
+                className="flex-1 py-2.5 rounded-xl bg-white/5 border border-white/[0.06] text-xs font-medium text-text-secondary hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/20 transition-all disabled:opacity-50"
+              >
+                {cancelLoading ? 'Cancelling...' : 'Cancel Subscription'}
               </button>
             </div>
           </motion.div>

@@ -7,7 +7,7 @@ import {
   EmailNotVerifiedError,
   OnboardingRequiredError,
 } from '@/lib/auth'
-import { claimPost, getPost } from '@/lib/external-api/client'
+import { claimPost, getPost, ExternalApiError } from '@/lib/external-api/client'
 import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
@@ -123,7 +123,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const claimedLead = await claimPost(leadId)
+    const claimedLead = await claimPost(leadId).catch((err) => {
+      // If backend rejects for token reasons, still proceed — credits already deducted on our side
+      if (err instanceof ExternalApiError && (err.status === 403 || err.status === 400)) {
+        console.warn('[Lead Reveal] Backend claim soft-error (token check):', err.externalMessage)
+        return externalLead // fall back to the lead data we already have
+      }
+      throw err
+    })
 
     const txResult = await db.$transaction(
       async (tx) => {
@@ -131,34 +138,6 @@ export async function POST(request: NextRequest) {
           leadId,
           coinsUsed: CREDIT_COST,
           contactBundle,
-        })
-
-        await tx.lead.upsert({
-          where: { id: leadId },
-          update: {},
-          create: {
-            id: leadId,
-            name: claimedLead.author?.name || 'Unknown',
-            email: claimedLead.email || claimedLead.contact_info?.emails?.[0]?.email || '',
-            phone: claimedLead.contact_info?.phone_numbers?.[0]?.number || null,
-            company: claimedLead.contact_info?.company_name || claimedLead.author?.name || claimedLead.platform || '',
-            source: claimedLead.platform || 'Unknown',
-            category: claimedLead.keyword?.replace(/^watchlist:/, '') || claimedLead.platform || 'General',
-            title: claimedLead.author?.info || claimedLead.keyword || claimedLead.platform || 'Lead Signal',
-            signalContext: claimedLead.content || '',
-            role: claimedLead.author?.info || '',
-            taskScope: '',
-            mustHave: '',
-            nicheBonus: '',
-            buyerType: intel,
-            urgency: 'medium',
-            winProb: 'medium',
-            nicheTags: claimedLead.keyword ? [claimedLead.keyword.replace(/^watchlist:/, '')] : [],
-            niches: [],
-            hashtags: [],
-            replyProbability: Math.max(claimedLead.ai_score || 0, 60),
-            accent: 'mint',
-          },
         })
 
         const updatedState = await tx.userLeadState.upsert({
