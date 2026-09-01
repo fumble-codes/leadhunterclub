@@ -65,7 +65,7 @@ export default function SettingsPage() {
     setPaymentLoading(true)
     try {
       const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/topup`, {
+      const res = await fetch('/api/payments/razorpay/topup', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ pack: 'topup_50' }),
@@ -81,7 +81,7 @@ export default function SettingsPage() {
           description: data.data.description,
           prefill: data.data.prefill,
           handler: async (response: any) => {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/verify`, {
+            await fetch('/api/payments/razorpay/verify', {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
               body: JSON.stringify(response),
@@ -101,7 +101,7 @@ export default function SettingsPage() {
     setPaymentLoading(true)
     try {
       const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/order`, {
+      const res = await fetch('/api/payments/razorpay/order', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: planId.toLowerCase() }),
@@ -117,7 +117,7 @@ export default function SettingsPage() {
           description: data.data.description,
           prefill: data.data.prefill,
           handler: async (response: any) => {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/razorpay/verify`, {
+            await fetch('/api/payments/razorpay/verify', {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
               body: JSON.stringify(response),
@@ -138,7 +138,7 @@ export default function SettingsPage() {
     setCancelLoading(true)
     try {
       const token = await import('@/lib/firebase').then(m => m.getFirebaseToken())
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/plans/me/cancel`, {
+      await fetch('/api/plans/cancel', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       })
