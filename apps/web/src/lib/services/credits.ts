@@ -84,11 +84,18 @@ async function deductInTx(
 ) {
   await checkAndRenewInTx(tx, userId)
 
-  const account = await tx.creditAccount.findUnique({
-    where: { userId },
-  })
-
-  if (!account) throw new Error('CreditAccount not found')
+  // Auto-create the CreditAccount if it doesn't exist yet
+  // (users approved before the credit system was built won't have one)
+  let account = await tx.creditAccount.findUnique({ where: { userId } })
+  if (!account) {
+    const user = await tx.user.findUnique({ where: { id: userId }, select: { plan: true } })
+    const limit = getPlanCredits(user?.plan ?? 'FREE')
+    const renewalDate = new Date()
+    renewalDate.setDate(renewalDate.getDate() + 30)
+    account = await tx.creditAccount.create({
+      data: { userId, subscriptionBalance: limit, bonusBalance: 0, rolloverBalance: 0, renewalDate },
+    })
+  }
 
   const totalAvailable = account.bonusBalance + account.subscriptionBalance + account.rolloverBalance
   if (totalAvailable < amount) throw new InsufficientCreditsError(amount, totalAvailable)
@@ -258,10 +265,17 @@ export const creditService = {
         data: { plan: planId },
       })
 
-      const updated = await tx.creditAccount.update({
+      const updated = await tx.creditAccount.upsert({
         where: { userId },
-        data: {
+        update: {
           subscriptionBalance: limit,
+          renewalDate,
+        },
+        create: {
+          userId,
+          subscriptionBalance: limit,
+          bonusBalance: 0,
+          rolloverBalance: 0,
           renewalDate,
         },
         select: {
