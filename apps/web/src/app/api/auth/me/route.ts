@@ -1,10 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import { getAuthUser } from '@/lib/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { getPlanCredits } from '@/lib/config/plans'
 
 export const dynamic = 'force-dynamic'
+
+const creditAccountInclude = {
+  creditAccount: {
+    select: {
+      subscriptionBalance: true,
+      bonusBalance: true,
+      rolloverBalance: true,
+      rolloverExpiresAt: true,
+      renewalDate: true,
+    },
+  },
+} as const
+
+function isPrismaMissingTable(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === 'P2021'
+  )
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,42 +51,33 @@ export async function GET(request: NextRequest) {
 
     let user = await db.user.findUnique({
       where: { id: uid },
-      include: {
-        creditAccount: {
-          select: {
-              subscriptionBalance: true,
-              bonusBalance: true,
-              rolloverBalance: true,
-              rolloverExpiresAt: true,
-              renewalDate: true,
-            },
-        },
-      },
+      include: creditAccountInclude,
     })
+
+    if (!user && email) {
+      const byEmail = await db.user.findUnique({
+        where: { email },
+        include: creditAccountInclude,
+      })
+      if (byEmail && byEmail.id !== uid) {
+        return NextResponse.json(
+          {
+            code: 'ACCOUNT_CONFLICT',
+            message: 'This email is already linked to another account. Sign in with the original method.',
+          },
+          { status: 409 },
+        )
+      }
+      if (byEmail) user = byEmail
+    }
 
     if (!user) {
       const limit = getPlanCredits('FREE')
       const renewalDate = new Date()
       renewalDate.setDate(renewalDate.getDate() + 30)
 
-      user = await db.$transaction(async (tx) => {
-        const existing = await tx.user.findUnique({
-          where: { id: uid },
-          include: {
-            creditAccount: {
-              select: {
-              subscriptionBalance: true,
-              bonusBalance: true,
-              rolloverBalance: true,
-              rolloverExpiresAt: true,
-              renewalDate: true,
-            },
-            },
-          },
-        })
-        if (existing) return existing
-
-        return tx.user.create({
+      try {
+        user = await db.user.create({
           data: {
             id: uid,
             email: email || '',
@@ -72,56 +85,70 @@ export async function GET(request: NextRequest) {
             phone: phone || null,
             role: 'user',
             status: 'PENDING',
+            // Mark onboarding as done by default — users fill profile from Settings page
+            discoverySource: 'registered',
             creditAccount: {
               create: { subscriptionBalance: limit, bonusBalance: 0, renewalDate },
             },
           },
-          include: {
-            creditAccount: {
-              select: {
-              subscriptionBalance: true,
-              bonusBalance: true,
-              rolloverBalance: true,
-              rolloverExpiresAt: true,
-              renewalDate: true,
-            },
-            },
-          },
+          include: creditAccountInclude,
         })
-      })
+      } catch (createError) {
+        if (
+          createError instanceof Prisma.PrismaClientKnownRequestError &&
+          createError.code === 'P2002' &&
+          email
+        ) {
+          user = await db.user.findUnique({
+            where: { email },
+            include: creditAccountInclude,
+          })
+          if (!user) throw createError
+          if (user.id !== uid) {
+            return NextResponse.json(
+              {
+                code: 'ACCOUNT_CONFLICT',
+                message: 'This email is already linked to another account. Sign in with the original method.',
+              },
+              { status: 409 },
+            )
+          }
+        } else {
+          throw createError
+        }
+      }
     } else if (email && email !== user.email) {
       user = await db.user.update({
-        where: { id: uid },
+        where: { id: user.id },
         data: { email },
-        include: {
+        include: creditAccountInclude,
+      })
+    }
+
+    if (!user) {
+      throw new Error('Failed to load or create user')
+    }
+
+    if (!user.creditAccount) {
+      const limit = getPlanCredits(user.plan || 'FREE')
+      const renewalDate = new Date()
+      renewalDate.setDate(renewalDate.getDate() + 30)
+      user = await db.user.update({
+        where: { id: user.id },
+        data: {
           creditAccount: {
-            select: {
-              subscriptionBalance: true,
-              bonusBalance: true,
-              rolloverBalance: true,
-              rolloverExpiresAt: true,
-              renewalDate: true,
-            },
+            create: { subscriptionBalance: limit, bonusBalance: 0, renewalDate },
           },
         },
+        include: creditAccountInclude,
       })
     }
 
     if (emailVerified === true && !user.emailVerified) {
       user = await db.user.update({
-        where: { id: uid },
+        where: { id: user.id },
         data: { emailVerified: new Date() },
-        include: {
-          creditAccount: {
-            select: {
-              subscriptionBalance: true,
-              bonusBalance: true,
-              rolloverBalance: true,
-              rolloverExpiresAt: true,
-              renewalDate: true,
-            },
-          },
-        },
+        include: creditAccountInclude,
       })
     }
 
@@ -176,8 +203,15 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('[Auth Me API] Error:', error)
+    const missingTable = isPrismaMissingTable(error)
+    const message =
+      process.env.NODE_ENV !== 'production' && error instanceof Error
+        ? error.message
+        : missingTable
+          ? 'App user tables are missing. Run prisma/create-club-tables.sql against DATABASE_URL.'
+          : 'An unexpected error occurred'
     return NextResponse.json(
-      { code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' },
+      { code: 'INTERNAL_SERVER_ERROR', message },
       { status: 500 },
     )
   }
