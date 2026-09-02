@@ -277,21 +277,21 @@ export default function WhoItsForGrid() {
   return (
     <section
       id="who"
-      className="py-36 px-6 max-w-[1400px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-24 md:py-28 px-6 max-w-[1240px] mx-auto relative overflow-hidden border-t border-white/[0.04]"
     >
       {/* Background ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] glow-purple-faint pointer-events-none" />
 
-      {/* HEADER BLOCK: Large text left, horizontal navigation segmented buttons right */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-16 relative z-10">
+      {/* HEADER BLOCK: Text left, horizontal navigation segmented buttons right */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-12 relative z-10">
         <div className="max-w-xl">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <span className="text-[10px] uppercase font-bold tracking-ultra mb-3 block text-accent-purple">
+            <span className="text-[13px] uppercase font-semibold tracking-wider mb-3 block text-primary">
               Target Audiences
             </span>
           </motion.div>
@@ -299,8 +299,8 @@ export default function WhoItsForGrid() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.05 }}
-            className="font-display text-[38px] md:text-[48px] font-bold tracking-tight text-text-primary leading-[1.1] mb-3"
+            transition={{ duration: 0.7, delay: 0.05 }}
+            className="font-sans text-3xl md:text-[40px] font-semibold tracking-tight text-text-primary leading-[1.12] mb-3"
           >
             Built for modern service-based businesses
           </motion.h2>
@@ -308,16 +308,16 @@ export default function WhoItsForGrid() {
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-sm md:text-base text-text-secondary font-light max-w-lg leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="text-sm md:text-base text-text-secondary/80 font-normal max-w-lg leading-relaxed"
           >
             {activePersona.description}
           </motion.p>
         </div>
 
-        {/* Top-Right Interactive horizontal navigation segmented controls */}
+        {/* Top-Right Interactive compact segmented controls */}
         <div className="lg:shrink-0 flex items-center w-full lg:w-auto">
-          <div className="w-full flex flex-wrap gap-2.5 md:gap-3 items-center justify-center lg:justify-end bg-surface p-2 md:p-2.5 border border-white/[0.08] rounded-3xl md:rounded-4xl shadow-[0_20px_50px_rgba(var(--rgb-black),0.5)]">
+          <div className="w-full flex flex-wrap gap-1.5 items-center justify-center lg:justify-end bg-surface/90 p-1.5 border border-white/[0.08] rounded-2xl shadow-xl">
             {PERSONAS.map((p) => {
               const isActive = p.id === activeTab
               const Icon = p.icon
@@ -327,22 +327,14 @@ export default function WhoItsForGrid() {
                   onClick={() => {
                     setActiveTab(p.id)
                   }}
-                  className={`flex flex-col items-center justify-center gap-2 px-3 py-6 md:px-5 md:py-8 rounded-[20px] md:rounded-4xl transition-all duration-300 relative focus:outline-none cursor-pointer flex-1 sm:flex-initial min-w-[95px] md:min-w-[120px] max-w-[130px] ${
+                  className={`flex items-center gap-2 px-3 py-2 md:px-3.5 md:py-2.5 rounded-xl transition-all duration-200 relative focus:outline-none cursor-pointer ${
                     isActive
-                      ? 'text-text-secondary hover:text-text-primary transition-colors'
-                      : 'text-text-secondary hover:text-text-primary'
+                      ? 'text-primary font-semibold bg-white/[0.08] border border-white/10 shadow-sm'
+                      : 'text-text-secondary/70 hover:text-text-primary hover:bg-white/[0.03]'
                   }`}
                 >
-                  {/* Active tab glow bg overlay using framer-motion */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="active-tab-glow"
-                      className="absolute inset-0 bg-white/[0.03] border border-white/[0.08] shadow-[0_6px_24px_rgba(var(--rgb-black),0.4)] rounded-[20px] md:rounded-4xl pointer-events-none"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  <Icon className="w-5 h-5 transition-colors" />
-                  <span className="text-[10px] md:text-xs font-bold tracking-wide text-center leading-tight mt-1 max-w-[90px] break-words">
+                  <Icon className="w-4 h-4 transition-colors shrink-0" />
+                  <span className="text-xs tracking-tight whitespace-nowrap">
                     {p.title}
                   </span>
                 </button>
@@ -352,12 +344,12 @@ export default function WhoItsForGrid() {
         </div>
       </div>
 
-      {/* SPACIOUS OVERLAPPED FULL WIDTH SIMULATOR CONTAINER */}
+      {/* OVERLAPPED SIMULATOR CONTAINER */}
       <div className="w-full relative z-10">
         <div
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-4xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[780px] md:h-[860px] justify-between"
+          className="w-full rounded-2xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-300 hover:border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] h-[640px] md:h-[680px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">

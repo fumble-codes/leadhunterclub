@@ -166,7 +166,7 @@ export default function Navbar() {
                 {/* Desktop Dashboard Link */}
                 <a
                   href="/dashboard"
-                  className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-primary hover:accent-glow-primary transition-all duration-500 hover:scale-[1.03] active:scale-95 group shrink-0"
+                  className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-black text-[13px] font-semibold hover:brightness-110 transition-all duration-300 active:scale-98 group shrink-0 shadow-[0_2px_12px_rgba(var(--rgb-primary),0.25)]"
                 >
                   <span>Go to Dashboard</span>
                   <ArrowRightIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -175,7 +175,7 @@ export default function Navbar() {
                 {/* Compact Mobile Dashboard Link */}
                 <a
                   href="/dashboard"
-                  className="md:hidden flex items-center justify-center px-4 py-2 rounded-full bg-text-primary text-bg-main text-[12px] font-bold transition-all duration-300 active:scale-95 shadow-[0_4px_12px_rgba(var(--rgb-white),0.1)] shrink-0"
+                  className="md:hidden flex items-center justify-center px-3.5 py-1.5 rounded-full bg-primary text-black text-[12px] font-semibold transition-all duration-300 active:scale-98 shrink-0"
                 >
                   Dashboard
                 </a>
@@ -183,7 +183,7 @@ export default function Navbar() {
             ) : (
               <>
                 {/* Desktop Guest Actions */}
-                <div className="hidden md:flex items-center gap-3 shrink-0 flex-nowrap">
+                <div className="hidden md:flex items-center gap-2.5 shrink-0 flex-nowrap">
                   <AnimatePresence>
                     {showLogin && (
                       <motion.a
@@ -192,7 +192,7 @@ export default function Navbar() {
                         exit={{ opacity: 0, width: 0, scale: 0.95 }}
                         transition={{ duration: 0.25, ease }}
                         href="/login"
-                        className="text-[13px] font-medium text-text-secondary/70 hover:text-text-primary transition-colors duration-300 tracking-wide px-4 py-2 overflow-hidden whitespace-nowrap"
+                        className="text-[13px] font-medium text-text-secondary/70 hover:text-text-primary transition-colors duration-300 tracking-wide px-3 py-1.5 overflow-hidden whitespace-nowrap"
                       >
                         Log in
                       </motion.a>
@@ -207,7 +207,7 @@ export default function Navbar() {
                         exit={{ opacity: 0, width: 0, scale: 0.95 }}
                         transition={{ duration: 0.25, ease }}
                         href="/sneak-peek"
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-accent-orange/20 hover:bg-accent-orange/[0.03] text-text-secondary hover:text-text-primary text-[13px] font-medium transition-all duration-300 overflow-hidden whitespace-nowrap"
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:border-white/15 hover:bg-white/[0.06] text-text-secondary hover:text-text-primary text-[13px] font-medium transition-all duration-300 overflow-hidden whitespace-nowrap"
                       >
                         <span>Sneak Peek</span>
                       </motion.a>
@@ -216,7 +216,7 @@ export default function Navbar() {
 
                   <a
                     href="/register"
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-text-primary text-bg-main text-[13px] font-bold overflow-hidden accent-glow-primary hover:accent-glow-primary transition-all duration-500 hover:scale-[1.03] active:scale-95 group"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-black text-[13px] font-semibold hover:brightness-110 transition-all duration-300 active:scale-98 group shadow-[0_2px_12px_rgba(var(--rgb-primary),0.25)]"
                   >
                     <span>Start Hunting</span>
                     <ArrowRightIcon className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -226,7 +226,7 @@ export default function Navbar() {
                 {/* Compact Mobile "Start Hunting" Link */}
                 <a
                   href="/register"
-                  className="md:hidden flex items-center justify-center px-4 py-2 rounded-full bg-text-primary text-bg-main text-[12px] font-bold transition-all duration-300 active:scale-95 shadow-[0_4px_12px_rgba(var(--rgb-white),0.1)]"
+                  className="md:hidden flex items-center justify-center px-3.5 py-1.5 rounded-full bg-primary text-black text-[12px] font-semibold transition-all duration-300 active:scale-98 shadow-[0_2px_10px_rgba(var(--rgb-primary),0.2)]"
                 >
                   Start Hunting
                 </a>

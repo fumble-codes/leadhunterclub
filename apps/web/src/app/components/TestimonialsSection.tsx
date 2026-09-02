@@ -133,7 +133,7 @@ export default function TestimonialsSection() {
   return (
     <section
       id="testimonials"
-      className="py-36 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-24 md:py-28 px-6 max-w-[1240px] mx-auto relative overflow-hidden border-t border-white/[0.04]"
     >
       {/* Self-contained float-heart & drift animations */}
       <style jsx global>{`
@@ -175,7 +175,7 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-orange">
+          <span className="text-[13px] font-semibold tracking-wider uppercase mb-3 block text-primary">
             Reviews (what people say)
           </span>
         </motion.div>
@@ -185,11 +185,11 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.08, ease }}
-          className="font-display text-[38px] md:text-[52px] font-semibold tracking-tight text-text-primary leading-[1.1] mb-5 max-w-3xl mx-auto"
+          className="font-sans text-3xl md:text-[42px] font-semibold tracking-tight text-text-primary leading-[1.12] mb-4 max-w-3xl mx-auto"
         >
           Real results from real people.
           <br />
-          <span className="text-text-secondary/60">No fluff, just outcomes.</span>
+          <span className="text-text-secondary/70 font-normal">No fluff, just outcomes.</span>
         </motion.h2>
 
         <motion.p
@@ -197,7 +197,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.15, ease }}
-          className="text-base text-text-secondary/60 max-w-lg mx-auto leading-relaxed"
+          className="text-base text-text-secondary/80 font-normal max-w-lg mx-auto leading-relaxed"
         >
           Freelancers, designers, and agency owners share exactly what changed after switching to
           LeadHunterClub.

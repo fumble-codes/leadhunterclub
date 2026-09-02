@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
@@ -207,25 +207,25 @@ function LeadsContent() {
 
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Header & Command Bar */}
-        <div className="flex flex-col items-center justify-center mb-16 mt-4">
+        <div className="flex flex-col items-center justify-center mb-8 mt-2">
           {/* Raycast-style Command Palette */}
-          <div className="relative group w-full max-w-2xl mb-12">
+          <div className="relative group w-full max-w-xl mb-6">
             <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-purple/10 to-accent-purple/20 rounded-2xl blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative flex items-center bg-surface border border-white/[0.08] rounded-2xl p-2 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
-              <div className="pl-4 pr-3 text-text-secondary">
-                <MagnifyingGlassIcon className="w-5 h-5 text-text-secondary" />
+            <div className="relative flex items-center bg-surface border border-white/[0.08] rounded-xl p-1.5 shadow-2xl focus-within:ring-1 focus-within:ring-white/20 transition-all">
+              <div className="pl-3 pr-2 text-text-secondary">
+                <MagnifyingGlassIcon className="w-4 h-4 text-text-secondary" />
               </div>
               <input
                 type="text"
                 placeholder="Ask AI or search signals... (Press ⌘K)"
-                className="w-full bg-transparent border-none text-text-primary text-[15px] placeholder:text-text-secondary/50 focus:outline-none focus:ring-0 py-3"
+                className="w-full bg-transparent border-none text-text-primary text-[13px] placeholder:text-text-secondary/50 focus:outline-none focus:ring-0 py-2"
               />
-              <div className="flex items-center gap-2 pr-3">
-                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                  <SparklesIcon className="w-[14px] h-[14px] text-text-secondary" />
-                  <span className="text-[11px] font-semibold text-text-secondary">AI Filter</span>
+              <div className="flex items-center gap-1.5 pr-2">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/5 border border-white/10">
+                  <SparklesIcon className="w-[12px] h-[12px] text-text-secondary" />
+                  <span className="text-[10px] font-semibold text-text-secondary">AI Filter</span>
                 </div>
-                <div className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-text-secondary tracking-widest">
+                <div className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-text-secondary tracking-widest">
                   ⌘K
                 </div>
               </div>
@@ -234,13 +234,13 @@ function LeadsContent() {
 
           <div className="w-full flex items-end justify-between">
             <div>
-              <h1 className="text-[32px] font-bold text-text-primary tracking-tight mb-2 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-text-primary tracking-tight mb-1 flex items-center gap-2.5">
                 Lead Feed
-                <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-purple bg-gradient-to-r from-accent-purple/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[11px] font-bold tracking-super uppercase">
-                  <span className="w-1.5 h-1.5 bg-accent-purple animate-pulse" />4 Signals
+                <div className="flex items-center gap-1.5 px-2 py-0.5 border-l-2 border-primary bg-gradient-to-r from-primary/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[10px] font-bold tracking-wider uppercase">
+                  <span className="w-1.5 h-1.5 bg-primary animate-pulse" />4 Signals
                 </div>
-              </h1>
-              <p className="text-text-secondary/80 text-sm">
+              </h2>
+              <p className="text-text-secondary/80 text-xs">
                 Real-time conversational opportunities intercepted across your network.
               </p>
             </div>
@@ -842,19 +842,30 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Centered Clario-style hero layout */}
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col justify-center items-center text-center pt-20 pb-4 transform-gpu">
+      {/* Centered hero layout with refined Plus Jakarta Sans scale */}
+      <div className="relative z-10 w-full max-w-[1240px] mx-auto flex flex-col justify-center items-center text-center pt-16 pb-4 transform-gpu">
         <div className="flex flex-col items-center relative w-full">
+          {/* Refined Eyebrow Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span className="text-[13px] font-semibold text-primary">Live Buyer-Intent Intercept</span>
+          </motion.div>
+
           {/* Centered Main Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.07, ease }}
-            className="font-sans text-[38px] md:text-[54px] lg:text-[68px] font-semibold leading-[1.05] tracking-tighter mb-6 text-text-primary max-w-4xl mx-auto antialiased"
+            className="font-sans text-4xl sm:text-5xl lg:text-[58px] font-semibold leading-[1.08] tracking-[-0.03em] mb-5 text-text-primary max-w-4xl mx-auto antialiased"
           >
-            Stop looking for clients
+            Stop looking for clients.
             <br />
-            <span className="text-accent-orange">Start intercepting them.</span>
+            <span className="text-primary italic font-normal">Start intercepting them.</span>
           </motion.h1>
 
           {/* Centered Description */}
@@ -862,33 +873,33 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease }}
-            className="text-[15px] md:text-[17px] text-text-secondary font-light leading-relaxed mb-10 max-w-2xl mx-auto antialiased"
+            className="text-base sm:text-[17px] text-text-secondary/80 font-normal leading-relaxed mb-8 max-w-xl mx-auto antialiased"
           >
             Lead Hunter Club monitors active service demand in real-time, compiles deep social
             intelligence, and unlocks verified contact details — so you can close deals while the
             demand is hot.
           </motion.p>
 
-          {/* Centered CTA Row */}
+          {/* Centered Ergonomic CTA Row */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="flex flex-row items-center justify-center gap-4 w-full relative z-10"
+            className="flex flex-row items-center justify-center gap-3 w-full relative z-10"
           >
             <Link href="/register">
               <motion.span
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary-container text-on-primary-container font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(var(--rgb-primary-container),0.3)] transition-all hover:bg-primary-container/90"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-black font-semibold text-sm cursor-pointer shadow-[0_2px_18px_rgba(var(--rgb-primary),0.3)] transition-all hover:brightness-110"
               >
                 Start Hunting <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </motion.span>
             </Link>
             <Link href="/sneak-peek">
               <motion.span
-                whileHover={{ scale: 1.02 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] hover:border-accent-purple/20"
+                whileHover={{ scale: 1.01 }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.03] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary text-sm transition-all cursor-pointer border border-white/[0.08] hover:border-white/15 hover:bg-white/[0.06]"
               >
                 Sneak Peek
               </motion.span>
@@ -950,7 +961,7 @@ export default function HeroSection() {
             </div>
 
             {/* App body */}
-            <div className="flex h-[760px] bg-bg-main overflow-hidden">
+            <div className="flex h-[640px] bg-bg-main overflow-hidden">
               {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
               <div className="w-[240px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
                 <div className="px-5 mb-6 flex items-center gap-3">

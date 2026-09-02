@@ -1,20 +1,14 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk as SpaceGrotesk, Inter } from 'next/font/google'
-import { GeistSans } from 'geist/font/sans'
+import { Plus_Jakarta_Sans } from 'next/font/google'
 import { GeistMono } from 'geist/font/mono'
 import ClientLayout from './ClientLayout'
 import './globals.css'
 
-const spaceGrotesk = SpaceGrotesk({
-  subsets: ['latin'],
-  variable: '--font-display',
-  weight: ['300', '400', '500', '600', '700'],
-})
-
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
-  weight: ['400', '500', '600'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
 })
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://leadhunterclub.com'
@@ -76,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body
-        className={`${GeistSans.variable} ${GeistMono.variable} ${spaceGrotesk.variable} ${inter.variable} font-sans antialiased bg-page-bg text-white`}
+        className={`${plusJakartaSans.variable} ${GeistMono.variable} font-sans antialiased bg-page-bg text-white`}
       >
         <ClientLayout>{children}</ClientLayout>
       </body>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
@@ -268,41 +268,39 @@ export default function LandingPage() {
       <HeroSection />
 
       {/* Problem & How It Works (Bento Grid) */}
-      <section id="funnel" className="py-40 px-6 max-w-[1200px] mx-auto relative">
+      <section id="funnel" className="py-24 md:py-28 px-6 max-w-[1240px] mx-auto relative">
         {/* Ambient section glows */}
         <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
         <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
-        <div className="text-center mb-24 relative z-10">
+        <div className="text-center mb-16 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, ease }}
+            transition={{ duration: 0.5, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
+            <span className="text-[13px] font-semibold tracking-wider uppercase mb-3 block text-primary">
               How It Works
             </span>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="font-display text-[48px] md:text-[64px] font-semibold tracking-tight mb-6 leading-[1.1] max-w-4xl mx-auto"
+            transition={{ duration: 0.7, delay: 0.1, ease }}
+            className="font-sans text-3xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.12] max-w-3xl mx-auto"
           >
-            From Raw Signal
-            <br />
-            <span className="text-text-secondary/70">To Closed Client.</span>
+            From Raw Signal <span className="text-text-secondary/70">To Closed Client.</span>
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2, ease }}
-            className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.2, ease }}
+            className="text-base text-text-secondary/80 font-normal max-w-xl mx-auto leading-relaxed"
           >
             Here&apos;s exactly how Lead Hunter Club turns unindexed buyer signals into high-value
             client conversations — before your competitors even know they exist.
@@ -310,15 +308,15 @@ export default function LandingPage() {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative z-10">
           {/* CARD 1: Fresh Buyer Intent (2/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.9, ease }}
-            whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            transition={{ duration: 0.8, ease }}
+            whileHover={{ y: -3 }}
+            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-300 min-h-[340px] flex flex-col justify-between"
           >
             {/* Visual Radar Container */}
             <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 overflow-hidden pointer-events-none flex items-center justify-center">
@@ -384,13 +382,13 @@ export default function LandingPage() {
             </div>
 
             <div className="relative z-10 pointer-events-none">
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
+              <span className="text-xs font-mono text-primary uppercase tracking-wider mb-2 block">
                 Step 01
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-sans text-xl md:text-[22px] font-semibold mb-2.5 tracking-tight">
                 We Intercept Fresh Signals
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed max-w-sm">
+              <p className="text-text-secondary/80 text-sm leading-relaxed max-w-sm">
                 Our engine continuously scans obscure forums, niche communities, social feeds, and
                 intent networks to capture the exact moment someone asks for help with a service you
                 offer. These are real people, posting right now.
@@ -400,17 +398,17 @@ export default function LandingPage() {
 
           {/* CARD 2: Qualified Leads (1/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.9, delay: 0.15, ease }}
-            whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between shadow-[0_0_15px_rgba(var(--rgb-white),0.15)]"
+            transition={{ duration: 0.8, delay: 0.1, ease }}
+            whileHover={{ y: -3 }}
+            className="group relative p-6 md:p-8 metallic-card transition-all duration-300 min-h-[340px] flex flex-col justify-between"
           >
             {/* AI Filter Funnel Visual */}
-            <div className="relative h-[140px] mb-4">
+            <div className="relative h-[130px] mb-3">
               {/* Incoming signals (top - raw/unfiltered) */}
-              <div className="space-y-2 mb-3">
+              <div className="space-y-1.5 mb-2">
                 {[
                   { label: 'Reddit: Need logo designer', status: 'pass' },
                   { label: 'Spam bot: Buy followers now', status: 'reject' },
@@ -419,18 +417,18 @@ export default function LandingPage() {
                 ].map((item, i) => (
                   <div
                     key={item.label}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-[10px] transition-all duration-500 ${
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[10px] transition-all duration-500 ${
                       item.status === 'pass'
-                        ? 'bg-surface-secondary border border-border-subtle group-hover:border-border-subtle group-hover:bg-surface-secondary'
-                        : 'bg-white/[0.01] border border-white/[0.04] group-hover:opacity-30 group-hover:line-through'
+                        ? 'bg-surface border border-white/[0.08]'
+                        : 'bg-white/[0.01] border border-white/[0.03] opacity-40 line-through'
                     }`}
                     style={{ transitionDelay: `${i * 60}ms` }}
                   >
                     <div
-                      className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[8px] font-black transition-all duration-500 ${
+                      className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 text-[8px] font-bold ${
                         item.status === 'pass'
-                          ? 'bg-surface-secondary text-text-secondary hover:text-text-primary transition-colors group-hover:bg-surface-secondary'
-                          : 'bg-white/5 text-text-secondary/30 group-hover:bg-red-500/20 group-hover:text-red-400'
+                          ? 'bg-emerald-500/20 text-emerald-400'
+                          : 'bg-red-500/20 text-red-400'
                       }`}
                     >
                       {item.status === 'pass' ? '✓' : '✕'}
@@ -450,13 +448,13 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <span className="text-xs font-mono text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest mb-3 block">
+              <span className="text-xs font-mono text-primary uppercase tracking-wider mb-2 block">
                 Step 02
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-sans text-xl md:text-[22px] font-semibold mb-2.5 tracking-tight">
                 AI Filters Out the Noise
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary/80 text-sm leading-relaxed">
                 Not every signal is worth your time. Our AI automatically filters dead leads, spam,
                 low-intent posts, and irrelevant requests — so only genuine, high-probability
                 opportunities make it through.
@@ -466,25 +464,22 @@ export default function LandingPage() {
 
           {/* CARD 3: Lead Intelligence Builder (1/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.9, ease }}
-            whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            transition={{ duration: 0.8, ease }}
+            whileHover={{ y: -3 }}
+            className="group relative p-6 md:p-8 metallic-card transition-all duration-300 min-h-[340px] flex flex-col justify-between"
           >
             {/* Intelligence Dossier Builder */}
-            <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-canvas-deeper/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.8)] overflow-hidden group-hover:border-border-subtle transition-colors duration-500 group-hover:border-accent-purple/15">
-              {/* Ambient node glow (toned down by 90% in opacity and size) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-purple/[0.02] blur-lg rounded-full group-hover:bg-accent-purple/[0.06] transition-colors duration-500 group-hover:border-accent-purple/15" />
-
-              <div className="relative z-10 h-full flex flex-col group-hover:border-accent-purple/15">
-                <div className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors font-bold text-[10px] uppercase tracking-widest mb-3 group-hover:border-accent-purple/15">
+            <div className="relative h-[130px] mb-3 p-3 rounded-xl bg-canvas-deeper/60 border border-white/[0.04] shadow-[inset_0_1px_4px_rgba(0,0,0,0.5)] overflow-hidden">
+              <div className="relative z-10 h-full flex flex-col">
+                <div className="flex items-center gap-1.5 text-primary font-semibold text-[10px] uppercase tracking-wider mb-2">
                   <GlobeAltIcon className="w-3 h-3" /> Compiling Intel...
                 </div>
 
                 {/* Data fields building up */}
-                <div className="space-y-2 flex-1 group-hover:border-accent-purple/15">
+                <div className="space-y-1.5 flex-1">
                   {[
                     { field: 'Pain Point', value: 'High CAC on Shopify store', delay: 0 },
                     { field: 'Budget', value: '$5k-$10k range', delay: 80 },
@@ -493,10 +488,10 @@ export default function LandingPage() {
                   ].map((item) => (
                     <div
                       key={item.field}
-                      className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-all duration-500"
+                      className="flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-all duration-300"
                       style={{ transitionDelay: `${item.delay}ms` }}
                     >
-                      <span className="text-[9px] text-text-secondary/50 font-bold uppercase tracking-widest w-[70px] shrink-0">
+                      <span className="text-[9px] text-text-secondary/50 font-bold uppercase tracking-wider w-[65px] shrink-0">
                         {item.field}
                       </span>
                       <span className="text-[10px] text-text-primary font-medium truncate">
@@ -508,11 +503,11 @@ export default function LandingPage() {
 
                 {/* Score reveal */}
                 <div
-                  className="flex items-center gap-2 mt-auto pt-2 border-t border-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  className="flex items-center gap-2 mt-auto pt-1.5 border-t border-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{ transitionDelay: '350ms' }}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
-                  <span className="text-[9px] text-accent-purple font-bold uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[9px] text-primary font-bold uppercase tracking-wider">
                     Intent Score: 94%
                   </span>
                 </div>
@@ -520,13 +515,13 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
+              <span className="text-xs font-mono text-primary uppercase tracking-wider mb-2 block">
                 Step 03
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-sans text-xl md:text-[22px] font-semibold mb-2.5 tracking-tight">
                 We Build Lead Intelligence
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary/80 text-sm leading-relaxed">
                 Every surviving lead gets deep-analyzed. We compile buyer context, company details,
                 urgency level, budget indicators, and the exact pain point they expressed — giving
                 you a complete intelligence brief before you even reach out.
@@ -536,46 +531,43 @@ export default function LandingPage() {
 
           {/* CARD 4: Released to the Hunters (2/3 width) */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.9, delay: 0.15, ease }}
-            whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            transition={{ duration: 0.8, delay: 0.1, ease }}
+            whileHover={{ y: -3 }}
+            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-300 min-h-[340px] flex flex-col justify-between"
           >
             {/* Dashboard Lead Drop Visual */}
-            <div className="absolute right-10 top-10 bottom-10 w-[240px] hidden md:flex flex-col justify-center space-y-3">
+            <div className="absolute right-8 top-8 bottom-8 w-[230px] hidden md:flex flex-col justify-center space-y-2">
               {/* Incoming leads dropping into feed */}
               {[
                 {
                   name: 'Sarah K.',
                   signal: 'Needs Shopify dev',
                   score: '96%',
-                  accent: 'purple',
                   delay: 0,
                 },
                 {
                   name: 'James T.',
                   signal: 'Conversion audit',
                   score: '91%',
-                  accent: 'purple',
                   delay: 120,
                 },
                 {
                   name: 'Priya M.',
                   signal: 'Brand redesign',
                   score: '88%',
-                  accent: 'purple',
                   delay: 240,
                 },
               ].map((lead) => (
                 <div
                   key={lead.name}
-                  className="p-3.5 rounded-xl bg-code-bg-dark/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(var(--rgb-black),0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-border-subtle group-hover:bg-surface-secondary group-hover:shadow-[0_4px_16px_rgba(var(--rgb-black),0.6)] group-hover:translate-x-2"
+                  className="p-2.5 rounded-xl bg-surface border border-white/[0.06] shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center gap-2.5 transform transition-all duration-300 group-hover:translate-x-1.5"
                   style={{ transitionDelay: `${lead.delay}ms` }}
                 >
-<div className="w-8 h-8 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
-                    <span className="text-[9px] font-bold text-accent-purple">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                    <span className="text-[9px] font-bold text-primary">
                       {lead.name
                         .split(' ')
                         .map((n) => n[0])
@@ -583,44 +575,35 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-11 font-bold text-text-primary truncate">{lead.name}</div>
-                    <div className="text-[9px] text-text-secondary/50 truncate">{lead.signal}</div>
+                    <div className="text-[11px] font-semibold text-text-primary truncate">{lead.name}</div>
+                    <div className="text-[9px] text-text-secondary/60 truncate">{lead.signal}</div>
                   </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span
-                      className="text-[9px] font-bold text-accent-purple opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ transitionDelay: `${lead.delay + 200}ms` }}
-                    >
+                  <div className="flex flex-col items-end gap-0.5 shrink-0">
+                    <span className="text-[9px] font-semibold text-primary">
                       {lead.score}
                     </span>
-                    <span
-                      className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ transitionDelay: `${lead.delay + 300}ms` }}
-                    />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   </div>
                 </div>
               ))}
 
               {/* Ready badge */}
-              <div
-                className="flex items-center justify-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ transitionDelay: '400ms' }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
-                <span className="text-[9px] text-accent-purple font-bold uppercase tracking-widest">
+              <div className="flex items-center justify-center gap-1.5 pt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-[9px] text-primary font-bold uppercase tracking-wider">
                   Ready to Hunt
                 </span>
               </div>
             </div>
 
             <div className="relative z-10 pointer-events-none md:w-[60%]">
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
+              <span className="text-xs font-mono text-primary uppercase tracking-wider mb-2 block">
                 Step 04
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-sans text-xl md:text-[22px] font-semibold mb-2.5 tracking-tight">
                 Released to the Hunters
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary/80 text-sm leading-relaxed">
                 Qualified, intelligence-loaded leads land directly in your dashboard — ready to act
                 on. Craft the perfect first touch or engage with your own strategy. Either way,
                 you&apos;re reaching warm buyers while the opportunity is still fresh.
@@ -633,33 +616,29 @@ export default function LandingPage() {
       {/* Conversational Intelligence Section */}
       <section
         id="features"
-        className="py-40 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]"
+        className="py-24 md:py-28 px-6 max-w-[1240px] mx-auto relative border-t border-white/[0.04]"
       >
         {/* Fine background glow */}
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-purple/[0.015] blur-2xl rounded-full pointer-events-none" />
 
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column - Copy Breakdown */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease }}
+            transition={{ duration: 0.7, ease }}
             className="lg:col-span-5 text-left relative z-10"
           >
-            <span className="text-[10px] uppercase tracking-widest mb-4 block font-semibold text-text-secondary/40 text-accent-purple">
+            <span className="text-[13px] uppercase tracking-wider mb-3 block font-semibold text-primary">
               02 / Philosophy
             </span>
-            <h2 className="font-display text-[42px] md:text-[48px] font-bold tracking-tight mb-6 leading-[1.1] text-text-primary">
-              Most lead tools{' '}
-              <span className="text-text-secondary hover:text-text-primary transition-colors">
-                chase
-              </span>{' '}
-              volume.
+            <h2 className="font-sans text-3xl md:text-[40px] font-semibold tracking-tight mb-4 leading-[1.12] text-text-primary">
+              Most lead tools chase volume.
               <br />
-              <span className="text-text-secondary font-light">We deliver intent.</span>
+              <span className="text-text-secondary/70 font-normal">We deliver intent.</span>
             </h2>
-            <p className="text-text-secondary text-sm leading-relaxed mb-10 max-w-sm font-light">
+            <p className="text-text-secondary/80 text-sm leading-relaxed mb-8 max-w-sm">
               Anyone can chase thousands of raw contacts. But without context, most get ignored.
               We prioritize high-intent signals over bulk noise.
             </p>
@@ -743,41 +722,41 @@ export default function LandingPage() {
       {/* Pricing */}
       <section
         id="pricing"
-        className="py-40 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+        className="py-24 md:py-28 px-6 max-w-[1240px] mx-auto relative overflow-hidden border-t border-white/[0.04]"
       >
         {/* Ambient glows */}
         <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
         <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
         {/* Header */}
-        <div className="text-center mb-24 relative z-10">
+        <div className="text-center mb-16 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, ease }}
+            transition={{ duration: 0.5, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
+            <span className="text-[13px] font-semibold tracking-wider uppercase mb-3 block text-primary">
               Pricing Plans
             </span>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="font-display text-[48px] md:text-[64px] font-semibold tracking-tight mb-6 leading-[1.1]"
+            transition={{ duration: 0.7, delay: 0.1, ease }}
+            className="font-sans text-3xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.12]"
           >
             Acquisition Fuel.
           </motion.h2>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2, ease }}
-            className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.2, ease }}
+            className="text-base text-text-secondary/80 font-normal max-w-xl mx-auto leading-relaxed"
           >
             Start free, upgrade when you&apos;re ready. Credits reveal lead identities so you can build
             your pipeline.
@@ -785,7 +764,7 @@ export default function LandingPage() {
         </div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-3 gap-6 relative z-10">
+        <div className="grid md:grid-cols-3 gap-5 relative z-10">
           {[
             {
               name: 'Free',
@@ -836,52 +815,54 @@ export default function LandingPage() {
           ].map((p, i) => (
             <motion.div
               key={p.name}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: i * 0.1, ease }}
-              whileHover={{ y: -6 }}
-              className={`group relative flex flex-col transition-all duration-500 metallic-card`}
+              transition={{ duration: 0.7, delay: i * 0.1, ease }}
+              whileHover={{ y: -4 }}
+              className={`group relative flex flex-col transition-all duration-300 metallic-card rounded-2xl ${
+                p.featured ? 'border-primary/30 shadow-[0_0_24px_rgba(var(--rgb-primary),0.1)]' : ''
+              }`}
             >
               {/* Featured ambient glow underneath */}
               {p.featured && (
-                <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none rounded-2xl" />
               )}
 
               {/* Card inner */}
-              <div className="relative z-10 p-8 md:p-10 flex flex-col flex-1">
+              <div className="relative z-10 p-6 md:p-8 flex flex-col flex-1">
                 {/* Popular badge */}
                 {p.featured && (
-                  <span className="absolute top-6 right-6 text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
+                  <span className="absolute top-5 right-5 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
                     Most Popular
                   </span>
                 )}
 
                 {/* Plan name & description */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <div
-                    className={`w-8 h-8 rounded-md ${p.featured ? 'bg-accent-purple/10 border border-accent-purple/20 text-accent-purple' : 'bg-white/5 border border-white/5 text-text-secondary/60'} flex items-center justify-center mb-5`}
+                    className={`w-7 h-7 rounded-lg ${p.featured ? 'bg-primary/10 border border-primary/20 text-primary' : 'bg-white/5 border border-white/5 text-text-secondary/60'} flex items-center justify-center mb-4`}
                   >
-                    <SparklesIcon className="w-[18px] h-[18px]" />
+                    <SparklesIcon className="w-4 h-4" />
                   </div>
-                  <h4 className="font-display text-2xl font-bold tracking-tight mb-2">{p.name}</h4>
-                  <p className="text-sm text-text-secondary font-light leading-relaxed">{p.desc}</p>
+                  <h4 className="font-sans text-xl font-semibold tracking-tight mb-1">{p.name}</h4>
+                  <p className="text-xs text-text-secondary/80 leading-relaxed">{p.desc}</p>
                 </div>
 
                 {/* Price */}
-                <div className="mb-8 pb-8 border-b border-white/[0.04]">
-                  <div className="flex items-end gap-3 mb-3">
-                    <span className="font-display text-[56px] font-semibold leading-none tracking-tight text-text-primary">
+                <div className="mb-6 pb-6 border-b border-white/[0.04]">
+                  <div className="flex items-end gap-2.5 mb-2.5">
+                    <span className="font-sans text-4xl md:text-5xl font-semibold leading-none tracking-tight text-text-primary">
                       {p.price}
                     </span>
-                    <span className="text-text-secondary/60 mb-3 text-[10px] font-bold uppercase tracking-widest">during early access</span>
+                    <span className="text-text-secondary/60 mb-1 text-[10px] font-bold uppercase tracking-wider">during early access</span>
                   </div>
 
                   {/* Token meter bar */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-11">
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs">
                       <span className="text-text-secondary/60">{p.tokens} Credits</span>
-                      <span className={`font-bold ${p.featured ? 'text-accent-purple' : 'text-text-secondary/60'}`}>{p.tokens} / mo</span>
+                      <span className={`font-semibold ${p.featured ? 'text-primary' : 'text-text-secondary/60'}`}>{p.tokens} / mo</span>
                     </div>
                     <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                       <motion.div
@@ -889,24 +870,24 @@ export default function LandingPage() {
                         whileInView={{ width: p.featured ? '100%' : i === 0 ? '30%' : '85%' }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.5 + i * 0.15, ease }}
-                        className={`h-full bg-accent-${p.accent}/50 rounded-full`}
+                        className={`h-full ${p.featured ? 'bg-primary' : 'bg-white/30'} rounded-full`}
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Feature list */}
-                <div className="flex-1 mb-8">
-                  <ul className="space-y-3">
+                <div className="flex-1 mb-6">
+                  <ul className="space-y-2.5">
                     {p.features.map((feat) => (
                       <li
                         key={feat}
-                        className="flex items-center gap-3 text-sm text-text-secondary/80"
+                        className="flex items-center gap-2.5 text-xs text-text-secondary/80"
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full bg-accent-${p.accent} shrink-0`}
+                          className={`w-1.5 h-1.5 rounded-full ${p.featured ? 'bg-primary' : 'bg-text-secondary/40'} shrink-0`}
                         />
-                        <span className="font-light">{feat}</span>
+                        <span>{feat}</span>
                       </li>
                     ))}
                   </ul>
@@ -915,10 +896,10 @@ export default function LandingPage() {
                 {/* CTA */}
                 <Link
                   href="/register"
-                  className={`block w-full py-4 rounded-2xl font-bold text-sm tracking-tight text-center transition-all duration-500 ${
+                  className={`block w-full py-3 rounded-xl font-semibold text-xs tracking-wide text-center transition-all duration-300 ${
                     p.featured
-                      ? 'bg-accent-orange text-text-on-accent'
-                      : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] text-text-primary hover:bg-white/[0.07]'
+                      ? 'bg-primary text-black hover:brightness-110 shadow-[0_2px_14px_rgba(var(--rgb-primary),0.25)]'
+                      : 'bg-white/[0.04] border border-white/[0.08] text-text-primary hover:bg-white/[0.08]'
                   }`}
                 >
                   Get Started with {p.name}
@@ -943,17 +924,17 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-40 px-8 max-w-[860px] mx-auto">
+      <section id="faq" className="py-20 md:py-24 px-6 max-w-[860px] mx-auto">
         <motion.h2
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1, ease }}
-          className="font-display text-[44px] font-semibold tracking-tight mb-16 text-center"
+          transition={{ duration: 0.8, ease }}
+          className="font-sans text-3xl md:text-[38px] font-semibold tracking-tight mb-12 text-center"
         >
           Operational Clarifications.
         </motion.h2>
-        <div className="border-t border-white/[0.03]">
+        <div className="border-t border-white/[0.04]">
           <FAQItem
             q="Do you book clients for me?"
             a="NO. We provide warm, fresh leads actively looking for your service, with AI-scored buyer context so you know exactly how to approach them. You own the relationship."
@@ -974,74 +955,74 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-32 px-6 max-w-[1100px] mx-auto text-center relative overflow-hidden">
+      <section className="py-20 md:py-24 px-6 max-w-[1100px] mx-auto text-center relative overflow-hidden">
         {/* Glowing aura */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-purple/[0.03] blur-2xl rounded-full pointer-events-none" />
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 1, ease }}
-          className="relative z-10 p-16 md:p-24 rounded-5xl border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
+          transition={{ duration: 0.8, ease }}
+          className="relative z-10 p-10 md:p-14 rounded-3xl border border-white/[0.08] bg-gradient-to-b from-surface to-page-bg overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
-          <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
+          <span className="text-[13px] font-semibold tracking-wider uppercase text-primary mb-3 block">
             Exclusive Syndicate Access
           </span>
 
-          <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight text-text-primary mb-6 leading-tight">
+          <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-text-primary mb-4 leading-tight">
             Stop Wasting Time <br />
             Looking For Clients.
           </h2>
 
-          <p className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-text-secondary/80 font-normal max-w-xl mx-auto mb-8 leading-relaxed">
             Lead Hunter Club brings fresh opportunities directly to you — while AI helps you start
             smarter conversations that actually get replies.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 font-mono text-sm text-text-secondary/70">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-8 font-mono text-xs text-text-secondary/70">
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               Spend less time scraping.
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               Spend more time closing.
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-3">
             <motion.div
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="inline-block"
             >
               <Link
                 href="/register"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-accent-orange text-text-on-accent font-bold text-sm shadow-[0_8px_30px_rgba(var(--rgb-accent-orange),0.35)] hover: transition-all duration-500 group"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-black font-semibold text-sm shadow-[0_2px_18px_rgba(var(--rgb-primary),0.3)] hover:brightness-110 transition-all duration-300 group"
               >
                 Start Finding Leads
-                <ArrowRightIcon className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRightIcon className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-0.5" />
               </Link>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} className="inline-block">
+            <motion.div whileHover={{ scale: 1.01 }} className="inline-block">
               <Link
                 href="/sneak-peek"
-                className="inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] text-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.03] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary transition-all cursor-pointer border border-white/[0.08] hover:border-white/15 hover:bg-white/[0.06] text-sm"
               >
                 Sneak Peek
               </Link>
             </motion.div>
           </div>
 
-          {/* Supporting Text from docs/PRODUCT.md */}
-          <div className="mt-8 font-mono text-11 tracking-super uppercase text-text-secondary/50 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          {/* Supporting Text */}
+          <div className="mt-8 font-mono text-[11px] tracking-wider uppercase text-text-secondary/50 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <span>Fresh buyer-intent leads</span>
-            <span className="text-accent-purple/40">•</span>
+            <span className="text-primary/40">•</span>
             <span>Smarter targeting</span>
-            <span className="text-accent-purple/40">•</span>
+            <span className="text-primary/40">•</span>
             <span>Less wasted time</span>
           </div>
         </motion.div>
@@ -1050,12 +1031,12 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {/* FOOTER                                                                */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
-      <footer className="relative border-t border-white/[0.03] overflow-hidden">
+      <footer className="relative border-t border-white/[0.04] overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.02] blur-2xl rounded-full pointer-events-none" />
 
         {/* Main footer content */}
-        <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12 relative z-10">
+        <div className="max-w-[1240px] mx-auto px-6 pt-16 pb-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-20">
             {/* Brand Column */}
             <div className="md:col-span-4">
