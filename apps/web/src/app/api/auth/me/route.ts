@@ -121,8 +121,6 @@ export async function GET(request: NextRequest) {
             phone: phone || null,
             role: 'user',
             status: 'PENDING',
-            // Mark onboarding as done by default — users fill profile from Settings page
-            discoverySource: 'registered',
             creditAccount: {
               create: { subscriptionBalance: limit, bonusBalance: 0, renewalDate },
             },
