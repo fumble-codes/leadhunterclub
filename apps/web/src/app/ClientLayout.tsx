@@ -45,12 +45,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     // Step 2: status-based routing
     if (isPublicRoute || isOnboardingRoute || isAdminRoute) {
       if (pathname === '/' && user) {
-        if (user.status === 'ACTIVE' && user.hasCompletedOnboarding) {
+        if (user.status === 'ACTIVE') {
           router.push('/dashboard')
-        } else if (user.status === 'ACTIVE' && !user.hasCompletedOnboarding) {
-          router.push('/onboarding')
         } else if (user.status === 'PENDING') {
-          router.push(user.hasCompletedOnboarding ? '/pending-approval' : '/onboarding')
+          router.push('/pending-approval')
         } else if (user.status === 'REJECTED' || user.status === 'SUSPENDED') {
           router.push('/pending-approval')
         }
@@ -58,11 +56,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       return
     }
 
-    if (user.status === 'ACTIVE' && !user.hasCompletedOnboarding) {
-      router.push('/onboarding')
-    } else if (user.status === 'PENDING' && !user.hasCompletedOnboarding) {
-      router.push('/onboarding')
-    } else if (user.status === 'PENDING' && user.hasCompletedOnboarding) {
+    if (user.status === 'PENDING') {
       router.push('/pending-approval')
     } else if (user.status === 'REJECTED' || user.status === 'SUSPENDED') {
       router.push('/pending-approval')
