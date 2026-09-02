@@ -211,7 +211,7 @@ export async function GET(request: NextRequest) {
     }
     console.error('[Leads API] GET error:', error)
     return NextResponse.json(
-      { code: 'INTERNAL_SERVER_ERROR', message: error instanceof Error ? error.message : 'Failed to retrieve leads' },
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve leads' },
       { status: 500 },
     )
   }
