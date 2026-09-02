@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
     console.error('[Admin Stats API] Error:', error)
     return NextResponse.json(
-      { code: 'INTERNAL_SERVER_ERROR', message: 'An unexpected error occurred' },
+      { code: 'INTERNAL_SERVER_ERROR', message: error instanceof Error ? error.message : 'An unexpected error occurred' },
       { status: 500 },
     )
   }
