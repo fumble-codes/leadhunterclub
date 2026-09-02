@@ -60,15 +60,51 @@ export async function GET(request: NextRequest) {
         include: creditAccountInclude,
       })
       if (byEmail && byEmail.id !== uid) {
-        return NextResponse.json(
-          {
-            code: 'ACCOUNT_CONFLICT',
-            message: 'This email is already linked to another account. Sign in with the original method.',
-          },
-          { status: 409 },
-        )
+        // User exists in DB with a different ID (Oracle UUID) — migrate to Firebase UID
+        // This handles the case where Oracle created the user before Firebase auth was set up
+        try {
+          // Update credit_accounts FK first, then update user id
+          await db.$executeRawUnsafe(
+            `UPDATE credit_accounts SET "userId" = $1 WHERE "userId" = $2`,
+            uid,
+            byEmail.id,
+          )
+          await db.$executeRawUnsafe(
+            `UPDATE audit_logs SET "userId" = $1 WHERE "userId" = $2`,
+            uid,
+            byEmail.id,
+          )
+          await db.$executeRawUnsafe(
+            `UPDATE user_lead_states SET "userId" = $1 WHERE "userId" = $2`,
+            uid,
+            byEmail.id,
+          )
+          await db.$executeRawUnsafe(
+            `UPDATE admin_notes SET "userId" = $1 WHERE "userId" = $2`,
+            uid,
+            byEmail.id,
+          )
+          await db.$executeRawUnsafe(
+            `UPDATE support_tickets SET "userId" = $1 WHERE "userId" = $2`,
+            uid,
+            byEmail.id,
+          )
+          await db.$executeRawUnsafe(
+            `UPDATE users SET id = $1 WHERE id = $2`,
+            uid,
+            byEmail.id,
+          )
+          user = await db.user.findUnique({
+            where: { id: uid },
+            include: creditAccountInclude,
+          })
+        } catch (migrateErr) {
+          console.error('[Auth Me] Failed to migrate user ID:', migrateErr)
+          // Fall back to using existing user as-is
+          user = byEmail
+        }
       }
-      if (byEmail) user = byEmail
+      if (!user && byEmail) user = byEmail
     }
 
     if (!user) {
