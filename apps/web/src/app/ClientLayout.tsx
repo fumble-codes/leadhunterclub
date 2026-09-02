@@ -21,6 +21,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const onboardingRoutes = ['/onboarding', '/verify-email', '/pending-approval', '/admin-register']
   const isPublicRoute =
     pathname === '/' ||
+    pathname === '/reviews' ||
+    pathname === '/wall-of-love' ||
     authRoutes.some((r) => pathname.startsWith(r)) ||
     pathname.startsWith('/sneak-peek')
   const isOnboardingRoute = onboardingRoutes.some((r) => pathname.startsWith(r))
@@ -123,7 +125,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <ToastProvider>
-      {pathname === '/' && <Navbar />}
+      {(pathname === '/' || pathname === '/reviews' || pathname === '/wall-of-love') && <Navbar />}
       {isAppRoute ? (
         <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
           <AppSidebar />

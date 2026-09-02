@@ -540,11 +540,11 @@ export default function WhoItsForGrid() {
                           </div>
                         </div>
 
-                        {/* Signal block */}
+                        {/* Signal block -> Core Scope (Intel) */}
                         <div className="text-[11px] text-text-secondary flex items-center gap-1.5 mb-2 select-none">
                           <span className="text-text-secondary/50 font-medium">Signal:</span>
                           <span className="text-text-primary font-semibold">
-                            {activePersona.lead.signalContext}
+                            {activePersona.lead.taskScope}
                           </span>
                         </div>
 

@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import {
   BookmarkIcon,
   LockClosedIcon,
+  EnvelopeIcon,
+  PhoneIcon,
 } from '@heroicons/react/24/solid'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/Toast'
 import { AppLead } from '@/types/lead'
 import { getFirebaseToken } from '@/lib/firebase'
+import { Badge } from '@/components/ui'
 
 export default function PipelineLeadCard({
   lead,
@@ -134,12 +136,15 @@ export default function PipelineLeadCard({
           ? 'purple'
           : 'cyan'
 
+  // Format clean title: Replace "For —" with details if present, and handle fallback for "--" or "-"
+  const displayTitle = lead.title && lead.title !== '--' && lead.title !== '-'
+    ? lead.title.replace('For —', `For ${lead.company || lead.name}`)
+    : lead.company || 'Lead Signals'
+
   return (
-    <motion.div
+    <div
       onClick={onClick}
-      whileHover={{ y: -2 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`group relative p-6 rounded-3xl transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer ${
+      className={`group relative p-6 rounded-3xl transition-all duration-500 flex flex-col justify-between overflow-hidden cursor-pointer hover:-translate-y-0.5 ${
         isSelected
           ? 'bg-surface-secondary border border-primary/50 shadow-[0_8px_30px_rgba(var(--rgb-primary),0.12)]'
           : 'bg-surface-secondary/50 border border-white/[0.04] hover:border-white/10 hover:bg-surface-secondary/70 shadow-lg'
@@ -164,10 +169,19 @@ export default function PipelineLeadCard({
         </div>
       </div>
 
-      {/* Signal Context Quote */}
-      <p className="text-sm text-text-primary/90 leading-relaxed mb-5 flex-1 font-light">
-        &quot;{lead.signalContext}&quot;
-      </p>
+      {/* Lead Title */}
+      <h3 className="text-[15px] font-bold text-text-primary mb-1 tracking-tight group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+        {displayTitle}
+      </h3>
+
+      {/* Signal Context Quote -> Core Scope (Intel) */}
+      {lead.taskScope && lead.taskScope.trim() !== '' ? (
+        <p className="text-sm text-text-secondary/70 leading-relaxed mb-5 flex-1 font-light line-clamp-2">
+          &quot;{lead.taskScope}&quot;
+        </p>
+      ) : (
+        <div className="flex-1 mb-5" />
+      )}
 
       {/* Intent Score Bar */}
       <div className="mb-5 w-full select-none">
@@ -178,9 +192,8 @@ export default function PipelineLeadCard({
           <span className={`font-bold text-accent-${leadAccent}`}>{lead.replyProbability}%</span>
         </div>
         <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${lead.replyProbability}%` }}
+          <div
+            style={{ width: `${lead.replyProbability}%`, transition: 'width 400ms ease' }}
             className={`h-full bg-accent-${leadAccent}/50 rounded-full`}
           />
         </div>
@@ -195,6 +208,26 @@ export default function PipelineLeadCard({
           {lead.urgency}
         </span>
       </div>
+      {/* Tags row */}
+      {((lead.niches && lead.niches.length > 0) || (lead.nicheTags && lead.nicheTags.length > 0)) && (
+        <div className="flex flex-wrap gap-1.5 mb-5 shrink-0 select-none">
+          {lead.niches &&
+            lead.niches.map((niche) => (
+              <Badge key={niche} size="sm" color={leadAccent}>
+                {niche}
+              </Badge>
+            ))}
+          {lead.nicheTags &&
+            lead.nicheTags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 text-[9px] font-medium rounded-md border bg-white/[0.02] text-text-secondary/60 border-white/[0.05]"
+              >
+                {tag}
+              </span>
+            ))}
+        </div>
+      )}
 
       {/* Locked / Revealed Identity Box */}
       {!isRevealed ? (
@@ -238,7 +271,8 @@ export default function PipelineLeadCard({
         </div>
       ) : (
         <div className="relative rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 overflow-hidden w-full select-none">
-          <div className="flex items-center justify-between gap-4">
+          {/* Row 1: Avatar, Name, and Save button */}
+          <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-3 min-w-0">
               <div
                 className={`w-9 h-9 rounded-xl bg-accent-${leadAccent}/10 border border-accent-${leadAccent}/20 flex items-center justify-center shrink-0`}
@@ -249,23 +283,42 @@ export default function PipelineLeadCard({
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-text-primary truncate">{lead.name}</div>
-                <div className="text-xxs text-text-secondary/50 truncate">
-                  {lead.email} {lead.phone && `• ${lead.phone}`}
-                </div>
               </div>
             </div>
-
-            {/* Engage Trigger Button */}
+            {/* Save / Saved Toggle Button */}
             <button
-              onClick={handleEngage}
+              onClick={handleSave}
               type="button"
-              className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 text-white font-extrabold text-[10px] tracking-wider uppercase transition-all shrink-0 cursor-pointer"
+              className={`px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border ${
+                isSaved
+                  ? 'bg-primary/15 border-primary/30 text-primary shadow-[0_0_12px_rgba(var(--rgb-primary),0.06)]'
+                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 text-white'
+              }`}
             >
-              Engage
+              {isSaved ? '✓ Saved' : 'Save'}
             </button>
+          </div>
+
+          {/* Divider line */}
+          <div className="h-px bg-white/[0.04] my-2.5" />
+
+          {/* Row 2 & 3: Email and Phone spanning the full width */}
+          <div className="flex flex-col gap-2 mt-1">
+            {lead.email && (
+              <div className="flex items-center gap-2 text-[11px] text-text-secondary hover:text-text-primary transition-colors select-all">
+                <EnvelopeIcon className="w-3.5 h-3.5 text-accent-purple/60 shrink-0" />
+                <span className="truncate" title={lead.email}>{lead.email}</span>
+              </div>
+            )}
+            {lead.phone && (
+              <div className="flex items-center gap-2 text-[11px] text-text-secondary hover:text-text-primary transition-colors select-all">
+                <PhoneIcon className="w-3.5 h-3.5 text-accent-mint/60 shrink-0" />
+                <span className="truncate" title={lead.phone}>{lead.phone}</span>
+              </div>
+            )}
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import {
   ChartBarSquareIcon,
   LockClosedIcon,
@@ -145,11 +144,9 @@ export default function LeadCard({
   }
 
   return (
-    <motion.button
+    <button
       onClick={onClick}
-      whileHover={{ y: -2 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`group relative text-left flex flex-col overflow-hidden h-full col-span-1 transition-all duration-300 ${
+      className={`group relative text-left flex flex-col overflow-hidden h-full col-span-1 transition-all duration-300 hover:-translate-y-0.5 ${
         isSelected ? `${theme.selected} rounded-2xl` : `rounded-2xl ${theme.glow}`}
       `}
     >
@@ -198,10 +195,14 @@ export default function LeadCard({
           {lead.category}
         </h4>
 
-        {/* Signal quote - clamped to 2 lines */}
-        <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 line-clamp-2 max-h-[4.5rem]">
-          {'"'} {lead.signalContext} {'"'}
-        </h3>
+        {/* Signal quote -> Core Scope (Intel) - clamped to 2 lines */}
+        {lead.taskScope && lead.taskScope.trim() !== '' ? (
+          <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 line-clamp-2 max-h-[4.5rem]">
+            {'"'} {lead.taskScope} {'"'}
+          </h3>
+        ) : (
+          <div className="mb-6 h-[4.5rem]" />
+        )}
 
         {/* Tags row + AI Reply Probability */}
         <div className="flex flex-wrap gap-2 mb-2 shrink-0">
@@ -277,6 +278,6 @@ export default function LeadCard({
           </div>
         </div>
       </Card>
-    </motion.button>
+    </button>
   )
 }

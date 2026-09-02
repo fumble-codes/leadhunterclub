@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import {
   Squares2X2Icon,
@@ -49,9 +48,8 @@ export default function AppSidebar({
   const creditPercentage = Math.min(100, (creditTotal / planMax) * 100)
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: isCollapsed ? '64px' : isDemo ? '180px' : '240px' }}
+    <aside
+      style={{ width: isCollapsed ? '64px' : isDemo ? '180px' : '240px', transition: 'width 200ms ease' }}
       className={
         isDemo
           ? 'h-full bg-surface/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[24px] overflow-hidden select-none shrink-0'
@@ -60,27 +58,20 @@ export default function AppSidebar({
     >
       {/* Sidebar Header */}
       <div className="h-24 flex items-center px-6 justify-between">
-        <AnimatePresence mode="wait">
-          {!isCollapsed && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              className="flex items-center gap-3"
-            >
-              <Image
-                src="/logo.svg"
-                alt="Lead Hunter Club"
-                width={32}
-                height={32}
-                className="w-8 h-8 rounded-xl"
-              />
-              <span className="font-semibold text-text-primary tracking-tight">
-                Lead Hunter Club
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div
+          className={`flex items-center gap-3 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        >
+          <Image
+            src="/logo.svg"
+            alt="Lead Hunter Club"
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-xl shrink-0"
+          />
+          <span className="font-semibold text-text-primary tracking-tight">
+            Lead Hunter Club
+          </span>
+        </div>
 
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -114,36 +105,25 @@ export default function AppSidebar({
               }}
               className={`block relative ${isBlurred ? 'opacity-40 blur-[2px] cursor-not-allowed select-none' : ''}`}
             >
-              <motion.div
-                whileHover={{ x: isActive || isBlurred ? 0 : 4 }}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 ${
+              <div
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 hover:translate-x-0.5 ${
                   isActive
                     ? 'text-accent-orange'
                     : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
                 }`}
               >
-                <item.icon className="w-[18px] h-[18px] text-current" />
+                <item.icon className="w-[18px] h-[18px] text-current shrink-0" />
 
-                <AnimatePresence>
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      className="text-sm font-medium whitespace-nowrap"
-                    >
-                      {item.name}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                <span
+                  className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                >
+                  {item.name}
+                </span>
+              </div>
 
               {/* Active Pill Highlight */}
               {isActive && (
-                <motion.div
-                  layoutId="sidebar-active"
-                  className="absolute inset-0 bg-accent-orange/10 border border-accent-orange/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-orange),0.15)] z-0"
-                />
+                <div className="absolute inset-0 bg-accent-orange/10 border border-accent-orange/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-orange),0.15)] z-0" />
               )}
             </Link>
           )
@@ -151,16 +131,11 @@ export default function AppSidebar({
       </div>
 
       {/* Token Status */}
-      <AnimatePresence>
-        {!isCollapsed && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="px-6 mb-6"
-          >
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
-              <div className="flex items-center justify-between">
+      <div
+        className={`px-6 mb-6 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      >
+        <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-3">
+          <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <BanknotesIcon className="w-[14px] h-[14px] text-accent-orange" />
                   <span className="text-xxs font-bold text-text-primary uppercase tracking-widest">
@@ -173,9 +148,8 @@ export default function AppSidebar({
               </div>
 
               <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${creditPercentage}%` }}
+                <div
+                  style={{ width: `${creditPercentage}%`, transition: 'width 400ms ease' }}
                   className="h-full bg-accent-orange shadow-[0_0_10px_rgba(var(--rgb-accent-orange),0.5)]"
                 />
               </div>
@@ -192,13 +166,11 @@ export default function AppSidebar({
                 </div>
               ) : null}
 
-              <button className="text-9 font-bold text-accent-orange uppercase tracking-super hover:opacity-80 transition-opacity">
-                Refill Pipeline →
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <button className="text-9 font-bold text-accent-orange uppercase tracking-super hover:opacity-80 transition-opacity">
+            Refill Pipeline →
+          </button>
+        </div>
+      </div>
 
       {/* Sidebar Footer */}
       <div className="p-4 space-y-2">
@@ -214,33 +186,22 @@ export default function AppSidebar({
           }}
           className={`block relative ${isSneakPeek ? 'opacity-40 blur-[2px] cursor-not-allowed select-none' : ''}`}
         >
-          <motion.div
-            whileHover={{ x: pathname === '/settings' || isSneakPeek ? 0 : 4 }}
-            className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 ${
+          <div
+            className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-300 relative z-10 hover:translate-x-0.5 ${
               pathname === '/settings'
                 ? 'text-accent-orange'
                 : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
             }`}
           >
-            <Cog6ToothIcon className="w-[18px] h-[18px] text-current" />
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="text-sm font-medium whitespace-nowrap"
-                >
-                  Settings
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.div>
+            <Cog6ToothIcon className="w-[18px] h-[18px] text-current shrink-0" />
+            <span
+              className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            >
+              Settings
+            </span>
+          </div>
           {pathname === '/settings' && !isSneakPeek && (
-            <motion.div
-              layoutId="sidebar-active"
-              className="absolute inset-0 bg-accent-orange/10 border border-accent-orange/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-orange),0.15)] z-0"
-            />
+            <div className="absolute inset-0 bg-accent-orange/10 border border-accent-orange/20 rounded-xl shadow-[inset_0_0_12px_rgba(var(--rgb-accent-orange),0.15)] z-0" />
           )}
         </Link>
         <button
@@ -253,26 +214,16 @@ export default function AppSidebar({
             logout()
           }}
         >
-          <motion.div
-            whileHover={{ x: isSneakPeek ? 0 : 4 }}
-            className="flex items-center gap-3 px-3 py-3 rounded-xl text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition-colors duration-300 relative z-10"
-          >
-            <ArrowLeftStartOnRectangleIcon className="w-[18px] h-[18px] text-current" />
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="text-sm font-medium whitespace-nowrap"
-                >
-                  Sign Out
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          <div className="flex items-center gap-3 px-3 py-3 rounded-xl text-text-secondary hover:bg-red-500/10 hover:text-red-400 transition-colors duration-300 relative z-10 hover:translate-x-0.5">
+            <ArrowLeftStartOnRectangleIcon className="w-[18px] h-[18px] text-current shrink-0" />
+            <span
+              className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            >
+              Sign Out
+            </span>
+          </div>
         </button>
       </div>
-    </motion.aside>
+    </aside>
   )
 }

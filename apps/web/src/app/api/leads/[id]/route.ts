@@ -10,11 +10,13 @@ import {
 import { getPost } from '@/lib/external-api/client'
 import { updateLeadSchema } from '@/lib/validators/auth'
 import type { AppLead } from '@/types/lead'
+import { extractNiches } from '@/lib/claim-reveal'
 
 export const dynamic = 'force-dynamic'
 
 function formatTimeAgo(dateStr: string): string {
-  const seconds = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 1000)
+  const diffMs = new Date().getTime() - new Date(dateStr).getTime()
+  const seconds = Math.max(0, Math.floor(diffMs / 1000))
   if (seconds < 60) return 'Just now'
   const minutes = Math.floor(seconds / 60)
   if (minutes < 60) return `${minutes}m ago`
@@ -39,10 +41,26 @@ function redactContact(content: string): string {
   return content.replace(EMAIL_REGEX, '[email hidden]').replace(PHONE_REGEX, '[phone hidden]')
 }
 
-function extractTags(keyword: string | null, platform: string): string[] {
+function extractTags(post: ExternalPost): string[] {
   const tags: string[] = []
-  if (keyword) tags.push(keyword.replace(/^watchlist:/, ''))
-  if (platform) tags.push(platform)
+  const platform = (post.platform || '').toLowerCase()
+  const authorName = (post.author?.name || '').toLowerCase()
+  const company = (post.contact_info?.company_name || '').toLowerCase()
+
+  if (post.keyword) {
+    const rawTag = post.keyword.replace(/^watchlist:/, '')
+    const tagLower = rawTag.toLowerCase()
+    
+    // Filter out platform source, author name, and company name matches
+    const isPlatform = tagLower === platform || ['linkedin', 'reddit', 'twitter', 'github', 'seed', 'external'].includes(tagLower)
+    const isAuthor = authorName && (authorName.includes(tagLower) || tagLower.includes(authorName))
+    const isCompany = company && (company.includes(tagLower) || tagLower.includes(company))
+
+    if (!isPlatform && !isAuthor && !isCompany) {
+      tags.push(rawTag)
+    }
+  }
+
   return tags
 }
 
@@ -92,8 +110,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       buyerType: '',
       urgency: 'medium',
       winProb: 'medium',
-      nicheTags: extractTags(externalLead.keyword, externalLead.platform),
-      niches: [],
+      nicheTags: extractTags(externalLead),
+      niches: extractNiches(externalLead.keyword, externalLead.content || '', externalLead.intelligence),
       hashtags: [],
       replyProbability: Math.max(externalLead.ai_score || 0, 60),
       accent: 'mint',

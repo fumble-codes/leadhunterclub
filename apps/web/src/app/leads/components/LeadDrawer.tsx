@@ -56,6 +56,10 @@ export default function LeadDrawer({
   const { addToast } = useToast()
   const tokenCost = lead.revealCost ?? null
 
+  const displayTitle = lead.title && lead.title !== '--' && lead.title !== '-'
+    ? lead.title.replace('For —', `For ${lead.company || lead.name}`)
+    : lead.company || 'Lead Signals'
+
   const handleRevealClick = async () => {
     if (!lead.isClaimable) {
       setErrorMsg('This lead is not yet approved. Intelligence is still being generated.')
@@ -153,7 +157,7 @@ export default function LeadDrawer({
       <div className="flex-1 overflow-y-auto p-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <div className="flex items-start justify-between gap-4 mb-4">
           <h2 className="text-[24px] font-bold tracking-tight text-text-primary leading-[1.2]">
-            {lead.title}
+            {displayTitle}
           </h2>
           {lead.urgency === 'high' || lead.urgency === 'critical' ? (
             <Badge size="sm" color="mint">
@@ -162,11 +166,13 @@ export default function LeadDrawer({
           ) : null}
         </div>
 
-        <div className="mb-8 mt-2">
-          <h3 className="text-[16px] font-medium leading-relaxed text-text-primary/90 italic border-l-2 border-border-subtle pl-4 py-1">
-            &quot;{lead.signalContext}&quot;
-          </h3>
-        </div>
+        {lead.taskScope && lead.taskScope.trim() !== '' && (
+          <div className="mb-8 mt-2">
+            <h3 className="text-[16px] font-medium leading-relaxed text-text-primary/90 italic border-l-2 border-border-subtle pl-4 py-1">
+              &quot;{lead.taskScope}&quot;
+            </h3>
+          </div>
+        )}
 
         <div className="w-full h-px bg-border-subtle mb-8" />
 

@@ -447,9 +447,9 @@ export default function TokenSystemSection() {
                       {lead.company}
                     </h4>
 
-                    {/* Signal quote */}
+                    {/* Signal quote -> Core Scope (Intel) */}
                     <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 flex-grow">
-                      &quot;{lead.signalContext}&quot;
+                      &quot;{lead.taskScope}&quot;
                     </h3>
 
                     {/* Tags row + AI Reply Probability */}

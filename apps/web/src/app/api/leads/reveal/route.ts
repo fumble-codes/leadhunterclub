@@ -12,6 +12,7 @@ import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 import { getLeadRevealCost, leadContactBundle } from '@/lib/config/coins'
+import { extractNiches } from '@/lib/claim-reveal'
 
 export const dynamic = 'force-dynamic'
 
@@ -153,8 +154,8 @@ export async function POST(request: NextRequest) {
             buyerType: intel,
             urgency: 'medium',
             winProb: 'medium',
-            nicheTags: claimedLead.keyword ? [claimedLead.keyword.replace(/^watchlist:/, '')] : [],
-            niches: [],
+            nicheTags: extractTags(claimedLead),
+            niches: extractNiches(claimedLead.keyword, claimedLead.content || '', claimedLead.intelligence),
             hashtags: [],
             replyProbability: Math.max(claimedLead.ai_score || 0, 60),
             accent: 'mint',
@@ -261,4 +262,28 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     )
   }
+}
+
+import type { ExternalPost } from '@/lib/external-api/client'
+function extractTags(post: ExternalPost): string[] {
+  const tags: string[] = []
+  const platform = (post.platform || '').toLowerCase()
+  const authorName = (post.author?.name || '').toLowerCase()
+  const company = (post.contact_info?.company_name || '').toLowerCase()
+
+  if (post.keyword) {
+    const rawTag = post.keyword.replace(/^watchlist:/, '')
+    const tagLower = rawTag.toLowerCase()
+    
+    // Filter out platform source, author name, and company name matches
+    const isPlatform = tagLower === platform || ['linkedin', 'reddit', 'twitter', 'github', 'seed', 'external'].includes(tagLower)
+    const isAuthor = authorName && (authorName.includes(tagLower) || tagLower.includes(authorName))
+    const isCompany = company && (company.includes(tagLower) || tagLower.includes(company))
+
+    if (!isPlatform && !isAuthor && !isCompany) {
+      tags.push(rawTag)
+    }
+  }
+
+  return tags
 }

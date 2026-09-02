@@ -12,7 +12,6 @@ import {
   ClipboardDocumentListIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { AppLead } from '@/types/lead'
 import { Badge, Button, CustomLoader } from '@/components/ui'
@@ -22,6 +21,7 @@ import { toCsv, toTsv, downloadXlsx, leadsToRows } from '@/lib/csv'
 
 export default function SavedLeadsPage() {
   const [activeTab, setActiveTab] = useState('All Leads')
+  const [searchTerm, setSearchTerm] = useState('')
   const [savedLeads, setSavedLeads] = useState<AppLead[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -101,18 +101,20 @@ export default function SavedLeadsPage() {
     return leadsToRows(filteredLeads)
   }
 
-  const handleExportSheet = () => {
+  const handleExportSheet = async () => {
     const rows = getRows()
     if (!rows) return
     setExporting('sheet')
     try {
       const date = new Date().toISOString().slice(0, 10)
-      downloadXlsx(
+      await downloadXlsx(
         `leadhunter-leads-${date}.xlsx`,
         rows,
         `Exported ${date} | View: ${activeTab} | Count: ${filteredLeads.length}`,
       )
       addToast({ type: 'success', message: `✓ Downloaded ${filteredLeads.length} leads as Excel` })
+    } catch {
+      addToast({ type: 'error', message: 'Failed to download Excel file' })
     } finally {
       setExporting(null)
       setExportOpen(false)
@@ -217,9 +219,15 @@ export default function SavedLeadsPage() {
   }, [])
 
   const filteredLeads = savedLeads.filter((lead) => {
-    if (activeTab === 'All Leads') return true
     if (activeTab === 'In Progress') return ['drafting', 'sent', 'follow-up'].includes(lead.status)
     if (activeTab === 'Archived') return lead.status === 'replied'
+    const term = searchTerm.trim().toLowerCase()
+    if (term) {
+      const name = (lead.isRevealed ? lead.name : '').toLowerCase()
+      const email = (lead.isRevealed ? lead.email : '').toLowerCase()
+      const company = (lead.company ?? '').toLowerCase()
+      if (!(name.includes(term) || email.includes(term) || company.includes(term))) return false
+    }
     return true
   })
 
@@ -236,12 +244,9 @@ export default function SavedLeadsPage() {
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Summary Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          {dynamicSummaryCards.map((card, i) => (
-            <motion.div
+          {dynamicSummaryCards.map((card) => (
+            <div
               key={card.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
               className="group relative p-6 metallic-card transition-all duration-300 overflow-hidden"
             >
               <div className="flex justify-between items-start mb-6">
@@ -261,7 +266,7 @@ export default function SavedLeadsPage() {
               <div
                 className={`absolute bottom-0 left-0 w-full h-1 bg-accent-${card.accent}/20 group-hover:bg-accent-${card.accent}/40 transition-all`}
               />
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -294,7 +299,9 @@ export default function SavedLeadsPage() {
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
               <input
                 type="text"
-                placeholder="Search pipeline..."
+                placeholder="Search by name, email, or company..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-border-subtle transition-all w-64"
               />
             </div>
@@ -385,12 +392,9 @@ export default function SavedLeadsPage() {
               </div>
 
               <div className="divide-y divide-white/[0.03]">
-                {filteredLeads.map((lead, i) => (
-                  <motion.div
+                {filteredLeads.map((lead) => (
+                  <div
                     key={lead.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 + i * 0.05 }}
                     className="grid grid-cols-12 gap-4 px-8 py-4 items-center group hover:bg-white/[0.02] transition-colors"
                   >
                     <div className="col-span-1 flex items-center">
@@ -472,7 +476,7 @@ export default function SavedLeadsPage() {
                         </Badge>
                       ) : null}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </>

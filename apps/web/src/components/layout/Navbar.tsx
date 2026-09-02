@@ -9,10 +9,11 @@ import { Bars3Icon, XMarkIcon, ArrowRightIcon } from '@heroicons/react/24/solid'
 import { useAuth } from '@/hooks/useAuth'
 
 const navLinks = [
-  { name: 'How It Works', href: '#funnel' },
-  { name: 'Features', href: '#features' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'FAQ', href: '#faq' },
+  { name: 'How It Works', href: '/#funnel' },
+  { name: 'Features', href: '/#features' },
+  { name: 'Pricing', href: '/#pricing' },
+  { name: 'FAQ', href: '/#faq' },
+  { name: 'Reviews', href: '/reviews' },
 ]
 
 const ease = [0.16, 1, 0.3, 1] as const
@@ -135,22 +136,26 @@ export default function Navbar() {
           {/* Center: Links (Desktop) */}
           <div className="hidden md:flex items-center shrink-0 flex-nowrap">
             <div className="flex items-center gap-1 flex-nowrap">
-              {navLinks.map((link) => {
-                const isActive = activeHash === link.href
-                return (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className={`relative px-4 py-2 text-[13px] font-medium transition-all duration-300 tracking-wide rounded-lg whitespace-nowrap ${
-                      isActive
-                        ? 'text-accent-orange bg-accent-orange/[0.04]'
-                        : 'text-text-secondary/70 hover:text-text-primary hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    {link.name}
-                  </a>
-                )
-              })}
+               {navLinks.map((link) => {
+                 const isHash = link.href.includes('#')
+                 const hashPart = isHash ? link.href.substring(link.href.indexOf('#')) : ''
+                 const isActive = isHash 
+                   ? (pathname === '/' && activeHash === hashPart)
+                   : pathname === link.href
+                 return (
+                   <Link
+                     key={link.name}
+                     href={link.href}
+                     className={`relative px-4 py-2 text-[13px] font-medium transition-all duration-300 tracking-wide rounded-lg whitespace-nowrap ${
+                       isActive
+                         ? 'text-accent-orange bg-accent-orange/[0.04]'
+                         : 'text-text-secondary/70 hover:text-text-primary hover:bg-white/[0.04]'
+                     }`}
+                   >
+                     {link.name}
+                   </Link>
+                 )
+               })}
             </div>
           </div>
 
@@ -271,18 +276,21 @@ export default function Navbar() {
             >
               <div className="space-y-1 mb-6">
                 {navLinks.map((link, i) => (
-                  <motion.a
+                  <motion.div
                     key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05, duration: 0.4, ease }}
-                    className="flex items-center justify-between px-4 py-3.5 rounded-xl text-[15px] font-medium text-text-secondary/80 hover:text-text-primary hover:bg-white/[0.04] transition-all duration-300"
                   >
-                    <span>{link.name}</span>
-                    <ArrowRightIcon className="w-[14px] h-[14px] text-text-secondary/30" />
-                  </motion.a>
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-between px-4 py-3.5 rounded-xl text-[15px] font-medium text-text-secondary/80 hover:text-text-primary hover:bg-white/[0.04] transition-all duration-300"
+                    >
+                      <span>{link.name}</span>
+                      <ArrowRightIcon className="w-[14px] h-[14px] text-text-secondary/30" />
+                    </Link>
+                  </motion.div>
                 ))}
               </div>
 
