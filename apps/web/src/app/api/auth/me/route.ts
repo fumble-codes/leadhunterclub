@@ -240,11 +240,12 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[Auth Me API] Error:', error)
     const missingTable = isPrismaMissingTable(error)
-    const message = missingTable
-      ? 'App user tables are missing. Run prisma/create-club-tables.sql against DATABASE_URL.'
-      : error instanceof Error
+    const message =
+      process.env.NODE_ENV !== 'production' && error instanceof Error
         ? error.message
-        : 'An unexpected error occurred'
+        : missingTable
+          ? 'App user tables are missing. Run prisma/create-club-tables.sql against DATABASE_URL.'
+          : 'An unexpected error occurred'
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message },
       { status: 500 },
