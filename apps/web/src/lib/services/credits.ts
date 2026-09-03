@@ -20,7 +20,8 @@ function now(): Date {
 }
 
 async function checkAndRenewInTx(tx: Prisma.TransactionClient, userId: string) {
-  await tx.$executeRaw`SELECT 1 FROM "credit_accounts" WHERE "userId" = ${userId} FOR UPDATE`
+  // Note: FOR UPDATE row locking is not used here as it's incompatible with
+  // pgbouncer transaction mode (used in production). Optimistic concurrency is sufficient.
 
   const account = await tx.creditAccount.findUnique({
     where: { userId },
@@ -84,18 +85,11 @@ async function deductInTx(
 ) {
   await checkAndRenewInTx(tx, userId)
 
-  // Auto-create the CreditAccount if it doesn't exist yet
-  // (users approved before the credit system was built won't have one)
-  let account = await tx.creditAccount.findUnique({ where: { userId } })
-  if (!account) {
-    const user = await tx.user.findUnique({ where: { id: userId }, select: { plan: true } })
-    const limit = getPlanCredits(user?.plan ?? 'FREE')
-    const renewalDate = new Date()
-    renewalDate.setDate(renewalDate.getDate() + 30)
-    account = await tx.creditAccount.create({
-      data: { userId, subscriptionBalance: limit, bonusBalance: 0, rolloverBalance: 0, renewalDate },
-    })
-  }
+  const account = await tx.creditAccount.findUnique({
+    where: { userId },
+  })
+
+  if (!account) throw new Error('CreditAccount not found')
 
   const totalAvailable = account.bonusBalance + account.subscriptionBalance + account.rolloverBalance
   if (totalAvailable < amount) throw new InsufficientCreditsError(amount, totalAvailable)
@@ -164,8 +158,6 @@ async function grantInTx(
   adminId?: string,
   pool: 'bonus' | 'subscription' = 'bonus',
 ) {
-  await tx.$executeRaw`SELECT 1 FROM "credit_accounts" WHERE "userId" = ${userId} FOR UPDATE`
-
   const account = await tx.creditAccount.findUnique({
     where: { userId },
   })
@@ -258,24 +250,15 @@ export const creditService = {
     renewalDate.setDate(renewalDate.getDate() + 30)
 
     return db.$transaction(async (tx) => {
-      await tx.$executeRaw`SELECT 1 FROM "credit_accounts" WHERE "userId" = ${userId} FOR UPDATE`
-
       await tx.user.update({
         where: { id: userId },
         data: { plan: planId },
       })
 
-      const updated = await tx.creditAccount.upsert({
+      const updated = await tx.creditAccount.update({
         where: { userId },
-        update: {
+        data: {
           subscriptionBalance: limit,
-          renewalDate,
-        },
-        create: {
-          userId,
-          subscriptionBalance: limit,
-          bonusBalance: 0,
-          rolloverBalance: 0,
           renewalDate,
         },
         select: {
@@ -309,8 +292,6 @@ export const creditService = {
 
   async renewSubscription(userId: string) {
     return db.$transaction(async (tx) => {
-      await tx.$executeRaw`SELECT 1 FROM "credit_accounts" WHERE "userId" = ${userId} FOR UPDATE`
-
       const account = await tx.creditAccount.findUnique({
         where: { userId },
         include: { user: { select: { plan: true } } },

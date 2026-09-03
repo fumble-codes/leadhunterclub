@@ -7,7 +7,7 @@ import {
   EmailNotVerifiedError,
   OnboardingRequiredError,
 } from '@/lib/auth'
-import { claimPostAsUser, getPost, ExternalApiError } from '@/lib/external-api/client'
+import { claimPost, getPost, ExternalApiError } from '@/lib/external-api/client'
 import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
@@ -19,10 +19,6 @@ export async function POST(request: NextRequest) {
   try {
     const authUser = await requireFullyAuthorized(request)
     const userId = authUser.uid
-
-    // Extract the raw Firebase token to forward to Oracle so it records
-    // the claim against the correct user (not the platform admin)
-    const userFirebaseToken = (request.headers.get('Authorization') || '').replace('Bearer ', '')
 
     const rl = await rateLimitByKey(`user:${userId}:reveal`, 30, 60_000)
     if (!rl.allowed) {
@@ -127,11 +123,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const claimedLead = await claimPostAsUser(leadId, userFirebaseToken).catch((err) => {
-      // If backend rejects for non-token reasons (e.g. lead not approved yet), still proceed
+    const claimedLead = await claimPost(leadId).catch((err) => {
+      // If backend rejects for token reasons, still proceed — credits already deducted on our side
       if (err instanceof ExternalApiError && (err.status === 403 || err.status === 400)) {
-        console.warn('[Lead Reveal] Backend claim soft-error:', err.externalMessage)
-        return externalLead
+        console.warn('[Lead Reveal] Backend claim soft-error (token check):', err.externalMessage)
+        return externalLead // fall back to the lead data we already have
       }
       throw err
     })
