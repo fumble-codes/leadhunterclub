@@ -398,20 +398,18 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
     }
 
-    // Delete from Firebase Auth
+    // Delete from Firebase Authentication
     try {
-      const { getAdminAuthInstance } = await import('@/lib/firebase-admin')
-      const auth = await getAdminAuthInstance()
-      await auth.deleteUser(targetUserId)
-    } catch (firebaseErr: unknown) {
+      const adminAuth = await import('@/lib/firebase-admin').then(m => m.getAdminAuthInstance())
+      await adminAuth.deleteUser(targetUserId)
+    } catch (firebaseErr: any) {
       // If user doesn't exist in Firebase, continue with DB deletion
-      const msg = firebaseErr instanceof Error ? firebaseErr.message : ''
-      if (!msg.includes('no user record')) {
-        console.error('[Admin Delete User] Firebase deletion failed:', msg)
+      if (firebaseErr?.code !== 'auth/user-not-found') {
+        console.error('[Admin Delete User] Firebase deletion failed:', firebaseErr?.message)
       }
     }
 
-    // Delete from DB (cascades to creditAccount, userLeadState, etc.)
+    // Delete from DB (cascade deletes credit_accounts, UserLeadState etc.)
     await db.user.delete({ where: { id: targetUserId } })
 
     return NextResponse.json({ success: true, message: 'User deleted from DB and Firebase' })
@@ -419,7 +417,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (error instanceof ForbiddenError) {
       return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
     }
-    const msg = error instanceof Error ? error.message : 'Failed to delete user'
-    return NextResponse.json({ code: 'INTERNAL_SERVER_ERROR', message: msg }, { status: 500 })
+    console.error('[Admin Delete User] Error:', error)
+    return NextResponse.json(
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to delete user' },
+      { status: 500 },
+    )
   }
 }

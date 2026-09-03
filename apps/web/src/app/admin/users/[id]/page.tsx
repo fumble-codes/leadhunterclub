@@ -389,7 +389,7 @@ export default function AdminUserDetailPage() {
               )}
               <button
                 onClick={async () => {
-                  if (!confirm(`Permanently delete ${user.name}? This removes them from the app AND Firebase. They will need to create a new account.`)) return
+                  if (!confirm(`Permanently delete ${user.email}? This also removes them from Firebase.`)) return
                   setActionLoading('DELETE')
                   const token = await getFirebaseToken()
                   const res = await fetch(`/api/admin/users/${params.id}`, {
@@ -402,7 +402,7 @@ export default function AdminUserDetailPage() {
                   setActionLoading(null)
                 }}
                 disabled={actionLoading === 'DELETE'}
-                className="w-full px-4 py-2.5 rounded-xl bg-red-900/20 border border-red-900/40 text-red-500 text-sm font-medium hover:bg-red-900/30 transition-all disabled:opacity-50"
+                className="w-full px-4 py-2.5 rounded-xl bg-red-900/20 border border-red-800/30 text-red-500 text-sm font-medium hover:bg-red-900/40 transition-all disabled:opacity-50"
               >
                 {actionLoading === 'DELETE' ? 'Deleting...' : '🗑 Delete User Permanently'}
               </button>
