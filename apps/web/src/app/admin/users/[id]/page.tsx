@@ -387,6 +387,25 @@ export default function AdminUserDetailPage() {
                   {actionLoading === 'REJECT' ? 'Rejecting...' : 'Reject User'}
                 </button>
               )}
+              <button
+                onClick={async () => {
+                  if (!confirm(`Permanently delete ${user.name}? This removes them from the app AND Firebase. They will need to create a new account.`)) return
+                  setActionLoading('DELETE')
+                  const token = await getFirebaseToken()
+                  const res = await fetch(`/api/admin/users/${params.id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` },
+                  })
+                  if (res.ok) {
+                    router.push('/admin/users')
+                  }
+                  setActionLoading(null)
+                }}
+                disabled={actionLoading === 'DELETE'}
+                className="w-full px-4 py-2.5 rounded-xl bg-red-900/20 border border-red-900/40 text-red-500 text-sm font-medium hover:bg-red-900/30 transition-all disabled:opacity-50"
+              >
+                {actionLoading === 'DELETE' ? 'Deleting...' : '🗑 Delete User Permanently'}
+              </button>
             </div>
           </div>
 
