@@ -280,67 +280,6 @@ export async function claimPost(id: string): Promise<ExternalPost> {
   return res.data
 }
 
-/**
- * Call Oracle with the user's own Firebase token instead of the admin service token.
- * Used for user-context operations like claiming a lead, where Oracle needs to know
- * which user is acting so it records the claim against the correct user.
- */
-export async function fetchApiAsUser<T>(
-  path: string,
-  userToken: string,
-  options: RequestInit = {},
-): Promise<T> {
-  const { BASE_URL } = requireCredentials()
-  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
-
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-      Authorization: `Bearer ${userToken}`,
-      ...options.headers,
-    },
-  })
-
-  if (!res.ok) {
-    const errorText = await res.text()
-    console.error(`[External API / user-ctx] ${res.status} ${path}:`, errorText)
-    const externalMessage = parseExternalError(res.status, errorText)
-    throw new ExternalApiError(res.status, `External API error: ${externalMessage}`, externalMessage)
-  }
-
-  return res.json()
-}
-
-/**
- * Claim a lead on Oracle using the end-user's Firebase token.
- * Returns the claimed lead. Treats "already claimed" as a success — idempotent.
- */
-export async function claimPostAsUser(id: string, userToken: string): Promise<ExternalPost> {
-  try {
-    const res = await fetchApiAsUser<ClaimResponse>(`/posts/${id}/claim`, userToken, {
-      method: 'POST',
-    })
-    if (!res.data) throw new Error(`External API: claim returned no data for post ${id}`)
-    return res.data
-  } catch (err) {
-    if (err instanceof ExternalApiError) {
-      // Already claimed by this user — idempotent, just fetch the current lead state
-      if (
-        err.status === 400 &&
-        err.externalMessage?.toLowerCase().includes('already claimed')
-      ) {
-        const current = await fetchApiAsUser<{ success: boolean; data: ExternalPost }>(
-          `/posts/${id}`,
-          userToken,
-        )
-        return current.data
-      }
-    }
-    throw err
-  }
-}
-
 // --- Admin lead management ---
 
 interface AdminActionResponse {
@@ -524,6 +463,19 @@ export async function reExtractPost(id: string): Promise<{ message?: string }> {
   return fetchApi<{ success: boolean; message?: string }>(`/posts/${id}/re-extract`, {
     method: 'POST',
   })
+}
+
+export async function setManualContact(
+  id: string,
+  data: { email?: string; phone?: string; note?: string },
+): Promise<{ success: boolean; data?: ExternalPost; message?: string }> {
+  return fetchApi<{ success: boolean; data?: ExternalPost; message?: string }>(
+    `/posts/${id}/manual-contact`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    },
+  )
 }
 
 export async function trainAiNow(): Promise<AiMetricsResponse['data']> {

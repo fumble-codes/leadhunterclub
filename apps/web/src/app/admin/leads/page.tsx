@@ -115,6 +115,13 @@ export default function AdminLeadsPage() {
   const { addToast } = useToast()
   const perPage = 10
 
+  // Manual contact state — keyed by lead ID
+  const [manualContactOpen, setManualContactOpen] = useState<string | null>(null)
+  const [manualContactEmail, setManualContactEmail] = useState('')
+  const [manualContactPhone, setManualContactPhone] = useState('')
+  const [manualContactNote, setManualContactNote] = useState('')
+  const [savingManualContact, setSavingManualContact] = useState(false)
+
   const apiGet = useCallback(async (path: string) => {
     const token = await getFirebaseToken()
     if (!token) throw new Error('Not authenticated')
@@ -143,6 +150,37 @@ export default function AdminLeadsPage() {
     })
     return res
   }, [])
+
+  const handleSaveManualContact = async (leadId: string) => {
+    if (!manualContactEmail.trim() && !manualContactPhone.trim()) return
+    setSavingManualContact(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/admin/leads/${leadId}/contact`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: manualContactEmail.trim() || undefined,
+          phone: manualContactPhone.trim() || undefined,
+          note: manualContactNote.trim() || undefined,
+        }),
+      })
+      const json = await res.json()
+      if (json.success) {
+        setLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, ...json.data } : l))
+        setManualContactOpen(null)
+        setManualContactEmail('')
+        setManualContactPhone('')
+        setManualContactNote('')
+        addToast({ type: 'success', message: 'Contact details saved successfully' })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to save contact' })
+      }
+    } catch (e) {
+      addToast({ type: 'error', message: 'Failed to save contact' })
+    }
+    setSavingManualContact(false)
+  }
 
   const fetchAiMetrics = useCallback(async () => {
     try {
@@ -1200,6 +1238,62 @@ export default function AdminLeadsPage() {
                         )}
                         {lead.enrichment_message && (
                           <p className="text-xs text-zinc-400">{lead.enrichment_message}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Manual Contact Input */}
+                    {lead.status === 'relevant' && (
+                      <div className="mb-4">
+                        {manualContactOpen === lead.id ? (
+                          <div className="p-4 bg-surface/50 border border-accent-mint/20 rounded-xl">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-accent-mint mb-3">Add Contact Manually</p>
+                            <div className="flex flex-col gap-2">
+                              <input
+                                type="email"
+                                placeholder="Email address"
+                                value={manualContactEmail}
+                                onChange={(e) => setManualContactEmail(e.target.value)}
+                                className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50"
+                              />
+                              <input
+                                type="tel"
+                                placeholder="Phone number (optional)"
+                                value={manualContactPhone}
+                                onChange={(e) => setManualContactPhone(e.target.value)}
+                                className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Note (optional)"
+                                value={manualContactNote}
+                                onChange={(e) => setManualContactNote(e.target.value)}
+                                className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50"
+                              />
+                              <div className="flex gap-2 mt-1">
+                                <button
+                                  onClick={() => handleSaveManualContact(lead.id)}
+                                  disabled={savingManualContact}
+                                  className="flex-1 py-2 rounded-lg bg-accent-mint text-black text-xs font-black uppercase tracking-widest hover:bg-accent-mint/90 transition-all disabled:opacity-50"
+                                >
+                                  {savingManualContact ? 'Saving...' : 'Save Contact'}
+                                </button>
+                                <button
+                                  onClick={() => { setManualContactOpen(null); setManualContactEmail(''); setManualContactPhone(''); setManualContactNote('') }}
+                                  className="px-4 py-2 rounded-lg bg-white/5 text-zinc-400 text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setManualContactOpen(lead.id)}
+                            className="w-full py-2 rounded-lg border border-dashed border-white/10 text-zinc-500 text-xs font-black uppercase tracking-widest hover:border-accent-mint/30 hover:text-accent-mint transition-all"
+                          >
+                            + Add Contact Manually
+                          </button>
                         )}
                       </div>
                     )}
