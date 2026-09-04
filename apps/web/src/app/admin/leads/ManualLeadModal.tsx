@@ -369,8 +369,8 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
                         <div className="space-y-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Platform</label>
                           <select value={platform} onChange={e => setPlatform(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3.5 py-2.5 text-sm">
-                            {PLATFORMS.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+                            className="w-full bg-surface-elevated border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3.5 py-2.5 text-sm [&>option]:bg-surface-elevated [&>option]:text-white">
+                            {PLATFORMS.map(p => <option key={p.id} value={p.id} className="bg-zinc-900 text-white">{p.label}</option>)}
                           </select>
                         </div>
                       </div>
