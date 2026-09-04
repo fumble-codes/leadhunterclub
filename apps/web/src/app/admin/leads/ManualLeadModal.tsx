@@ -135,7 +135,7 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
       const token = await getFirebaseToken()
       if (!token) throw new Error('Not authenticated')
 
-      const res = await fetch('/api/admin/leads/create-text', {
+      const res = await fetch('/api/admin/manual-lead', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
