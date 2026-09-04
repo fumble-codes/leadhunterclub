@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   XMarkIcon, ArrowUpTrayIcon, PhotoIcon, CheckCircleIcon,
   ExclamationTriangleIcon, DocumentTextIcon, UserIcon, TagIcon,
-  PencilSquareIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon,
+  PencilSquareIcon, EnvelopeIcon, PhoneIcon,
 } from '@heroicons/react/24/solid'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useToast } from '@/components/ui/Toast'
@@ -379,20 +379,6 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
                       <div className="p-4 bg-white/[0.02] border border-white/[0.06] rounded-xl space-y-3">
                         <p className="text-[10px] font-black uppercase tracking-widest text-accent-mint">Contact Details (Optional — skip enrichment)</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary flex items-center gap-1.5">
-                              <UserIcon className="w-3 h-3" /> Contact Name
-                            </label>
-                            <input placeholder="John Doe" value={contactName} onChange={e => setContactName(e.target.value)}
-                              className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50" />
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary flex items-center gap-1.5">
-                              <BuildingOfficeIcon className="w-3 h-3" /> Company
-                            </label>
-                            <input placeholder="Acme Corp" value={contactCompany} onChange={e => setContactCompany(e.target.value)}
-                              className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50" />
-                          </div>
                           <div className="space-y-1.5">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary flex items-center gap-1.5">
                               <EnvelopeIcon className="w-3 h-3" /> Email
