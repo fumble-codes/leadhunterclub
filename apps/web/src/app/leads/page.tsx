@@ -385,11 +385,12 @@ export default function LeadsPage() {
                   )}
                 </div>
               ) : (
-                filteredLeads.map((lead) =>
+                filteredLeads.map((lead, index) =>
                   viewMode === 'pipeline' ? (
                     <PipelineLeadCard
                       key={lead.id}
                       lead={lead}
+                      index={index}
                       isSelected={lead.id === selectedLeadId}
                       onClick={() => setSelectedLeadId(lead.id)}
                       onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
@@ -405,6 +406,7 @@ export default function LeadsPage() {
                     <LeadCard
                       key={lead.id}
                       lead={lead}
+                      index={index}
                       isSelected={lead.id === selectedLeadId}
                       onClick={() => setSelectedLeadId(lead.id)}
                       onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}

@@ -11,7 +11,7 @@ import { getPosts, getPost } from '@/lib/external-api/client'
 import type { ExternalPost } from '@/lib/external-api/client'
 import type { AppLead } from '@/types/lead'
 import { getLeadRevealCost } from '@/lib/config/coins'
-import { extractNiches } from '@/lib/claim-reveal'
+import { extractNiches, sanitizePublicText, extractCleanNicheTags, sanitizeHeadline } from '@/lib/claim-reveal'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,24 +85,37 @@ function externalPostToAppLead(
   const email = post.email || post.contact_info?.emails?.[0]?.email || ''
   const intel = post.intelligence || ''
 
+  const niches = extractNiches(post.keyword, post.content || '', post.intelligence)
+  const cleanTags = extractCleanNicheTags(post, niches)
+  const cleanTitle = sanitizeHeadline(post.author?.info || post.keyword || '', niches[0])
+  const cleanScope = sanitizePublicText(
+    extractSection(intel, 'Context You Might Miss') ||
+      extractSection(intel, 'What They Actually Want') ||
+      extractSection(intel, 'One-Liner') ||
+      post.content ||
+      '',
+  )
+
   return {
     id: post.id,
     name: isRevealed ? post.author?.name || 'Unknown' : 'Unlocked Contact',
     email: isRevealed ? email : 'unlocked@leadhunterclub.com',
-    company: post.contact_info?.company_name || post.author?.name || post.platform || '',
-    source: post.platform || 'Unknown',
-    category: extractSection(intel, 'One-Liner') || post.author?.info || post.keyword?.replace(/^watchlist:/, '') || post.platform || 'General',
-    title: post.author?.info || post.keyword || post.platform || 'Lead Signal',
-    signalContext: isRevealed ? post.content || '' : redactContact(post.content || ''),
-    role: post.author?.info || extractSection(intel, 'One-Liner'),
-    taskScope: extractSection(intel, 'Context You Might Miss'),
-    mustHave: extractSection(intel, 'What They Actually Want'),
-    nicheBonus: extractSection(intel, 'How to Win'),
-    buyerType: intel,
+    company: isRevealed
+      ? post.contact_info?.company_name || post.author?.name || post.platform || ''
+      : 'Confidential Client',
+    source: 'Lead Signal',
+    category: niches[0] || 'General',
+    title: cleanTitle,
+    signalContext: isRevealed ? post.content || '' : sanitizePublicText(post.content || ''),
+    role: sanitizePublicText(post.author?.info || extractSection(intel, 'One-Liner')),
+    taskScope: cleanScope,
+    mustHave: sanitizePublicText(extractSection(intel, 'What They Actually Want')),
+    nicheBonus: sanitizePublicText(extractSection(intel, 'How to Win')),
+    buyerType: sanitizePublicText(intel),
     urgency: 'medium',
     winProb: 'medium',
-    nicheTags: extractTags(post),
-    niches: extractNiches(post.keyword, post.content || '', post.intelligence),
+    nicheTags: cleanTags,
+    niches,
     hashtags: [],
     replyProbability: Math.max(post.ai_score || 0, 60),
     accent: 'mint',
@@ -113,7 +126,7 @@ function externalPostToAppLead(
     isClaimable: isLeadClaimable(post),
     hasPhone: !!phone,
     revealCost: getLeadRevealCost(post),
-    phone,
+    phone: isRevealed ? phone : null,
   }
 }
 

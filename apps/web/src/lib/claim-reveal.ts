@@ -114,3 +114,139 @@ export function extractNiches(
 
   return formatted
 }
+
+/**
+ * STRICT CONFIDENTIALITY & PII PROTECTION
+ * Enforces the core rule:
+ * NO person names, NO origins/sources, NO phone/WhatsApp numbers, NO emails
+ * may ever be visible on unrevealed/locked cards.
+ */
+
+export function sanitizePublicText(text: string): string {
+  if (!text) return ''
+
+  return text
+    // Redact emails
+    .replace(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/gi, '')
+    // Redact WhatsApp numbers and labels (e.g. "whatsapp +34 690 221", "whatsapp: +1...", "wa.me/...")
+    .replace(/(?:whatsapp|wa\.me|call|phone|tel|contact|reach me at|msg me at|ping me at)[\s:/-]*\+?[\d\s\-().]{5,}\d/gi, '')
+    // Redact international / general phone numbers
+    .replace(/(\+?\d{1,4}[\s\-]?)?(\(?\d{2,5}\)?[\s\-]?)?[\d\s\-().]{6,}\d/g, '')
+    // Redact social links / usernames
+    .replace(/(?:https?:\/\/)?(?:www\.)?(?:linkedin\.com|twitter\.com|x\.com|instagram\.com|facebook\.com|t\.me)\/[^\s]+/gi, '')
+    // Clean up trailing pipes, colons, and excessive spaces
+    .replace(/\s*\|\s*$/, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+}
+
+const VALID_SKILL_KEYWORDS: Array<{ key: string; label: string }> = [
+  { key: 'woocommerce', label: 'WooCommerce' },
+  { key: 'wordpress', label: 'WordPress' },
+  { key: 'shopify', label: 'Shopify' },
+  { key: 'elementor', label: 'Elementor' },
+  { key: 'nextjs', label: 'Next.js' },
+  { key: 'next.js', label: 'Next.js' },
+  { key: 'react', label: 'React' },
+  { key: 'php', label: 'PHP' },
+  { key: 'javascript', label: 'JavaScript' },
+  { key: 'typescript', label: 'TypeScript' },
+  { key: 'python', label: 'Python' },
+  { key: 'figma', label: 'Figma' },
+  { key: 'ui/ux', label: 'UI/UX' },
+  { key: 'seo', label: 'SEO' },
+  { key: 'b2b saas', label: 'B2B SaaS' },
+  { key: 'saas', label: 'SaaS' },
+  { key: 'b2b', label: 'B2B' },
+  { key: 'dtc', label: 'DTC' },
+  { key: 'e-commerce', label: 'E-Commerce' },
+  { key: 'ecommerce', label: 'E-Commerce' },
+  { key: 'automation', label: 'Automation' },
+  { key: 'ai', label: 'AI' },
+  { key: 'revops', label: 'RevOps' },
+  { key: 'sales', label: 'Sales' },
+  { key: 'copywriting', label: 'Copywriting' },
+  { key: 'content', label: 'Content' },
+  { key: 'branding', label: 'Branding' },
+  { key: 'marketing', label: 'Marketing' },
+  { key: 'outbound', label: 'Outbound' },
+  { key: 'web dev', label: 'Web Dev' },
+  { key: 'frontend', label: 'Frontend' },
+  { key: 'backend', label: 'Backend' },
+  { key: 'fullstack', label: 'Fullstack' },
+  { key: 'consulting', label: 'Consulting' },
+]
+
+export function extractCleanNicheTags(
+  post: {
+    keyword?: string | null
+    content?: string | null
+    intelligence?: string | null
+    author?: { name?: string; info?: string } | null
+    platform?: string | null
+  },
+  leadNiches?: string[]
+): string[] {
+  const textCorpus = [
+    post.keyword || '',
+    post.content || '',
+    post.intelligence || '',
+    post.author?.info || '',
+  ]
+    .join(' ')
+    .toLowerCase()
+
+  const matchedTags: string[] = []
+
+  for (const { key, label } of VALID_SKILL_KEYWORDS) {
+    const regex = new RegExp(`\\b${key.replace('.', '\\.')}\\b`, 'i')
+    if (regex.test(textCorpus)) {
+      matchedTags.push(label)
+    }
+    if (matchedTags.length >= 3) break
+  }
+
+  if (matchedTags.length === 0 && leadNiches && leadNiches.length > 0) {
+    for (const niche of leadNiches) {
+      if (!matchedTags.includes(niche)) matchedTags.push(niche)
+    }
+  }
+
+  if (matchedTags.length === 0) {
+    matchedTags.push('B2B', 'Verified Demand')
+  }
+
+  return Array.from(new Set(matchedTags)).slice(0, 3)
+}
+
+export function sanitizeHeadline(rawTitle: string, primaryNiche?: string): string {
+  if (!rawTitle || rawTitle === '--' || rawTitle === '-') {
+    return `${(primaryNiche || 'SERVICE').toUpperCase()} FOR —`
+  }
+
+  let cleaned = sanitizePublicText(rawTitle)
+
+  // Strip company affiliations like "@ Company LLC", "at Acme Corp", "at University..."
+  cleaned = cleaned.replace(/@\s*[^|,\n]+/gi, '')
+  cleaned = cleaned.replace(/\bat\s+[A-Z][^|,\n]+/g, '')
+
+  // Strip trailing descriptors after pipes or commas
+  if (cleaned.includes('|')) {
+    cleaned = cleaned.split('|')[0].trim()
+  }
+
+  // Remove person name patterns
+  const words = cleaned.split(/\s+/).filter(Boolean)
+  const looksLikePersonName =
+    words.length >= 2 && words.length <= 3 && words.every((w) => /^[A-Z][a-z]+$/.test(w))
+
+  if (cleaned.length < 3 || looksLikePersonName) {
+    return `${(primaryNiche || 'OPPORTUNITY').toUpperCase()} FOR —`
+  }
+
+  if (!cleaned.toUpperCase().includes('FOR —') && !cleaned.toUpperCase().includes('FOR -')) {
+    cleaned = `${cleaned.trim()} FOR —`
+  }
+
+  return cleaned.toUpperCase()
+}

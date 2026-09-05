@@ -49,26 +49,26 @@ export default function AppSidebar({
 
   return (
     <aside
-      style={{ width: isCollapsed ? '64px' : isDemo ? '180px' : '240px', transition: 'width 200ms ease' }}
+      style={{ width: isCollapsed ? '60px' : isDemo ? '170px' : '215px', transition: 'width 200ms ease' }}
       className={
         isDemo
-          ? 'h-full bg-surface/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[24px] overflow-hidden select-none shrink-0'
-          : 'h-[calc(100vh-32px)] my-4 ml-4 bg-surface/70 backdrop-blur-lg border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-4xl overflow-hidden'
+          ? 'h-full bg-surface/90 border-r border-white/[0.06] flex flex-col z-40 transition-colors rounded-l-[16px] overflow-hidden select-none shrink-0'
+          : 'h-[calc(100vh-24px)] my-3 ml-3 bg-surface/70 backdrop-blur-lg border border-white/[0.06] shadow-2xl flex flex-col z-40 transition-colors rounded-2xl overflow-hidden'
       }
     >
       {/* Sidebar Header */}
-      <div className="h-24 flex items-center px-6 justify-between">
+      <div className="h-14 flex items-center px-4 justify-between">
         <div
-          className={`flex items-center gap-3 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className={`flex items-center gap-2.5 overflow-hidden whitespace-nowrap transition-opacity duration-200 ${isCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
           <Image
             src="/logo.svg"
             alt="Lead Hunter Club"
-            width={32}
-            height={32}
-            className="w-8 h-8 rounded-xl shrink-0"
+            width={24}
+            height={24}
+            className="w-6 h-6 rounded-lg shrink-0"
           />
-          <span className="font-semibold text-text-primary tracking-tight">
+          <span className="font-semibold text-sm text-text-primary tracking-tight">
             Lead Hunter Club
           </span>
         </div>
