@@ -139,23 +139,23 @@ export default function TokenSystemSection() {
   const activeCardIndex = leads.findIndex((l) => l.id === activeCardId)
 
   return (
-    <section id="tokens" className="py-24 md:py-28 px-6 max-w-[1240px] mx-auto overflow-hidden border-t border-white/[0.04]">
-      {/* Centered Header Section */}
-      <div className="text-center mb-16 max-w-3xl mx-auto space-y-4">
-        <span className="text-[13px] font-semibold tracking-wider uppercase text-primary block">
-          Simple Credit-Based System
+    <section id="tokens" className="py-40 px-6 max-w-[1300px] mx-auto overflow-hidden">
+      {/* Centered Header Section with Big Eyebrow */}
+      <div className="text-center mb-24 max-w-4xl mx-auto space-y-5">
+        <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
+          Simple Token-Based System
         </span>
-        <h2 className="font-sans text-3xl md:text-[42px] font-semibold tracking-tight text-text-primary leading-[1.12] max-w-3xl mx-auto">
+        <h2 className="font-display text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-tight text-text-primary leading-[1.1] max-w-3xl mx-auto">
           You control how your workflow operates.
         </h2>
-        <p className="text-base text-text-secondary/80 font-normal leading-relaxed max-w-2xl mx-auto">
-          Every subscription includes monthly credits. Use them however you want—unlock qualified
+        <p className="text-base md:text-lg text-text-secondary font-light leading-relaxed max-w-3xl mx-auto">
+          Every subscription includes monthly tokens. Use them however you want—unlock qualified
           leads, reveal verified contact details, and access real-time intent intelligence. No
-          bloated tiers, and no paying for features you never use.
+          bloated pricing tiers, and no paying for features you never use.
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+      <div className="grid lg:grid-cols-12 gap-16 items-center">
         {/* Left Column (40%): Explanatory Text & Clerk-Style Accordion/Tabs */}
         <div className="lg:col-span-5 space-y-8 text-left">
           {/* Core Balance Pill */}

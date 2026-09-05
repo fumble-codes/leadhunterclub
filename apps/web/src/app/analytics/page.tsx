@@ -83,7 +83,7 @@ export default function AnalyticsPage() {
             <CustomLoader page="analytics" />
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl max-w-md mx-auto">
-              <h3 className="text-base font-bold text-text-primary mb-2">Couldn&apos;t load analytics</h3>
+              <h3 className="text-base font-bold text-text-primary mb-2">Couldn't load analytics</h3>
               <p className="text-sm text-text-secondary/70 mb-6">{error}</p>
               <button
                 onClick={load}

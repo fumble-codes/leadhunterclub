@@ -671,7 +671,7 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   <p className="text-xxs text-text-secondary/60 mt-5">
-                    You&apos;ll be taken to a secure Razorpay checkout to complete your subscription.
+                    You'll be taken to a secure Razorpay checkout to complete your subscription.
                   </p>
                 </div>
               </div>
