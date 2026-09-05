@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
@@ -268,19 +268,19 @@ export default function LandingPage() {
       <HeroSection />
 
       {/* Problem & How It Works (Bento Grid) */}
-      <section id="funnel" className="py-40 px-6 max-w-[1200px] mx-auto relative">
+      <section id="funnel" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative">
         {/* Ambient section glows */}
         <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
         <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
-        <div className="text-center mb-24 relative z-10">
+        <div className="text-center mb-12 md:mb-14 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
+            <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-purple">
               How It Works
             </span>
           </motion.div>
@@ -290,7 +290,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="font-display text-[48px] md:text-[64px] font-semibold tracking-tight mb-6 leading-[1.1] max-w-4xl mx-auto"
+            className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.15] max-w-3xl mx-auto"
           >
             From Raw Signal
             <br />
@@ -302,7 +302,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2, ease }}
-            className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base text-text-secondary font-light max-w-xl mx-auto leading-relaxed"
           >
             Here&apos;s exactly how Lead Hunter Club turns unindexed buyer signals into high-value
             client conversations — before your competitors even know they exist.
@@ -318,7 +318,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, ease }}
             whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-500 min-h-[280px] md:min-h-[300px] flex flex-col justify-between"
           >
             {/* Visual Radar Container */}
             <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 overflow-hidden pointer-events-none flex items-center justify-center">
@@ -384,13 +384,13 @@ export default function LandingPage() {
             </div>
 
             <div className="relative z-10 pointer-events-none">
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
+              <span className="text-[10px] font-mono text-accent-purple uppercase tracking-widest mb-2 block">
                 Step 01
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-display text-lg md:text-xl font-semibold mb-2.5 tracking-tight">
                 We Intercept Fresh Signals
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed max-w-sm">
+              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed max-w-sm">
                 Our engine continuously scans obscure forums, niche communities, social feeds, and
                 intent networks to capture the exact moment someone asks for help with a service you
                 offer. These are real people, posting right now.
@@ -405,7 +405,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, ease }}
             whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between shadow-[0_0_15px_rgba(var(--rgb-white),0.15)]"
+            className="group relative p-6 md:p-8 metallic-card transition-all duration-500 min-h-[280px] md:min-h-[300px] flex flex-col justify-between shadow-[0_0_15px_rgba(var(--rgb-white),0.15)]"
           >
             {/* AI Filter Funnel Visual */}
             <div className="relative h-[140px] mb-4">
@@ -450,13 +450,13 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <span className="text-xs font-mono text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest mb-3 block">
+              <span className="text-[10px] font-mono text-text-secondary hover:text-text-primary transition-colors uppercase tracking-widest mb-2 block">
                 Step 02
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-display text-lg md:text-xl font-semibold mb-2.5 tracking-tight">
                 AI Filters Out the Noise
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
                 Not every signal is worth your time. Our AI automatically filters dead leads, spam,
                 low-intent posts, and irrelevant requests — so only genuine, high-probability
                 opportunities make it through.
@@ -471,7 +471,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, ease }}
             whileHover={{ y: -4 }}
-            className="group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            className="group relative p-6 md:p-8 metallic-card transition-all duration-500 min-h-[280px] md:min-h-[300px] flex flex-col justify-between"
           >
             {/* Intelligence Dossier Builder */}
             <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-canvas-deeper/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.8)] overflow-hidden group-hover:border-border-subtle transition-colors duration-500 group-hover:border-accent-purple/15">
@@ -520,13 +520,13 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
+              <span className="text-[10px] font-mono text-accent-purple uppercase tracking-widest mb-2 block">
                 Step 03
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-display text-lg md:text-xl font-semibold mb-2.5 tracking-tight">
                 We Build Lead Intelligence
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
                 Every surviving lead gets deep-analyzed. We compile buyer context, company details,
                 urgency level, budget indicators, and the exact pain point they expressed — giving
                 you a complete intelligence brief before you even reach out.
@@ -541,7 +541,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, ease }}
             whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-8 md:p-10 metallic-card transition-all duration-500 min-h-[380px] flex flex-col justify-between"
+            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-500 min-h-[280px] md:min-h-[300px] flex flex-col justify-between"
           >
             {/* Dashboard Lead Drop Visual */}
             <div className="absolute right-10 top-10 bottom-10 w-[240px] hidden md:flex flex-col justify-center space-y-3">
@@ -574,7 +574,7 @@ export default function LandingPage() {
                   className="p-3.5 rounded-xl bg-code-bg-dark/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(var(--rgb-black),0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-border-subtle group-hover:bg-surface-secondary group-hover:shadow-[0_4px_16px_rgba(var(--rgb-black),0.6)] group-hover:translate-x-2"
                   style={{ transitionDelay: `${lead.delay}ms` }}
                 >
-<div className="w-8 h-8 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
                     <span className="text-[9px] font-bold text-accent-purple">
                       {lead.name
                         .split(' ')
@@ -583,44 +583,30 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-11 font-bold text-text-primary truncate">{lead.name}</div>
-                    <div className="text-[9px] text-text-secondary/50 truncate">{lead.signal}</div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    <span
-                      className="text-[9px] font-bold text-accent-purple opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ transitionDelay: `${lead.delay + 200}ms` }}
-                    >
-                      {lead.score}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-text-primary truncate">
+                        {lead.name}
+                      </span>
+                      <span className="text-[9px] font-bold text-accent-purple font-mono">
+                        {lead.score}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-text-secondary/60 truncate block">
+                      {lead.signal}
                     </span>
-                    <span
-                      className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ transitionDelay: `${lead.delay + 300}ms` }}
-                    />
                   </div>
                 </div>
               ))}
-
-              {/* Ready badge */}
-              <div
-                className="flex items-center justify-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ transitionDelay: '400ms' }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
-                <span className="text-[9px] text-accent-purple font-bold uppercase tracking-widest">
-                  Ready to Hunt
-                </span>
-              </div>
             </div>
 
             <div className="relative z-10 pointer-events-none md:w-[60%]">
-              <span className="text-xs font-mono text-accent-purple uppercase tracking-widest mb-3 block">
+              <span className="text-[10px] font-mono text-accent-purple uppercase tracking-widest mb-2 block">
                 Step 04
               </span>
-              <h3 className="font-display text-2xl font-bold mb-4 tracking-tight">
+              <h3 className="font-display text-lg md:text-xl font-semibold mb-2.5 tracking-tight">
                 Released to the Hunters
               </h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
+              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
                 Qualified, intelligence-loaded leads land directly in your dashboard — ready to act
                 on. Craft the perfect first touch or engage with your own strategy. Either way,
                 you&apos;re reaching warm buyers while the opportunity is still fresh.
@@ -633,7 +619,7 @@ export default function LandingPage() {
       {/* Conversational Intelligence Section */}
       <section
         id="features"
-        className="py-40 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]"
+        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]"
       >
         {/* Fine background glow */}
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-purple/[0.015] blur-2xl rounded-full pointer-events-none" />
@@ -650,7 +636,7 @@ export default function LandingPage() {
             <span className="text-[10px] uppercase tracking-widest mb-4 block font-semibold text-text-secondary/40 text-accent-purple">
               02 / Philosophy
             </span>
-            <h2 className="font-display text-[42px] md:text-[48px] font-bold tracking-tight mb-6 leading-[1.1] text-text-primary">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight mb-4 leading-[1.15] text-text-primary">
               Most lead tools{' '}
               <span className="text-text-secondary hover:text-text-primary transition-colors">
                 chase
@@ -659,7 +645,7 @@ export default function LandingPage() {
               <br />
               <span className="text-text-secondary font-light">We deliver intent.</span>
             </h2>
-            <p className="text-text-secondary text-sm leading-relaxed mb-10 max-w-sm font-light">
+            <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mb-8 max-w-sm font-light">
               Anyone can chase thousands of raw contacts. But without context, most get ignored.
               We prioritize high-intent signals over bulk noise.
             </p>
@@ -743,21 +729,21 @@ export default function LandingPage() {
       {/* Pricing */}
       <section
         id="pricing"
-        className="py-40 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
       >
         {/* Ambient glows */}
         <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
         <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
         {/* Header */}
-        <div className="text-center mb-24 relative z-10">
+        <div className="text-center mb-12 md:mb-14 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
+            <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-purple">
               Pricing Plans
             </span>
           </motion.div>
@@ -767,7 +753,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="font-display text-[48px] md:text-[64px] font-semibold tracking-tight mb-6 leading-[1.1]"
+            className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.15]"
           >
             Acquisition Fuel.
           </motion.h2>
@@ -777,7 +763,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2, ease }}
-            className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base text-text-secondary font-light max-w-xl mx-auto leading-relaxed"
           >
             Start free, upgrade when you&apos;re ready. Credits reveal lead identities so you can build
             your pipeline.
@@ -849,7 +835,7 @@ export default function LandingPage() {
               )}
 
               {/* Card inner */}
-              <div className="relative z-10 p-8 md:p-10 flex flex-col flex-1">
+              <div className="relative z-10 p-6 md:p-7 flex flex-col flex-1">
                 {/* Popular badge */}
                 {p.featured && (
                   <span className="absolute top-6 right-6 text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
@@ -858,23 +844,23 @@ export default function LandingPage() {
                 )}
 
                 {/* Plan name & description */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <div
-                    className={`w-8 h-8 rounded-md ${p.featured ? 'bg-accent-purple/10 border border-accent-purple/20 text-accent-purple' : 'bg-white/5 border border-white/5 text-text-secondary/60'} flex items-center justify-center mb-5`}
+                    className={`w-8 h-8 rounded-md ${p.featured ? 'bg-accent-purple/10 border border-accent-purple/20 text-accent-purple' : 'bg-white/5 border border-white/5 text-text-secondary/60'} flex items-center justify-center mb-4`}
                   >
                     <SparklesIcon className="w-[18px] h-[18px]" />
                   </div>
-                  <h4 className="font-display text-2xl font-bold tracking-tight mb-2">{p.name}</h4>
-                  <p className="text-sm text-text-secondary font-light leading-relaxed">{p.desc}</p>
+                  <h4 className="font-display text-xl font-bold tracking-tight mb-1.5">{p.name}</h4>
+                  <p className="text-xs text-text-secondary font-light leading-relaxed">{p.desc}</p>
                 </div>
 
                 {/* Price */}
-                <div className="mb-8 pb-8 border-b border-white/[0.04]">
+                <div className="mb-6 pb-6 border-b border-white/[0.04]">
                   <div className="flex items-end gap-3 mb-3">
-                    <span className="font-display text-[56px] font-semibold leading-none tracking-tight text-text-primary">
+                    <span className="font-display text-4xl md:text-[44px] font-semibold leading-none tracking-tight text-text-primary">
                       {p.price}
                     </span>
-                    <span className="text-text-secondary/60 mb-3 text-[10px] font-bold uppercase tracking-widest">during early access</span>
+                    <span className="text-text-secondary/60 mb-2 text-[10px] font-bold uppercase tracking-widest">during early access</span>
                   </div>
 
                   {/* Token meter bar */}
@@ -896,12 +882,12 @@ export default function LandingPage() {
                 </div>
 
                 {/* Feature list */}
-                <div className="flex-1 mb-8">
-                  <ul className="space-y-3">
+                <div className="flex-1 mb-6">
+                  <ul className="space-y-2.5">
                     {p.features.map((feat) => (
                       <li
                         key={feat}
-                        className="flex items-center gap-3 text-sm text-text-secondary/80"
+                        className="flex items-center gap-3 text-xs text-text-secondary/80"
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full bg-accent-${p.accent} shrink-0`}
@@ -915,9 +901,9 @@ export default function LandingPage() {
                 {/* CTA */}
                 <Link
                   href="/register"
-                  className={`block w-full py-4 rounded-2xl font-bold text-sm tracking-tight text-center transition-all duration-500 ${
+                  className={`block w-full py-2.5 rounded-xl font-semibold text-xs tracking-wide text-center transition-all duration-300 ${
                     p.featured
-                      ? 'bg-accent-orange text-text-on-accent'
+                      ? 'bg-accent-orange text-text-on-accent hover:brightness-110 shadow-[0_4px_20px_rgba(var(--rgb-accent-orange),0.3)]'
                       : 'bg-white/[0.04] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] text-text-primary hover:bg-white/[0.07]'
                   }`}
                 >
@@ -943,13 +929,13 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-40 px-8 max-w-[860px] mx-auto">
+      <section id="faq" className="py-20 md:py-24 px-6 max-w-[800px] mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="font-display text-[44px] font-semibold tracking-tight mb-16 text-center"
+          className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-10 text-center"
         >
           Operational Clarifications.
         </motion.h2>
@@ -974,7 +960,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-32 px-6 max-w-[1100px] mx-auto text-center relative overflow-hidden">
+      <section className="py-20 md:py-24 px-6 max-w-[1000px] mx-auto text-center relative overflow-hidden">
         {/* Glowing aura */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-purple/[0.03] blur-2xl rounded-full pointer-events-none" />
 
@@ -983,7 +969,7 @@ export default function LandingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="relative z-10 p-16 md:p-24 rounded-5xl border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
+          className="relative z-10 p-10 md:p-14 rounded-3xl border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
@@ -991,17 +977,17 @@ export default function LandingPage() {
             Exclusive Syndicate Access
           </span>
 
-          <h2 className="font-display text-4xl md:text-6xl font-semibold tracking-tight text-text-primary mb-6 leading-tight">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-text-primary mb-4 leading-snug">
             Stop Wasting Time <br />
             Looking For Clients.
           </h2>
 
-          <p className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-sm sm:text-base text-text-secondary font-light max-w-xl mx-auto mb-8 leading-relaxed">
             Lead Hunter Club brings fresh opportunities directly to you — while AI helps you start
             smarter conversations that actually get replies.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12 font-mono text-sm text-text-secondary/70">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 font-mono text-xs text-text-secondary/70">
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
               Spend less time scraping.
@@ -1012,7 +998,7 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-3.5">
             <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
@@ -1020,7 +1006,7 @@ export default function LandingPage() {
             >
               <Link
                 href="/register"
-                className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-accent-orange text-text-on-accent font-bold text-sm shadow-[0_8px_30px_rgba(var(--rgb-accent-orange),0.35)] hover: transition-all duration-500 group"
+                className="inline-flex items-center gap-2.5 px-7 py-3 rounded-xl bg-accent-orange text-text-on-accent font-semibold text-xs sm:text-sm shadow-[0_4px_20px_rgba(var(--rgb-accent-orange),0.3)] hover:brightness-110 transition-all duration-300 group"
               >
                 Start Finding Leads
                 <ArrowRightIcon className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-1" />
@@ -1029,7 +1015,7 @@ export default function LandingPage() {
             <motion.div whileHover={{ scale: 1.02 }} className="inline-block">
               <Link
                 href="/sneak-peek"
-                className="inline-flex items-center gap-2 px-10 py-5 rounded-2xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] text-sm"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] text-xs sm:text-sm"
               >
                 Sneak Peek
               </Link>

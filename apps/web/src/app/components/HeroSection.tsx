@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
@@ -843,14 +843,14 @@ export default function HeroSection() {
       />
 
       {/* Centered Clario-style hero layout */}
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col justify-center items-center text-center pt-20 pb-4 transform-gpu">
+      <div className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col justify-center items-center text-center pt-16 pb-4 transform-gpu">
         <div className="flex flex-col items-center relative w-full">
           {/* Centered Main Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.07, ease }}
-            className="font-sans text-[38px] md:text-[54px] lg:text-[68px] font-semibold leading-[1.05] tracking-tighter mb-6 text-text-primary max-w-4xl mx-auto antialiased"
+            className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-semibold leading-[1.1] tracking-tight mb-5 text-text-primary max-w-3xl mx-auto antialiased"
           >
             Stop looking for clients
             <br />
@@ -862,7 +862,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease }}
-            className="text-[15px] md:text-[17px] text-text-secondary font-light leading-relaxed mb-10 max-w-2xl mx-auto antialiased"
+            className="text-sm sm:text-base text-text-secondary font-light leading-relaxed mb-8 max-w-xl mx-auto antialiased"
           >
             Lead Hunter Club monitors active service demand in real-time, compiles deep social
             intelligence, and unlocks verified contact details — so you can close deals while the
@@ -874,13 +874,13 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="flex flex-row items-center justify-center gap-4 w-full relative z-10"
+            className="flex flex-row items-center justify-center gap-3.5 w-full relative z-10"
           >
             <Link href="/register">
               <motion.span
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-primary-container text-on-primary-container font-bold text-sm cursor-pointer shadow-[0_4px_25px_rgba(var(--rgb-primary-container),0.3)] transition-all hover:bg-primary-container/90"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary-container text-on-primary-container font-semibold text-xs sm:text-sm cursor-pointer shadow-[0_4px_20px_rgba(var(--rgb-primary-container),0.25)] transition-all hover:bg-primary-container/90"
               >
                 Start Hunting <ArrowTopRightOnSquareIcon className="w-4 h-4" />
               </motion.span>
@@ -888,7 +888,7 @@ export default function HeroSection() {
             <Link href="/sneak-peek">
               <motion.span
                 whileHover={{ scale: 1.02 }}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] hover:border-accent-purple/20"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary text-xs sm:text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] hover:border-accent-purple/20"
               >
                 Sneak Peek
               </motion.span>
@@ -950,7 +950,7 @@ export default function HeroSection() {
             </div>
 
             {/* App body */}
-            <div className="flex h-[760px] bg-bg-main overflow-hidden">
+            <div className="flex h-[540px] md:h-[580px] bg-bg-main overflow-hidden">
               {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
               <div className="w-[240px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
                 <div className="px-5 mb-6 flex items-center gap-3">

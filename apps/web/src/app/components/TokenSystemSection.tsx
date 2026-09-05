@@ -139,16 +139,16 @@ export default function TokenSystemSection() {
   const activeCardIndex = leads.findIndex((l) => l.id === activeCardId)
 
   return (
-    <section id="tokens" className="py-40 px-6 max-w-[1300px] mx-auto overflow-hidden">
+    <section id="tokens" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto overflow-hidden">
       {/* Centered Header Section with Big Eyebrow */}
-      <div className="text-center mb-24 max-w-4xl mx-auto space-y-5">
+      <div className="text-center mb-12 md:mb-14 max-w-4xl mx-auto space-y-4">
         <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
           Simple Token-Based System
         </span>
-        <h2 className="font-display text-4xl md:text-5xl lg:text-[56px] font-semibold tracking-tight text-text-primary leading-[1.1] max-w-3xl mx-auto">
+        <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight text-text-primary leading-[1.15] max-w-2xl mx-auto">
           You control how your workflow operates.
         </h2>
-        <p className="text-base md:text-lg text-text-secondary font-light leading-relaxed max-w-3xl mx-auto">
+        <p className="text-sm sm:text-base text-text-secondary font-light leading-relaxed max-w-xl mx-auto">
           Every subscription includes monthly tokens. Use them however you want—unlock qualified
           leads, reveal verified contact details, and access real-time intent intelligence. No
           bloated pricing tiers, and no paying for features you never use.
@@ -164,7 +164,7 @@ export default function TokenSystemSection() {
               Live Token Ledger Simulator
             </span>
             <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-xl">
-              <BanknotesIcon className="w-4 h-4 text-text-secondary animate-pulse" />
+              <BanknotesIcon className="w-4 h-4 text-text-secondary" />
               <span className="font-mono text-base font-bold text-text-primary">
                 {tokens} Credits
               </span>

@@ -133,7 +133,7 @@ export default function TestimonialsSection() {
   return (
     <section
       id="testimonials"
-      className="py-36 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
       {/* Self-contained float-heart & drift animations */}
       <style jsx global>{`
@@ -168,14 +168,14 @@ export default function TestimonialsSection() {
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] glow-purple-medium pointer-events-none z-0" />
 
       {/* Header */}
-      <div className="text-center mb-12 relative z-10">
+      <div className="text-center mb-10 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-orange">
+          <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-orange">
             Reviews (what people say)
           </span>
         </motion.div>
@@ -185,7 +185,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.08, ease }}
-          className="font-display text-[38px] md:text-[52px] font-semibold tracking-tight text-text-primary leading-[1.1] mb-5 max-w-3xl mx-auto"
+          className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight text-text-primary leading-[1.15] mb-4 max-w-2xl mx-auto"
         >
           Real results from real people.
           <br />
@@ -197,7 +197,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.15, ease }}
-          className="text-base text-text-secondary/60 max-w-lg mx-auto leading-relaxed"
+          className="text-sm sm:text-base text-text-secondary/60 max-w-lg mx-auto leading-relaxed"
         >
           Freelancers, designers, and agency owners share exactly what changed after switching to
           LeadHunterClub.

@@ -352,7 +352,7 @@ export default function LeadsPage() {
                   <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4 text-red-400">
                     <AdjustmentsHorizontalIcon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-base font-bold text-text-primary mb-1">Couldn't load leads</h3>
+                  <h3 className="text-base font-bold text-text-primary mb-1">Couldn&apos;t load leads</h3>
                   <p className="text-sm text-text-secondary/70 max-w-sm">{error}</p>
                   <button
                     onClick={fetchLeads}

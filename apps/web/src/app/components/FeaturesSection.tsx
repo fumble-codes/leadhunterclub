@@ -882,21 +882,21 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="py-40 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
       {/* Ambient backdrop glows */}
       <div className="absolute top-[-5%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
       <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
 
       {/* Headline */}
-      <div className="text-center mb-28 relative z-10">
+      <div className="text-center mb-12 md:mb-14 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-purple">
+          <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-purple">
             Product Capabilities
           </span>
         </motion.div>
@@ -906,7 +906,7 @@ export default function FeaturesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1, ease }}
-          className="font-display text-[42px] md:text-[56px] font-semibold tracking-tight mb-6 leading-[1.1] max-w-4xl mx-auto"
+          className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.15] max-w-3xl mx-auto"
         >
           Everything You Need.
           <br />
@@ -918,7 +918,7 @@ export default function FeaturesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2, ease }}
-          className="text-lg md:text-xl text-text-secondary font-light max-w-2xl mx-auto leading-relaxed"
+          className="text-sm sm:text-base text-text-secondary font-light max-w-xl mx-auto leading-relaxed"
         >
           A complete, unified acquisition stack designed to qualify, analyze, and convert high-value
           clients effortlessly.
@@ -926,7 +926,7 @@ export default function FeaturesSection() {
       </div>
 
       {/* ═══ ALTERNATING FULL-WIDTH ROWS ═══ */}
-      <div className="space-y-24 md:space-y-36 relative z-10">
+      <div className="space-y-16 md:space-y-20 relative z-10">
         {/* ── ROW 1: Fresh Daily Leads + Multi-Platform Sourcing (Text Left / Visual Right) ── */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}

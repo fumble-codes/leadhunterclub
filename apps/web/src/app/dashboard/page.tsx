@@ -75,7 +75,7 @@ export default function DashboardPage() {
     return (
       <main className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl max-w-md">
-          <h3 className="text-base font-bold text-text-primary mb-2">Couldn't load your dashboard</h3>
+          <h3 className="text-base font-bold text-text-primary mb-2">Couldn&apos;t load your dashboard</h3>
           <p className="text-sm text-text-secondary/70 mb-6">{error}</p>
           <button
             onClick={() => load(true)}
