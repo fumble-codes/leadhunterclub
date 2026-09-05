@@ -329,7 +329,7 @@ export default function RegisterPage() {
                     className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {emailVerified
-                      ? 'Skip — I’ll do this later'
+                      ? 'Skip · I’ll do this later'
                       : 'Verify your email first to continue'}
                   </button>
                 </>
@@ -385,7 +385,7 @@ export default function RegisterPage() {
                     className="text-xs text-text-secondary/40 hover:text-text-secondary transition-colors text-center disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {emailVerified
-                      ? 'Skip — I’ll do this later'
+                      ? 'Skip · I’ll do this later'
                       : 'Verify your email first to continue'}
                   </button>
                 </>

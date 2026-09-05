@@ -119,7 +119,7 @@ function FreshLeadsVisual({
         )
       })}
       <div className="flex items-center gap-2 mt-1 ml-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
         <span className="text-[9px] text-accent-purple/60 font-bold uppercase tracking-widest">
           Live Feed
         </span>
@@ -194,7 +194,7 @@ function PlatformNetworkVisual({
     <div className={`relative aspect-[200/160] w-full max-w-[220px] mx-auto ${className}`}>
       {/* Center hub */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center z-20">
-        <AdjustmentsHorizontalIcon className="w-4 h-4 text-text-secondary animate-pulse" />
+        <AdjustmentsHorizontalIcon className="w-4 h-4 text-text-secondary" />
       </div>
 
       {/* Connection lines */}
@@ -408,7 +408,7 @@ function LeadIntelVisual({
           </div>
           <div className="min-w-0 flex-1">
             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[9px] font-bold tracking-wider uppercase mb-0.5">
-              <span className="w-1 h-1 bg-accent-purple rounded-full animate-pulse" />
+              <span className="w-1 h-1 bg-accent-purple rounded-full" />
               15 Signals
             </span>
             <div className="text-[11px] font-bold text-text-primary truncate">Alex K.</div>
@@ -480,7 +480,7 @@ function LeadIntelVisual({
         </div>
         <p className="text-[10px] text-text-secondary/70 leading-snug">
           {emailStatus === 'sent'
-            ? '"Lead revealed — verified email and phone unlocked. Saved to your pipeline."'
+            ? '"Lead revealed: verified email and phone unlocked. Saved to your pipeline."'
             : '"Posted about high Shopify acquisition costs on Twitter 2h ago. Actively seeking conversion assistance."'}
         </p>
       </motion.div>
@@ -560,7 +560,7 @@ function EmailComposeVisual({
             </motion.div>
           ) : (
             <>
-              High buyer intent detected — posted about rising Shopify acquisition costs 2h ago.
+              High buyer intent detected. Posted about rising Shopify acquisition costs 2h ago.
               Email and phone unlocked. Ready to save and reach out on your own terms.
               <span className="inline-block w-1 h-3 ml-0.5 bg-accent-purple animate-pulse align-middle" />
             </>
@@ -799,21 +799,21 @@ function PersonaCardsVisual({
       role: 'Free',
       icon: CodeBracketIcon,
       accent: 'accent-purple',
-      desc: '50 credits — get started today',
+      desc: '50 credits · Get started today',
     },
     {
       id: 'freelancer',
       role: 'Freelancer',
       icon: PaintBrushIcon,
       accent: 'accent-purple',
-      desc: '500 credits — build your pipeline',
+      desc: '500 credits · Build your pipeline',
     },
     {
       id: 'agency',
       role: 'Agency',
       icon: ChartBarIcon,
       accent: 'accent-purple',
-      desc: '1,000 credits — scale operations',
+      desc: '1,000 credits · Scale operations',
     },
   ]
 
@@ -896,8 +896,8 @@ export default function FeaturesSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-purple">
-            Product Capabilities
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
+            [ CAPABILITIES ]
           </span>
         </motion.div>
 
@@ -938,8 +938,8 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-                Real-time acquisition
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
+                01 // Real-Time Interception
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Fresh Daily Leads from Multiple Platforms
@@ -1002,8 +1002,8 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-                Lead Enrichment
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
+                02 // Deep Intelligence
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Lead Intelligence with Revealed Contacts
@@ -1062,8 +1062,8 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-                Pipeline momentum
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
+                03 // Pipeline Momentum
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Track Every Touch
@@ -1071,7 +1071,7 @@ export default function FeaturesSection() {
             </div>
             <p className="text-text-secondary text-sm md:text-base leading-relaxed">
               Keep your pipeline moving by logging every interaction. Reveal a lead, save it, mark
-              when you reach out — and see where each conversation stands at a glance.
+              when you reach out, and see where each conversation stands at a glance.
             </p>
             <ul className="space-y-3 pt-2">
               {[
@@ -1120,8 +1120,8 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-                Credit-Based Usage
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
+                04 // Credit Economics
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Credits Based, Not Seat Based
@@ -1140,7 +1140,7 @@ export default function FeaturesSection() {
                 },
                 {
                   title: 'Built for Every Scale',
-                  desc: 'From solo operators to full agencies — pick the credit plan that fits.',
+                  desc: 'From solo operators to full agencies: pick the credit plan that fits.',
                 },
               ].map((item, idx) => (
                 <li key={idx} className="flex gap-2.5 items-start">

@@ -134,7 +134,7 @@ export default function PendingApprovalPage() {
 
               <p className="text-sm text-text-secondary leading-relaxed mb-8">
                 Thanks for completing your profile! Our team is reviewing your application. This
-                page refreshes automatically — you&apos;ll be redirected to the dashboard once
+                page refreshes automatically: you&apos;ll be redirected to the dashboard once
                 approved.
               </p>
 

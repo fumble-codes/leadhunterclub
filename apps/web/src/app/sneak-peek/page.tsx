@@ -104,7 +104,7 @@ export default function SneakPeekPage() {
               <div>
                 <span className="text-sm font-bold text-text-primary">Sneak Peek Mode</span>
                 <span className="text-xs text-text-secondary/60 ml-2">
-                  — You&apos;re previewing the lead feed. Lead details are locked until you have
+                  · You&apos;re previewing the lead feed. Lead details are locked until you have
                   tokens.
                 </span>
               </div>

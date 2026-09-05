@@ -175,8 +175,8 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-orange">
-            Reviews (what people say)
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
+            [ 04 // MEMBER PROOF ]
           </span>
         </motion.div>
 
@@ -207,7 +207,7 @@ export default function TestimonialsSection() {
       {/* Live Feed Status Notice */}
       <div className="flex items-center justify-center gap-2.5 text-[12px] text-text-secondary/45 leading-relaxed mb-12 relative z-10">
         <span>✨</span>
-        <span>These screenshots are shared directly by active members inside our club — this feed is live.</span>
+        <span>These screenshots are shared directly by active members inside our club: this feed is live.</span>
       </div>
 
       {/* Reviews Grid & Hover Interactive Zone */}
@@ -223,7 +223,7 @@ export default function TestimonialsSection() {
                 onMouseEnter={isMiddleTrigger ? () => setIsHovered(true) : undefined}
               >
                 {isMiddleTrigger && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-orange text-bg-main border border-accent-orange/40 text-[10px] font-bold tracking-wider uppercase shadow-[0_4px_14px_rgba(var(--rgb-accent-orange),0.35)] animate-pulse whitespace-nowrap">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent-orange text-bg-main border border-accent-orange/40 text-[10px] font-mono font-bold tracking-wider uppercase shadow-[0_4px_14px_rgba(var(--rgb-accent-orange),0.35)] whitespace-nowrap">
                     <span>✨</span>
                     <span>Reviews (what people say)</span>
                   </div>

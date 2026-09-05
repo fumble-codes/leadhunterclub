@@ -78,7 +78,7 @@ const SIGNAL_LEADS = [
     company: 'Nexus AI',
     source: 'Reddit',
     signal:
-      '"Struggling with slow load times and high bounce rates on our Shopify store — losing sales."',
+      '"Struggling with slow load times and high bounce rates on our Shopify store, losing sales."',
     urgency: 'High',
     tags: ['Shopify', 'Web Dev'],
     email: 'a.shepard@nexus.ai',
@@ -120,7 +120,7 @@ function SignalPreviewUI() {
             live-signal-feed
           </span>
           <div className="ml-auto flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
             <span className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary">
               Intent Monitor
             </span>
@@ -280,8 +280,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-purple">
-              How It Works
+            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
+              [ 01 // HOW IT WORKS ]
             </span>
           </motion.div>
 
@@ -305,7 +305,7 @@ export default function LandingPage() {
             className="text-sm sm:text-base text-text-secondary font-light max-w-xl mx-auto leading-relaxed"
           >
             Here&apos;s exactly how Lead Hunter Club turns unindexed buyer signals into high-value
-            client conversations — before your competitors even know they exist.
+            client conversations before competitors even know they exist.
           </motion.p>
         </div>
 
@@ -458,7 +458,7 @@ export default function LandingPage() {
               </h3>
               <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
                 Not every signal is worth your time. Our AI automatically filters dead leads, spam,
-                low-intent posts, and irrelevant requests — so only genuine, high-probability
+                low-intent posts, and irrelevant requests: only genuine, high-probability
                 opportunities make it through.
               </p>
             </div>
@@ -488,7 +488,7 @@ export default function LandingPage() {
                   {[
                     { field: 'Pain Point', value: 'High CAC on Shopify store', delay: 0 },
                     { field: 'Budget', value: '$5k-$10k range', delay: 80 },
-                    { field: 'Urgency', value: 'Critical — Q2 deadline', delay: 160 },
+                    { field: 'Urgency', value: 'Critical (Q2 deadline)', delay: 160 },
                     { field: 'Context', value: 'Posted on Twitter 2h ago', delay: 240 },
                   ].map((item) => (
                     <div
@@ -511,7 +511,7 @@ export default function LandingPage() {
                   className="flex items-center gap-2 mt-auto pt-2 border-t border-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{ transitionDelay: '350ms' }}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
                   <span className="text-[9px] text-accent-purple font-bold uppercase tracking-widest">
                     Intent Score: 94%
                   </span>
@@ -528,7 +528,7 @@ export default function LandingPage() {
               </h3>
               <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
                 Every surviving lead gets deep-analyzed. We compile buyer context, company details,
-                urgency level, budget indicators, and the exact pain point they expressed — giving
+                urgency level, budget indicators, and the exact pain point they expressed, giving
                 you a complete intelligence brief before you even reach out.
               </p>
             </div>
@@ -607,7 +607,7 @@ export default function LandingPage() {
                 Released to the Hunters
               </h3>
               <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
-                Qualified, intelligence-loaded leads land directly in your dashboard — ready to act
+                Qualified, intelligence-loaded leads land directly in your dashboard, ready to act
                 on. Craft the perfect first touch or engage with your own strategy. Either way,
                 you&apos;re reaching warm buyers while the opportunity is still fresh.
               </p>
@@ -633,8 +633,8 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease }}
             className="lg:col-span-5 text-left relative z-10"
           >
-            <span className="text-[10px] uppercase tracking-widest mb-4 block font-semibold text-text-secondary/40 text-accent-purple">
-              02 / Philosophy
+            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-4 block text-orange-400">
+              [ 02 // PHILOSOPHY ]
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight mb-4 leading-[1.15] text-text-primary">
               Most lead tools{' '}
@@ -743,8 +743,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[10px] font-bold tracking-ultra uppercase mb-3 block text-accent-purple">
-              Pricing Plans
+            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
+              [ 05 // ACQUISITION FUEL ]
             </span>
           </motion.div>
 
@@ -954,7 +954,7 @@ export default function LandingPage() {
           />
           <FAQItem
             q="Can I contact these leads myself?"
-            a="Yes. You get the verified contact info and intelligence, and you reach out however you prefer — from your own email, LinkedIn, or phone. We focus on high-intent, quality conversations."
+            a="Yes. You get the verified contact info and intelligence, and you reach out however you prefer: from your own email, LinkedIn, or phone. We focus on high-intent, quality conversations."
           />
         </div>
       </section>
@@ -973,8 +973,8 @@ export default function LandingPage() {
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
-          <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-            Exclusive Syndicate Access
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
+            [ GET STARTED ]
           </span>
 
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-text-primary mb-4 leading-snug">
@@ -983,7 +983,7 @@ export default function LandingPage() {
           </h2>
 
           <p className="text-sm sm:text-base text-text-secondary font-light max-w-xl mx-auto mb-8 leading-relaxed">
-            Lead Hunter Club brings fresh opportunities directly to you — while AI helps you start
+            Lead Hunter Club brings fresh opportunities directly to you, while intelligence helps you start
             smarter conversations that actually get replies.
           </p>
 

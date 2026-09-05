@@ -50,7 +50,7 @@ export default function TokenSystemSection() {
       email: 'a.shepard@gmail.com',
       company: 'Nexus AI',
       source: 'Twitter',
-      title: 'Web Development For —',
+      title: 'Shopify Speed Optimization',
       signalContext:
         'Struggling with slow load times and high bounce rates on their current Shopify store.',
       urgency: 'high',
@@ -64,7 +64,7 @@ export default function TokenSystemSection() {
       email: 'm.carter@stellar.co',
       company: 'Stellar Co',
       source: 'Reddit',
-      title: 'Brand Identity For —',
+      title: 'Brand Identity & Design System',
       signalContext: 'Just raised seed round, looking to completely rebrand before product launch.',
       urgency: 'medium',
       nicheTags: ['SaaS', 'Branding', 'Design'],
@@ -77,7 +77,7 @@ export default function TokenSystemSection() {
       email: 'l.hernandez@nexus.com',
       company: 'Nexus Analytics',
       source: 'Twitter',
-      title: 'SEO Strategy For —',
+      title: 'SEO Technical Strategy',
       signalContext: 'Competitor just outranked them for their main keyword. Founder is stressed.',
       urgency: 'critical',
       nicheTags: ['B2B SaaS', 'SEO', 'Content'],
@@ -90,7 +90,7 @@ export default function TokenSystemSection() {
       email: 'd.chen@apexflow.io',
       company: 'ApexFlow',
       source: 'LinkedIn',
-      title: 'SaaS Platform For —',
+      title: 'Node.js Backend Refactor',
       signalContext:
         'Looking for a dedicated Node/React team to refactor their legacy subscription architecture.',
       urgency: 'medium',
@@ -104,7 +104,7 @@ export default function TokenSystemSection() {
       email: 's.jenkins@elevateops.net',
       company: 'Elevate Ops',
       source: 'Threads',
-      title: 'Growth Marketing For —',
+      title: 'B2B Growth Marketing',
       signalContext:
         'Scaling outbound campaigns and looking for a reliable growth partner.',
       urgency: 'critical',
@@ -142,14 +142,14 @@ export default function TokenSystemSection() {
     <section id="tokens" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto overflow-hidden">
       {/* Centered Header Section with Big Eyebrow */}
       <div className="text-center mb-12 md:mb-14 max-w-4xl mx-auto space-y-4">
-        <span className="text-[10px] font-bold tracking-ultra uppercase text-accent-purple">
-          Simple Token-Based System
+        <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-orange-400">
+          [ 02 // CREDIT SYSTEM ]
         </span>
         <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight text-text-primary leading-[1.15] max-w-2xl mx-auto">
           You control how your workflow operates.
         </h2>
         <p className="text-sm sm:text-base text-text-secondary font-light leading-relaxed max-w-xl mx-auto">
-          Every subscription includes monthly tokens. Use them however you want—unlock qualified
+          Every subscription includes monthly tokens. Use them however you want: unlock qualified
           leads, reveal verified contact details, and access real-time intent intelligence. No
           bloated pricing tiers, and no paying for features you never use.
         </p>
@@ -195,7 +195,7 @@ export default function TokenSystemSection() {
                 <span
                   className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'leads' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
-                  ● USER INTENT FEEDS
+                  USER INTENT FEEDS
                 </span>
                 <ChevronRightIcon
                   className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'leads' ? 'rotate-90' : ''}`}
@@ -262,7 +262,7 @@ export default function TokenSystemSection() {
                 <span
                   className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'contacts' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
-                  ○ VERIFIED CONTACTS
+                  VERIFIED CONTACTS
                 </span>
                 <ChevronRightIcon
                   className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'contacts' ? 'rotate-90' : ''}`}
@@ -277,7 +277,7 @@ export default function TokenSystemSection() {
                   className="mt-3 overflow-hidden text-xs text-text-secondary pl-3"
                 >
                   <p className="leading-relaxed">
-                    Revealing a lead decrypts the verified email address, phone, and profile link —
+                    Revealing a lead decrypts the verified email address, phone, and profile link:
                     export anytime as CSV or Excel.
                   </p>
                 </motion.div>
@@ -297,7 +297,7 @@ export default function TokenSystemSection() {
                 <span
                   className={`text-xs font-bold font-mono tracking-widest uppercase ${activeTab === 'pipeline' ? 'text-text-secondary hover:text-text-primary transition-colors' : 'text-text-secondary'}`}
                 >
-                  ○ PIPELINE TRACKING
+                  PIPELINE TRACKING
                 </span>
                 <ChevronRightIcon
                   className={`w-4 h-4 text-text-secondary transition-transform duration-300 ${activeTab === 'pipeline' ? 'rotate-90' : ''}`}
@@ -312,7 +312,7 @@ export default function TokenSystemSection() {
                   className="mt-3 overflow-hidden text-xs text-text-secondary pl-3"
                 >
                   <p className="leading-relaxed">
-                    Keep your saved pipeline moving — mark when you reach out, when a prospect
+                    Keep your saved pipeline moving: mark when you reach out, when a prospect
                     replies, and watch every deal progress to close.
                   </p>
                 </motion.div>

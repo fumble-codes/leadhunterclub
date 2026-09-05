@@ -810,7 +810,7 @@ export default function OnboardingPage() {
                       Almost there!
                     </h1>
                     <p className="text-sm text-text-secondary mt-2">
-                      One last thing — how did you find us?
+                      One last thing: how did you find us?
                     </p>
                   </div>
 

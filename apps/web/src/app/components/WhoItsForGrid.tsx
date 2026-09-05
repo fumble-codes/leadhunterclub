@@ -53,7 +53,7 @@ const mockLead1 = {
   email: 'l.hernandez@nexus.com',
   company: 'Nexus Analytics',
   source: 'Twitter',
-  title: 'SEO Strategy For —',
+  title: 'SEO Strategy & Keyword Recovery',
   signalContext: 'Competitor just outranked them for their main keyword. Founder is stressed.',
   urgency: 'critical',
   nicheTags: ['B2B SaaS', 'SEO', 'Content'],
@@ -69,7 +69,7 @@ const mockLead2 = {
   email: 'd.anderson@prism.io',
   company: 'Prism Labs',
   source: 'Job Board',
-  title: 'Sales Enablement For —',
+  title: 'Sales Enablement & Outbound Systems',
   signalContext: 'Just hired 3 new SDRs. Clear indicator they need outbound infrastructure.',
   urgency: 'medium',
   nicheTags: ['B2B', 'Sales', 'Systems'],
@@ -94,7 +94,7 @@ const PERSONAS: PersonaData[] = [
       email: 'a.shepard@nexus.ai',
       company: 'Nexus AI',
       source: 'Reddit',
-      title: 'Web Development For —',
+      title: 'Shopify Speed & Web Optimization',
       signalContext:
         'Struggling with slow load times and high bounce rates on their current Shopify store.',
       urgency: 'high',
@@ -117,7 +117,7 @@ const PERSONAS: PersonaData[] = [
       email: 'alex@dtcbrands.co',
       company: 'DTC Brands',
       source: 'Twitter',
-      title: 'UI/UX Design For —',
+      title: 'Checkout UI/UX Redesign',
       signalContext: 'Our current checkout page is ugly and conversions are dropping drastically.',
       urgency: 'critical',
       nicheTags: ['E-Commerce', 'UI/UX', 'Conversion'],
@@ -139,7 +139,7 @@ const PERSONAS: PersonaData[] = [
       email: 's.connor@vanguard.io',
       company: 'Vanguard Group',
       source: 'LinkedIn',
-      title: 'Brand Identity For —',
+      title: 'Brand Identity & Design System',
       signalContext:
         'Looking for a brand designer to completely overhaul our corporate guidelines and slide deck.',
       urgency: 'high',
@@ -162,7 +162,7 @@ const PERSONAS: PersonaData[] = [
       email: 'm.carter@stellar.co',
       company: 'Stellar Co',
       source: 'Reddit',
-      title: 'Next.js Optimization For —',
+      title: 'Next.js Performance & Core Web Vitals',
       signalContext: 'Core web vitals dragging down SEO ranking, LCP over 4 seconds.',
       urgency: 'critical',
       nicheTags: ['Next.js', 'Core Web Vitals', 'SEO'],
@@ -184,7 +184,7 @@ const PERSONAS: PersonaData[] = [
       email: 'm.gold@apparelscale.com',
       company: 'Marcus Apparel',
       source: 'LinkedIn',
-      title: 'Paid Ads Scaling For —',
+      title: 'Paid Ads Scaling & Creative Testing',
       signalContext:
         'Struggling to maintain ROAS above 1.8x, looking for creative ad testing framework.',
       urgency: 'high',
@@ -207,7 +207,7 @@ const PERSONAS: PersonaData[] = [
       email: 'david@gtmpartners.co',
       company: 'GTM Partners',
       source: 'Twitter',
-      title: 'B2B Demand Gen For —',
+      title: 'B2B Demand Gen & Retainer Pipeline',
       signalContext:
         'Need an agency with proven experience in B2B demand gen and scalable pipelines.',
       urgency: 'high',
@@ -256,7 +256,7 @@ export default function WhoItsForGrid() {
       setDisplayedText('')
 
       let index = 0
-      const fullText = `Verified contact unlocked: ${activePersona.lead.email} · phone and profile link included. Saved to your pipeline — export anytime as CSV or Excel.`
+      const fullText = `Verified contact unlocked: ${activePersona.lead.email} · phone and profile link included. Saved to your pipeline: export anytime as CSV or Excel.`
       const interval = setInterval(() => {
         if (index < fullText.length) {
           setDisplayedText(fullText.substring(0, index + 2))
@@ -291,8 +291,8 @@ export default function WhoItsForGrid() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-[10px] uppercase font-bold tracking-ultra mb-3 block text-accent-purple">
-              Target Audiences
+            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
+              [ 03 // AUDIENCE RADAR ]
             </span>
           </motion.div>
           <motion.h2
@@ -357,7 +357,7 @@ export default function WhoItsForGrid() {
         <div
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[540px] md:h-[600px] justify-between"
+          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[460px] md:h-[500px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">
@@ -403,7 +403,7 @@ export default function WhoItsForGrid() {
             </div>
 
             {/* Simulated Desktop Workspace Main Panel */}
-            <div className="flex-1 h-full flex flex-col bg-bg-main relative p-8 md:p-10 lg:p-12 overflow-hidden">
+            <div className="flex-1 h-full flex flex-col bg-bg-main relative p-4 md:p-6 overflow-hidden">
               {/* BACKGROUND LAYER: The leads feed dashboard (dimmed/blurred when cockpit overlays) */}
               <div
                 className={`w-full h-full flex flex-col justify-start gap-5 transition-all duration-500 ${
@@ -429,7 +429,7 @@ export default function WhoItsForGrid() {
                       Lead Feed
                     </h3>
                     <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-purple bg-gradient-to-r from-accent-purple/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-super uppercase">
-                      <span className="w-1 h-1 bg-accent-purple animate-pulse shadow-[0_0_8px_currentColor]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
                       6 Signals
                     </div>
                   </div>
@@ -531,7 +531,7 @@ export default function WhoItsForGrid() {
                         {/* AI strategy bar */}
                         <div className="flex items-center gap-2 mb-3 select-none overflow-x-auto pb-1">
                           <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-[8px] font-bold uppercase tracking-wider">
-                            <SparklesIcon className="w-2 h-2 animate-pulse" />
+                            <SparklesIcon className="w-2 h-2" />
                             <span>Buyer Context:</span>
                           </div>
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-secondary border border-border-subtle text-[8px] font-bold text-text-secondary hover:text-text-primary transition-colors">
@@ -575,7 +575,7 @@ export default function WhoItsForGrid() {
                 )}
               </AnimatePresence>
 
-              {/* Bottom fade-out overlay (opaque gradient — no backdrop-blur for scroll perf) */}
+              {/* Bottom fade-out overlay */}
               <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-20">
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 via-60% to-transparent pointer-events-none" />
               </div>
@@ -590,7 +590,7 @@ export default function WhoItsForGrid() {
             </div>
             <div className="flex items-center gap-1">
               <span>Active socket connection</span>
-              <ArrowRightIcon className="w-[9px] h-[9px] text-text-secondary animate-pulse" />
+              <ArrowRightIcon className="w-[9px] h-[9px] text-text-secondary" />
             </div>
           </div>
         </div>

@@ -129,7 +129,7 @@ export default function SavedLeadsPage() {
       await navigator.clipboard.writeText(toTsv(rows))
       addToast({
         type: 'success',
-        message: `✓ Copied ${filteredLeads.length} leads — paste into Excel/Sheets`,
+        message: `✓ Copied ${filteredLeads.length} leads · Paste into Excel/Sheets`,
       })
     } catch {
       addToast({ type: 'error', message: 'Clipboard access blocked' })
@@ -334,7 +334,7 @@ export default function SavedLeadsPage() {
                     <ClipboardDocumentListIcon className="w-4 h-4 text-accent-mint shrink-0" />
                     <span>
                       <span className="block text-xs font-bold text-text-primary">Copy as CSV</span>
-                      <span className="block text-[10px] text-text-secondary mt-0.5">Comma-separated — for any app</span>
+                      <span className="block text-[10px] text-text-secondary mt-0.5">Comma-separated · Universal format</span>
                     </span>
                   </button>
                   <div className="h-px bg-white/[0.05]" />
@@ -345,7 +345,7 @@ export default function SavedLeadsPage() {
                     <ClipboardDocumentListIcon className="w-4 h-4 text-accent-purple shrink-0" />
                     <span>
                       <span className="block text-xs font-bold text-text-primary">Copy as TSV</span>
-                      <span className="block text-[10px] text-text-secondary mt-0.5">Tab-separated — paste into Sheets/Excel</span>
+                      <span className="block text-[10px] text-text-secondary mt-0.5">Tab-separated · Paste into Sheets/Excel</span>
                     </span>
                   </button>
                   <div className="h-px bg-white/[0.05]" />
@@ -356,7 +356,7 @@ export default function SavedLeadsPage() {
                     <DocumentArrowDownIcon className="w-4 h-4 text-accent-mint shrink-0" />
                     <span>
                       <span className="block text-xs font-bold text-text-primary">Download Sheet</span>
-                      <span className="block text-[10px] text-text-secondary mt-0.5">Formatted .xlsx — headers, filters, frozen row</span>
+                      <span className="block text-[10px] text-text-secondary mt-0.5">Formatted .xlsx · Headers, filters, frozen row</span>
                     </span>
                   </button>
                 </div>

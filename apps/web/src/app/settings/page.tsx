@@ -193,7 +193,7 @@ export default function SettingsPage() {
       if (result.succeeded) {
         addToast({
           type: 'success',
-          message: 'Payment received — your credits will update shortly.',
+          message: 'Payment received: your credits will update shortly.',
         })
       } else if (result.canceled) {
         addToast({ type: 'error', message: 'Checkout was cancelled.' })
@@ -529,7 +529,7 @@ export default function SettingsPage() {
                 />
               </div>
               <p className="text-xxs text-text-secondary/50 mt-3">
-                Credits are consumed when revealing lead identities — the exact cost depends on the
+                Credits are consumed when revealing lead identities: the exact cost depends on the
                 contact data available (phone, email, or profile link).
               </p>
               {user?.creditAccount?.rolloverBalance ? (
@@ -659,7 +659,7 @@ export default function SettingsPage() {
                     <button
                       onClick={() => {
                         setPlanModalOpen(false)
-                        addToast({ type: 'error', message: 'Agency plan is available on request — contact support.' })
+                        addToast({ type: 'error', message: 'Agency plan is available on request: contact support.' })
                       }}
                       className="w-full flex items-center justify-between p-5 rounded-2xl bg-white/5 border border-white/[0.06] hover:border-accent-purple/40 transition-all text-left"
                     >

@@ -617,7 +617,7 @@ export default function HeroSection() {
             className="text-sm sm:text-base text-text-secondary font-light leading-relaxed mb-8 max-w-xl mx-auto antialiased"
           >
             Lead Hunter Club monitors active service demand in real-time, compiles deep social
-            intelligence, and unlocks verified contact details — so you can close deals while the
+            intelligence, and unlocks verified contact details so you can close deals while the
             demand is hot.
           </motion.p>
 
