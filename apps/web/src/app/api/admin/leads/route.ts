@@ -75,6 +75,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(trainResult)
       }
 
+      case 'bulk-title': {
+        const titleRes = await fetchApi<{ success: boolean; queued: number; message: string }>(
+          '/posts/bulk-title',
+          { method: 'POST', body: JSON.stringify(filters || {}) },
+        )
+        return NextResponse.json(titleRes)
+      }
+
       default:
         return NextResponse.json({ code: 'UNKNOWN_ACTION', message: `Unknown action: ${action}` }, { status: 400 })
     }

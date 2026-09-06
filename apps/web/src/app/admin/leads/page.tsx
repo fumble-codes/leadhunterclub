@@ -110,6 +110,7 @@ export default function AdminLeadsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [counts, setCounts] = useState<LeadCounts>({})
   const [isTrainingAi, setIsTrainingAi] = useState(false)
+  const [isBulkTitling, setIsBulkTitling] = useState(false)
   const [intelConfigured, setIntelConfigured] = useState<boolean | null>(null)
   const [intelModel, setIntelModel] = useState('')
   const { addToast } = useToast()
@@ -503,8 +504,20 @@ export default function AdminLeadsPage() {
     }
   }
 
-  const handleBulkApproveSelected = async () => {
-    if (selectedLeadIds.length === 0) return
+  const handleBulkTitle = async () => {
+    try {
+      setIsBulkTitling(true)
+      const res = await apiPost('/api/admin/leads', { action: 'bulk-title', filters: getBulkFilters() })
+      const json = await res.json()
+      addToast({ type: 'success', message: json?.message || `Queued ${json?.queued || 0} leads for titling` })
+    } catch {
+      addToast({ type: 'error', message: 'Failed to queue titles' })
+    } finally {
+      setIsBulkTitling(false)
+    }
+  }
+
+  const handleBulkApproveSelected = async () => {    if (selectedLeadIds.length === 0) return
     try {
       setBulkSelectionBusy(true)
       const res = await apiPost('/api/admin/leads', { action: 'bulk-approve', ids: selectedLeadIds })
@@ -909,6 +922,14 @@ export default function AdminLeadsPage() {
           >
             {bulkReenriching ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
             {bulkReenriching ? 'Queueing...' : 'Re-enrich All'}
+          </button>
+          <button
+            onClick={handleBulkTitle}
+            disabled={isBulkTitling}
+            className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+          >
+            {isBulkTitling ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+            {isBulkTitling ? 'Queueing...' : 'Generate Titles'}
           </button>
           <button
             onClick={() => setIsManualModalOpen(true)}
