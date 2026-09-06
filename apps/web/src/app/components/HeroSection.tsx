@@ -298,11 +298,11 @@ function LeadsContent() {
     return result
   }, [searchQuery, activeNiche, sortBy])
 
-  const displayLeads = filteredLeads.length > 0 ? filteredLeads.slice(0, 4) : allLeads.slice(0, 4)
+  const displayLeads = filteredLeads.length > 0 ? filteredLeads.slice(0, 6) : allLeads.slice(0, 6)
 
   return (
     <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 pb-16 relative w-full scrollbar-hide">
-      <div className="max-w-3xl mx-auto relative z-10">
+      <div className="w-full max-w-[1040px] mx-auto relative z-10">
         {/* Real Lead Feed Header & Controls Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3.5">
           <div className="flex items-center gap-3 shrink-0">
@@ -334,7 +334,7 @@ function LeadsContent() {
                     Clear
                   </button>
                 )}
-                <span className="px-1 py-0.2 rounded bg-white/5 border border-white/10 text-[9px] font-mono text-text-secondary shrink-0">
+                <span className="px-1 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-mono text-text-secondary shrink-0">
                   ⌘K
                 </span>
               </div>
@@ -453,11 +453,11 @@ function LeadsContent() {
           })}
         </div>
 
-        {/* 2-column Grid of real LeadCards matching leadfeed design */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-stretch max-w-[760px] mx-auto">
+        {/* 3-column Grid of real LeadCards matching leadfeed design */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 items-stretch w-full mx-auto">
           {displayLeads.map((lead, i) => (
             <div key={lead.id} className="w-full flex justify-center">
-              <div className="w-full max-w-[370px]">
+              <div className="w-full max-w-[360px]">
                 {viewMode === 'pipeline' ? (
                   <PipelineLeadCard lead={lead} index={i} />
                 ) : (
@@ -830,7 +830,7 @@ export default function HeroSection() {
       {/* 3D Perspective Container for Clario-style tilt reveal */}
       <div
         style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
-        className="relative z-10 w-full max-w-[1200px] mt-[-24px] lg:mt-[-48px] group/appwindow"
+        className="relative z-10 w-full max-w-[1240px] mt-[-24px] lg:mt-[-48px] group/appwindow"
       >
         <motion.div
           style={{
@@ -855,9 +855,9 @@ export default function HeroSection() {
             </div>
 
             {/* App body */}
-            <div className="flex h-[540px] md:h-[580px] bg-bg-main overflow-hidden">
+            <div className="flex h-[560px] md:h-[600px] bg-bg-main overflow-hidden">
               {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
-              <div className="w-[240px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
+              <div className="w-[210px] lg:w-[215px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
                 <div className="px-5 mb-6 flex items-center gap-3">
                   <Image
                     src="/logo.svg"

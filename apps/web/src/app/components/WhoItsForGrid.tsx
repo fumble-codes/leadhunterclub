@@ -631,9 +631,9 @@ export default function WhoItsForGrid() {
                 </div>
 
                 {/* Spacious 3-card Lead Feed Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch justify-center overflow-hidden max-w-[1140px] mx-auto w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch justify-center overflow-hidden max-w-[1140px] mx-auto w-full">
                   {/* Card 1: Secondary mock lead (SEO optimization signal) */}
-                  <div className="hidden xl:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
+                  <div className="hidden md:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
                     <div className="w-full max-w-[360px]">
                       {viewMode === 'pipeline' ? (
                         <PipelineLeadCard lead={mockLead1} index={0} />
