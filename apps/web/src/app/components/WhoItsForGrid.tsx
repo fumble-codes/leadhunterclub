@@ -279,9 +279,6 @@ export default function WhoItsForGrid() {
       id="who"
       className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
-      {/* Background ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] glow-purple-faint pointer-events-none" />
-
       {/* HEADER BLOCK: Large text left, horizontal navigation segmented buttons right */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-10 relative z-10">
         <div className="max-w-xl">

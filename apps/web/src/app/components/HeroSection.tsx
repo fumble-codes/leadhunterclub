@@ -571,26 +571,17 @@ export default function HeroSection() {
     <section
       className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-6"
     >
-      {/* Subtle geometric grid background (Centered under the text, faint mint lines) */}
+      {/* Crisp geometric grid background (Engineering precision) */}
       <div
         className="absolute inset-0 pointer-events-none z-0 opacity-100"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(var(--rgb-accent-purple), 0.015) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(var(--rgb-accent-purple), 0.015) 1px, transparent 1px)
+            linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px)
           `,
-          backgroundSize: '48px 48px',
-          maskImage: 'radial-gradient(circle at 50% 30%, black 10%, transparent 60%)',
-          WebkitMaskImage: 'radial-gradient(circle at 50% 30%, black 10%, transparent 60%)',
-        }}
-      />
-
-      {/* Faint precise technical backlight glow */}
-      <div
-        className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[600px] h-[350px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-70"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 50%, rgba(var(--rgb-accent-purple),0.03) 0%, rgba(var(--rgb-tab-purple),0.02) 50%, transparent 70%)',
+          backgroundSize: '40px 40px',
+          maskImage: 'radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at 50% 20%, black 15%, transparent 70%)',
         }}
       />
 
@@ -646,12 +637,6 @@ export default function HeroSection() {
               </motion.span>
             </Link>
           </motion.div>
-
-          {/* Concentrated amber backlight aura directly behind the button */}
-          <div className="absolute top-[48%] left-1/2 -translate-x-1/2 w-[400px] h-[150px] glow-primary-strong pointer-events-none z-0" />
-
-          {/* Larger ambient backlight glow under button and behind mockup top edge */}
-          <div className="absolute top-[60%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] glow-primary-strong pointer-events-none z-0" />
         </div>
       </div>
 
@@ -669,26 +654,7 @@ export default function HeroSection() {
           }}
           className="w-full transform-gpu will-change-transform"
         >
-          {/* Faint separation backlight Behind the App Window */}
-          <div
-            className="absolute top-[-25%] left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-[100%] pointer-events-none -z-10 mix-blend-screen"
-            style={{
-              background:
-                'radial-gradient(circle, rgba(var(--rgb-accent-purple),0.06) 0%, transparent 70%)',
-            }}
-          />
-
-          {/* Faint Stage shadow glow */}
-          <div
-            className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 w-2/3 h-24 rounded-full"
-            style={{
-              background:
-                'radial-gradient(ellipse, rgba(var(--rgb-accent-purple),0.07) 0%, transparent 75%)',
-              filter: 'blur(20px)',
-            }}
-          />
-
-          <div className="rim-light rounded-t-[24px] overflow-hidden shadow-[0_-60px_120px_-20px_rgba(var(--rgb-black),0.9)] border border-white/[0.04] border-t-accent-purple/20 border-b-0 relative">
+          <div className="rounded-t-[24px] overflow-hidden shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)] border border-white/[0.08] border-b-0 relative">
             {/* Glass reflection sheen overlay */}
             <div className="absolute inset-0 pointer-events-none z-20 bg-gradient-to-tr from-transparent via-white/[0.015] to-white/[0.05] mix-blend-overlay" />
             {/* macOS chrome */}

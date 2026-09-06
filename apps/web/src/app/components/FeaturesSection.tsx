@@ -325,10 +325,8 @@ export function AIWriterVisual({
 
   return (
     <div
-      className={`relative h-[220px] w-full p-4 rounded-2xl bg-surface border border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6)] overflow-hidden flex flex-col justify-between hover:border-border-subtle transition-all duration-500 ${className} hover:border-accent-purple/20`}
+      className={`relative h-[220px] w-full p-4 rounded-2xl bg-surface border border-white/[0.04] shadow-[0_12px_40px_-10px_rgba(var(--rgb-black),0.6),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden flex flex-col justify-between hover:border-border-subtle transition-all duration-500 ${className} hover:border-accent-purple/20`}
     >
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 glow-purple-intense pointer-events-none" />
-
       <div className="relative z-10 font-mono text-[11px] leading-relaxed flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 text-accent-purple font-bold mb-3 uppercase tracking-wider text-[9px]">
@@ -884,10 +882,6 @@ export default function FeaturesSection() {
       id="features"
       className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
-      {/* Ambient backdrop glows */}
-      <div className="absolute top-[-5%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-      <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-
       {/* Headline */}
       <div className="text-center mb-12 md:mb-14 relative z-10">
         <motion.div
@@ -980,8 +974,6 @@ export default function FeaturesSection() {
             transition={{ duration: 0.4, ease }}
             className="lg:col-span-7 w-full group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
-            {/* Orb Glow */}
-            <div className="absolute top-0 left-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <PlatformNetworkVisual
               className="max-w-[200px]"
               hoveredPlatform={hoveredPlatform}
@@ -1044,8 +1036,6 @@ export default function FeaturesSection() {
             transition={{ duration: 0.4, ease }}
             className="lg:col-span-7 w-full lg:order-first group relative grid grid-cols-1 md:grid-cols-2 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
-            {/* Orb Glow */}
-            <div className="absolute bottom-0 right-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <LeadIntelVisual emailStatus={emailStatus} />
             <EmailComposeVisual emailStatus={emailStatus} onSend={handleSendEmail} />
           </motion.div>
@@ -1103,8 +1093,6 @@ export default function FeaturesSection() {
             transition={{ duration: 0.4, ease }}
             className="lg:col-span-7 w-full group relative grid grid-cols-1 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
-            {/* Orb Glow */}
-            <div className="absolute top-0 right-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <FollowUpTimelineVisual selectedStep={selectedStep} onSelectStep={setSelectedStep} />
           </motion.div>
         </motion.div>
@@ -1162,8 +1150,6 @@ export default function FeaturesSection() {
             transition={{ duration: 0.4, ease }}
             className="lg:col-span-7 w-full lg:order-first group relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-center metallic-card p-6 md:p-8 min-h-[340px] cursor-pointer transition-colors duration-500"
           >
-            {/* Orb Glow */}
-            <div className="absolute bottom-0 left-0 w-40 h-40 glow-purple-strong pointer-events-none" />
             <div className="lg:col-span-5 flex justify-center w-full group-hover:-translate-y-1 transition-transform duration-500">
               <TokenMeterVisual selectedPersona={selectedPersona} />
             </div>

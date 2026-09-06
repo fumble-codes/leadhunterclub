@@ -267,12 +267,11 @@ export default function LandingPage() {
     <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden">
       <HeroSection />
 
+      {/* Precision Beam Divider */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
       {/* Problem & How It Works (Bento Grid) */}
       <section id="funnel" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative">
-        {/* Ambient section glows */}
-        <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-        <div className="absolute bottom-[10%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-
         <div className="text-center mb-12 md:mb-14 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -475,9 +474,6 @@ export default function LandingPage() {
           >
             {/* Intelligence Dossier Builder */}
             <div className="relative h-[140px] mb-4 p-4 rounded-2xl bg-canvas-deeper/60 border border-white/[0.03] shadow-[inset_0_2px_8px_rgba(var(--rgb-black),0.8)] overflow-hidden group-hover:border-border-subtle transition-colors duration-500 group-hover:border-accent-purple/15">
-              {/* Ambient node glow (toned down by 90% in opacity and size) */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-accent-purple/[0.02] blur-lg rounded-full group-hover:bg-accent-purple/[0.06] transition-colors duration-500 group-hover:border-accent-purple/15" />
-
               <div className="relative z-10 h-full flex flex-col group-hover:border-accent-purple/15">
                 <div className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors font-bold text-[10px] uppercase tracking-widest mb-3 group-hover:border-accent-purple/15">
                   <GlobeAltIcon className="w-3 h-3" /> Compiling Intel...
@@ -617,13 +613,11 @@ export default function LandingPage() {
       </section>
 
       {/* Conversational Intelligence Section */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <section
         id="features"
-        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative border-t border-white/[0.03]"
+        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative"
       >
-        {/* Fine background glow */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-accent-purple/[0.015] blur-2xl rounded-full pointer-events-none" />
-
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Column - Copy Breakdown */}
           <motion.div
@@ -727,14 +721,11 @@ export default function LandingPage() {
       <TestimonialsSection />
 
       {/* Pricing */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <section
         id="pricing"
-        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden"
       >
-        {/* Ambient glows */}
-        <div className="absolute top-[-10%] left-1/3 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-        <div className="absolute bottom-[5%] right-1/4 w-[500px] h-[500px] glow-purple-very-faint pointer-events-none" />
-
         {/* Header */}
         <div className="text-center mb-12 md:mb-14 relative z-10">
           <motion.div
@@ -829,9 +820,9 @@ export default function LandingPage() {
               whileHover={{ y: -6 }}
               className={`group relative flex flex-col transition-all duration-500 metallic-card`}
             >
-              {/* Featured ambient glow underneath */}
+              {/* Featured top specular highlight */}
               {p.featured && (
-                <div className="absolute inset-0 bg-gradient-to-b from-accent-purple/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
               )}
 
               {/* Card inner */}
@@ -960,16 +951,14 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <section className="py-20 md:py-24 px-6 max-w-[1000px] mx-auto text-center relative overflow-hidden">
-        {/* Glowing aura */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-accent-purple/[0.03] blur-2xl rounded-full pointer-events-none" />
-
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="relative z-10 p-10 md:p-14 rounded-3xl border border-white/[0.06] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
+          className="relative z-10 p-10 md:p-14 rounded-3xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
@@ -1036,10 +1025,8 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {/* FOOTER                                                                */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
-      <footer className="relative border-t border-white/[0.03] overflow-hidden">
-        {/* Ambient glow */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-purple/[0.02] blur-2xl rounded-full pointer-events-none" />
-
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+      <footer className="relative overflow-hidden">
         {/* Main footer content */}
         <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-20">

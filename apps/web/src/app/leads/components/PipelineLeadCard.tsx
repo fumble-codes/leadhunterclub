@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Activity, Lock, Coins, ShieldCheck, Mail, Phone } from 'lucide-react'
+import { Lock, Coins, Mail, Phone } from 'lucide-react'
 import { AppLead } from '@/types/lead'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -193,140 +193,136 @@ export default function PipelineLeadCard({
     }
   }
 
+  const visibleTags = (lead.nicheTags || [])
+    .filter((tag) => {
+      if (!tag) return false
+      const t = tag.trim()
+      const lower = t.toLowerCase()
+      if (['linkedin', 'reddit', 'twitter', 'github', 'seed', 'external'].includes(lower)) return false
+      const words = t.split(/\s+/)
+      if (words.length >= 2 && words.length <= 3 && words.every((w) => /^[A-Z][a-z]+$/.test(w))) return false
+      if (words.length >= 2 && words.length <= 3 && words.every((w) => /^[A-Z]{3,}$/.test(w))) return false
+      return true
+    })
+    .slice(0, 3)
+
   return (
     <motion.div
       onClick={onClick}
-      whileHover={{ y: -4, scale: 1.01 }}
+      whileHover={{ y: -3, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className={`group relative text-left flex flex-col p-6 rounded-[28px] overflow-hidden min-h-[320px] w-full col-span-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 cursor-pointer ${
+      className={`group relative text-left flex flex-col justify-between p-5 rounded-[22px] overflow-hidden h-full min-h-[250px] w-full col-span-1 shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer ${
         theme.cardBg
-      } ${isSelected ? 'ring-4 ring-black/30' : ''}`}
+      } ${isSelected ? 'ring-3 ring-black/30' : ''}`}
     >
-      {/* Header: Niche & Urgency */}
-      <div className="flex items-center justify-between mb-4 w-full select-none">
-        {/* Top Left: Niche / Service Type (No Platform Sources) */}
-        <div className="flex items-center gap-2 min-w-0">
-          <div className={`w-2 h-2 rounded-full bg-current shrink-0 ${theme.text}`} />
-          <span className={`text-[11px] font-bold tracking-[0.2em] uppercase truncate ${theme.textMuted}`}>
-            {topCategory}
-          </span>
+      {/* Top & Content Section */}
+      <div className="flex flex-col flex-1">
+        {/* Header: Clean Niche Category without Intent Score */}
+        <div className="flex items-center justify-between mb-2.5 w-full select-none shrink-0">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <div className={`w-1.5 h-1.5 rounded-full bg-current shrink-0 ${theme.text}`} />
+            <span className={`text-[10px] font-bold tracking-[0.16em] uppercase truncate ${theme.textMuted}`}>
+              {topCategory}
+            </span>
+          </div>
+
+          {lead.timestamp && (
+            <span className={`text-[10px] font-medium tracking-tight shrink-0 ml-2 opacity-60 ${theme.textMuted}`}>
+              {lead.timestamp}
+            </span>
+          )}
         </div>
 
-        {/* Top Right: Urgency */}
-        <div className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider shrink-0 ml-3 ${theme.textMuted}`}>
-          <Activity size={14} />
-          <span>{lead.urgency}</span>
-        </div>
-      </div>
+        {/* Scaled-down Headline */}
+        <h4 className={`text-[10.5px] font-bold tracking-[0.12em] uppercase mb-1.5 line-clamp-1 select-none opacity-90 ${theme.text}`}>
+          {displayHeadline}
+        </h4>
 
-      {/* Small Headline */}
-      <h4 className={`text-[12px] font-bold tracking-widest uppercase mb-2 line-clamp-1 select-none ${theme.text}`}>
-        {displayHeadline}
-      </h4>
+        {/* Scaled-down Quote: refined, aesthetic font sizing */}
+        <h3 className={`text-[13.5px] sm:text-[14.5px] font-semibold tracking-tight leading-[1.4] mb-3 line-clamp-3 select-none flex-1 ${theme.text}`}>
+          &quot;{quoteContent}&quot;
+        </h3>
 
-      {/* Large Main Quote */}
-      <h3 className={`text-[18px] sm:text-[21px] font-semibold tracking-tight leading-[1.35] mb-5 flex-grow line-clamp-3 select-none ${theme.text}`}>
-        &quot;{quoteContent}&quot;
-      </h3>
-
-      {/* Tags & Match Rate */}
-      <div className="flex flex-wrap items-center gap-2 mb-6 shrink-0 select-none">
-        {(lead.nicheTags || [])
-          .filter((tag) => {
-            if (!tag) return false
-            const t = tag.trim()
-            const lower = t.toLowerCase()
-            if (['linkedin', 'reddit', 'twitter', 'github', 'seed', 'external'].includes(lower)) return false
-            const words = t.split(/\s+/)
-            if (words.length >= 2 && words.length <= 3 && words.every((w) => /^[A-Z][a-z]+$/.test(w))) return false
-            if (words.length >= 2 && words.length <= 3 && words.every((w) => /^[A-Z]{3,}$/.test(w))) return false
-            return true
-          })
-          .map((tag) => (
+        {/* Clean Tags Row without match score badge */}
+        <div className="flex items-center gap-1.5 mb-3 shrink-0 select-none overflow-hidden flex-nowrap">
+          {visibleTags.map((tag) => (
             <span
               key={tag}
-              className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border backdrop-blur-sm ${theme.tagBg}`}
+              className={`px-2 py-0.5 text-[10px] font-semibold rounded-md border backdrop-blur-sm shrink-0 whitespace-nowrap ${theme.tagBg}`}
             >
               {tag}
             </span>
           ))}
-
-        {lead.replyProbability > 0 && (
-          <span
-            className={`px-3 py-1.5 text-[11px] font-bold rounded-lg border-transparent flex items-center gap-1.5 shadow-sm ${theme.matchTag}`}
-          >
-            <ShieldCheck size={14} />
-            {lead.replyProbability}% Match
-          </span>
-        )}
+        </div>
       </div>
 
-      {/* Footer Area */}
-      <div className="w-full pt-4 flex items-center justify-between shrink-0 border-t border-black/10">
+      {/* Footer Area: Cute scaled-down lock and reveal button */}
+      <div className="w-full flex items-center justify-between shrink-0 mt-auto pt-1.5">
         {!isRevealed ? (
           <>
-            {/* Locked Blurred Contact Area */}
-            <div className="flex items-center gap-3 select-none">
+            {/* Cute Micro Locked Placeholder */}
+            <div className="flex items-center gap-2 select-none shrink-0">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shrink-0 ${theme.blurBg}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center overflow-hidden shrink-0 ${theme.blurBg}`}
               >
-                <Lock size={15} className={theme.textMuted} />
+                <Lock size={12} className={theme.textMuted} />
               </div>
-              <div className="flex flex-col gap-1.5 pointer-events-none">
-                <div className={`h-2.5 w-24 rounded-[4px] blur-[2px] ${theme.blurLine}`} />
-                <div className={`h-2 w-32 rounded-[4px] blur-[2px] ${theme.blurBg}`} />
+              <div className="flex flex-col gap-1 pointer-events-none shrink-0">
+                <div className={`h-2 w-14 rounded-[3px] blur-[1.5px] ${theme.blurLine}`} />
+                <div className={`h-1.5 w-20 rounded-[3px] blur-[1.5px] ${theme.blurBg}`} />
               </div>
             </div>
 
-            {/* Reveal Action Button */}
+            {/* Cute Scaled-down Reveal Action Button */}
             <button
               type="button"
               onClick={handleReveal}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-[12px] shadow-md transition-all active:scale-95 cursor-pointer ${theme.button}`}
+              className={`w-[96px] h-[32px] rounded-xl font-bold text-[11px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shrink-0 ${theme.button}`}
             >
-              Reveal
-              <span className="flex items-center gap-1 opacity-90 text-[10px] uppercase tracking-widest ml-1">
-                <Coins size={13} /> -{lead.revealCost ?? 3}
+              <span>Reveal</span>
+              <span className="flex items-center gap-0.5 opacity-90 text-[10px] font-semibold tabular-nums">
+                <Coins size={11} className="shrink-0" />
+                <span>-{lead.revealCost ?? 3}</span>
               </span>
             </button>
           </>
         ) : (
           <>
-            {/* Unlocked Contact Details: 2 clean rows */}
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+            {/* Cute Scaled-down Unlocked Contact Details */}
+            <div className="flex items-center gap-2 min-w-0 flex-1 mr-1.5">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 ${theme.matchTag}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] uppercase shrink-0 ${theme.matchTag}`}
               >
                 {lead.name.split(' ').map((n) => n[0]).join('')}
               </div>
               <div className="min-w-0 flex-1">
-                <div className={`text-xs font-bold truncate ${theme.text}`}>{lead.name}</div>
+                <div className={`text-[11px] font-bold truncate leading-tight ${theme.text}`}>{lead.name}</div>
                 {lead.email && (
                   <div
-                    className={`text-[10px] truncate select-all flex items-center gap-1 mt-0.5 ${theme.textMuted}`}
+                    className={`text-[9.5px] truncate select-all flex items-center gap-1 mt-0.5 ${theme.textMuted}`}
                     title={lead.email}
                   >
-                    <Mail size={11} className="shrink-0" />
+                    <Mail size={9.5} className="shrink-0" />
                     <span className="truncate">{lead.email}</span>
                   </div>
                 )}
                 {lead.phone && (
                   <div
-                    className={`text-[10px] truncate select-all flex items-center gap-1 ${theme.textMuted}`}
+                    className={`text-[9.5px] truncate select-all flex items-center gap-1 ${theme.textMuted}`}
                     title={lead.phone}
                   >
-                    <Phone size={11} className="shrink-0" />
+                    <Phone size={9.5} className="shrink-0" />
                     <span className="truncate">{lead.phone}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Save / Saved Button */}
+            {/* Scaled-down Save Button */}
             <button
               type="button"
               onClick={handleSave}
-              className={`px-3.5 py-2 rounded-xl text-[10px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border ml-2 ${
+              className={`w-[66px] h-[32px] rounded-xl text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
                 isSaved ? theme.savedButton : theme.saveButton
               }`}
             >

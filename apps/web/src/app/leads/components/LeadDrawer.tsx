@@ -17,6 +17,8 @@ import { Badge, Modal, Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
 
+import { sanitizePublicText } from '@/lib/claim-reveal'
+
 const themeMap = {
   mint: {
     textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
@@ -56,9 +58,13 @@ export default function LeadDrawer({
   const { addToast } = useToast()
   const tokenCost = lead.revealCost ?? null
 
-  const displayTitle = lead.title && lead.title !== '--' && lead.title !== '-'
-    ? lead.title.replace('For —', `For ${lead.company || lead.name}`)
-    : lead.company || 'Lead Signals'
+  const displayTitle = !lead.isRevealed
+    ? lead.title || 'OPPORTUNITY FOR —'
+    : lead.title && lead.title !== '--' && lead.title !== '-'
+      ? lead.title.replace(/FOR —|FOR -/i, `FOR ${lead.company || lead.name}`)
+      : lead.company || lead.name || 'Lead Signal'
+
+  const taskScopeDisplay = lead.isRevealed ? lead.taskScope : sanitizePublicText(lead.taskScope || '')
 
   const handleRevealClick = async () => {
     if (!lead.isClaimable) {
@@ -154,22 +160,20 @@ export default function LeadDrawer({
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto p-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div
+        className="flex-1 overflow-y-auto p-6 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         <div className="flex items-start justify-between gap-4 mb-4">
           <h2 className="text-[24px] font-bold tracking-tight text-text-primary leading-[1.2]">
             {displayTitle}
           </h2>
-          {lead.urgency === 'high' || lead.urgency === 'critical' ? (
-            <Badge size="sm" color="mint">
-              <ChartBarSquareIcon className="w-3 h-3 mr-1" /> {lead.urgency}
-            </Badge>
-          ) : null}
         </div>
 
-        {lead.taskScope && lead.taskScope.trim() !== '' && (
+        {taskScopeDisplay && taskScopeDisplay.trim() !== '' && (
           <div className="mb-8 mt-2">
             <h3 className="text-[16px] font-medium leading-relaxed text-text-primary/90 italic border-l-2 border-border-subtle pl-4 py-1">
-              &quot;{lead.taskScope}&quot;
+              &quot;{taskScopeDisplay}&quot;
             </h3>
           </div>
         )}
@@ -213,18 +217,13 @@ export default function LeadDrawer({
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
-          {lead.winProb === 'high' && (
+        {lead.winProb === 'high' && (
+          <div className="flex items-center gap-4">
             <div className="text-[12px] font-medium text-emerald-400">
               Win Probability: <span className="font-bold">HIGH</span>
             </div>
-          )}
-          {lead.replyProbability > 80 && (
-            <div className="text-[12px] font-medium text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1">
-              <CheckCircleIcon className="w-[14px] h-[14px]" /> {lead.replyProbability}% Reply Match
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Footer Area */}

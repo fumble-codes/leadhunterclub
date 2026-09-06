@@ -76,11 +76,8 @@ export function ReviewScreenshotCard({
         '--bg-hover-color': isFeatured ? 'rgba(var(--rgb-accent-orange), 0.05)' : `rgba(var(--rgb-accent-${accent}), 0.02)`,
       } as React.CSSProperties}
     >
-      {/* Dynamic Glow Corner on Hover */}
-      <div
-        className="absolute -top-12 -right-12 w-24 h-24 blur-xl rounded-full pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-30"
-        style={{ background: isFeatured ? 'var(--accent-orange)' : `var(--accent-${accent})` }}
-      />
+      {/* Specular Top Edge on Hover */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       {/* Screenshot Container */}
       <div className="relative rounded-lg overflow-hidden flex items-center justify-center flex-1">
         <img
@@ -163,9 +160,6 @@ export default function TestimonialsSection() {
           animation: slow-drift var(--drift-duration) ease-in-out infinite;
         }
       `}</style>
-
-      {/* Ambient glow decoration */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] glow-purple-medium pointer-events-none z-0" />
 
       {/* Header */}
       <div className="text-center mb-10 relative z-10">

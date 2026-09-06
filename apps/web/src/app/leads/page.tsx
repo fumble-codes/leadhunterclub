@@ -144,7 +144,10 @@ export default function LeadsPage() {
   const selectedLead = leadsList.find((l) => l.id === selectedLeadId)
 
   return (
-    <main className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative">
+    <main
+      className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
       <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />
 
@@ -272,7 +275,10 @@ export default function LeadsPage() {
                         </button>
                       )}
                     </div>
-                    <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto py-1 scrollbar-hide">
+                    <div
+                      className="flex flex-wrap gap-2 max-h-48 overflow-y-auto py-1 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
                       {allTags.length === 0 ? (
                         <span className="text-xs text-text-secondary/50 py-2">
                           No tags available
@@ -311,7 +317,7 @@ export default function LeadsPage() {
 
         {/* Niche Filter Pills */}
         <div
-          className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 -mx-4 px-4 md:-mx-0 md:px-0"
+          className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 -mx-4 px-4 md:-mx-0 md:px-0 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {primaryNiches.map((niche) => {
@@ -337,7 +343,7 @@ export default function LeadsPage() {
         >
           <div className={selectedLeadId ? 'lg:col-span-2' : 'col-span-1'}>
             <div
-              className={`grid gap-5 auto-rows-[minmax(280px,auto)] transition-all duration-300 ${
+              className={`grid gap-4 auto-rows-fr items-stretch transition-all duration-300 ${
                 selectedLeadId
                   ? 'grid-cols-1 lg:grid-cols-2'
                   : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
