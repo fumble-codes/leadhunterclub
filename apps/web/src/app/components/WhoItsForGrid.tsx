@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   UserIcon,
@@ -13,10 +13,13 @@ import {
   BoltIcon,
   BookmarkIcon,
   Bars3Icon,
+  AdjustmentsHorizontalIcon,
+  ChevronDownIcon,
 } from '@heroicons/react/24/solid'
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from '@/app/leads/components/LeadCard'
+import PipelineLeadCard from '@/app/leads/components/PipelineLeadCard'
 import { AppLead } from '@/types/lead'
 
 interface PersonaData {
@@ -246,6 +249,16 @@ const PERSONAS: PersonaData[] = [
   },
 ]
 
+const AUDIENCE_NICHES = [
+  { label: 'All', id: 'all', personaId: 'freelancers' },
+  { label: 'Shopify Dev', id: 'shopify', personaId: 'freelancers' },
+  { label: 'UI/UX Design', id: 'uiux', personaId: 'web-designers' },
+  { label: 'Brand Identity', id: 'branding', personaId: 'graphic-designers' },
+  { label: 'Fullstack Dev', id: 'dev', personaId: 'developers' },
+  { label: 'Paid Ads', id: 'ads', personaId: 'smma-owners' },
+  { label: 'Demand Gen', id: 'agency', personaId: 'agency-owners' },
+]
+
 export default function WhoItsForGrid() {
   const [activeTab, setActiveTab] = useState<string>('freelancers')
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
@@ -253,6 +266,11 @@ export default function WhoItsForGrid() {
   const [displayedText, setDisplayedText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [viewMode, setViewMode] = useState<'grid' | 'pipeline'>('grid')
+  const [sortBy, setSortBy] = useState<'newest' | 'replyProbability' | 'urgency'>('newest')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [selectedNicheId, setSelectedNicheId] = useState<string>('all')
 
   const activePersona = PERSONAS.find((p) => p.id === activeTab) || PERSONAS[0]
 
@@ -356,6 +374,11 @@ export default function WhoItsForGrid() {
                   key={p.id}
                   onClick={() => {
                     setActiveTab(p.id)
+                    const match = AUDIENCE_NICHES.find(
+                      (n) => n.personaId === p.id && n.id !== 'all',
+                    )
+                    if (match) setSelectedNicheId(match.id)
+                    else setSelectedNicheId('all')
                   }}
                   className={`flex flex-col items-center justify-center gap-1.5 px-3 py-3 md:px-4 md:py-4 rounded-xl md:rounded-2xl transition-all duration-300 relative focus:outline-none cursor-pointer flex-1 sm:flex-initial min-w-[85px] md:min-w-[105px] max-w-[120px] ${
                     isActive
@@ -387,7 +410,7 @@ export default function WhoItsForGrid() {
         <div
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[500px] md:h-[520px] justify-between"
+          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[530px] md:h-[550px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">
@@ -434,79 +457,221 @@ export default function WhoItsForGrid() {
 
             {/* Simulated Desktop Workspace Main Panel */}
             <div className="flex-1 h-full flex flex-col bg-bg-main relative p-4 md:p-6 overflow-hidden">
-              {/* BACKGROUND LAYER: The leads feed dashboard (dimmed/blurred when cockpit overlays) */}
+              {/* BACKGROUND LAYER: The authentic leads feed dashboard */}
               <div
-                className={`w-full h-full flex flex-col justify-start gap-5 transition-all duration-500 ${
+                className={`w-full h-full flex flex-col justify-start gap-3 transition-all duration-500 overflow-y-auto scrollbar-hide ${
                   revealed[activePersona.id]
                     ? 'opacity-30 blur-[3px] scale-98 pointer-events-none'
                     : 'opacity-100 blur-0 scale-100'
                 }`}
               >
-                {/* Leads Feed Dashboard Header */}
-                <div className="flex items-end justify-between shrink-0 select-none">
+                {/* Real Leads Feed Header & Controls Bar */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0 select-none">
                   <div className="flex items-center gap-2.5">
                     {/* Toggle Sidebar Button */}
                     <button
                       onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                      className={`p-2 bg-surface/80 hover:bg-white/5 border border-white/[0.08] hover:border-white/15 rounded-xl text-text-secondary hover:text-text-primary transition-all cursor-pointer flex items-center justify-center mr-2 shadow-md`}
+                      className="p-1.5 bg-surface/80 hover:bg-white/5 border border-white/[0.08] hover:border-white/15 rounded-xl text-text-secondary hover:text-text-primary transition-all cursor-pointer flex items-center justify-center mr-1 shadow-md"
                       title={isSidebarOpen ? 'Hide Sidebar' : 'Show Sidebar'}
                     >
                       <Bars3Icon
-                        className={`w-[15px] h-[15px] transition-transform duration-300 ${isSidebarOpen ? 'rotate-90 text-text-secondary' : ''}`}
+                        className={`w-3.5 h-3.5 transition-transform duration-300 ${isSidebarOpen ? 'rotate-90 text-text-secondary' : ''}`}
                       />
                     </button>
-                    <h3 className="text-lg font-bold text-text-primary tracking-tight">
+                    <h3 className="text-base font-bold text-text-primary tracking-tight">
                       Lead Feed
                     </h3>
-                    <div className="flex items-center gap-2 px-2.5 py-1 border-l-2 border-accent-purple bg-gradient-to-r from-accent-purple/10 to-transparent text-text-secondary hover:text-text-primary transition-colors text-[9px] font-bold tracking-super uppercase">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
-                      6 Signals
+                    <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[10px] font-medium font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
+                      <span>6 Live Signals</span>
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                    {/* Real Search Input with ⌘K */}
+                    <div className="relative group flex-1 sm:w-52">
+                      <div className="absolute -inset-[1px] bg-gradient-to-r from-accent-purple/20 via-accent-mint/20 to-accent-purple/20 rounded-xl blur-sm opacity-40 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="relative flex items-center bg-code-bg/90 border border-white/[0.08] rounded-xl px-2.5 py-1 shadow-sm focus-within:ring-1 focus-within:ring-white/20">
+                        <MagnifyingGlassIcon className="w-3.5 h-3.5 text-text-secondary mr-1.5 shrink-0" />
+                        <input
+                          type="text"
+                          placeholder="Search signals... (⌘K)"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full bg-transparent border-none text-text-primary text-[11px] placeholder:text-text-secondary/50 focus:outline-none focus:ring-0 py-0.5"
+                        />
+                        {searchQuery && (
+                          <button
+                            onClick={() => setSearchQuery('')}
+                            className="px-1 text-[10px] font-medium text-accent-purple hover:text-accent-purple/80 transition-colors"
+                          >
+                            Clear
+                          </button>
+                        )}
+                        <span className="px-1 py-0.2 rounded bg-white/5 border border-white/10 text-[9px] font-mono text-text-secondary shrink-0">
+                          ⌘K
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* View Mode Toggle */}
+                    <div className="flex items-center bg-[#1b1c1d] border border-white/[0.08] rounded-xl p-0.5 shadow-sm shrink-0">
+                      <button
+                        onClick={() => setViewMode('grid')}
+                        type="button"
+                        className={`p-1.5 rounded-lg transition-all ${
+                          viewMode === 'grid'
+                            ? 'bg-white/10 text-white shadow-sm'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                        }`}
+                        title="Classic Grid View"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-3.5 h-3.5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setViewMode('pipeline')}
+                        type="button"
+                        className={`p-1.5 rounded-lg transition-all ${
+                          viewMode === 'pipeline'
+                            ? 'bg-primary/20 text-primary border border-primary/20 shadow-sm'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                        }`}
+                        title="Pipeline Card View"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-3.5 h-3.5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v13.5c0 .621.504 1.125 1.125 1.125Z"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Sort Pill */}
+                    <div
+                      onClick={() =>
+                        setSortBy((prev) =>
+                          prev === 'newest'
+                            ? 'replyProbability'
+                            : prev === 'replyProbability'
+                              ? 'urgency'
+                              : 'newest',
+                        )
+                      }
+                      className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-xl bg-code-bg/80 border border-white/[0.08] text-[11px] text-text-secondary cursor-pointer hover:border-white/15 transition-colors select-none"
+                      title="Click to cycle sort order"
+                    >
+                      <span>
+                        {sortBy === 'newest'
+                          ? 'Newest'
+                          : sortBy === 'replyProbability'
+                            ? 'High Reply'
+                            : 'Urgent'}
+                      </span>
+                      <ChevronDownIcon className="w-3 h-3 text-text-secondary" />
+                    </div>
+
+                    {/* Filters Button */}
+                    <button
+                      onClick={() => setIsFilterOpen(!isFilterOpen)}
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-xl bg-code-bg/80 border text-[11px] font-medium transition-all ${
+                        isFilterOpen
+                          ? 'border-accent-purple bg-accent-purple/10 text-accent-purple'
+                          : 'border-white/[0.08] text-text-secondary hover:text-text-primary hover:border-white/15'
+                      }`}
+                    >
+                      <AdjustmentsHorizontalIcon className="w-3.5 h-3.5" />
+                      <span>Filters</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Raycast-style Command Input */}
-                <div className="relative flex items-center bg-surface/80 border border-white/[0.08] rounded-xl p-2.5 shadow-xl shrink-0 select-none my-3">
-                  <MagnifyingGlassIcon className="w-[14px] h-[14px] text-text-secondary/40 ml-2" />
-                  <span className="text-[11px] text-text-secondary/40 flex-1 ml-2 font-normal">
-                    Ask AI or search signals... (Press ⌘K)
-                  </span>
-                  <div className="flex items-center gap-1.5 pr-1">
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-text-secondary">
-                      <SparklesIcon className="w-[11px] h-[11px] text-text-secondary" />
-                      <span>AI Filter</span>
-                    </div>
-                    <div className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold text-text-secondary">
-                      ⌘K
-                    </div>
-                  </div>
+                {/* Niche Filter Pills Row */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide shrink-0">
+                  {AUDIENCE_NICHES.map((niche) => {
+                    const isActive = selectedNicheId === niche.id
+                    return (
+                      <button
+                        key={niche.id}
+                        onClick={() => {
+                          setSelectedNicheId(niche.id)
+                          setActiveTab(niche.personaId)
+                        }}
+                        className={`px-3 py-1 text-[11px] font-semibold rounded-full border transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                          isActive
+                            ? 'bg-accent-purple/10 border-accent-purple text-accent-purple shadow-[0_0_12px_rgba(168,85,247,0.18)]'
+                            : 'bg-white/5 border-white/[0.06] text-text-secondary hover:bg-white/10 hover:border-white/12 hover:text-text-primary'
+                        }`}
+                      >
+                        {niche.label}
+                      </button>
+                    )
+                  })}
                 </div>
 
                 {/* Spacious 3-card Lead Feed Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch justify-center overflow-hidden max-w-[1140px] mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch justify-center overflow-hidden max-w-[1140px] mx-auto w-full">
                   {/* Card 1: Secondary mock lead (SEO optimization signal) */}
                   <div className="hidden xl:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
                     <div className="w-full max-w-[360px]">
-                      <LeadCard lead={mockLead1} index={0} />
+                      {viewMode === 'pipeline' ? (
+                        <PipelineLeadCard lead={mockLead1} index={0} />
+                      ) : (
+                        <LeadCard lead={mockLead1} index={0} />
+                      )}
                     </div>
                   </div>
 
                   {/* Card 2: THE PRIMARY ACTIVE PERSONA LEAD CARD (clickable to reveal) */}
                   <div className="flex items-stretch justify-center">
                     <div className="w-full max-w-[360px]">
-                      <LeadCard
-                        lead={appLead}
-                        index={1}
-                        isSelected={true}
-                        onReveal={() => handleReveal(activePersona.id)}
-                      />
+                      {viewMode === 'pipeline' ? (
+                        <PipelineLeadCard
+                          lead={appLead}
+                          index={1}
+                          isSelected={true}
+                          onReveal={() => handleReveal(activePersona.id)}
+                        />
+                      ) : (
+                        <LeadCard
+                          lead={appLead}
+                          index={1}
+                          isSelected={true}
+                          onReveal={() => handleReveal(activePersona.id)}
+                        />
+                      )}
                     </div>
                   </div>
 
                   {/* Card 3: CRM migration signal */}
                   <div className="hidden md:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
                     <div className="w-full max-w-[360px]">
-                      <LeadCard lead={mockLead2} index={2} />
+                      {viewMode === 'pipeline' ? (
+                        <PipelineLeadCard lead={mockLead2} index={2} />
+                      ) : (
+                        <LeadCard lead={mockLead2} index={2} />
+                      )}
                     </div>
                   </div>
                 </div>
