@@ -13,9 +13,23 @@ import {
   ChartBarIcon,
   ArrowRightIcon,
   CheckIcon,
+  PlayIcon,
 } from '@heroicons/react/24/solid'
 
 const ease = [0.16, 1, 0.3, 1] as const
+
+interface CapabilityCard {
+  id: string
+  indexStr: string
+  shortLabel: string
+  tag: string
+  title: string
+  description: string
+  duration: string
+  browserRoute: string
+  videoUrl?: string
+  videoPoster?: string
+}
 
 // ─── Telemetry Chip Scatter Pattern for Collapsed Cards ────────────────────────
 function TelemetryChipScatter({ index }: { index: number }) {
@@ -24,62 +38,45 @@ function TelemetryChipScatter({ index }: { index: number }) {
       { label: 'X', val: '2m ago', active: true },
       { label: 'Li', val: '5m ago', active: true },
       { label: 'R', val: '8m ago', active: true },
-      { label: 'Th', val: '12m ago', active: false },
     ],
     [
       { label: 'INTENT', val: '98%', active: true },
       { label: 'BUDGET', val: 'HIGH', active: true },
       { label: 'URGENCY', val: 'CRIT', active: true },
-      { label: 'STATUS', val: 'VERIFIED', active: false },
     ],
     [
       { label: '01', val: 'REVEAL', active: true },
       { label: '02', val: 'SAVED', active: true },
       { label: '03', val: 'CONTACT', active: true },
-      { label: '04', val: 'REPLIED', active: false },
     ],
     [
       { label: 'CRD', val: '500', active: true },
       { label: 'PLAN', val: 'PRO', active: true },
       { label: 'ROLL', val: '100%', active: true },
-      { label: 'SEAT', val: '0 FEE', active: false },
     ],
   ]
 
   const items = telemetryData[index] || telemetryData[0]
 
   return (
-    <div className="w-full flex-1 flex flex-col justify-center items-center py-4 relative select-none pointer-events-none">
-      {/* Precision matrix dot grid background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-15">
-        <svg className="w-24 h-24" viewBox="0 0 96 96" fill="currentColor">
-          <pattern id={`dotgrid-${index}`} x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="1" className="text-white" />
-          </pattern>
-          <rect width="96" height="96" fill={`url(#dotgrid-${index})`} />
-        </svg>
-      </div>
-
-      {/* Floating HUD chips */}
-      <div className="w-full flex flex-col gap-1.5 z-10 px-1">
-        {items.map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between px-2 py-1 rounded bg-white/[0.03] border border-white/[0.06] text-[8.5px] font-mono group-hover:border-white/15 transition-colors"
+    <div className="w-full flex flex-col gap-1.5 z-10 px-0.5 select-none pointer-events-none">
+      {items.map((item, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between px-2 py-1 rounded-md bg-[#090A0F] border border-white/[0.08] text-[8px] font-mono group-hover:border-white/15 transition-colors"
+        >
+          <span className="font-bold text-white/50 group-hover:text-white/80 transition-colors">
+            {item.label}
+          </span>
+          <span
+            className={`font-semibold tracking-wider ${
+              item.active ? 'text-accent-orange/90' : 'text-text-secondary/40'
+            }`}
           >
-            <span className="font-bold text-white/50 group-hover:text-white/80 transition-colors">
-              {item.label}
-            </span>
-            <span
-              className={`font-semibold tracking-wider ${
-                item.active ? 'text-accent-orange/80' : 'text-text-secondary/40'
-              }`}
-            >
-              {item.val}
-            </span>
-          </div>
-        ))}
-      </div>
+            {item.val}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
@@ -136,15 +133,15 @@ function FreshLeadsVisual({
             key={notif.name}
             onMouseEnter={() => setHoveredNotif(i)}
             onMouseLeave={() => setHoveredNotif(null)}
-            className={`p-2.5 rounded-xl bg-surface border transition-all duration-300 flex items-center gap-2.5 relative overflow-hidden ${
+            className={`p-2.5 rounded-xl bg-[#11141D] border transition-all duration-300 flex items-center gap-2.5 relative overflow-hidden ${
               isSelfHovered
-                ? 'border-border-subtle bg-surface-secondary shadow-[0_8px_20px_rgba(0,0,0,0.5)] -translate-y-0.5'
+                ? 'border-border-subtle bg-[#161B26] shadow-[0_8px_24px_rgba(0,0,0,0.6)] -translate-y-0.5'
                 : isPlatformHighlighted
-                  ? 'border-accent-orange/40 bg-surface shadow-[0_4px_16px_rgba(244,141,22,0.15)] scale-102'
-                  : 'border-white/[0.05]'
+                  ? 'border-accent-orange/50 bg-[#141824] shadow-[0_4px_16px_rgba(244,141,22,0.15)] scale-102'
+                  : 'border-white/[0.07]'
             }`}
           >
-            <div className="w-7 h-7 rounded-full bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-full bg-accent-purple/15 border border-accent-purple/30 flex items-center justify-center shrink-0">
               <span className="text-[9.5px] font-bold text-accent-purple">
                 {notif.name
                   .split(' ')
@@ -157,17 +154,17 @@ function FreshLeadsVisual({
                 <span className="text-[10.5px] font-bold text-text-primary truncate">
                   {notif.name}
                 </span>
-                <span className="text-[8.5px] text-text-secondary/40 font-mono shrink-0">
+                <span className="text-[8.5px] text-text-secondary/50 font-mono shrink-0">
                   {notif.time}
                 </span>
               </div>
-              <p className="text-[9.5px] text-text-secondary/70 truncate">{notif.signal}</p>
+              <p className="text-[9.5px] text-text-secondary/80 truncate">{notif.signal}</p>
             </div>
             <div
               className={`px-1.5 py-0.5 rounded text-[7.5px] font-bold uppercase tracking-wider shrink-0 transition-colors duration-300 ${
                 isPlatformHighlighted
                   ? 'bg-accent-orange text-text-on-accent'
-                  : 'bg-white/5 border border-white/[0.06] text-text-secondary/60'
+                  : 'bg-white/5 border border-white/[0.08] text-text-secondary/70'
               }`}
             >
               {notif.platform}
@@ -187,7 +184,7 @@ function FreshLeadsVisual({
       })}
       <div className="flex items-center gap-1.5 mt-0.5 ml-1">
         <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
-        <span className="text-[8.5px] text-accent-orange/80 font-bold uppercase tracking-widest font-mono">
+        <span className="text-[8.5px] text-accent-orange/90 font-bold uppercase tracking-widest font-mono">
           Live Signal Feed
         </span>
       </div>
@@ -259,7 +256,7 @@ function PlatformNetworkVisual({
   return (
     <div className={`relative aspect-[190/160] w-full max-w-[190px] mx-auto ${className}`}>
       {/* Center hub */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-accent-orange/10 border border-accent-orange/25 flex items-center justify-center z-20 shadow-md">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-accent-orange/15 border border-accent-orange/30 flex items-center justify-center z-20 shadow-md">
         <AdjustmentsHorizontalIcon className="w-3.5 h-3.5 text-accent-orange" />
       </div>
 
@@ -277,7 +274,7 @@ function PlatformNetworkVisual({
             y1={line.y1}
             x2={line.x2}
             y2={line.y2}
-            stroke="rgba(255, 255, 255, 0.1)"
+            stroke="rgba(255, 255, 255, 0.12)"
             strokeWidth="1"
             strokeDasharray="3 3"
           />
@@ -298,8 +295,8 @@ function PlatformNetworkVisual({
             <motion.div
               className={`rounded-full flex items-center justify-center transition-all duration-300 ${
                 isHovered
-                  ? 'border-accent-orange bg-surface-secondary scale-110 shadow-[0_0_15px_rgba(244,141,22,0.3)]'
-                  : 'bg-surface border border-white/10 hover:border-white/25'
+                  ? 'border-accent-orange bg-[#1B1F2C] scale-110 shadow-[0_0_15px_rgba(244,141,22,0.35)]'
+                  : 'bg-[#10131B] border border-white/10 hover:border-white/30'
               }`}
               style={{ width: p.size, height: p.size }}
             >
@@ -345,38 +342,38 @@ function LeadIntelVisual({
       label: 'Budget Signal',
       value: 'High',
       width: '85%',
-      color: 'bg-accent-orange/80',
+      color: 'bg-accent-orange/85',
     },
     {
       label: 'Urgency Level',
       value: emailStatus === 'sent' ? 'Handled' : 'Critical',
       width: emailStatus === 'sent' ? '100%' : '92%',
-      color: 'bg-accent-orange/70',
+      color: 'bg-accent-orange/75',
     },
   ]
 
   return (
     <div className={`w-full flex flex-col justify-center gap-2.5 ${className}`}>
       {/* Lead profile box */}
-      <div className="p-3 rounded-xl bg-surface border border-white/[0.06] shadow-md">
+      <div className="p-3.5 rounded-xl bg-[#11141E] border border-white/[0.08] shadow-lg">
         <div className="flex items-center gap-2.5 mb-2.5">
-          <div className="w-7 h-7 rounded-lg bg-surface-secondary border border-border-subtle flex items-center justify-center shrink-0">
-            <span className="text-[9.5px] font-bold text-accent-orange">AK</span>
+          <div className="w-8 h-8 rounded-lg bg-[#181D29] border border-border-subtle flex items-center justify-center shrink-0">
+            <span className="text-[10px] font-bold text-accent-orange">AK</span>
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <span className="text-[10.5px] font-bold text-text-primary truncate">Alex K.</span>
-              <span className="px-1.5 py-0.2 rounded bg-accent-orange/10 border border-accent-orange/20 text-accent-orange text-[7.5px] font-bold tracking-wider uppercase">
+              <span className="text-[11px] font-bold text-text-primary truncate">Alex K.</span>
+              <span className="px-1.5 py-0.2 rounded bg-accent-orange/15 border border-accent-orange/30 text-accent-orange text-[7.5px] font-bold tracking-wider uppercase">
                 15 Signals
               </span>
             </div>
-            <p className="text-[8.5px] text-text-secondary/60 truncate">Founder @ Direct Commerce Co.</p>
+            <p className="text-[8.5px] text-text-secondary/70 truncate">Founder @ Direct Commerce Co.</p>
           </div>
           <span
             className={`px-1.5 py-0.5 rounded text-[7.5px] font-bold uppercase tracking-wider ${
               emailStatus === 'sent'
                 ? 'bg-accent-orange text-text-on-accent'
-                : 'bg-white/5 border border-white/[0.06] text-text-secondary/60'
+                : 'bg-white/5 border border-white/[0.08] text-text-secondary/70'
             }`}
           >
             {emailStatus === 'sent' ? 'Saved' : 'Verified'}
@@ -384,14 +381,14 @@ function LeadIntelVisual({
         </div>
 
         {/* Metric bars */}
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {metrics.map((m) => (
             <div key={m.label} className="space-y-0.5">
               <div className="flex justify-between text-[8.5px]">
-                <span className="text-text-secondary/60">{m.label}</span>
-                <span className="text-text-primary font-mono font-semibold">{m.value}</span>
+                <span className="text-text-secondary/70">{m.label}</span>
+                <span className="text-text-primary font-mono font-bold">{m.value}</span>
               </div>
-              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: '10%' }}
                   animate={{ width: m.width }}
@@ -405,11 +402,11 @@ function LeadIntelVisual({
       </div>
 
       {/* AI Context snippet */}
-      <div className="p-2.5 rounded-lg bg-surface-secondary/70 border border-border-subtle">
+      <div className="p-2.5 rounded-lg bg-[#141824]/90 border border-border-subtle shadow-sm">
         <div className="text-[8px] text-accent-orange font-bold uppercase tracking-widest mb-0.5 flex items-center gap-1">
           <GlobeAltIcon className="w-2.5 h-2.5" /> Context Analysis
         </div>
-        <p className="text-[9px] text-text-secondary/75 leading-tight">
+        <p className="text-[9px] text-text-secondary/80 leading-relaxed">
           {emailStatus === 'sent'
             ? 'Verified email and direct phone revealed. Pinned to your active pipeline.'
             : 'Posted about high checkout drop-offs 2h ago. Actively vetting conversion specialists.'}
@@ -431,20 +428,20 @@ function EmailComposeVisual({
   return (
     <div className={`w-full overflow-hidden ${className}`}>
       <div
-        className={`w-full rounded-xl bg-surface border transition-all duration-300 flex flex-col justify-between p-3 min-h-[190px] ${
+        className={`w-full rounded-xl bg-[#11141E] border transition-all duration-300 flex flex-col justify-between p-3.5 min-h-[210px] shadow-lg ${
           emailStatus === 'sent'
-            ? 'border-accent-orange/40 shadow-[0_8px_24px_rgba(244,141,22,0.1)]'
-            : 'border-white/[0.06]'
+            ? 'border-accent-orange/50 shadow-[0_8px_24px_rgba(244,141,22,0.15)]'
+            : 'border-white/[0.08]'
         }`}
       >
         <div>
           {/* Card header */}
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.04]">
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500/60" />
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/60" />
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
-              <span className="text-[8.5px] text-text-secondary/50 font-mono ml-1">
+          <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/[0.06]">
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/70" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70" />
+              <span className="text-[8.5px] text-text-secondary/60 font-mono ml-1">
                 Contact Dossier
               </span>
             </div>
@@ -454,21 +451,21 @@ function EmailComposeVisual({
           </div>
 
           {/* Contact rows */}
-          <div className="space-y-1 text-[9px] font-mono mb-2.5">
-            <div className="flex items-center gap-1.5 p-1 rounded bg-white/[0.02] border border-white/[0.03]">
-              <span className="text-text-secondary/50">Email:</span>
+          <div className="space-y-1.5 text-[9.5px] font-mono mb-2.5">
+            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[#0A0C12] border border-white/[0.05]">
+              <span className="text-text-secondary/60">Email:</span>
               <span className="text-text-primary font-medium truncate">alex.k@shopifybrand.com</span>
             </div>
-            <div className="flex items-center gap-1.5 p-1 rounded bg-white/[0.02] border border-white/[0.03]">
-              <span className="text-text-secondary/50">Phone:</span>
+            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[#0A0C12] border border-white/[0.05]">
+              <span className="text-text-secondary/60">Phone:</span>
               <span className="text-text-primary font-medium truncate">+1 (555) 012-3456</span>
             </div>
           </div>
         </div>
 
         {/* Action button */}
-        <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between">
-          <span className="text-[8px] text-text-secondary/40 font-mono">
+        <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
+          <span className="text-[8px] text-text-secondary/50 font-mono">
             {emailStatus === 'sending' ? 'Saving...' : emailStatus === 'sent' ? 'In Pipeline' : 'Ready to save'}
           </span>
           <button
@@ -477,7 +474,7 @@ function EmailComposeVisual({
               onSend()
             }}
             disabled={emailStatus !== 'idle'}
-            className={`px-3 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-200 ${
+            className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-200 ${
               emailStatus === 'sending'
                 ? 'bg-white/10 text-white/50 cursor-wait'
                 : emailStatus === 'sent'
@@ -524,7 +521,7 @@ function FollowUpTimelineVisual({
     <div className={`w-full flex flex-col justify-center ${className}`}>
       <div className="space-y-2 relative">
         {/* Connecting spine */}
-        <div className="absolute left-[13px] top-3 bottom-3 w-px bg-white/[0.08]" />
+        <div className="absolute left-[13px] top-3 bottom-3 w-px bg-white/[0.12]" />
 
         {steps.map((step, i) => {
           const isSelected = selectedStep === i
@@ -540,10 +537,10 @@ function FollowUpTimelineVisual({
               <div
                 className={`w-7 h-7 rounded-full border shrink-0 flex items-center justify-center font-mono text-[9px] font-bold transition-all duration-300 ${
                   isSelected
-                    ? 'border-accent-orange bg-surface-secondary text-accent-orange scale-105 shadow-[0_0_12px_rgba(244,141,22,0.3)]'
+                    ? 'border-accent-orange bg-[#1B1F2C] text-accent-orange scale-105 shadow-[0_0_12px_rgba(244,141,22,0.35)]'
                     : step.status === 'done'
-                      ? 'border-white/20 bg-surface text-white/70 group-hover:border-white/40'
-                      : 'border-white/10 bg-surface/50 text-white/30'
+                      ? 'border-white/20 bg-[#11141E] text-white/80 group-hover:border-white/40'
+                      : 'border-white/10 bg-[#0E1017] text-white/40'
                 }`}
               >
                 {step.day}
@@ -552,15 +549,15 @@ function FollowUpTimelineVisual({
               <div
                 className={`flex-1 px-3 py-2 rounded-xl border transition-all duration-300 flex items-center justify-between ${
                   isSelected
-                    ? 'border-accent-orange/40 bg-surface-secondary shadow-md'
-                    : 'border-white/[0.05] bg-surface hover:bg-surface-secondary/80 hover:border-white/10'
+                    ? 'border-accent-orange/50 bg-[#161B27] shadow-md'
+                    : 'border-white/[0.07] bg-[#11141D] hover:bg-[#151A25] hover:border-white/15'
                 }`}
               >
                 <div>
-                  <span className="text-[10px] font-bold text-text-primary block leading-none mb-0.5">
+                  <span className="text-[10.5px] font-bold text-text-primary block leading-none mb-0.5">
                     {step.stage}
                   </span>
-                  <span className="text-[8px] text-text-secondary/60 leading-none">
+                  <span className="text-[8px] text-text-secondary/70 leading-none">
                     {step.action}
                   </span>
                 </div>
@@ -569,8 +566,8 @@ function FollowUpTimelineVisual({
                     isSelected
                       ? 'text-accent-orange'
                       : step.status === 'done'
-                        ? 'text-emerald-400/80'
-                        : 'text-text-secondary/40'
+                        ? 'text-emerald-400'
+                        : 'text-text-secondary/50'
                   }`}
                 >
                   {isSelected ? 'Active' : step.status === 'done' ? 'Logged' : 'Next'}
@@ -615,25 +612,25 @@ function StageDetailsPanel({ selectedStep }: { selectedStep: number }) {
   const current = details[selectedStep] || details[0]
 
   return (
-    <div className="w-full h-full flex flex-col justify-between p-3 rounded-xl bg-surface border border-white/[0.06]">
+    <div className="w-full h-full flex flex-col justify-between p-3.5 rounded-xl bg-[#11141E] border border-white/[0.08] shadow-lg">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="px-1.5 py-0.5 rounded bg-accent-orange/10 border border-accent-orange/20 text-[7.5px] font-bold text-accent-orange uppercase tracking-wider">
+          <span className="px-1.5 py-0.5 rounded bg-accent-orange/15 border border-accent-orange/30 text-[7.5px] font-bold text-accent-orange uppercase tracking-wider">
             {current.badge}
           </span>
-          <span className="text-[8.5px] font-mono text-emerald-400 font-bold">
+          <span className="text-[9px] font-mono text-emerald-400 font-bold">
             {current.metric}
           </span>
         </div>
-        <h5 className="text-[11px] font-bold text-text-primary mb-1.5">
+        <h5 className="text-[11.5px] font-bold text-text-primary mb-1.5">
           {current.title}
         </h5>
-        <p className="text-[9.5px] text-text-secondary/80 leading-relaxed">
+        <p className="text-[10px] text-text-secondary/85 leading-relaxed">
           {current.desc}
         </p>
       </div>
 
-      <div className="pt-2 border-t border-white/[0.04] flex items-center gap-1.5 text-[8px] text-text-secondary/50 font-mono">
+      <div className="pt-2 border-t border-white/[0.06] flex items-center gap-1.5 text-[8px] text-text-secondary/60 font-mono">
         <SparklesIcon className="w-2.5 h-2.5 text-accent-orange" />
         <span>Click any stage step to inspect workflow</span>
       </div>
@@ -666,15 +663,15 @@ function TokenMeterVisual({
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       {/* Circular meter */}
-      <div className="relative w-[100px] h-[100px]">
+      <div className="relative w-[105px] h-[105px]">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
           <circle
             cx="60"
             cy="60"
             r="48"
             fill="none"
-            stroke="rgba(255, 255, 255, 0.05)"
-            strokeWidth="6"
+            stroke="rgba(255, 255, 255, 0.08)"
+            strokeWidth="7"
           />
           <motion.circle
             key={selectedPersona || 'default'}
@@ -683,7 +680,7 @@ function TokenMeterVisual({
             r="48"
             fill="none"
             stroke="#F48D16"
-            strokeWidth="6"
+            strokeWidth="7"
             strokeLinecap="round"
             strokeDasharray={2 * Math.PI * 48}
             initial={{ strokeDashoffset: 2 * Math.PI * 48 }}
@@ -698,27 +695,27 @@ function TokenMeterVisual({
             key={current.count}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-lg font-bold text-text-primary font-mono"
+            className="text-xl font-bold text-text-primary font-mono"
           >
             {current.count}
           </motion.span>
-          <span className="text-[7.5px] text-text-secondary/50 font-bold uppercase tracking-widest">
+          <span className="text-[8px] text-text-secondary/60 font-bold uppercase tracking-widest">
             credits
           </span>
         </div>
       </div>
 
       {/* Credit breakdown pills */}
-      <div className="flex items-center gap-1.5 mt-2.5">
-        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]">
+      <div className="flex items-center gap-1.5 mt-3">
+        <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#0A0C12] border border-white/[0.08]">
           <BanknotesIcon className="w-2.5 h-2.5 text-accent-orange" />
-          <span className="text-[7.5px] font-mono font-bold text-text-secondary/70 uppercase">
+          <span className="text-[8px] font-mono font-bold text-text-secondary/80 uppercase">
             {current.label}
           </span>
         </div>
-        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]">
+        <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#0A0C12] border border-white/[0.08]">
           <BanknotesIcon className="w-2.5 h-2.5 text-accent-orange" />
-          <span className="text-[7.5px] font-mono font-bold text-text-secondary/70 uppercase">
+          <span className="text-[8px] font-mono font-bold text-text-secondary/80 uppercase">
             {current.label2}
           </span>
         </div>
@@ -773,26 +770,26 @@ function PersonaCardsVisual({
               onClick={() => onSelectPersona(p.id)}
               className={`p-2.5 rounded-xl border transition-all duration-200 flex flex-col items-center text-center cursor-pointer ${
                 isSelected
-                  ? 'border-accent-orange/40 bg-surface-secondary shadow-md scale-102'
-                  : 'bg-surface border-white/[0.05] hover:border-white/15'
+                  ? 'border-accent-orange/50 bg-[#171C28] shadow-md scale-102'
+                  : 'bg-[#11141D] border-white/[0.07] hover:border-white/20'
               }`}
             >
               <div
                 className={`w-7 h-7 rounded-lg flex items-center justify-center mb-1.5 transition-colors ${
-                  isSelected ? 'bg-accent-orange/20 text-accent-orange' : 'bg-white/5 text-white/50'
+                  isSelected ? 'bg-accent-orange/20 text-accent-orange' : 'bg-white/5 text-white/60'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
               </div>
-              <h6 className="text-[9.5px] font-bold text-text-primary tracking-tight mb-0.5">
+              <h6 className="text-[10px] font-bold text-text-primary tracking-tight mb-0.5">
                 {p.role}
               </h6>
-              <p className="text-[8px] text-text-secondary/60 leading-tight mb-1 font-mono">
+              <p className="text-[8.5px] text-text-secondary/70 leading-tight mb-1 font-mono">
                 {p.desc}
               </p>
               <span
                 className={`text-[7px] font-bold uppercase tracking-wider mt-auto ${
-                  isSelected ? 'text-accent-orange' : 'text-text-secondary/40'
+                  isSelected ? 'text-accent-orange font-bold' : 'text-text-secondary/50'
                 }`}
               >
                 {isSelected ? 'Selected' : p.sub}
@@ -854,7 +851,7 @@ export default function FeaturesSection() {
     }, 1200)
   }
 
-  const cards = [
+  const cards: CapabilityCard[] = [
     {
       id: 'interception',
       indexStr: '01.',
@@ -863,6 +860,9 @@ export default function FeaturesSection() {
       title: 'Fresh Daily Leads from Multiple Platforms',
       description:
         'Opportunities surface in real-time from obscure forums, social networks, and intent sites. Monitor high-intent queries across LinkedIn, Reddit, Twitter/X, and Threads the exact second buyers ask for help.',
+      duration: '0:18',
+      browserRoute: 'app.leadhunterclub.com/feed/social-radar',
+      // videoUrl: '/videos/lead-interception.mp4', // Drop in screen recording video when ready
     },
     {
       id: 'intelligence',
@@ -872,6 +872,9 @@ export default function FeaturesSection() {
       title: 'Lead Intelligence & Verified Contacts',
       description:
         'Analyze and enrich prospect profiles instantly to understand who you are speaking to. See urgency levels, budget cues, and comprehensive buyer context with verified contact details ready to save.',
+      duration: '0:14',
+      browserRoute: 'app.leadhunterclub.com/intel/alex-k',
+      // videoUrl: '/videos/lead-intelligence.mp4',
     },
     {
       id: 'momentum',
@@ -881,6 +884,9 @@ export default function FeaturesSection() {
       title: 'Track Every Touch',
       description:
         'Keep your pipeline moving by logging every touchpoint. Move leads smoothly through stages from Revealed to Contacted and Replied so zero high-value opportunities slip through the cracks.',
+      duration: '0:22',
+      browserRoute: 'app.leadhunterclub.com/pipeline/active',
+      // videoUrl: '/videos/pipeline-momentum.mp4',
     },
     {
       id: 'economics',
@@ -890,16 +896,19 @@ export default function FeaturesSection() {
       title: 'Credits Based, Not Seat Based',
       description:
         'Pay only for the specific actions you perform. Solo builders, growth consultancies, and digital agencies scale usage smoothly without complex monthly seat commitments or locked tiers.',
+      duration: '0:16',
+      browserRoute: 'app.leadhunterclub.com/credits/rollover',
+      // videoUrl: '/videos/credit-economics.mp4',
     },
   ]
 
   return (
     <section
       id="features"
-      className="py-20 md:py-24 px-4 sm:px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-20 md:py-24 px-4 sm:px-6 max-w-[1296px] mx-auto relative overflow-hidden border-t border-white/[0.04]"
     >
       {/* ═══ ASYMMETRIC HEADER (Parley inspired) ═══ */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16 relative z-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-14 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -931,144 +940,217 @@ export default function FeaturesSection() {
         </motion.div>
       </div>
 
-      {/* ═══ DESKTOP 4-CARD EXPANDABLE ACCORDION DECK (hidden < md) ═══ */}
-      <div className="hidden md:flex flex-row gap-3.5 items-stretch min-h-[500px] h-[510px] w-full relative z-10">
-        {cards.map((card, i) => {
-          const isActive = activeCardIndex === i
+      {/* ═══ MACHINED HARDWARE TRAY CHASSIS (Adds tangible structural weight) ═══ */}
+      <div className="hidden md:flex p-2.5 lg:p-3 rounded-[26px] bg-[#0B0D14]/90 border border-white/[0.08] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl relative z-10">
+        <div className="flex flex-row gap-3 items-stretch min-h-[580px] h-[590px] w-full">
+          {cards.map((card, i) => {
+            const isActive = activeCardIndex === i
 
-          return (
-            <motion.div
-              key={card.id}
-              layout
-              transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              onMouseEnter={() => setActiveCardIndex(i)}
-              onClick={() => setActiveCardIndex(i)}
-              className={`relative overflow-hidden transition-all duration-300 ${
-                isActive
-                  ? 'flex-[2.6] bg-surface-elevated border border-white/12 shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85)] rounded-[22px] p-5 lg:p-6 flex flex-col justify-between cursor-default'
-                  : 'flex-1 bg-surface/40 hover:bg-surface/75 border border-white/[0.06] hover:border-white/15 rounded-[20px] p-4 lg:p-5 flex flex-col justify-between cursor-pointer group'
-              }`}
-            >
-              {isActive ? (
-                /* ── Expanded Active Card ── */
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-full flex flex-col justify-between"
-                >
-                  {/* Micro-UI Preview Panel */}
-                  <div className="h-[270px] w-full rounded-xl bg-surface/50 border border-white/[0.04] p-4 flex items-center justify-center relative overflow-hidden shadow-inner">
-                    {i === 0 && (
-                      <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                        <div className="col-span-5 flex justify-center items-center">
-                          <PlatformNetworkVisual
-                            hoveredPlatform={hoveredPlatform}
-                            onHoverPlatform={setHoveredPlatform}
-                          />
+            return (
+              <motion.div
+                key={card.id}
+                layout
+                transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                onMouseEnter={() => setActiveCardIndex(i)}
+                onClick={() => setActiveCardIndex(i)}
+                className={`relative overflow-hidden transition-all duration-300 ${
+                  isActive
+                    ? 'flex-[2.6] bg-[#141722] border border-white/15 shadow-[0_24px_70px_-15px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.12)] rounded-[20px] p-5 lg:p-6 flex flex-col justify-between cursor-default'
+                    : 'flex-1 bg-[#101219] hover:bg-[#141722] border border-white/[0.08] hover:border-white/20 rounded-[18px] p-4 lg:p-5 flex flex-col justify-between cursor-pointer group shadow-md'
+                }`}
+              >
+                {isActive ? (
+                  /* ── Expanded Active Card ── */
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="h-full flex flex-col justify-between"
+                  >
+                    {/* ── Screen Recording Video / Interactive Viewport ── */}
+                    <div className="w-full h-[340px] rounded-xl bg-[#090B10] border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)] flex flex-col overflow-hidden relative">
+                      {/* Machined Window & Player Header */}
+                      <div className="h-8 px-3.5 bg-[#0F121A] border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-red-500/70" />
+                            <span className="w-2 h-2 rounded-full bg-yellow-500/70" />
+                            <span className="w-2 h-2 rounded-full bg-emerald-500/70" />
+                          </div>
+                          <div className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-[8.5px] font-mono text-text-secondary/70 flex items-center gap-1">
+                            <span className="text-accent-orange/70">https://</span>
+                            <span className="truncate max-w-[190px]">{card.browserRoute}</span>
+                          </div>
                         </div>
-                        <div className="col-span-7 flex flex-col justify-center">
-                          <FreshLeadsVisual
-                            hoveredPlatform={hoveredPlatform}
-                            maxItems={3}
-                          />
+
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent-orange/15 border border-accent-orange/30 text-[8px] font-mono font-bold text-accent-orange uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
+                            <span>{card.videoUrl ? 'VIDEO PLAYING' : 'DEMO PREVIEW'}</span>
+                          </div>
+                          <span className="text-[8.5px] font-mono text-white/50">{card.duration}</span>
                         </div>
                       </div>
-                    )}
 
-                    {i === 1 && (
-                      <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                        <div className="col-span-6 flex flex-col justify-center">
-                          <LeadIntelVisual emailStatus={emailStatus} />
-                        </div>
-                        <div className="col-span-6 flex flex-col justify-center">
-                          <EmailComposeVisual
-                            emailStatus={emailStatus}
-                            onSend={handleSendEmail}
+                      {/* Viewport Content Body */}
+                      <div className="flex-1 w-full h-full relative overflow-hidden flex items-center justify-center p-3 lg:p-4 bg-gradient-to-b from-[#090B10] to-[#0D1017]">
+                        {card.videoUrl ? (
+                          <video
+                            src={card.videoUrl}
+                            poster={card.videoPoster}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover rounded-lg shadow-2xl"
                           />
-                        </div>
-                      </div>
-                    )}
+                        ) : (
+                          <>
+                            {i === 0 && (
+                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
+                                <div className="col-span-5 flex justify-center items-center">
+                                  <PlatformNetworkVisual
+                                    hoveredPlatform={hoveredPlatform}
+                                    onHoverPlatform={setHoveredPlatform}
+                                  />
+                                </div>
+                                <div className="col-span-7 flex flex-col justify-center">
+                                  <FreshLeadsVisual
+                                    hoveredPlatform={hoveredPlatform}
+                                    maxItems={3}
+                                  />
+                                </div>
+                              </div>
+                            )}
 
-                    {i === 2 && (
-                      <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                        <div className="col-span-6 flex flex-col justify-center">
-                          <FollowUpTimelineVisual
-                            selectedStep={selectedStep}
-                            onSelectStep={setSelectedStep}
-                          />
-                        </div>
-                        <div className="col-span-6 flex flex-col justify-center h-full">
-                          <StageDetailsPanel selectedStep={selectedStep} />
-                        </div>
-                      </div>
-                    )}
+                            {i === 1 && (
+                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
+                                <div className="col-span-6 flex flex-col justify-center">
+                                  <LeadIntelVisual emailStatus={emailStatus} />
+                                </div>
+                                <div className="col-span-6 flex flex-col justify-center">
+                                  <EmailComposeVisual
+                                    emailStatus={emailStatus}
+                                    onSend={handleSendEmail}
+                                  />
+                                </div>
+                              </div>
+                            )}
 
-                    {i === 3 && (
-                      <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                        <div className="col-span-5 flex justify-center items-center">
-                          <TokenMeterVisual selectedPersona={selectedPersona} />
-                        </div>
-                        <div className="col-span-7 flex flex-col justify-center">
-                          <PersonaCardsVisual
-                            selectedPersona={selectedPersona}
-                            onSelectPersona={setSelectedPersona}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                            {i === 2 && (
+                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
+                                <div className="col-span-6 flex flex-col justify-center">
+                                  <FollowUpTimelineVisual
+                                    selectedStep={selectedStep}
+                                    onSelectStep={setSelectedStep}
+                                  />
+                                </div>
+                                <div className="col-span-6 flex flex-col justify-center h-full">
+                                  <StageDetailsPanel selectedStep={selectedStep} />
+                                </div>
+                              </div>
+                            )}
 
-                  {/* Narrative Details Block */}
-                  <div className="mt-4 pt-3 border-t border-white/[0.05] flex flex-col justify-end">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
-                      <span className="text-[10px] font-bold text-accent-orange uppercase tracking-wider font-mono">
-                        {card.tag}
+                            {i === 3 && (
+                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
+                                <div className="col-span-5 flex justify-center items-center">
+                                  <TokenMeterVisual selectedPersona={selectedPersona} />
+                                </div>
+                                <div className="col-span-7 flex flex-col justify-center">
+                                  <PersonaCardsVisual
+                                    selectedPersona={selectedPersona}
+                                    onSelectPersona={setSelectedPersona}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Narrative Details Block */}
+                    <div className="mt-4 pt-3 border-t border-white/[0.08] flex flex-col justify-end">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
+                        <span className="text-[10px] font-bold text-accent-orange uppercase tracking-wider font-mono">
+                          {card.tag}
+                        </span>
+                      </div>
+                      <h3 className="font-display text-xl lg:text-2xl font-bold tracking-tight text-white mb-2 leading-snug">
+                        {card.title}
+                      </h3>
+                      <p className="text-text-secondary text-xs lg:text-sm leading-relaxed font-light line-clamp-2">
+                        {card.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  /* ── Collapsed Inactive Card ── */
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25 }}
+                    className="h-full flex flex-col justify-between items-start select-none"
+                  >
+                    {/* Top: Index + Duration */}
+                    <div className="w-full flex items-center justify-between">
+                      <span className="text-2xl lg:text-3xl font-display font-bold text-white/30 group-hover:text-white/60 transition-colors font-mono tracking-tighter">
+                        {card.indexStr}
+                      </span>
+                      <span className="text-[8.5px] font-mono font-bold text-white/30 group-hover:text-accent-orange transition-colors">
+                        {card.duration}
                       </span>
                     </div>
-                    <h3 className="font-display text-xl lg:text-2xl font-bold tracking-tight text-white mb-2 leading-snug">
-                      {card.title}
-                    </h3>
-                    <p className="text-text-secondary text-xs lg:text-sm leading-relaxed font-light line-clamp-2">
-                      {card.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ) : (
-                /* ── Collapsed Inactive Card ── */
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.25 }}
-                  className="h-full flex flex-col justify-between items-start select-none"
-                >
-                  {/* Top Index Number */}
-                  <span className="text-2xl lg:text-3xl font-display font-medium text-white/20 group-hover:text-white/40 transition-colors font-mono">
-                    {card.indexStr}
-                  </span>
 
-                  {/* Center Telemetry Constellation */}
-                  <TelemetryChipScatter index={i} />
+                    {/* Center: Mini Screen-Recording Slate Frame with Play Glyph */}
+                    <div className="w-full flex-1 flex flex-col justify-center items-center py-3 gap-3">
+                      <div className="w-full aspect-[16/10] rounded-xl bg-[#080A0F] border border-white/[0.08] group-hover:border-white/25 transition-all p-2 flex flex-col justify-between relative overflow-hidden shadow-inner group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.7)]">
+                        {/* Matrix scanline backdrop */}
+                        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:8px_8px] pointer-events-none" />
 
-                  {/* Bottom Title Label & Action Hint */}
-                  <div className="w-full flex items-center justify-between border-t border-white/[0.04] pt-3">
-                    <span className="text-xs font-semibold text-text-secondary/70 group-hover:text-text-primary transition-colors tracking-tight truncate">
-                      {card.shortLabel}
-                    </span>
-                    <ArrowRightIcon className="w-3 h-3 text-accent-orange opacity-0 group-hover:opacity-100 transition-opacity shrink-0 -translate-x-1 group-hover:translate-x-0 duration-200" />
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          )
-        })}
+                        <div className="flex items-center justify-between text-[7px] font-mono text-white/40">
+                          <span className="flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-accent-orange" />
+                            <span>REC</span>
+                          </span>
+                          <span>60FPS</span>
+                        </div>
+
+                        {/* Play button glyph */}
+                        <div className="self-center my-auto w-8 h-8 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/60 group-hover:text-accent-orange group-hover:bg-accent-orange/15 group-hover:border-accent-orange/40 group-hover:scale-110 transition-all duration-300 shadow-md">
+                          <PlayIcon className="w-3.5 h-3.5 fill-current ml-0.5" />
+                        </div>
+
+                        <div className="flex items-center justify-between text-[7px] font-mono text-white/40">
+                          <span className="truncate max-w-[65px]">{card.shortLabel}</span>
+                          <span>{card.duration}</span>
+                        </div>
+                      </div>
+
+                      {/* Compact Telemetry Badges */}
+                      <TelemetryChipScatter index={i} />
+                    </div>
+
+                    {/* Bottom: Title Label & Expand Arrow */}
+                    <div className="w-full flex items-center justify-between border-t border-white/[0.06] pt-3">
+                      <span className="text-xs font-semibold text-text-secondary/80 group-hover:text-white transition-colors tracking-tight truncate">
+                        {card.shortLabel}
+                      </span>
+                      <ArrowRightIcon className="w-3.5 h-3.5 text-accent-orange opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0 -translate-x-1 group-hover:translate-x-0" />
+                    </div>
+                  </motion.div>
+                )}
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
 
       {/* ═══ MOBILE TOUCH-FRIENDLY CONTROLS (< md) ═══ */}
       <div className="md:hidden flex flex-col gap-4 relative z-10">
         {/* Horizontal Segmented Pill Selector */}
-        <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-surface/80 border border-white/[0.06]">
+        <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-[#0E1017] border border-white/[0.08]">
           {cards.map((card, i) => {
             const isActive = activeCardIndex === i
             return (
@@ -1077,7 +1159,7 @@ export default function FeaturesSection() {
                 onClick={() => setActiveCardIndex(i)}
                 className={`py-2 px-1 rounded-xl text-center transition-all duration-200 flex flex-col items-center gap-0.5 ${
                   isActive
-                    ? 'bg-surface-elevated text-accent-orange border border-white/10 shadow-sm'
+                    ? 'bg-[#181C28] text-accent-orange border border-white/15 shadow-sm'
                     : 'text-text-secondary/60 hover:text-text-primary'
                 }`}
               >
@@ -1096,52 +1178,82 @@ export default function FeaturesSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease }}
-          className="bg-surface-elevated border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 shadow-xl"
+          className="bg-[#141722] border border-white/15 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 shadow-2xl"
         >
-          {/* Micro-UI container */}
-          <div className="min-h-[250px] w-full rounded-xl bg-surface/50 border border-white/[0.04] p-3 flex items-center justify-center relative overflow-hidden">
-            {activeCardIndex === 0 && (
-              <div className="flex flex-col gap-3 w-full">
-                <PlatformNetworkVisual
-                  hoveredPlatform={hoveredPlatform}
-                  onHoverPlatform={setHoveredPlatform}
-                />
-                <FreshLeadsVisual
-                  hoveredPlatform={hoveredPlatform}
-                  maxItems={2}
-                />
+          {/* Micro-UI or Video container with browser chrome */}
+          <div className="w-full rounded-xl bg-[#090B10] border border-white/10 overflow-hidden shadow-inner">
+            <div className="h-7 px-3 bg-[#0F121A] border-b border-white/[0.08] flex items-center justify-between select-none">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
+                <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/70" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70" />
+                <span className="text-[7.5px] font-mono text-text-secondary/60 ml-1 truncate max-w-[140px]">
+                  {cards[activeCardIndex].browserRoute}
+                </span>
               </div>
-            )}
+              <span className="text-[7.5px] font-mono text-accent-orange font-bold">
+                {cards[activeCardIndex].duration}
+              </span>
+            </div>
 
-            {activeCardIndex === 1 && (
-              <div className="flex flex-col gap-3 w-full">
-                <LeadIntelVisual emailStatus={emailStatus} />
-                <EmailComposeVisual
-                  emailStatus={emailStatus}
-                  onSend={handleSendEmail}
+            <div className="min-h-[260px] p-3 flex items-center justify-center">
+              {cards[activeCardIndex].videoUrl ? (
+                <video
+                  src={cards[activeCardIndex].videoUrl}
+                  poster={cards[activeCardIndex].videoPoster}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover rounded-lg shadow-xl"
                 />
-              </div>
-            )}
+              ) : (
+                <>
+                  {activeCardIndex === 0 && (
+                    <div className="flex flex-col gap-3 w-full">
+                      <PlatformNetworkVisual
+                        hoveredPlatform={hoveredPlatform}
+                        onHoverPlatform={setHoveredPlatform}
+                      />
+                      <FreshLeadsVisual
+                        hoveredPlatform={hoveredPlatform}
+                        maxItems={2}
+                      />
+                    </div>
+                  )}
 
-            {activeCardIndex === 2 && (
-              <div className="flex flex-col gap-3 w-full">
-                <FollowUpTimelineVisual
-                  selectedStep={selectedStep}
-                  onSelectStep={setSelectedStep}
-                />
-                <StageDetailsPanel selectedStep={selectedStep} />
-              </div>
-            )}
+                  {activeCardIndex === 1 && (
+                    <div className="flex flex-col gap-3 w-full">
+                      <LeadIntelVisual emailStatus={emailStatus} />
+                      <EmailComposeVisual
+                        emailStatus={emailStatus}
+                        onSend={handleSendEmail}
+                      />
+                    </div>
+                  )}
 
-            {activeCardIndex === 3 && (
-              <div className="flex flex-col gap-3 w-full items-center">
-                <TokenMeterVisual selectedPersona={selectedPersona} />
-                <PersonaCardsVisual
-                  selectedPersona={selectedPersona}
-                  onSelectPersona={setSelectedPersona}
-                />
-              </div>
-            )}
+                  {activeCardIndex === 2 && (
+                    <div className="flex flex-col gap-3 w-full">
+                      <FollowUpTimelineVisual
+                        selectedStep={selectedStep}
+                        onSelectStep={setSelectedStep}
+                      />
+                      <StageDetailsPanel selectedStep={selectedStep} />
+                    </div>
+                  )}
+
+                  {activeCardIndex === 3 && (
+                    <div className="flex flex-col gap-3 w-full items-center">
+                      <TokenMeterVisual selectedPersona={selectedPersona} />
+                      <PersonaCardsVisual
+                        selectedPersona={selectedPersona}
+                        onSelectPersona={setSelectedPersona}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Text narrative */}
