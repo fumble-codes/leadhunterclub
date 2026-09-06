@@ -1065,6 +1065,13 @@ export default function AdminLeadsPage() {
                       </div>
                     </div>
 
+                    {/* Lead Title */}
+                    {(lead as any).title && (
+                      <div className="mb-3 flex items-center gap-2">
+                        <span className="text-sm font-bold text-white">{(lead as any).title}</span>
+                      </div>
+                    )}
+
                     {lead.qualification_reason && lead.status !== 'pending' && (
                       <div className={`mb-4 p-3 border border-l-2 rounded-lg ${
                         lead.status === 'relevant'
