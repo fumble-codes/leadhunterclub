@@ -223,9 +223,13 @@ function LeadsContent() {
         </div>
 
         {/* 2-column Grid of real LeadCards matching leadfeed design */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-stretch max-w-[760px] mx-auto">
           {feedLeads.map((lead, i) => (
-            <LeadCard key={lead.id} lead={lead} index={i} />
+            <div key={lead.id} className="w-full flex justify-center">
+              <div className="w-full max-w-[370px]">
+                <LeadCard lead={lead} index={i} />
+              </div>
+            </div>
           ))}
         </div>
       </div>

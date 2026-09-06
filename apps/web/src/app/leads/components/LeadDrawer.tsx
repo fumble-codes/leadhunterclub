@@ -18,6 +18,7 @@ import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
 
 import { sanitizePublicText } from '@/lib/claim-reveal'
+import { triggerUnlockConfetti } from '@/lib/confetti'
 
 const themeMap = {
   mint: {
@@ -79,6 +80,27 @@ export default function LeadDrawer({
   }
 
   const confirmReveal = async () => {
+    // Smooth reveal for demo/mock leads
+    if (
+      lead.id.startsWith('mock') ||
+      lead.id.startsWith('hero') ||
+      lead.id.startsWith('card') ||
+      ['checkout', 'shopify', 'rebrand', 'freelancers', 'agencies', 'consultants'].includes(lead.id)
+    ) {
+      setIsRevealing(true)
+      setErrorMsg(null)
+      setShowCreditModal(false)
+      await new Promise((resolve) => setTimeout(resolve, 550))
+      onReveal(lead.name, lead.email, lead.phone)
+      triggerUnlockConfetti()
+      addToast({
+        type: 'success',
+        message: `✓ Contact information unlocked for ${lead.name}`,
+      })
+      setIsRevealing(false)
+      return
+    }
+
     try {
       setIsRevealing(true)
       setErrorMsg(null)
@@ -95,6 +117,7 @@ export default function LeadDrawer({
       const json = await res.json()
       if (res.ok && json.success) {
         onReveal(json.name, json.email, json.phone)
+        triggerUnlockConfetti()
         addToast({
           type: 'success',
           message: `✓ Contact information unlocked${json.coinsUsed ? ` · ${json.coinsUsed} coins` : ''}`,

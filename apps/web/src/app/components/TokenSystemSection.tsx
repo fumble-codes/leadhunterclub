@@ -366,7 +366,7 @@ export default function TokenSystemSection() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
 
           {/* Layered sheets container */}
-          <div className="relative w-full max-w-[420px] h-[340px]">
+          <div className="relative w-full max-w-[370px] h-[280px] mx-auto">
             {leads.map((lead, idx) => {
               const isActive = lead.id === activeCardId
 
@@ -451,7 +451,7 @@ export default function TokenSystemSection() {
                       setActiveTab('leads')
                     }
                   }}
-                  className={`absolute top-0 left-0 right-0 w-full ${filterClass}`}
+                  className={`absolute top-0 left-0 right-0 w-full h-[260px] ${filterClass}`}
                 >
                   <LeadCard
                     lead={lead}

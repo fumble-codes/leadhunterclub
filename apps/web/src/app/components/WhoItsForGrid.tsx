@@ -387,7 +387,7 @@ export default function WhoItsForGrid() {
         <div
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[520px] md:h-[560px] justify-between"
+          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[500px] md:h-[520px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">
@@ -483,25 +483,31 @@ export default function WhoItsForGrid() {
                 </div>
 
                 {/* Spacious 3-card Lead Feed Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 items-stretch overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch justify-center overflow-hidden max-w-[1140px] mx-auto">
                   {/* Card 1: Secondary mock lead (SEO optimization signal) */}
-                  <div className="hidden xl:flex items-stretch h-full opacity-70 hover:opacity-100 transition-opacity duration-300">
-                    <LeadCard lead={mockLead1} index={0} />
+                  <div className="hidden xl:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-full max-w-[360px]">
+                      <LeadCard lead={mockLead1} index={0} />
+                    </div>
                   </div>
 
                   {/* Card 2: THE PRIMARY ACTIVE PERSONA LEAD CARD (clickable to reveal) */}
-                  <div className="flex items-stretch h-full">
-                    <LeadCard
-                      lead={appLead}
-                      index={1}
-                      isSelected={true}
-                      onReveal={() => handleReveal(activePersona.id)}
-                    />
+                  <div className="flex items-stretch justify-center">
+                    <div className="w-full max-w-[360px]">
+                      <LeadCard
+                        lead={appLead}
+                        index={1}
+                        isSelected={true}
+                        onReveal={() => handleReveal(activePersona.id)}
+                      />
+                    </div>
                   </div>
 
                   {/* Card 3: CRM migration signal */}
-                  <div className="hidden md:flex items-stretch h-full opacity-70 hover:opacity-100 transition-opacity duration-300">
-                    <LeadCard lead={mockLead2} index={2} />
+                  <div className="hidden md:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-full max-w-[360px]">
+                      <LeadCard lead={mockLead2} index={2} />
+                    </div>
                   </div>
                 </div>
               </div>

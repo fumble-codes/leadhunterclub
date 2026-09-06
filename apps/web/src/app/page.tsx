@@ -138,7 +138,7 @@ function SignalPreviewUI() {
   }
 
   return (
-    <div className="w-full overflow-hidden">
+    <div className="w-full max-w-[420px] mx-auto overflow-hidden">
       <div className="w-full rounded-2xl bg-surface border border-white/[0.06] shadow-[0_30px_90px_rgba(var(--rgb-black),0.5)] overflow-hidden">
         {/* Window chrome */}
         <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center gap-3">
@@ -159,7 +159,7 @@ function SignalPreviewUI() {
         </div>
 
         {/* Lead selector pills */}
-        <div className="flex items-center gap-1.5 px-4 pt-3 pb-3">
+        <div className="flex items-center justify-center gap-1.5 px-4 pt-3 pb-3">
           {SIGNAL_LEADS.map((lead) => (
             <button
               key={lead.id}
@@ -175,14 +175,16 @@ function SignalPreviewUI() {
           ))}
         </div>
 
-        {/* Real LeadCard matching the exact LeadFeed page card design */}
-        <div className="p-4 pt-0">
-          <LeadCard
-            lead={leadToDisplay}
-            index={SIGNAL_LEADS.findIndex((l) => l.id === selectedId)}
-            isSelected={true}
-            onReveal={() => handleReveal(selected.id)}
-          />
+        {/* Real LeadCard matching the exact LeadFeed page card design and standard size */}
+        <div className="p-4 pt-0 flex justify-center">
+          <div className="w-full max-w-[370px]">
+            <LeadCard
+              lead={leadToDisplay}
+              index={SIGNAL_LEADS.findIndex((l) => l.id === selectedId)}
+              isSelected={true}
+              onReveal={() => handleReveal(selected.id)}
+            />
+          </div>
         </div>
       </div>
     </div>

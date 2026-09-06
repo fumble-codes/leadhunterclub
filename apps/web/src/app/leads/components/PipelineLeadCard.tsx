@@ -241,14 +241,14 @@ export default function PipelineLeadCard({
       onClick={onClick}
       whileHover={{ y: -3, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className={`group relative text-left flex flex-col justify-between p-5 rounded-[22px] overflow-hidden h-full min-h-[250px] w-full col-span-1 shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer ${
+      className={`group relative text-left flex flex-col justify-between p-5 rounded-[22px] overflow-hidden h-[260px] min-h-[260px] max-h-[260px] w-full col-span-1 shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer ${
         theme.cardBg
       } ${isSelected ? 'ring-3 ring-black/30' : ''}`}
     >
       {/* Top & Content Section */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 min-h-0">
         {/* Header: Clean Niche Category without Intent Score */}
-        <div className="flex items-center justify-between mb-2.5 w-full select-none shrink-0">
+        <div className="flex items-center justify-between mb-2 w-full select-none shrink-0 h-[18px]">
           <div className="flex items-center gap-1.5 min-w-0">
             <div className={`w-1.5 h-1.5 rounded-full bg-current shrink-0 ${theme.text}`} />
             <span className={`text-[10px] font-bold tracking-[0.16em] uppercase truncate ${theme.textMuted}`}>
@@ -264,17 +264,19 @@ export default function PipelineLeadCard({
         </div>
 
         {/* Scaled-down Headline */}
-        <h4 className={`text-[10.5px] font-bold tracking-[0.12em] uppercase mb-1.5 line-clamp-1 select-none opacity-90 ${theme.text}`}>
+        <h4 className={`text-[10.5px] font-bold tracking-[0.12em] uppercase mb-1.5 line-clamp-1 select-none opacity-90 shrink-0 h-[16px] ${theme.text}`}>
           {displayHeadline}
         </h4>
 
-        {/* Scaled-down Quote: refined, aesthetic font sizing */}
-        <h3 className={`text-[13.5px] sm:text-[14.5px] font-semibold tracking-tight leading-[1.4] mb-3 line-clamp-3 select-none flex-1 ${theme.text}`}>
-          &quot;{quoteContent}&quot;
-        </h3>
+        {/* Scaled-down Quote: fixed height container ensures 100% uniform card layout regardless of copy length */}
+        <div className="h-[52px] mb-2.5 flex items-start select-none overflow-hidden shrink-0">
+          <h3 className={`text-[13px] sm:text-[13.5px] font-semibold tracking-tight leading-[1.35] line-clamp-2 ${theme.text}`}>
+            &quot;{quoteContent}&quot;
+          </h3>
+        </div>
 
         {/* Clean Tags Row without match score badge */}
-        <div className="flex items-center gap-1.5 mb-3 shrink-0 select-none overflow-hidden flex-nowrap">
+        <div className="flex items-center gap-1.5 mb-2.5 shrink-0 select-none overflow-hidden flex-nowrap h-[22px]">
           {visibleTags.map((tag) => (
             <span
               key={tag}
@@ -287,7 +289,7 @@ export default function PipelineLeadCard({
       </div>
 
       {/* Footer Area: Cute scaled-down lock and reveal button */}
-      <div className="w-full flex items-center justify-between shrink-0 mt-auto pt-1.5">
+      <div className="w-full h-[34px] flex items-center justify-between shrink-0 mt-auto pt-1 border-t border-black/[0.06]">
         {!isRevealed ? (
           <>
             {/* Cute Micro Locked Placeholder */}
@@ -303,23 +305,40 @@ export default function PipelineLeadCard({
               </div>
             </div>
 
-            {/* Cute Scaled-down Reveal Action Button */}
+            {/* Cute Scaled-down Reveal Action Button with Loading Animation */}
             <button
               type="button"
               onClick={handleReveal}
-              className={`w-[96px] h-[32px] rounded-xl font-bold text-[11px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shrink-0 ${theme.button}`}
+              disabled={isRevealing}
+              className={`w-[96px] h-[30px] rounded-xl font-bold text-[10.5px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 ${theme.button} ${
+                isRevealing ? 'opacity-85 cursor-wait pointer-events-none' : 'cursor-pointer'
+              }`}
             >
-              <span>Reveal</span>
-              <span className="flex items-center gap-0.5 opacity-90 text-[10px] font-semibold tabular-nums">
-                <Coins size={11} className="shrink-0" />
-                <span>-{lead.revealCost ?? 3}</span>
-              </span>
+              {isRevealing ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 size={12} className="animate-spin shrink-0" />
+                  <span className="text-[10px] font-semibold tracking-tight">Unlocking...</span>
+                </span>
+              ) : (
+                <>
+                  <span>Reveal</span>
+                  <span className="flex items-center gap-0.5 opacity-90 text-[10px] font-semibold tabular-nums">
+                    <Coins size={11} className="shrink-0" />
+                    <span>-{lead.revealCost ?? 3}</span>
+                  </span>
+                </>
+              )}
             </button>
           </>
         ) : (
           <>
-            {/* Cute Scaled-down Unlocked Contact Details */}
-            <div className="flex items-center gap-2 min-w-0 flex-1 mr-1.5">
+            {/* Cute Scaled-down Unlocked Contact Details with Smooth Pop-in */}
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 25 }}
+              className="flex items-center gap-2 min-w-0 flex-1 mr-1.5"
+            >
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] uppercase shrink-0 ${theme.matchTag}`}
               >
@@ -327,7 +346,7 @@ export default function PipelineLeadCard({
               </div>
               <div className="min-w-0 flex-1">
                 <div className={`text-[11px] font-bold truncate leading-tight ${theme.text}`}>{lead.name}</div>
-                {lead.email && (
+                {lead.email ? (
                   <div
                     className={`text-[9.5px] truncate select-all flex items-center gap-1 mt-0.5 ${theme.textMuted}`}
                     title={lead.email}
@@ -335,24 +354,23 @@ export default function PipelineLeadCard({
                     <Mail size={9.5} className="shrink-0" />
                     <span className="truncate">{lead.email}</span>
                   </div>
-                )}
-                {lead.phone && (
+                ) : lead.phone ? (
                   <div
-                    className={`text-[9.5px] truncate select-all flex items-center gap-1 ${theme.textMuted}`}
+                    className={`text-[9.5px] truncate select-all flex items-center gap-1 mt-0.5 ${theme.textMuted}`}
                     title={lead.phone}
                   >
                     <Phone size={9.5} className="shrink-0" />
                     <span className="truncate">{lead.phone}</span>
                   </div>
-                )}
+                ) : null}
               </div>
-            </div>
+            </motion.div>
 
             {/* Scaled-down Save Button */}
             <button
               type="button"
               onClick={handleSave}
-              className={`w-[66px] h-[32px] rounded-xl text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
+              className={`w-[66px] h-[30px] rounded-xl text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
                 isSaved ? theme.savedButton : theme.saveButton
               }`}
             >
