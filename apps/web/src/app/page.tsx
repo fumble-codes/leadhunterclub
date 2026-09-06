@@ -16,8 +16,9 @@ import WhoItsForGrid from '@/app/components/WhoItsForGrid'
 import FeaturesSection from '@/app/components/FeaturesSection'
 import TestimonialsSection from '@/app/components/TestimonialsSection'
 import { NewsletterSignup } from '@/app/components/NewsletterSignup'
-import LeadCard from '@/app/leads/components/LeadCard'
-import { AppLead } from '@/types/lead'
+import { SignalInterceptStage } from '@/app/components/SignalInterceptStage'
+import { LeadGiftWrapStage } from '@/app/components/LeadGiftWrapStage'
+import { LeadOutreachFlowchart } from '@/app/components/LeadOutreachFlowchart'
 const ease = [0.16, 1, 0.3, 1] as const
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -52,148 +53,9 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   )
 }
 
-const SIGNAL_LEADS: AppLead[] = [
-  {
-    id: 'checkout',
-    name: 'Alex Carter',
-    company: 'DTC Brands',
-    source: 'Twitter',
-    category: 'UI/UX DESIGN',
-    title: 'Checkout UI/UX Redesign',
-    taskScope:
-      'Our current checkout page is ugly and conversions are dropping drastically. Need high-converting redesign.',
-    signalContext: 'Our current checkout page is ugly and conversions are dropping drastically.',
-    urgency: 'critical',
-    nicheTags: ['E-Commerce', 'UI/UX', 'Conversion'],
-    email: 'alex.k@dtcbrands.co',
-    phone: '+1 (555) 012-3456',
-    replyProbability: 97,
-    accent: 'pink',
-    status: 'new',
-    timestamp: '1h ago',
-    isClaimable: true,
-    revealCost: 3,
-    isRevealed: false,
-  },
-  {
-    id: 'shopify',
-    name: 'Andy Shepard',
-    company: 'Nexus AI',
-    source: 'Reddit',
-    category: 'SHOPIFY DEV',
-    title: 'Shopify Speed Optimization',
-    taskScope:
-      'Struggling with slow load times and high bounce rates on our Shopify store, losing checkouts.',
-    signalContext: 'Struggling with slow load times and high bounce rates on our Shopify store.',
-    urgency: 'high',
-    nicheTags: ['Shopify', 'Web Dev', 'Speed'],
-    email: 'a.shepard@nexus.ai',
-    phone: '+1 (555) 017-8892',
-    replyProbability: 92,
-    accent: 'purple',
-    status: 'new',
-    timestamp: '3h ago',
-    isClaimable: true,
-    revealCost: 3,
-    isRevealed: false,
-  },
-  {
-    id: 'rebrand',
-    name: 'Michael Carter',
-    company: 'Stellar Co',
-    source: 'LinkedIn',
-    category: 'BRAND IDENTITY',
-    title: 'Brand Identity & Design System',
-    taskScope:
-      'Just raised a seed round and need a full rebrand and Figma design system before our product launch.',
-    signalContext: 'Just raised a seed round and need a full rebrand before our product launch.',
-    urgency: 'high',
-    nicheTags: ['SaaS', 'Branding', 'Figma'],
-    email: 'm.carter@stellar.co',
-    phone: '+1 (555) 019-2045',
-    replyProbability: 88,
-    accent: 'cyan',
-    status: 'new',
-    timestamp: '5h ago',
-    isClaimable: true,
-    revealCost: 3,
-    isRevealed: false,
-  },
-]
-
-// ─── Signal Reveal UI — the right-hand visual for the Philosophy section ──
-function SignalPreviewUI() {
-  const [selectedId, setSelectedId] = useState(SIGNAL_LEADS[0].id)
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({})
-  const selected = SIGNAL_LEADS.find((l) => l.id === selectedId)!
-
-  const leadToDisplay: AppLead = {
-    ...selected,
-    isRevealed: !!revealed[selected.id],
-    status: revealed[selected.id] ? 'saved' : 'new',
-  }
-
-  const handleReveal = (id: string) => {
-    setRevealed((prev) => ({ ...prev, [id]: true }))
-  }
-
-  return (
-    <div className="w-full max-w-[420px] mx-auto overflow-hidden">
-      <div className="w-full rounded-2xl bg-surface border border-white/[0.06] shadow-[0_30px_90px_rgba(var(--rgb-black),0.5)] overflow-hidden">
-        {/* Window chrome */}
-        <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center gap-3">
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="w-2 h-2 rounded-full bg-dot-red opacity-70" />
-            <span className="w-2 h-2 rounded-full bg-dot-yellow opacity-70" />
-            <span className="w-2 h-2 rounded-full bg-dot-green opacity-70" />
-          </div>
-          <span className="text-[9.5px] font-mono text-text-secondary/40 tracking-wider">
-            live-signal-feed
-          </span>
-          <div className="ml-auto flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
-            <span className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary">
-              Intent Monitor
-            </span>
-          </div>
-        </div>
-
-        {/* Lead selector pills */}
-        <div className="flex items-center justify-center gap-1.5 px-4 pt-3 pb-3">
-          {SIGNAL_LEADS.map((lead) => (
-            <button
-              key={lead.id}
-              onClick={() => setSelectedId(lead.id)}
-              className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
-                selectedId === lead.id
-                  ? 'bg-accent-purple/15 text-accent-purple border border-accent-purple/25'
-                  : 'bg-white/[0.03] text-text-secondary/60 border border-white/[0.06] hover:text-text-primary'
-              }`}
-            >
-              {lead.company}
-            </button>
-          ))}
-        </div>
-
-        {/* Real LeadCard matching the exact LeadFeed page card design and standard size */}
-        <div className="p-4 pt-0 flex justify-center">
-          <div className="w-full max-w-[370px]">
-            <LeadCard
-              lead={leadToDisplay}
-              index={SIGNAL_LEADS.findIndex((l) => l.id === selectedId)}
-              isSelected={true}
-              onReveal={() => handleReveal(selected.id)}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden">
+    <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden max-w-[1296px] mx-auto px-4 sm:px-6 md:px-8">
       <HeroSection />
 
       {/* Precision Beam Divider */}
@@ -208,8 +70,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
-              [ 01 // HOW IT WORKS ]
+            <span className="text-sm font-semibold text-accent-orange mb-3 block">
+              How it works
             </span>
           </motion.div>
 
@@ -246,83 +108,28 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, ease }}
             whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-500 min-h-[280px] md:min-h-[300px] flex flex-col justify-between"
+            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-500 flex flex-col justify-center"
           >
-            {/* Visual Radar Container */}
-            <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 overflow-hidden pointer-events-none flex items-center justify-center">
-              {/* Concentric circles - slightly more visible */}
-              <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-accent-purple/[0.15] flex items-center justify-center shadow-[inset_0_0_40px_rgba(var(--rgb-accent-purple),0.05)]">
-                <div className="w-[180px] h-[180px] rounded-full border border-dashed border-accent-purple/[0.2] flex items-center justify-center shadow-[inset_0_0_20px_rgba(var(--rgb-accent-purple),0.05)]">
-                  <div className="w-[80px] h-[80px] rounded-full border border-dashed border-accent-purple/[0.3]" />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+              {/* Left Column: Clean Context */}
+              <div className="md:col-span-5 flex flex-col justify-center pr-0 md:pr-2">
+                <span className="text-xs font-semibold text-accent-orange block mb-2">
+                  Step 01
+                </span>
+
+                <h3 className="font-display text-xl md:text-2xl font-semibold mb-3 tracking-tight text-white leading-snug">
+                  We Intercept Fresh Signals
+                </h3>
+
+                <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
+                  Our engine continuously scans niche communities, social feeds, and intent networks to capture the exact moment someone asks for help with a service you offer. These are real people, posting right now.
+                </p>
               </div>
 
-              {/* Eye-catching Hero Radar Sweep */}
-              <div className="absolute w-[300px] h-[300px] animate-[spin_4s_linear_infinite] rounded-full overflow-hidden">
-                {/* Radar sweep cone */}
-                <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[conic-gradient(from_180deg_at_0_100%,rgba(var(--rgb-accent-purple),0)_0deg,rgba(var(--rgb-accent-purple),0.25)_90deg)]" />
-                {/* Leading edge line */}
-                <div className="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-accent-orange origin-left -translate-y-1/2 shadow-[0_0_12px_rgba(var(--rgb-accent-orange),0.6)]" />
+              {/* Right Column: Live Signal Stage */}
+              <div className="md:col-span-7 w-full">
+                <SignalInterceptStage />
               </div>
-
-              {/* Glowing cinematic intercept logos */}
-              {/* X / Twitter */}
-              <motion.div
-                className="absolute top-[20%] left-[20%] w-10 h-10 rounded-full bg-social-twitter/10 border border-social-twitter/30 flex items-center justify-center text-social-twitter group-hover:scale-110 group-hover: group-hover:border-social-twitter/50 group-hover:bg-social-twitter/20 transition-all duration-500 backdrop-blur-md"
-                animate={{ scale: [0.9, 1.1, 0.9], opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <svg className="w-4 h-4 fill-current text-social-twitter" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </motion.div>
-
-              {/* LinkedIn */}
-              <motion.div
-                className="absolute bottom-[25%] right-[15%] w-8 h-8 rounded-md bg-social-linkedin/10 border border-social-linkedin/30 flex items-center justify-center text-social-linkedin group-hover:scale-110 group-hover: group-hover:border-social-linkedin/50 group-hover:bg-social-linkedin/20 transition-all duration-500 backdrop-blur-md shadow-[0_0_15px_rgba(var(--rgb-social-twitter),0.3)]"
-                animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.3, 1, 0.3] }}
-                transition={{ duration: 5, repeat: Infinity, delay: 1.5, ease: 'easeInOut' }}
-              >
-                <svg className="w-5 h-5 fill-current text-social-linkedin" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z" />
-                </svg>
-              </motion.div>
-
-              {/* Reddit */}
-              <motion.div
-                className="absolute top-[35%] right-[25%] w-11 h-11 rounded-full bg-social-reddit/10 border border-social-reddit/30 flex items-center justify-center text-social-reddit group-hover:scale-110 group-hover: group-hover:border-social-reddit/50 group-hover:bg-social-reddit/20 transition-all duration-500 backdrop-blur-md shadow-[0_0_15px_rgba(var(--rgb-social-twitter),0.3)]"
-                animate={{ scale: [0.9, 1.25, 0.9], opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity, delay: 0.5, ease: 'easeInOut' }}
-              >
-                <svg className="w-5 h-5 fill-current text-social-reddit" viewBox="0 0 24 24">
-                  <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 0-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.203-.094z" />
-                </svg>
-              </motion.div>
-
-              {/* Threads */}
-              <motion.div
-                className="absolute bottom-[20%] left-[25%] w-10 h-10 rounded-full bg-white/5 border border-white/20 flex items-center justify-center text-white group-hover:scale-110 group-hover: group-hover:border-white/40 group-hover:bg-white/10 transition-all duration-500 backdrop-blur-md shadow-[0_0_15px_rgba(10,102,194,0.3)]"
-                animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.3, 1, 0.3] }}
-                transition={{ duration: 4.5, repeat: Infinity, delay: 2, ease: 'easeInOut' }}
-              >
-                <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 192 192">
-                  <path d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.881 72.2328C81.6116 63.5383 90.6052 61.6848 97.2286 61.6848C97.3051 61.6848 97.3819 61.6848 97.4576 61.6855C105.707 61.7381 111.932 64.1366 115.961 68.814C118.893 72.2193 120.854 76.925 121.825 82.8638C114.511 81.6207 106.601 81.2385 98.145 81.7233C74.3247 83.0954 59.0111 96.9879 60.0396 116.292C60.5615 126.084 65.4397 134.508 73.775 140.011C80.8224 144.663 89.899 146.938 99.3323 146.423C111.79 145.74 121.563 140.987 128.381 132.296C133.559 125.696 136.834 117.143 138.28 106.366C144.217 109.949 148.617 114.664 151.047 120.332C155.179 129.967 155.42 145.8 142.501 158.708C131.182 170.016 117.576 174.908 97.0135 175.059C74.2042 174.89 56.9538 167.575 45.7381 153.317C35.2355 139.966 29.8077 120.682 29.6052 96C29.8077 71.3178 35.2355 52.0336 45.7381 38.6827C56.9538 24.4249 74.2039 17.11 97.0132 16.9405C119.988 17.1113 137.539 24.4614 148.902 38.8168C156.035 47.8225 160.852 59.2065 163.093 72.8468L179.882 70.0932C177.108 53.6491 170.932 39.8146 162.062 28.627C148.067 10.9231 126.069 1.70613 97.0094 1.5H96.9458C67.9224 1.70613 46.0629 10.9254 32.228 28.5303C19.7891 44.3644 13.1118 67.246 12.9062 95.8943V96.1057C13.1118 124.754 19.7891 147.636 32.228 163.47C46.0629 181.075 67.9224 190.294 96.9458 190.5H97.0094C126.115 190.294 145.457 182.261 159.277 168.455C175.291 152.457 175.143 131.258 166.726 111.666C161.42 99.3093 153.256 92.4287 141.537 88.9883ZM98.4405 129.507C88.0005 130.095 77.1544 125.409 76.6196 115.372C76.2232 107.93 81.9158 99.626 99.0812 98.6368C101.047 98.5234 102.976 98.468 104.871 98.468C111.106 98.468 116.939 99.0737 122.242 100.233C120.264 124.935 108.662 128.946 98.4405 129.507Z" />
-                </svg>
-              </motion.div>
-            </div>
-
-            <div className="relative z-10 pointer-events-none">
-              <span className="text-[10px] font-mono text-accent-purple uppercase tracking-widest mb-2 block">
-                Step 01
-              </span>
-              <h3 className="font-display text-lg md:text-xl font-semibold mb-2.5 tracking-tight">
-                We Intercept Fresh Signals
-              </h3>
-              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed max-w-sm">
-                Our engine continuously scans obscure forums, niche communities, social feeds, and
-                intent networks to capture the exact moment someone asks for help with a service you
-                offer. These are real people, posting right now.
-              </p>
             </div>
           </motion.div>
 
@@ -466,76 +273,33 @@ export default function LandingPage() {
             viewport={{ once: true, margin: '-40px' }}
             transition={{ duration: 0.9, delay: 0.15, ease }}
             whileHover={{ y: -4 }}
-            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-500 min-h-[280px] md:min-h-[300px] flex flex-col justify-between"
+            className="md:col-span-2 group relative p-6 md:p-8 metallic-card transition-all duration-500 flex flex-col justify-center"
           >
-            {/* Dashboard Lead Drop Visual */}
-            <div className="absolute right-10 top-10 bottom-10 w-[240px] hidden md:flex flex-col justify-center space-y-3">
-              {/* Incoming leads dropping into feed */}
-              {[
-                {
-                  name: 'Sarah K.',
-                  signal: 'Needs Shopify dev',
-                  score: '96%',
-                  accent: 'purple',
-                  delay: 0,
-                },
-                {
-                  name: 'James T.',
-                  signal: 'Conversion audit',
-                  score: '91%',
-                  accent: 'purple',
-                  delay: 120,
-                },
-                {
-                  name: 'Priya M.',
-                  signal: 'Brand redesign',
-                  score: '88%',
-                  accent: 'purple',
-                  delay: 240,
-                },
-              ].map((lead) => (
-                <div
-                  key={lead.name}
-                  className="p-3.5 rounded-xl bg-code-bg-dark/40 border border-white/[0.02] shadow-[0_2px_8px_rgba(var(--rgb-black),0.3)] flex items-center gap-3 transform transition-all duration-500 group-hover:border-border-subtle group-hover:bg-surface-secondary group-hover:shadow-[0_4px_16px_rgba(var(--rgb-black),0.6)] group-hover:translate-x-2"
-                  style={{ transitionDelay: `${lead.delay}ms` }}
-                >
-                  <div className="w-8 h-8 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center shrink-0">
-                    <span className="text-[9px] font-bold text-accent-purple">
-                      {lead.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-text-primary truncate">
-                        {lead.name}
-                      </span>
-                      <span className="text-[9px] font-bold text-accent-purple font-mono">
-                        {lead.score}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-text-secondary/60 truncate block">
-                      {lead.signal}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+              {/* Left Column: Context & Copy */}
+              <div className="md:col-span-5 flex flex-col justify-center pr-0 md:pr-2">
+                <span className="text-xs font-semibold text-accent-orange block mb-2">
+                  Step 04
+                </span>
 
-            <div className="relative z-10 pointer-events-none md:w-[60%]">
-              <span className="text-[10px] font-mono text-accent-purple uppercase tracking-widest mb-2 block">
-                Step 04
-              </span>
-              <h3 className="font-display text-lg md:text-xl font-semibold mb-2.5 tracking-tight">
-                Released to the Hunters
-              </h3>
-              <p className="text-text-secondary text-xs sm:text-sm leading-relaxed">
-                Qualified, intelligence-loaded leads land directly in your dashboard, ready to act
-                on. Craft the perfect first touch or engage with your own strategy. Either way,
-                you&apos;re reaching warm buyers while the opportunity is still fresh.
-              </p>
+                <h3 className="font-display text-xl md:text-2xl font-semibold mb-3 tracking-tight text-white leading-snug">
+                  Released to the Hunters
+                </h3>
+
+                <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mb-4">
+                  Qualified, intelligence-loaded leads land directly in your dashboard, packaged and ready to act on. Reach warm buyers with complete context while the opportunity is fresh.
+                </p>
+
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[11px] text-zinc-400 font-mono w-fit">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                  <span>Click sleeve to unpack fresh leads</span>
+                </div>
+              </div>
+
+              {/* Right Column: Lead Gift Wrap Stage */}
+              <div className="md:col-span-7 w-full flex items-center justify-center">
+                <LeadGiftWrapStage />
+              </div>
             </div>
           </motion.div>
         </div>
@@ -544,98 +308,113 @@ export default function LandingPage() {
       {/* Conversational Intelligence Section */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <section
-        id="features"
-        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative"
+        id="philosophy"
+        className="py-20 md:py-28 px-4 sm:px-6 max-w-[1200px] mx-auto relative"
       >
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Left Column - Copy Breakdown */}
+        {/* Section Header */}
+        <div className="text-center mb-12 md:mb-14 relative z-10 max-w-3xl mx-auto">
           <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease }}
+          >
+            <span className="text-sm font-semibold text-accent-orange mb-3 block">
+              Why Lead Hunter Club
+            </span>
+          </motion.div>
+
+          <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease }}
-            className="lg:col-span-5 text-left relative z-10"
+            transition={{ duration: 0.8, delay: 0.1, ease }}
+            className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.15] text-text-primary"
           >
-            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-4 block text-orange-400">
-              [ 02 // PHILOSOPHY ]
-            </span>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight mb-4 leading-[1.15] text-text-primary">
-              Most lead tools{' '}
-              <span className="text-text-secondary hover:text-text-primary transition-colors">
-                chase
-              </span>{' '}
-              volume.
-              <br />
-              <span className="text-text-secondary font-light">We deliver intent.</span>
-            </h2>
-            <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mb-8 max-w-sm font-light">
-              Anyone can chase thousands of raw contacts. But without context, most get ignored.
-              We prioritize high-intent signals over bulk noise.
-            </p>
+            Most lead tools chase volume.
+            <br />
+            <span className="text-text-secondary/70 font-light">We deliver intent.</span>
+          </motion.h2>
 
-            {/* Noise vs Signal Minimal Matrix */}
-            <div className="space-y-8 mb-10">
-              {/* The Noise (Spam) */}
-              <div className="border-l border-white/[0.04] pl-6 relative">
-                <span className="text-[10px] uppercase tracking-wider block mb-3 text-text-secondary/30 font-semibold">
-                  The Noise
-                </span>
-                <ul className="space-y-2.5">
-                  {[
-                    'Robotic, dry templates that get ignored',
-                    'Desperate multi-platform follow-up sequences',
-                    'Copy-pasted messaging lacking buyer context',
-                    'Forgettable angles that land in spam folders',
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="text-xs text-text-secondary/50 flex items-center gap-3"
-                    >
-                      <span className="w-1 h-1 rounded-full bg-white/10 shrink-0" />
-                      <span className="font-light">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* The Signal (LHC) */}
-              <div className="border-l border-white/[0.08] pl-6 relative">
-                <span className="text-[10px] uppercase tracking-wider block mb-3 text-text-secondary/50 font-semibold">
-                  The Signal
-                </span>
-                <ul className="space-y-2.5">
-                  {[
-                    'High-value, direct conversations',
-                    'Hyper-targeted buyer context personalization',
-                    'Ultra-low resistance messaging angles',
-                    'Strong, psychologically sound messaging angles',
-                    'Significantly higher actual reply probability',
-                  ].map((item) => (
-                    <li key={item} className="text-xs text-text-primary flex items-center gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-purple shrink-0" />
-                      <span className="font-light">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <p className="text-xs text-text-secondary/60 leading-normal border-l border-white/10 pl-4 py-0.5 tracking-tight font-medium">
-              &quot;Because getting more replies matters more than sending more messages.&quot;
-            </p>
-          </motion.div>
-
-          {/* Right Column - Live Signal Reveal Widget */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.9, delay: 0.15, ease }}
-            className="lg:col-span-7"
+            transition={{ duration: 0.8, delay: 0.2, ease }}
+            className="text-sm sm:text-base text-text-secondary font-light leading-relaxed max-w-2xl mx-auto"
           >
-            <SignalPreviewUI />
-          </motion.div>
+            Anyone can scrape thousands of raw contacts. But without buyer context, cold messages get ignored.
+            Lead Hunter Club turns fresh intent signals into rich dossiers that feed your choice of AI, crafting surgical outreach that lands in primary inboxes and drives real replies.
+          </motion.p>
         </div>
+
+        {/* The Noise vs The Signal: Compact Parallel Comparison */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.25, ease }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[900px] mx-auto mb-10"
+        >
+          {/* The Noise */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-text-secondary/50 font-bold">
+                The Noise: Bulk Scraping
+              </span>
+              <span className="text-[10px] font-mono text-red-400/80 bg-red-500/10 px-2 py-0.5 rounded">
+                ~1.2% Reply Rate
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {[
+                'Robotic, dry templates blast unverified contacts',
+                'Copy-pasted pitches lacking specific pain points',
+                'Aggressive follow-ups that land directly in spam',
+              ].map((item) => (
+                <li key={item} className="text-xs text-text-secondary/50 flex items-center gap-2.5">
+                  <span className="w-1 h-1 rounded-full bg-red-400/40 shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* The Signal */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.03] border border-primary/25 shadow-[0_0_25px_rgba(255,184,0,0.08)]">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-primary font-bold">
+                The Signal: Lead Hunter Club
+              </span>
+              <span className="text-[10px] font-mono text-secondary bg-secondary/10 px-2 py-0.5 rounded border border-secondary/20 font-medium">
+                ~38% Reply Rate
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {[
+                'Intercepts verified buyers asking for help right now',
+                'Compiles deep tech stack, budget, and pain point dossier',
+                'Routes context to your AI to write surgical human outreach',
+              ].map((item) => (
+                <li key={item} className="text-xs text-text-primary flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </motion.div>
+
+        {/* Live Interactive Flowchart Canvas */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, delay: 0.3, ease }}
+          className="w-full max-w-[960px] mx-auto"
+        >
+          <LeadOutreachFlowchart />
+        </motion.div>
       </section>
       {/* Product Capabilities */}
       <FeaturesSection />
@@ -663,8 +442,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
           >
-            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
-              [ 05 // ACQUISITION FUEL ]
+            <span className="text-sm font-semibold text-accent-orange mb-3 block">
+              Pricing
             </span>
           </motion.div>
 
@@ -850,15 +629,20 @@ export default function LandingPage() {
 
       {/* FAQ */}
       <section id="faq" className="py-20 md:py-24 px-6 max-w-[800px] mx-auto">
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease }}
-          className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-10 text-center"
-        >
-          Operational Clarifications.
-        </motion.h2>
+        <div className="text-center mb-10">
+          <span className="text-sm font-semibold text-accent-orange mb-3 block">
+            FAQ
+          </span>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease }}
+            className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-center"
+          >
+            Frequently asked questions
+          </motion.h2>
+        </div>
         <div className="border-t border-white/[0.03]">
           <FAQItem
             q="Do you book clients for me?"
@@ -891,8 +675,8 @@ export default function LandingPage() {
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
-            [ GET STARTED ]
+          <span className="text-sm font-semibold text-accent-orange mb-3 block">
+            Get started
           </span>
 
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-text-primary mb-4 leading-snug">
@@ -928,14 +712,6 @@ export default function LandingPage() {
               >
                 Start Finding Leads
                 <ArrowRightIcon className="w-4 h-4 text-current transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} className="inline-block">
-              <Link
-                href="/sneak-peek"
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] text-xs sm:text-sm"
-              >
-                Sneak Peek
               </Link>
             </motion.div>
           </div>

@@ -152,6 +152,12 @@ export default function PipelineLeadCard({
     e.stopPropagation()
     if (isRevealing) return
 
+    // Capture click position synchronously before any async ticks
+    const clickCoords =
+      e && typeof e.clientX === 'number' && e.clientX > 0
+        ? { x: e.clientX, y: e.clientY }
+        : null
+
     // Smooth client-side reveal for landing page demos / mock cards
     if (
       lead.id.startsWith('mock') ||
@@ -163,7 +169,7 @@ export default function PipelineLeadCard({
       await new Promise((resolve) => setTimeout(resolve, 550))
       setIsRevealed(true)
       setIsRevealing(false)
-      triggerUnlockConfetti(e)
+      triggerUnlockConfetti(clickCoords)
       addToast({
         type: 'success',
         message: `Unlocked contact for ${lead.name || 'lead'}!`,
@@ -204,7 +210,7 @@ export default function PipelineLeadCard({
       }
 
       setIsRevealed(true)
-      triggerUnlockConfetti(e)
+      triggerUnlockConfetti(clickCoords)
       addToast({
         type: 'success',
         message: `Unlocked contact for ${json.name || 'lead'}!`,

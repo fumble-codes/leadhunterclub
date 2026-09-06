@@ -181,8 +181,8 @@ export default function TokenSystemSection() {
     <section id="tokens" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto overflow-hidden">
       {/* Centered Header Section with Big Eyebrow */}
       <div className="text-center mb-12 md:mb-14 max-w-4xl mx-auto space-y-4">
-        <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-orange-400">
-          [ 02 // CREDIT SYSTEM ]
+        <span className="text-sm font-semibold text-accent-orange mb-3 block">
+          Credit system
         </span>
         <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight text-text-primary leading-[1.15] max-w-2xl mx-auto">
           You control how your workflow operates.

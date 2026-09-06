@@ -339,8 +339,8 @@ export default function WhoItsForGrid() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
-              [ 03 // AUDIENCE RADAR ]
+            <span className="text-sm font-semibold text-accent-orange mb-3 block">
+              Audience radar
             </span>
           </motion.div>
           <motion.h2

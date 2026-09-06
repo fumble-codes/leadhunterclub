@@ -2,54 +2,72 @@ import confetti from 'canvas-confetti'
 
 /**
  * Triggers a celebratory confetti explosion when a lead contact is unlocked.
- * Automatically aligns to the button coordinates or screen center.
+ * Guaranteed to fire visible, vibrant confetti even if coordinates are missing, undefined, or zero.
  */
-export function triggerUnlockConfetti(event?: React.MouseEvent | HTMLElement | null) {
+export function triggerUnlockConfetti(coords?: { x?: number; y?: number } | null) {
   if (typeof window === 'undefined') return
 
-  let origin = { x: 0.5, y: 0.6 }
+  let originX = 0.5
+  let originY = 0.55
 
-  if (event) {
-    if ('clientX' in event && event.clientX && event.clientY) {
-      origin = {
-        x: event.clientX / window.innerWidth,
-        y: event.clientY / window.innerHeight,
-      }
-    } else if ('getBoundingClientRect' in event && typeof event.getBoundingClientRect === 'function') {
-      const rect = event.getBoundingClientRect()
-      origin = {
-        x: (rect.left + rect.width / 2) / window.innerWidth,
-        y: (rect.top + rect.height / 2) / window.innerHeight,
-      }
-    }
+  if (coords && typeof coords.x === 'number' && Number.isFinite(coords.x) && coords.x > 0 && window.innerWidth > 0) {
+    originX = Math.max(0.1, Math.min(0.9, coords.x / window.innerWidth))
+  }
+  if (coords && typeof coords.y === 'number' && Number.isFinite(coords.y) && coords.y > 0 && window.innerHeight > 0) {
+    originY = Math.max(0.1, Math.min(0.9, coords.y / window.innerHeight))
   }
 
-  // 1. Immediate crisp pop at the button position with pastel brand colors
-  confetti({
-    particleCount: 50,
-    spread: 60,
-    startVelocity: 28,
-    origin,
-    colors: ['#B8F36B', '#A78BFA', '#F9A8D4', '#7DD3FC', '#FFB86B', '#FDE047'],
-    ticks: 180,
-    gravity: 1.1,
-    scalar: 0.9,
-    shapes: ['circle', 'square'],
-    zIndex: 99999,
-  })
+  const pastelColors = [
+    '#B8F36B', // mint
+    '#A78BFA', // purple
+    '#F9A8D4', // pink
+    '#7DD3FC', // cyan
+    '#FFB86B', // orange
+    '#FDE047', // gold yellow
+    '#38BDF8', // sky blue
+    '#FFFFFF', // sparkling white
+  ]
 
-  // 2. Secondary wider burst for celebratory feel
-  setTimeout(() => {
+  try {
+    // 1. Immediate crisp explosion from the button or center
     confetti({
-      particleCount: 35,
-      spread: 90,
-      startVelocity: 35,
-      origin,
-      colors: ['#FFFFFF', '#B8F36B', '#A78BFA', '#38BDF8', '#F43F5E'],
-      ticks: 220,
+      particleCount: 85,
+      spread: 85,
+      startVelocity: 45,
+      origin: { x: originX, y: originY },
+      colors: pastelColors,
+      ticks: 240,
       gravity: 0.95,
-      scalar: 1.1,
-      zIndex: 99999,
+      scalar: 1.2,
+      zIndex: 999999,
     })
-  }, 100)
+
+    // 2. Dual celebratory side-cannons firing inward across the screen
+    setTimeout(() => {
+      try {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 60,
+          startVelocity: 55,
+          origin: { x: 0, y: 0.75 },
+          colors: pastelColors,
+          zIndex: 999999,
+        })
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 60,
+          startVelocity: 55,
+          origin: { x: 1, y: 0.75 },
+          colors: pastelColors,
+          zIndex: 999999,
+        })
+      } catch (err) {
+        console.warn('Secondary confetti error:', err)
+      }
+    }, 120)
+  } catch (err) {
+    console.warn('Primary confetti error:', err)
+  }
 }

@@ -302,7 +302,7 @@ function LeadsContent() {
 
   return (
     <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 pb-16 relative w-full scrollbar-hide">
-      <div className="w-full max-w-[1040px] mx-auto relative z-10">
+      <div className="w-full max-w-[1240px] mx-auto relative z-10">
         {/* Real Lead Feed Header & Controls Bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3.5">
           <div className="flex items-center gap-3 shrink-0">
@@ -746,6 +746,16 @@ function PipelineContent() {
 // ─── HERO ─────────────────────────────────────────────────────────────────────
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState('leads')
+  const heroCardRef = useRef<HTMLDivElement>(null)
+
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroCardRef,
+    offset: ['start start', 'end start'],
+  })
+
+  // Scroll-scrubbed background scale zoom inside clipped island frame
+  const bgScale = useTransform(heroProgress, [0, 1], [1.1, 1.35])
+  const textOpacity = useTransform(heroProgress, [0, 0.7], [1, 0.3])
 
   const { scrollY } = useScroll()
 
@@ -756,7 +766,7 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-6"
+      className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-0"
     >
       {/* Crisp geometric grid background (Engineering precision) */}
       <div
@@ -772,65 +782,99 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Centered Clario-style hero layout */}
-      <div className="relative z-10 w-full max-w-[1200px] mx-auto flex flex-col justify-center items-center text-center pt-16 pb-4 transform-gpu">
-        <div className="flex flex-col items-center relative w-full">
-          {/* Centered Main Headline */}
+      {/* ─── 1. Framed Island Card with Custom Wolf Artwork ─── */}
+      <div
+        ref={heroCardRef}
+        className="relative mx-auto w-full min-h-[520px] md:min-h-[580px] rounded-[24px] border border-white/[0.08] overflow-hidden flex items-center justify-center shadow-[0_25px_85px_-20px_rgba(0,0,0,0.85)] mb-12"
+      >
+        {/* Zooming Background Layer with Custom Wolf Artwork */}
+        <motion.div
+          style={{ scale: bgScale }}
+          className="absolute inset-0 w-full h-full transform-gpu will-change-transform pointer-events-none"
+        >
+          <Image
+            src="/images/Hero image.png"
+            alt="Wolf overlooking glowing client intent signals in the dark valley"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_35%] select-none"
+          />
+
+          {/* Calibrated Dark Contrast Scrim for 100% WCAG Typography Legibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-page-bg/95 via-black/50 to-black/40" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse at 50% 45%, rgba(11,13,19,0.15) 0%, rgba(11,13,19,0.75) 100%)',
+            }}
+          />
+        </motion.div>
+
+        {/* Centered Content Stack */}
+        <motion.div
+          style={{ opacity: textOpacity }}
+          className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-12 max-w-[800px] mx-auto"
+        >
+          {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.07, ease }}
-            className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-semibold leading-[1.1] tracking-tight mb-5 text-text-primary max-w-3xl mx-auto antialiased"
+            transition={{ duration: 0.75, ease }}
+            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[62px] font-semibold leading-[1.05] tracking-tight text-white mb-6 [text-wrap:balance]"
           >
-            Stop looking for clients
+            Stop looking for clients.
             <br />
-            <span className="text-accent-orange">Start intercepting them.</span>
+            <span className="italic font-normal font-serif text-white/90">
+              Start intercepting them.
+            </span>
           </motion.h1>
 
-          {/* Centered Description */}
+          {/* Description */}
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease }}
-            className="text-sm sm:text-base text-text-secondary font-light leading-relaxed mb-8 max-w-xl mx-auto antialiased"
+            className="text-sm sm:text-base text-white/80 font-light leading-relaxed max-w-[480px] mx-auto mb-8 [text-wrap:balance]"
           >
             Lead Hunter Club monitors active service demand in real-time, compiles deep social
-            intelligence, and unlocks verified contact details so you can close deals while the
-            demand is hot.
+            intelligence, and unlocks verified contact details so you close deals first.
           </motion.p>
 
-          {/* Centered CTA Row */}
+          {/* CTA Row */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="flex flex-row items-center justify-center gap-3.5 w-full relative z-10"
+            transition={{ duration: 0.7, delay: 0.25, ease }}
+            className="flex flex-wrap items-center justify-center gap-3.5"
           >
-            <Link href="/register">
-              <motion.span
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary-container text-on-primary-container font-semibold text-xs sm:text-sm cursor-pointer shadow-[0_4px_20px_rgba(var(--rgb-primary-container),0.25)] transition-all hover:bg-primary-container/90"
-              >
-                Start Hunting <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-              </motion.span>
-            </Link>
-            <Link href="/sneak-peek">
-              <motion.span
-                whileHover={{ scale: 1.02 }}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/[0.02] shadow-[inset_0_1px_0_rgba(var(--rgb-white),0.06)] font-medium text-text-secondary hover:text-text-primary text-xs sm:text-sm transition-colors cursor-pointer border border-white/[0.06] hover:border-border-subtle hover:bg-accent-purple/[0.03] hover:border-accent-purple/20"
-              >
-                Sneak Peek
-              </motion.span>
+            <Link
+              href="/register"
+              className="group inline-flex items-center gap-3.5 p-1.5 pr-6 rounded-xl bg-surface-elevated/95 backdrop-blur-md border border-white/15 hover:border-accent-purple/50 transition-all shadow-[0_12px_32px_rgba(0,0,0,0.6)] hover:shadow-[0_12px_32px_rgba(var(--rgb-accent-purple),0.25)] active:scale-[0.98]"
+            >
+              <div className="w-8 h-8 rounded-lg bg-accent-orange flex items-center justify-center text-black shadow-[0_2px_8px_rgba(244,141,22,0.4)] transition-transform duration-300 group-hover:translate-x-0.5">
+                <ArrowRightIcon className="w-4 h-4 text-black stroke-[2.5]" />
+              </div>
+              <span className="text-xs sm:text-sm font-semibold text-white tracking-wide">
+                Start Hunting Free
+              </span>
             </Link>
           </motion.div>
-        </div>
+        </motion.div>
+      </div>
+
+      {/* ─── Social Proof Strip ─── */}
+      <div className="mb-8 flex flex-col items-center justify-center gap-2 text-center">
+        <span className="text-xs font-mono font-medium text-text-secondary/70 uppercase tracking-widest">
+          Trusted by 500+ freelancers, contractors & growth agencies
+        </span>
       </div>
 
       {/* 3D Perspective Container for Clario-style tilt reveal */}
       <div
         style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
-        className="relative z-10 w-full max-w-[1240px] mt-[-24px] lg:mt-[-48px] group/appwindow"
+        className="relative z-10 w-full mt-[-24px] lg:mt-[-48px] group/appwindow"
       >
         <motion.div
           style={{

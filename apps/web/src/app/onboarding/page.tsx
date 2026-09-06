@@ -298,7 +298,7 @@ export default function OnboardingPage() {
   if (!emailVerified) {
     return (
       <main className="min-h-dvh bg-bg-main flex items-center justify-center px-4 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.06)_0%,transparent_60%)] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-primary),0.08)_0%,transparent_60%)] pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -306,7 +306,7 @@ export default function OnboardingPage() {
           transition={{ duration: 0.4 }}
           className="relative z-10 w-full max-w-md bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-3xl shadow-elevation-4 p-8 text-center"
         >
-          <ShieldExclamationIcon className="w-10 h-10 text-accent-mint mx-auto mb-4" />
+          <ShieldExclamationIcon className="w-10 h-10 text-primary mx-auto mb-4" />
           <h1 className="text-xl font-bold text-text-primary tracking-tight">Verify your email</h1>
           <p className="text-sm text-text-secondary mt-2 leading-relaxed">
             We sent a verification link to{' '}
@@ -321,10 +321,10 @@ export default function OnboardingPage() {
             <button
               onClick={handleResendVerification}
               disabled={resending}
-              className="px-5 py-3 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-white text-sm font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-black font-semibold text-sm transition-all shadow-[0_4px_20px_rgba(var(--rgb-primary),0.25)] active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {resending ? (
-                <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <div className="w-5 h-5 rounded-full border-2 border-black/20 border-t-black animate-spin" />
               ) : (
                 <>
                   <ArrowPathIcon className="w-4 h-4" />
@@ -466,7 +466,7 @@ export default function OnboardingPage() {
 
   return (
     <main className="min-h-dvh bg-bg-main flex flex-col items-center justify-start px-4 relative overflow-y-auto pt-12 pb-8 scrollbar-hide">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.06)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-primary),0.08)_0%,transparent_60%)] pointer-events-none" />
 
       {step > 1 && (
         <motion.button
@@ -492,18 +492,18 @@ export default function OnboardingPage() {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                   s < step
-                    ? 'bg-accent-mint text-black'
+                    ? 'bg-primary text-black'
                     : s === step
-                      ? 'bg-accent-mint text-white shadow-[0_0_16px_rgba(var(--rgb-accent-mint),0.3)]'
+                      ? 'bg-primary text-black shadow-[0_0_16px_rgba(var(--rgb-primary),0.35)]'
                       : 'bg-white/5 text-text-secondary/40'
                 }`}
               >
-                {s < step ? <CheckCircleIcon className="w-4 h-4" /> : s}
+                {s < step ? <CheckCircleIcon className="w-4 h-4 text-black" /> : s}
               </div>
               {s < 3 && (
                 <div
                   className={`w-12 h-px transition-all duration-300 ${
-                    s < step ? 'bg-accent-mint' : 'bg-white/5'
+                    s < step ? 'bg-primary' : 'bg-white/5'
                   }`}
                 />
               )}
@@ -522,14 +522,14 @@ export default function OnboardingPage() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="text-center mb-8">
-                    <SparklesIcon className="w-8 h-8 text-accent-mint mx-auto mb-3" />
+                    <SparklesIcon className="w-8 h-8 text-primary mx-auto mb-3" />
                     <h1 className="text-2xl font-bold text-text-primary tracking-tight">
                       Let&apos;s set up your profile
                     </h1>
                     <p className="text-sm text-text-secondary mt-2">
                       Add your profile links so leads know who they&apos;re talking to
                     </p>
-                    <p className="text-xs text-accent-mint mt-1 font-medium">
+                    <p className="text-xs text-primary mt-1 font-medium">
                       At least one profile link required
                     </p>
                   </div>
@@ -543,7 +543,7 @@ export default function OnboardingPage() {
                         value={portfolio}
                         onChange={(e) => { setPortfolio(e.target.value); setStep1Error('') }}
                         placeholder="https://your-portfolio.com"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -555,7 +555,7 @@ export default function OnboardingPage() {
                         value={website}
                         onChange={(e) => { setWebsite(e.target.value); setStep1Error('') }}
                         placeholder="https://your-company.com"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -567,7 +567,7 @@ export default function OnboardingPage() {
                         value={linkedin}
                         onChange={(e) => { setLinkedin(e.target.value); setStep1Error('') }}
                         placeholder="https://linkedin.com/in/your-profile"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -579,7 +579,7 @@ export default function OnboardingPage() {
                         value={instagram}
                         onChange={(e) => { setInstagram(e.target.value); setStep1Error('') }}
                         placeholder="https://instagram.com/your-handle"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -591,7 +591,7 @@ export default function OnboardingPage() {
                         value={dribbble}
                         onChange={(e) => { setDribbble(e.target.value); setStep1Error('') }}
                         placeholder="https://dribbble.com/your-handle"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -603,7 +603,7 @@ export default function OnboardingPage() {
                         value={behance}
                         onChange={(e) => { setBehance(e.target.value); setStep1Error('') }}
                         placeholder="https://behance.net/your-profile"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -615,7 +615,7 @@ export default function OnboardingPage() {
                         value={github}
                         onChange={(e) => { setGithub(e.target.value); setStep1Error('') }}
                         placeholder="https://github.com/your-handle"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
@@ -627,21 +627,21 @@ export default function OnboardingPage() {
                         value={twitter}
                         onChange={(e) => { setTwitter(e.target.value); setStep1Error('') }}
                         placeholder="https://twitter.com/your-handle"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       />
                     </div>
 
                     <div className="border-t border-white/[0.06] pt-4">
                       <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                          Phone number <span className="text-red-400">*</span>
+                          Phone number <span className="text-primary">*</span>
                         </label>
                         <input
                           value={phoneNumber}
                           onChange={(e) => { setPhoneNumber(e.target.value); setStep1Error('') }}
                           type="tel"
                           placeholder="+1 (555) 123-4567"
-                          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                         />
                         <p className="text-xs text-text-secondary/60 mt-0.5">
                           We need this number to contact you, so provide your real number only
@@ -671,7 +671,7 @@ export default function OnboardingPage() {
                       setStep1Error('')
                       setStep(2)
                     }}
-                    className="mt-6 w-full bg-accent-mint hover:bg-accent-mint/90 text-white rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)] px-4 py-3 font-medium"
+                    className="mt-6 w-full bg-primary hover:bg-primary/90 text-black font-semibold rounded-xl active:scale-98 transition-all shadow-[0_4px_20px_rgba(var(--rgb-primary),0.25)] px-4 py-3"
                   >
                     Continue
                   </button>
@@ -696,7 +696,7 @@ export default function OnboardingPage() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="text-center mb-8">
-                    <SparklesIcon className="w-8 h-8 text-accent-mint mx-auto mb-3" />
+                    <SparklesIcon className="w-8 h-8 text-primary mx-auto mb-3" />
                     <h1 className="text-2xl font-bold text-text-primary tracking-tight">
                       What do you offer?
                     </h1>
@@ -717,8 +717,8 @@ export default function OnboardingPage() {
                             onClick={() => setServicesOffered(toggleArrayItem(servicesOffered, s))}
                             className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all duration-200 ${
                               servicesOffered.includes(s)
-                                ? 'bg-accent-mint/20 border-accent-mint/40 text-accent-mint'
-                                : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                ? 'bg-primary/15 border-primary/40 text-primary font-semibold shadow-[0_0_12px_rgba(var(--rgb-primary),0.12)]'
+                                : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5 hover:border-white/10'
                             }`}
                           >
                             {s}
@@ -742,8 +742,8 @@ export default function OnboardingPage() {
                             }
                             className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all duration-200 ${
                               preferredLeadCategories.includes(c)
-                                ? 'bg-accent-mint/20 border-accent-mint/40 text-accent-mint'
-                                : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5'
+                                ? 'bg-primary/15 border-primary/40 text-primary font-semibold shadow-[0_0_12px_rgba(var(--rgb-primary),0.12)]'
+                                : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5 hover:border-white/10'
                             }`}
                           >
                             {c}
@@ -759,7 +759,7 @@ export default function OnboardingPage() {
                       <select
                         value={outreachExperience}
                         onChange={(e) => setOutreachExperience(e.target.value)}
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3"
+                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all px-4 py-3"
                       >
                         <option value="" disabled>
                           Select your experience level
@@ -776,9 +776,9 @@ export default function OnboardingPage() {
                   <button
                     onClick={() => setStep(3)}
                     disabled={!canProceedFromStep2}
-                    className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-medium ${
+                    className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-semibold ${
                       canProceedFromStep2
-                        ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)]'
+                        ? 'bg-primary hover:bg-primary/90 text-black shadow-[0_4px_20px_rgba(var(--rgb-primary),0.25)]'
                         : 'bg-white/5 text-text-secondary/40 cursor-not-allowed'
                     }`}
                   >
@@ -805,7 +805,7 @@ export default function OnboardingPage() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="text-center mb-8">
-                    <SparklesIcon className="w-8 h-8 text-accent-mint mx-auto mb-3" />
+                    <SparklesIcon className="w-8 h-8 text-primary mx-auto mb-3" />
                     <h1 className="text-2xl font-bold text-text-primary tracking-tight">
                       Almost there!
                     </h1>
@@ -822,8 +822,8 @@ export default function OnboardingPage() {
                           onClick={() => setDiscoverySource(s)}
                           className={`px-4 py-3 rounded-xl text-sm font-medium border transition-all duration-200 ${
                             discoverySource === s
-                              ? 'bg-accent-mint/20 border-accent-mint/40 text-accent-mint'
-                              : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5'
+                              ? 'bg-primary/15 border-primary/40 text-primary font-semibold shadow-[0_0_12px_rgba(var(--rgb-primary),0.12)]'
+                              : 'bg-white/[0.02] border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/5 hover:border-white/10'
                           }`}
                         >
                           {s}
@@ -850,15 +850,15 @@ export default function OnboardingPage() {
                   <button
                     onClick={handleSubmit}
                     disabled={!discoverySource || isSubmitting}
-                    className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-medium flex items-center justify-center gap-2 ${
+                    className={`mt-8 w-full rounded-xl active:scale-98 transition-all px-4 py-3 font-semibold flex items-center justify-center gap-2 ${
                       discoverySource && !isSubmitting
-                        ? 'bg-accent-mint hover:bg-accent-mint/90 text-white shadow-[0_4px_20px_rgba(var(--rgb-accent-mint),0.15)]'
+                        ? 'bg-primary hover:bg-primary/90 text-black shadow-[0_4px_20px_rgba(var(--rgb-primary),0.25)]'
                         : 'bg-white/5 text-text-secondary/40 cursor-not-allowed'
                     }`}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                        <div className="w-5 h-5 rounded-full border-2 border-black/20 border-t-black animate-spin" />
                         Submitting...
                       </>
                     ) : (

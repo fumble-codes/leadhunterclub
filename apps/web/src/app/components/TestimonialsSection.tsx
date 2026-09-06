@@ -169,8 +169,8 @@ export default function TestimonialsSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
-            [ 04 // MEMBER PROOF ]
+          <span className="text-sm font-semibold text-accent-orange mb-3 block">
+            What people say
           </span>
         </motion.div>
 

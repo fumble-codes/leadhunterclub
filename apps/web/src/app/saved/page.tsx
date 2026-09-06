@@ -11,6 +11,12 @@ import {
   DocumentArrowDownIcon,
   ClipboardDocumentListIcon,
   ArrowPathIcon,
+  ChevronDownIcon,
+  CheckIcon,
+  PaperAirplaneIcon,
+  PencilSquareIcon,
+  EnvelopeIcon,
+  TrashIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import { AppLead } from '@/types/lead'
@@ -27,6 +33,7 @@ export default function SavedLeadsPage() {
   const [syncing, setSyncing] = useState(false)
   const [exportOpen, setExportOpen] = useState(false)
   const [exporting, setExporting] = useState<'csv' | 'tsv' | 'sheet' | null>(null)
+  const [openActionDropdownId, setOpenActionDropdownId] = useState<string | null>(null)
   const { addToast } = useToast()
 
   const readyCount = savedLeads.filter(
@@ -157,11 +164,56 @@ export default function SavedLeadsPage() {
     }
   }
 
+  const handleCopyEmail = async (lead: AppLead) => {
+    if (!lead.isRevealed) {
+      addToast({ type: 'info', message: 'Reveal contact info to view and copy email' })
+      return
+    }
+    if (!lead.email || lead.email.includes('hidden')) {
+      addToast({ type: 'error', message: 'No valid email available for this lead' })
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(lead.email)
+      addToast({ type: 'success', message: `✓ Copied ${lead.email}` })
+    } catch {
+      addToast({ type: 'error', message: 'Clipboard access blocked' })
+    }
+  }
+
+  const handleRemoveSaved = async (leadId: string) => {
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ isSaved: false, status: 'new' }),
+      })
+      if (res.ok) {
+        setSavedLeads((prev) => prev.filter((l) => l.id !== leadId))
+        addToast({ type: 'success', message: '✓ Removed from saved leads' })
+      } else {
+        addToast({ type: 'error', message: 'Failed to remove from saved leads' })
+      }
+    } catch {
+      addToast({ type: 'error', message: 'Network error removing lead' })
+    }
+  }
+
   useEffect(() => {
-    if (!exportOpen) return
-    const close = () => setExportOpen(false)
+    if (!exportOpen && !openActionDropdownId) return
+    const close = () => {
+      setExportOpen(false)
+      setOpenActionDropdownId(null)
+    }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExportOpen(false)
+      if (e.key === 'Escape') {
+        setExportOpen(false)
+        setOpenActionDropdownId(null)
+      }
     }
     window.addEventListener('click', close)
     window.addEventListener('keydown', onKey)
@@ -169,7 +221,7 @@ export default function SavedLeadsPage() {
       window.removeEventListener('click', close)
       window.removeEventListener('keydown', onKey)
     }
-  }, [exportOpen])
+  }, [exportOpen, openActionDropdownId])
 
   const handleSync = async () => {
     setSyncing(true)
@@ -232,6 +284,7 @@ export default function SavedLeadsPage() {
   })
 
   const statusBadgeColor: Record<string, 'mint' | 'purple'> = {
+    new: 'mint',
     saved: 'mint',
     drafting: 'mint',
     sent: 'purple',
@@ -366,7 +419,7 @@ export default function SavedLeadsPage() {
         </div>
 
         {/* Pipeline Table */}
-        <div className="metallic-card overflow-hidden">
+        <div className="metallic-card">
           {filteredLeads.length === 0 && !loading && (
             <div className="p-12 text-center">
               <p className="text-text-secondary text-sm">No leads match this view.</p>
@@ -392,92 +445,243 @@ export default function SavedLeadsPage() {
               </div>
 
               <div className="divide-y divide-white/[0.03]">
-                {filteredLeads.map((lead) => (
-                  <div
-                    key={lead.id}
-                    className="grid grid-cols-12 gap-4 px-8 py-4 items-center group hover:bg-white/[0.02] transition-colors"
-                  >
-                    <div className="col-span-1 flex items-center">
-                      <div
-                        className={`w-2.5 h-2.5 rounded-full ${
-                          lead.status === 'replied'
-                            ? 'bg-accent-purple'
-                            : lead.status === 'sent' || lead.status === 'follow-up'
+                {filteredLeads.map((lead, index) => {
+                  const isDropdownOpen = openActionDropdownId === lead.id
+                  const isNearBottom = index >= filteredLeads.length - 2 && filteredLeads.length > 2
+
+                  return (
+                    <div
+                      key={lead.id}
+                      className={`grid grid-cols-12 gap-4 px-8 py-4 items-center group hover:bg-white/[0.02] transition-colors relative ${
+                        isDropdownOpen ? 'z-30' : 'z-10'
+                      }`}
+                    >
+                      <div className="col-span-1 flex items-center">
+                        <div
+                          className={`w-2.5 h-2.5 rounded-full ${
+                            lead.status === 'replied'
                               ? 'bg-accent-purple'
-                              : 'bg-accent-mint'
-                        } ${lead.isActionable ? 'animate-pulse ring-4 ring-accent-purple/20' : ''}`}
-                      />
-                    </div>
-
-                    <div className="col-span-3 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-surface-elevated border border-white/10 flex items-center justify-center text-11 font-bold text-text-primary overflow-hidden shrink-0">
-                        {lead.isRevealed
-                          ? lead.name.split(' ').map((n) => n[0]).join('')
-                          : '??'}
+                              : lead.status === 'sent' || lead.status === 'follow-up'
+                                ? 'bg-accent-purple'
+                                : 'bg-accent-mint'
+                          } ${lead.isActionable ? 'animate-pulse ring-4 ring-accent-purple/20' : ''}`}
+                        />
                       </div>
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold text-text-primary truncate">
-                          {lead.isRevealed ? lead.name : 'Unlocked Contact'}
+
+                      <div className="col-span-3 flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-surface-elevated border border-white/10 flex items-center justify-center text-11 font-bold text-text-primary overflow-hidden shrink-0">
+                          {lead.isRevealed
+                            ? lead.name.split(' ').map((n) => n[0]).join('')
+                            : '??'}
                         </div>
-                        <div className="text-xxs text-text-secondary truncate">
-                          {lead.isRevealed ? lead.email : 'unlocked@leadhunterclub.com'}
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-text-primary truncate">
+                            {lead.isRevealed ? lead.name : 'Unlocked Contact'}
+                          </div>
+                          <div className="text-xxs text-text-secondary truncate">
+                            {lead.isRevealed ? lead.email : 'unlocked@leadhunterclub.com'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-span-2">
+                        <Badge size="sm" color={statusBadgeColor[lead.status] || 'mint'}>
+                          {lead.status}
+                        </Badge>
+                      </div>
+
+                      <div className="col-span-3">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            size="sm"
+                            color={
+                              lead.urgency === 'critical' || lead.urgency === 'high'
+                                ? 'mint'
+                                : 'purple'
+                            }
+                          >
+                            {lead.urgency}
+                          </Badge>
+                          {lead.replyProbability > 0 && (
+                            <span className="text-xxs text-text-secondary">
+                              {lead.replyProbability}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="col-span-3 text-right flex items-center justify-end relative">
+                        <div className="relative inline-block text-left" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => setOpenActionDropdownId(isDropdownOpen ? null : lead.id)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                              isDropdownOpen
+                                ? 'bg-white/15 text-text-primary border-white/25 shadow-sm'
+                                : 'bg-white/5 hover:bg-white/10 text-text-secondary hover:text-text-primary border-white/10'
+                            }`}
+                            aria-expanded={isDropdownOpen}
+                            aria-haspopup="true"
+                          >
+                            <span>Actions</span>
+                            <ChevronDownIcon
+                              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                                isDropdownOpen ? 'rotate-180 text-text-primary' : 'text-text-secondary'
+                              }`}
+                            />
+                          </button>
+
+                          {isDropdownOpen && (
+                            <div
+                              className={`absolute right-0 ${
+                                isNearBottom ? 'bottom-full mb-2 origin-bottom-right' : 'top-full mt-2 origin-top-right'
+                              } w-52 rounded-2xl bg-surface-elevated border border-white/10 shadow-2xl shadow-black/60 py-2 z-50 text-left backdrop-blur-md`}
+                            >
+                              <div className="px-3 pb-1.5 pt-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary/70">
+                                Stage / Status
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleMarkStatus(lead.id, 'saved', 'Saved')
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors hover:bg-white/5 ${
+                                  lead.status === 'saved' || lead.status === 'new'
+                                    ? 'text-accent-mint font-semibold'
+                                    : 'text-text-primary'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <BookmarkIcon className="w-3.5 h-3.5 text-accent-mint shrink-0" />
+                                  Mark as Saved
+                                </span>
+                                {(lead.status === 'saved' || lead.status === 'new') && (
+                                  <CheckIcon className="w-3.5 h-3.5 text-accent-mint" />
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleMarkStatus(lead.id, 'drafting', 'Drafting')
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors hover:bg-white/5 ${
+                                  lead.status === 'drafting'
+                                    ? 'text-accent-mint font-semibold'
+                                    : 'text-text-primary'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <PencilSquareIcon className="w-3.5 h-3.5 text-accent-mint shrink-0" />
+                                  Mark as Drafting
+                                </span>
+                                {lead.status === 'drafting' && (
+                                  <CheckIcon className="w-3.5 h-3.5 text-accent-mint" />
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleMarkStatus(lead.id, 'sent', 'Sent')
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors hover:bg-white/5 ${
+                                  lead.status === 'sent'
+                                    ? 'text-accent-purple font-semibold'
+                                    : 'text-text-primary'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <PaperAirplaneIcon className="w-3.5 h-3.5 text-accent-purple shrink-0" />
+                                  Mark as Sent
+                                </span>
+                                {lead.status === 'sent' && (
+                                  <CheckIcon className="w-3.5 h-3.5 text-accent-purple" />
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleMarkStatus(lead.id, 'follow-up', 'Follow-up')
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors hover:bg-white/5 ${
+                                  lead.status === 'follow-up'
+                                    ? 'text-accent-purple font-semibold'
+                                    : 'text-text-primary'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <ArrowPathIcon className="w-3.5 h-3.5 text-accent-purple shrink-0" />
+                                  Mark as Follow-up
+                                </span>
+                                {lead.status === 'follow-up' && (
+                                  <CheckIcon className="w-3.5 h-3.5 text-accent-purple" />
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleMarkStatus(lead.id, 'replied', 'Replied')
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors hover:bg-white/5 ${
+                                  lead.status === 'replied'
+                                    ? 'text-accent-purple font-semibold'
+                                    : 'text-text-primary'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <ChatBubbleLeftRightIcon className="w-3.5 h-3.5 text-accent-purple shrink-0" />
+                                  Mark as Replied
+                                </span>
+                                {lead.status === 'replied' && (
+                                  <CheckIcon className="w-3.5 h-3.5 text-accent-purple" />
+                                )}
+                              </button>
+
+                              <div className="h-px bg-white/[0.08] my-1.5" />
+
+                              <div className="px-3 pb-1.5 pt-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary/70">
+                                Lead Actions
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleCopyEmail(lead)
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-text-primary hover:bg-white/5 transition-colors"
+                              >
+                                <EnvelopeIcon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
+                                Copy Email
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleRemoveSaved(lead.id)
+                                  setOpenActionDropdownId(null)
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
+                              >
+                                <TrashIcon className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                                Remove from Saved
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-
-                    <div className="col-span-2">
-                      <Badge size="sm" color={statusBadgeColor[lead.status] || 'mint'}>
-                        {lead.status}
-                      </Badge>
-                    </div>
-
-                    <div className="col-span-3">
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          size="sm"
-                          color={
-                            lead.urgency === 'critical' || lead.urgency === 'high'
-                              ? 'mint'
-                              : 'purple'
-                          }
-                        >
-                          {lead.urgency}
-                        </Badge>
-                        {lead.replyProbability > 0 && (
-                          <span className="text-xxs text-text-secondary">
-                            {lead.replyProbability}%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="col-span-3 text-right flex items-center justify-end gap-2">
-                      {lead.status === 'saved' || lead.status === 'new' ? (
-                        <Button
-                          variant="ghost"
-                          color="mint"
-                          size="sm"
-                          onClick={() => handleMarkStatus(lead.id, 'sent', 'Sent')}
-                        >
-                          Mark Sent
-                        </Button>
-                      ) : lead.status === 'sent' || lead.status === 'follow-up' ? (
-                        <Button
-                          variant="ghost"
-                          color="purple"
-                          size="sm"
-                          onClick={() => handleMarkStatus(lead.id, 'replied', 'Replied')}
-                        >
-                          Replied
-                        </Button>
-                      ) : lead.status === 'replied' ? (
-                        <Badge size="sm" color="purple">
-                          Done
-                        </Badge>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </>
           )}

@@ -890,8 +890,8 @@ export default function FeaturesSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase mb-3 block text-orange-400">
-            [ CAPABILITIES ]
+          <span className="text-sm font-semibold text-accent-orange mb-3 block">
+            Capabilities
           </span>
         </motion.div>
 
@@ -932,8 +932,8 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
-                01 // Real-Time Interception
+              <span className="text-xs font-semibold text-accent-orange mb-2 block">
+                Real-time interception
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Fresh Daily Leads from Multiple Platforms
@@ -994,8 +994,8 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
-                02 // Deep Intelligence
+              <span className="text-xs font-semibold text-accent-orange mb-2 block">
+                Deep intelligence
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Lead Intelligence with Revealed Contacts
@@ -1052,8 +1052,8 @@ export default function FeaturesSection() {
           {/* Copy */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
-                03 // Pipeline Momentum
+              <span className="text-xs font-semibold text-accent-orange mb-2 block">
+                Pipeline momentum
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Track Every Touch
@@ -1108,8 +1108,8 @@ export default function FeaturesSection() {
           {/* Copy (Desktop right) */}
           <div className="lg:col-span-5 space-y-6 lg:order-last">
             <div className="space-y-3">
-              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-orange-400">
-                04 // Credit Economics
+              <span className="text-xs font-semibold text-accent-orange mb-2 block">
+                Credit economics
               </span>
               <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-text-primary">
                 Credits Based, Not Seat Based

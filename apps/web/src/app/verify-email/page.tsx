@@ -83,7 +83,7 @@ function VerifyEmailContent() {
 
   return (
     <main className="min-h-screen bg-bg-main flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-accent-mint),0.06)_0%,transparent_60%)] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,rgba(var(--rgb-primary),0.08)_0%,transparent_60%)] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -105,15 +105,15 @@ function VerifyEmailContent() {
               </p>
               <button
                 onClick={handleVerified}
-                className="w-full px-5 py-3 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-white text-sm font-medium transition-all"
+                className="w-full px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-black font-semibold text-sm transition-all shadow-[0_4px_20px_rgba(var(--rgb-primary),0.25)] active:scale-98"
               >
                 Continue
               </button>
             </>
           ) : (
             <>
-              <div className="w-16 h-16 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center mx-auto mb-6">
-                <EnvelopeIcon className="w-8 h-8 text-accent-mint" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-6">
+                <EnvelopeIcon className="w-8 h-8 text-primary" />
               </div>
 
               <h1 className="text-2xl font-bold text-text-primary tracking-tight mb-3">
@@ -134,10 +134,10 @@ function VerifyEmailContent() {
                 <button
                   onClick={handleResend}
                   disabled={resending}
-                  className="w-full px-5 py-3 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-white text-sm font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full px-5 py-3 rounded-xl bg-primary hover:bg-primary/90 text-black font-semibold text-sm transition-all shadow-[0_4px_20px_rgba(var(--rgb-primary),0.25)] active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {resending ? (
-                    <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                    <div className="w-5 h-5 rounded-full border-2 border-black/20 border-t-black animate-spin" />
                   ) : (
                     <>
                       <ArrowPathIcon className="w-4 h-4" />
