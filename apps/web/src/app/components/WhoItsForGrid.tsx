@@ -8,19 +8,15 @@ import {
   SparklesIcon,
   ChartBarSquareIcon,
   ChartBarIcon,
-  BanknotesIcon,
   ArrowRightIcon,
   MagnifyingGlassIcon,
   BoltIcon,
   BookmarkIcon,
-  LockClosedIcon,
-  InformationCircleIcon,
   Bars3Icon,
 } from '@heroicons/react/24/solid'
 
 import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from '@/app/leads/components/LeadCard'
-import PipelineLeadCard from '@/app/leads/components/PipelineLeadCard'
 import { AppLead } from '@/types/lead'
 
 interface PersonaData {
@@ -37,47 +33,61 @@ interface PersonaData {
     email: string
     company: string
     source: string
+    category: string
     title: string
+    taskScope: string
     signalContext: string
     urgency: 'low' | 'medium' | 'high' | 'critical'
     nicheTags: string[]
     replyProbability: number
-    accent: 'purple'
+    accent: 'purple' | 'cyan' | 'orange' | 'pink' | 'mint'
   }
 }
 
 // Pre-defined static mock leads to populate the spacious background Leads Feed
-const mockLead1 = {
+const mockLead1: AppLead = {
   id: 'mock-1',
   name: 'Lily Hernandez',
   email: 'l.hernandez@nexus.com',
   company: 'Nexus Analytics',
   source: 'Twitter',
+  category: 'SEO STRATEGY',
   title: 'SEO Strategy & Keyword Recovery',
+  taskScope:
+    'Competitor just outranked them for main keywords. Need a senior SEO strategist to recover organic rankings and rebuild backlink velocity.',
   signalContext: 'Competitor just outranked them for their main keyword. Founder is stressed.',
   urgency: 'critical',
   nicheTags: ['B2B SaaS', 'SEO', 'Content'],
   replyProbability: 95,
-  accent: 'purple',
+  accent: 'cyan',
   status: 'new',
   timestamp: '4h ago',
-} as AppLead
+  isClaimable: true,
+  revealCost: 3,
+  isRevealed: false,
+}
 
-const mockLead2 = {
+const mockLead2: AppLead = {
   id: 'mock-2',
   name: 'David Anderson',
   email: 'd.anderson@prism.io',
   company: 'Prism Labs',
   source: 'Job Board',
+  category: 'OUTBOUND SYSTEMS',
   title: 'Sales Enablement & Outbound Systems',
+  taskScope:
+    'Just hired 3 new SDRs. Need an outbound architecture specialist to setup Clay, Smartlead, and automated lead enrichment.',
   signalContext: 'Just hired 3 new SDRs. Clear indicator they need outbound infrastructure.',
   urgency: 'medium',
   nicheTags: ['B2B', 'Sales', 'Systems'],
   replyProbability: 75,
-  accent: 'purple',
+  accent: 'orange',
   status: 'new',
   timestamp: '3d ago',
-} as AppLead
+  isClaimable: true,
+  revealCost: 3,
+  isRevealed: false,
+}
 
 const PERSONAS: PersonaData[] = [
   {
@@ -94,7 +104,10 @@ const PERSONAS: PersonaData[] = [
       email: 'a.shepard@nexus.ai',
       company: 'Nexus AI',
       source: 'Reddit',
+      category: 'SHOPIFY DEV',
       title: 'Shopify Speed & Web Optimization',
+      taskScope:
+        'Struggling with slow load times and high bounce rates on our current Shopify store. Need full audit and speed optimization.',
       signalContext:
         'Struggling with slow load times and high bounce rates on their current Shopify store.',
       urgency: 'high',
@@ -117,12 +130,15 @@ const PERSONAS: PersonaData[] = [
       email: 'alex@dtcbrands.co',
       company: 'DTC Brands',
       source: 'Twitter',
+      category: 'UI/UX DESIGN',
       title: 'Checkout UI/UX Redesign',
+      taskScope:
+        'Our current checkout page is ugly and mobile conversions are dropping drastically. Looking for complete high-converting Figma overhaul.',
       signalContext: 'Our current checkout page is ugly and conversions are dropping drastically.',
       urgency: 'critical',
       nicheTags: ['E-Commerce', 'UI/UX', 'Conversion'],
       replyProbability: 97,
-      accent: 'purple',
+      accent: 'pink',
     },
   },
   {
@@ -139,13 +155,16 @@ const PERSONAS: PersonaData[] = [
       email: 's.connor@vanguard.io',
       company: 'Vanguard Group',
       source: 'LinkedIn',
+      category: 'BRAND IDENTITY',
       title: 'Brand Identity & Design System',
+      taskScope:
+        'Looking for a brand designer to completely overhaul our corporate guidelines, visual identity, and investor deck.',
       signalContext:
         'Looking for a brand designer to completely overhaul our corporate guidelines and slide deck.',
       urgency: 'high',
       nicheTags: ['Branding', 'Vector Art', 'Figma'],
       replyProbability: 96,
-      accent: 'purple',
+      accent: 'mint',
     },
   },
   {
@@ -162,12 +181,15 @@ const PERSONAS: PersonaData[] = [
       email: 'm.carter@stellar.co',
       company: 'Stellar Co',
       source: 'Reddit',
+      category: 'FULLSTACK DEV',
       title: 'Next.js Performance & Core Web Vitals',
+      taskScope:
+        'Core web vitals dragging down SEO ranking, LCP over 4 seconds. Looking for a senior React/Next.js engineer to refactor rendering pipeline.',
       signalContext: 'Core web vitals dragging down SEO ranking, LCP over 4 seconds.',
       urgency: 'critical',
       nicheTags: ['Next.js', 'Core Web Vitals', 'SEO'],
       replyProbability: 99,
-      accent: 'purple',
+      accent: 'cyan',
     },
   },
   {
@@ -184,13 +206,16 @@ const PERSONAS: PersonaData[] = [
       email: 'm.gold@apparelscale.com',
       company: 'Marcus Apparel',
       source: 'LinkedIn',
+      category: 'PAID ADS',
       title: 'Paid Ads Scaling & Creative Testing',
+      taskScope:
+        'Struggling to maintain ROAS above 1.8x on Meta and TikTok. Looking for creative ad testing framework and media buying partner.',
       signalContext:
         'Struggling to maintain ROAS above 1.8x, looking for creative ad testing framework.',
       urgency: 'high',
       nicheTags: ['DTC Ads', 'Meta', 'TikTok'],
       replyProbability: 95,
-      accent: 'purple',
+      accent: 'orange',
     },
   },
   {
@@ -207,7 +232,10 @@ const PERSONAS: PersonaData[] = [
       email: 'david@gtmpartners.co',
       company: 'GTM Partners',
       source: 'Twitter',
+      category: 'DEMAND GEN',
       title: 'B2B Demand Gen & Retainer Pipeline',
+      taskScope:
+        'Need an agency partner with proven track record in B2B demand gen, outbound pipeline infrastructure, and scalable deal acquisition.',
       signalContext:
         'Need an agency with proven experience in B2B demand gen and scalable pipelines.',
       urgency: 'high',
@@ -233,21 +261,26 @@ export default function WhoItsForGrid() {
   }
 
   // Construct a type-compliant AppLead representing the primary interactive card
-  const appLead = {
+  const appLead: AppLead = {
     id: activePersona.id,
     name: activePersona.lead.name,
     email: activePersona.lead.email,
     company: activePersona.lead.company,
     source: activePersona.lead.source,
+    category: activePersona.lead.category,
     title: activePersona.lead.title,
+    taskScope: activePersona.lead.taskScope,
     signalContext: activePersona.lead.signalContext,
     urgency: activePersona.lead.urgency,
     nicheTags: activePersona.lead.nicheTags,
     replyProbability: activePersona.lead.replyProbability,
     accent: activePersona.lead.accent,
-    status: revealed[activePersona.id] ? 'drafting' : 'new',
+    status: revealed[activePersona.id] ? 'saved' : 'new',
     timestamp: '2h ago',
-  } as AppLead
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: !!revealed[activePersona.id],
+  }
 
   // Typewriting effect inside messaging cockpit draft
   useEffect(() => {
@@ -354,7 +387,7 @@ export default function WhoItsForGrid() {
         <div
           onMouseEnter={() => setIsHoveredPanel(true)}
           onMouseLeave={() => setIsHoveredPanel(false)}
-          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[460px] md:h-[500px] justify-between"
+          className="w-full rounded-3xl bg-surface border border-white/[0.08] flex flex-col relative overflow-hidden transition-all duration-500 hover:border-white/15 hover:shadow-[0_45px_100px_rgba(var(--rgb-black),0.85)] shadow-[0_30px_70px_rgba(var(--rgb-black),0.6)] h-[520px] md:h-[560px] justify-between"
         >
           {/* Window header */}
           <div className="h-11 border-b border-white/[0.04] bg-surface flex items-center px-6 justify-between shrink-0 select-none">
@@ -450,20 +483,25 @@ export default function WhoItsForGrid() {
                 </div>
 
                 {/* Spacious 3-card Lead Feed Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 items-stretch overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 items-stretch overflow-hidden">
                   {/* Card 1: Secondary mock lead (SEO optimization signal) */}
-                  <div className="hidden xl:flex items-stretch h-full opacity-45 hover:opacity-75 transition-opacity duration-300">
-                    <PipelineLeadCard lead={mockLead1} />
+                  <div className="hidden xl:flex items-stretch h-full opacity-70 hover:opacity-100 transition-opacity duration-300">
+                    <LeadCard lead={mockLead1} index={0} />
                   </div>
 
                   {/* Card 2: THE PRIMARY ACTIVE PERSONA LEAD CARD (clickable to reveal) */}
                   <div className="flex items-stretch h-full">
-                    <PipelineLeadCard lead={appLead} onClick={() => handleReveal(activePersona.id)} />
+                    <LeadCard
+                      lead={appLead}
+                      index={1}
+                      isSelected={true}
+                      onReveal={() => handleReveal(activePersona.id)}
+                    />
                   </div>
 
                   {/* Card 3: CRM migration signal */}
-                  <div className="hidden md:flex items-stretch h-full opacity-45 hover:opacity-75 transition-opacity duration-300">
-                    <PipelineLeadCard lead={mockLead2} />
+                  <div className="hidden md:flex items-stretch h-full opacity-70 hover:opacity-100 transition-opacity duration-300">
+                    <LeadCard lead={mockLead2} index={2} />
                   </div>
                 </div>
               </div>
@@ -573,7 +611,7 @@ export default function WhoItsForGrid() {
               </AnimatePresence>
 
               {/* Bottom fade-out overlay */}
-              <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none z-20">
+              <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none z-20">
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 via-60% to-transparent pointer-events-none" />
               </div>
             </div>

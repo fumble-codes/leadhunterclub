@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Lock, Coins, Mail, Phone } from 'lucide-react'
+import { Lock, Coins, Mail, Phone, Loader2 } from 'lucide-react'
 import { AppLead } from '@/types/lead'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
 import { sanitizePublicText, sanitizeHeadline } from '@/lib/claim-reveal'
+import { triggerUnlockConfetti } from '@/lib/confetti'
 
 const themeMap = {
   mint: {
@@ -92,6 +93,7 @@ export default function PipelineLeadCard({
 
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
+  const [isRevealing, setIsRevealing] = useState(false)
 
   useEffect(() => {
     setIsSaved(lead.status === 'saved')
@@ -148,6 +150,30 @@ export default function PipelineLeadCard({
 
   const handleReveal = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (isRevealing) return
+
+    // Smooth client-side reveal for landing page demos / mock cards
+    if (
+      lead.id.startsWith('mock') ||
+      lead.id.startsWith('hero') ||
+      lead.id.startsWith('card') ||
+      ['checkout', 'shopify', 'rebrand', 'freelancers', 'agencies', 'consultants'].includes(lead.id)
+    ) {
+      setIsRevealing(true)
+      await new Promise((resolve) => setTimeout(resolve, 550))
+      setIsRevealed(true)
+      setIsRevealing(false)
+      triggerUnlockConfetti(e)
+      addToast({
+        type: 'success',
+        message: `Unlocked contact for ${lead.name || 'lead'}!`,
+      })
+      if (onReveal) {
+        onReveal(lead.id, lead.name, lead.email, lead.phone)
+      }
+      return
+    }
+
     if (!lead.isClaimable) {
       addToast({
         type: 'error',
@@ -157,6 +183,7 @@ export default function PipelineLeadCard({
     }
 
     try {
+      setIsRevealing(true)
       const token = await getFirebaseToken()
       const res = await fetch('/api/leads/reveal', {
         method: 'POST',
@@ -177,6 +204,7 @@ export default function PipelineLeadCard({
       }
 
       setIsRevealed(true)
+      triggerUnlockConfetti(e)
       addToast({
         type: 'success',
         message: `Unlocked contact for ${json.name || 'lead'}!`,
@@ -190,6 +218,8 @@ export default function PipelineLeadCard({
         type: 'error',
         message: 'Network error while unlocking lead. Please try again.',
       })
+    } finally {
+      setIsRevealing(false)
     }
   }
 

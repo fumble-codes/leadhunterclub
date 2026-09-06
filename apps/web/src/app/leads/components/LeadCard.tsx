@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Lock, Coins, Mail, Phone } from 'lucide-react'
+import { Lock, Coins, Mail, Phone, Loader2 } from 'lucide-react'
 import { AppLead } from '@/types/lead'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
 import { sanitizePublicText, sanitizeHeadline } from '@/lib/claim-reveal'
+import { triggerUnlockConfetti } from '@/lib/confetti'
 
 const themeMap = {
   mint: {
@@ -92,6 +93,7 @@ export default function LeadCard({
 
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
+  const [isRevealing, setIsRevealing] = useState(false)
 
   useEffect(() => {
     setIsSaved(lead.status === 'saved')
@@ -148,6 +150,30 @@ export default function LeadCard({
 
   const handleReveal = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (isRevealing) return
+
+    // Smooth client-side reveal for landing page demos / mock cards
+    if (
+      lead.id.startsWith('mock') ||
+      lead.id.startsWith('hero') ||
+      lead.id.startsWith('card') ||
+      ['checkout', 'shopify', 'rebrand', 'freelancers', 'agencies', 'consultants'].includes(lead.id)
+    ) {
+      setIsRevealing(true)
+      await new Promise((resolve) => setTimeout(resolve, 550))
+      setIsRevealed(true)
+      setIsRevealing(false)
+      triggerUnlockConfetti(e)
+      addToast({
+        type: 'success',
+        message: `Unlocked contact for ${lead.name || 'lead'}!`,
+      })
+      if (onReveal) {
+        onReveal(lead.id, lead.name, lead.email, lead.phone)
+      }
+      return
+    }
+
     if (!lead.isClaimable) {
       addToast({
         type: 'error',
@@ -157,6 +183,7 @@ export default function LeadCard({
     }
 
     try {
+      setIsRevealing(true)
       const token = await getFirebaseToken()
       const res = await fetch('/api/leads/reveal', {
         method: 'POST',
@@ -177,6 +204,7 @@ export default function LeadCard({
       }
 
       setIsRevealed(true)
+      triggerUnlockConfetti(e)
       addToast({
         type: 'success',
         message: `Unlocked contact for ${json.name || 'lead'}!`,
@@ -190,6 +218,8 @@ export default function LeadCard({
         type: 'error',
         message: 'Network error while unlocking lead. Please try again.',
       })
+    } finally {
+      setIsRevealing(false)
     }
   }
 
@@ -273,23 +303,40 @@ export default function LeadCard({
               </div>
             </div>
 
-            {/* Cute Scaled-down Reveal Action Button */}
+            {/* Cute Scaled-down Reveal Action Button with Loading Animation */}
             <button
               type="button"
               onClick={handleReveal}
-              className={`w-[96px] h-[32px] rounded-xl font-bold text-[11px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer shrink-0 ${theme.button}`}
+              disabled={isRevealing}
+              className={`w-[96px] h-[32px] rounded-xl font-bold text-[11px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 ${theme.button} ${
+                isRevealing ? 'opacity-85 cursor-wait pointer-events-none' : 'cursor-pointer'
+              }`}
             >
-              <span>Reveal</span>
-              <span className="flex items-center gap-0.5 opacity-90 text-[10px] font-semibold tabular-nums">
-                <Coins size={11} className="shrink-0" />
-                <span>-{lead.revealCost ?? 3}</span>
-              </span>
+              {isRevealing ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 size={12} className="animate-spin shrink-0" />
+                  <span className="text-[10px] font-semibold tracking-tight">Unlocking...</span>
+                </span>
+              ) : (
+                <>
+                  <span>Reveal</span>
+                  <span className="flex items-center gap-0.5 opacity-90 text-[10px] font-semibold tabular-nums">
+                    <Coins size={11} className="shrink-0" />
+                    <span>-{lead.revealCost ?? 3}</span>
+                  </span>
+                </>
+              )}
             </button>
           </>
         ) : (
           <>
-            {/* Cute Scaled-down Unlocked Contact Details */}
-            <div className="flex items-center gap-2 min-w-0 flex-1 mr-1.5">
+            {/* Cute Scaled-down Unlocked Contact Details with Smooth Pop-in */}
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 450, damping: 25 }}
+              className="flex items-center gap-2 min-w-0 flex-1 mr-1.5"
+            >
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] uppercase shrink-0 ${theme.matchTag}`}
               >
@@ -316,7 +363,7 @@ export default function LeadCard({
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
 
             {/* Scaled-down Save Button */}
             <button

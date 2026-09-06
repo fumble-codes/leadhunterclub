@@ -25,35 +25,15 @@ import {
   ClockIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
-const allLeads: Array<{
-  id: string
-  name: string
-  email: string
-  company: string
-  source: string
-  category: string
-  title: string
-  signalContext: string
-  role: string
-  taskScope: string
-  mustHave: string
-  nicheBonus: string
-  buyerType: string
-  urgency: 'low' | 'medium' | 'high' | 'critical'
-  winProb: 'low' | 'medium' | 'high'
-  nicheTags: string[]
-  hashtags: string[]
-  replyProbability: number
-  status: 'new' | 'saved' | 'drafting' | 'sent' | 'replied' | 'follow-up'
-  timestamp: string
-  niches: string[]
-  accent?: 'mint' | 'purple'
-  isActionable?: boolean
-}> = [
+import { AppLead } from '@/types/lead'
+import LeadCard from '@/app/leads/components/LeadCard'
+
+const allLeads: AppLead[] = [
   {
-    id: '1',
+    id: 'hero-1',
     name: 'Andy Shepard',
     email: 'a.shepard@gmail.com',
+    phone: '+1 (555) 012-3456',
     company: 'Nexus AI',
     source: 'LEAD HUNTER CLUB',
     category: 'SHOPIFY DESIGN',
@@ -73,11 +53,15 @@ const allLeads: Array<{
     status: 'saved',
     timestamp: '2h ago',
     niches: ['Web Design', 'Web Dev', 'Design'],
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: false,
   },
   {
-    id: '2',
+    id: 'hero-2',
     name: 'Emily Thompson',
     email: 'e.thompson@vanguard.io',
+    phone: '+1 (555) 017-8892',
     company: 'Vanguard Group',
     source: 'LEAD HUNTER CLUB',
     category: 'PERFORMANCE MARKETING',
@@ -96,11 +80,15 @@ const allLeads: Array<{
     status: 'drafting',
     timestamp: '5h ago',
     niches: ['Marketing'],
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: false,
   },
   {
-    id: '3',
+    id: 'hero-3',
     name: 'Michael Carter',
     email: 'm.carter@stellar.co',
+    phone: '+1 (555) 019-2045',
     company: 'Stellar Co',
     source: 'LEAD HUNTER CLUB',
     category: 'BRAND IDENTITY',
@@ -119,11 +107,15 @@ const allLeads: Array<{
     status: 'saved',
     timestamp: '1d ago',
     niches: ['Design'],
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: true,
   },
   {
-    id: '4',
+    id: 'hero-4',
     name: 'David Anderson',
     email: 'd.anderson@prism.io',
+    phone: '+1 (555) 014-9921',
     company: 'Prism Labs',
     source: 'LEAD HUNTER CLUB',
     category: 'SALES INFRASTRUCTURE',
@@ -142,6 +134,9 @@ const allLeads: Array<{
     status: 'new',
     timestamp: '3d ago',
     niches: ['Sales & RevOps', 'AI & Automation'],
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: false,
   },
 ]
 const getSavedLeads = () =>
@@ -179,9 +174,6 @@ const activityData = [
   { day: 'Sat', value: 32 },
   { day: 'Sun', value: 28 },
 ]
-import LeadCard from '@/app/leads/components/LeadCard'
-import PipelineLeadCard from '@/app/leads/components/PipelineLeadCard'
-
 const ease = [0.16, 1, 0.3, 1] as const
 
 const tabs = [
@@ -191,53 +183,9 @@ const tabs = [
   { id: 'dashboard', label: 'Dashboard', icon: Squares2X2Icon },
 ]
 
-function MockHeroLeadCard({ lead }: { lead: (typeof allLeads)[0] }) {
-  const urgencyColor =
-    lead.urgency === 'critical'
-      ? 'text-accent-pink bg-accent-pink/10 border-accent-pink/20'
-      : lead.urgency === 'high'
-        ? 'text-accent-mint bg-accent-mint/10 border-accent-mint/20'
-        : 'text-accent-purple bg-accent-purple/10 border-accent-purple/20'
-
-  return (
-    <div className="p-3.5 rounded-xl bg-surface-secondary/40 border border-white/[0.05] hover:border-white/10 transition-all flex flex-col justify-between group">
-      <div>
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-mint/80 shrink-0" />
-            <span className="text-[10px] font-mono uppercase tracking-wider text-text-secondary truncate">
-              {lead.source}
-            </span>
-          </div>
-          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase font-medium ${urgencyColor}`}>
-            {lead.urgency}
-          </span>
-        </div>
-        <h4 className="text-xs font-semibold text-text-primary tracking-tight mb-1 line-clamp-1 group-hover:text-accent-orange transition-colors">
-          {lead.title}
-        </h4>
-        <p className="text-[11px] text-text-secondary/70 leading-relaxed line-clamp-2 mb-2.5 font-light">
-          &ldquo;{lead.signalContext}&rdquo;
-        </p>
-      </div>
-
-      <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10px]">
-        <div className="flex items-center gap-1.5">
-          <span className="text-text-secondary/40 font-mono text-[9px]">INTENT</span>
-          <span className="font-semibold text-accent-mint font-mono text-[10px]">{lead.replyProbability}%</span>
-        </div>
-        <span className="text-text-secondary/40 font-mono text-[9px]">{lead.timestamp}</span>
-      </div>
-    </div>
-  )
-}
-
 // ─── Real Lead Feed content (compact hero preview) ──────────────
 function LeadsContent() {
-  const feedLeads = Array.from({ length: 4 }, (_, i) => ({
-    ...allLeads[i % allLeads.length],
-    id: `hero-lead-${i}`,
-  }))
+  const feedLeads = allLeads.slice(0, 4)
 
   return (
     <div className="flex-1 overflow-y-auto px-5 py-4 pb-16 relative w-full scrollbar-hide">
@@ -274,10 +222,10 @@ function LeadsContent() {
           </div>
         </div>
 
-        {/* 2-column Grid of compact cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 auto-rows-fr">
-          {feedLeads.map((lead) => (
-            <MockHeroLeadCard key={lead.id} lead={lead} />
+        {/* 2-column Grid of real LeadCards matching leadfeed design */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-stretch">
+          {feedLeads.map((lead, i) => (
+            <LeadCard key={lead.id} lead={lead} index={i} />
           ))}
         </div>
       </div>

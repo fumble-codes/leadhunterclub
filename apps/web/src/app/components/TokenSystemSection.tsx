@@ -3,114 +3,164 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  LockClosedIcon,
   BanknotesIcon,
   ChevronRightIcon,
+  ArrowPathIcon,
   ChartBarSquareIcon,
   BookmarkIcon,
+  LockClosedIcon,
   SparklesIcon,
-  ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import { Card, Badge } from '@/components/ui'
+import LeadCard from '@/app/leads/components/LeadCard'
+import { AppLead } from '@/types/lead'
 
 const ease = [0.16, 1, 0.3, 1] as const
-
-interface LeadCardData {
-  id: string
-  name: string
-  email: string
-  company: string
-  source: string
-  title: string
-  signalContext: string
-  urgency: 'low' | 'medium' | 'high' | 'critical'
-  nicheTags: string[]
-  replyProbability: number
-  isLocked: boolean
-}
-
-const urgencyColors: Record<string, { badge: 'purple'; topLine: string; dotColor: string }> = {
-  critical: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
-  high: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
-  medium: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
-  low: { badge: 'purple', topLine: 'from-transparent via-accent-purple to-transparent', dotColor: 'bg-accent-purple' },
-}
 
 export default function TokenSystemSection() {
   const [tokens, setTokens] = useState(750)
   const [activeTab, setActiveTab] = useState<'leads' | 'contacts' | 'pipeline'>('leads')
   const [activeCardId, setActiveCardId] = useState<string>('card-2')
-  const [isRevealing, setIsRevealing] = useState<string | null>(null)
 
-  // 3 real high-fidelity UI cards matching exact leadsData mock accents & copy
-  const [leads, setLeads] = useState<LeadCardData[]>([
+  // 5 real high-fidelity UI cards matching exact leadsData mock accents & copy
+  const [leads, setLeads] = useState<AppLead[]>([
     {
       id: 'card-1',
       name: 'Andy Shepard',
       email: 'a.shepard@gmail.com',
+      phone: '+1 (555) 012-3456',
       company: 'Nexus AI',
       source: 'Twitter',
+      category: 'SHOPIFY DEV',
       title: 'Shopify Speed Optimization',
       signalContext:
         'Struggling with slow load times and high bounce rates on their current Shopify store.',
+      role: 'Shopify Developer',
+      taskScope: 'Struggling with slow load times and high bounce rates on our current Shopify store.',
+      mustHave: 'Shopify optimization expertise',
+      nicheBonus: 'Liquid & Core Web Vitals',
+      buyerType: 'eCommerce Brand',
       urgency: 'high',
+      winProb: 'high',
       nicheTags: ['E-Commerce', 'Web Dev', 'Shopify'],
+      hashtags: ['#shopify', '#speed'],
       replyProbability: 92,
-      isLocked: true,
+      status: 'new',
+      timestamp: '2h ago',
+      niches: ['Web Dev'],
+      isClaimable: true,
+      revealCost: 3,
+      isRevealed: false,
     },
     {
       id: 'card-2',
       name: 'Michael Carter',
       email: 'm.carter@stellar.co',
+      phone: '+1 (555) 019-2045',
       company: 'Stellar Co',
       source: 'Reddit',
+      category: 'BRAND IDENTITY',
       title: 'Brand Identity & Design System',
       signalContext: 'Just raised seed round, looking to completely rebrand before product launch.',
+      role: 'Brand Designer',
+      taskScope: 'Just raised seed round, looking to completely rebrand before product launch.',
+      mustHave: 'Modern minimal aesthetic',
+      nicheBonus: 'Design systems experience',
+      buyerType: 'Funded Startup',
       urgency: 'medium',
+      winProb: 'high',
       nicheTags: ['SaaS', 'Branding', 'Design'],
+      hashtags: ['#saas', '#design'],
       replyProbability: 88,
-      isLocked: true,
+      status: 'new',
+      timestamp: '4h ago',
+      niches: ['Design'],
+      isClaimable: true,
+      revealCost: 3,
+      isRevealed: false,
     },
     {
       id: 'card-3',
       name: 'Lily Hernandez',
       email: 'l.hernandez@nexus.com',
+      phone: '+1 (555) 017-8892',
       company: 'Nexus Analytics',
       source: 'Twitter',
+      category: 'SEO STRATEGY',
       title: 'SEO Technical Strategy',
       signalContext: 'Competitor just outranked them for their main keyword. Founder is stressed.',
+      role: 'SEO Specialist',
+      taskScope: 'Competitor just outranked us for our main keyword. Founder is stressed and need urgent fix.',
+      mustHave: 'Technical SEO & Content Strategy',
+      nicheBonus: 'B2B SaaS experience',
+      buyerType: 'B2B SaaS',
       urgency: 'critical',
+      winProb: 'high',
       nicheTags: ['B2B SaaS', 'SEO', 'Content'],
+      hashtags: ['#seo', '#b2b'],
       replyProbability: 95,
-      isLocked: true,
+      status: 'new',
+      timestamp: '6h ago',
+      niches: ['Marketing'],
+      isClaimable: true,
+      revealCost: 3,
+      isRevealed: false,
     },
     {
       id: 'card-4',
       name: 'David Chen',
       email: 'd.chen@apexflow.io',
+      phone: '+1 (555) 014-3321',
       company: 'ApexFlow',
       source: 'LinkedIn',
+      category: 'BACKEND DEV',
       title: 'Node.js Backend Refactor',
       signalContext:
         'Looking for a dedicated Node/React team to refactor their legacy subscription architecture.',
+      role: 'Full Stack Engineer',
+      taskScope: 'Looking for a dedicated Node/React team to refactor legacy subscription architecture.',
+      mustHave: 'Node.js & Postgres architecture',
+      nicheBonus: 'Stripe Billing expertise',
+      buyerType: 'Scaleup',
       urgency: 'medium',
+      winProb: 'high',
       nicheTags: ['SaaS', 'Node.js', 'Refactor'],
+      hashtags: ['#nodejs', '#backend'],
       replyProbability: 94,
-      isLocked: true,
+      status: 'new',
+      timestamp: '1d ago',
+      niches: ['Web Dev'],
+      isClaimable: true,
+      revealCost: 3,
+      isRevealed: false,
     },
     {
       id: 'card-5',
       name: 'Sarah Jenkins',
       email: 's.jenkins@elevateops.net',
+      phone: '+1 (555) 018-7744',
       company: 'Elevate Ops',
       source: 'Threads',
+      category: 'GROWTH MARKETING',
       title: 'B2B Growth Marketing',
       signalContext:
         'Scaling outbound campaigns and looking for a reliable growth partner.',
+      role: 'Growth Strategist',
+      taskScope: 'Scaling outbound campaigns and looking for a reliable growth partner to take over execution.',
+      mustHave: 'Outbound campaign management',
+      nicheBonus: 'HubSpot & Clay automation',
+      buyerType: 'Agency',
       urgency: 'critical',
+      winProb: 'high',
       nicheTags: ['Growth', 'GTM', 'B2B'],
+      hashtags: ['#growth', '#outbound'],
       replyProbability: 91,
-      isLocked: true,
+      status: 'new',
+      timestamp: '2d ago',
+      niches: ['Sales & RevOps'],
+      isClaimable: true,
+      revealCost: 3,
+      isRevealed: false,
     },
   ])
 
@@ -119,21 +169,10 @@ export default function TokenSystemSection() {
       setTokens(750) // Reset for simulation
       return
     }
-
-    setIsRevealing(id)
-
-    setTimeout(() => {
-      setTokens((prev) => prev - 3)
-      setLeads((prev) =>
-        prev.map((lead) => {
-          if (lead.id === id) {
-            return { ...lead, isLocked: false }
-          }
-          return lead
-        }),
-      )
-      setIsRevealing(null)
-    }, 700)
+    setTokens((prev) => Math.max(0, prev - 3))
+    setLeads((prev) =>
+      prev.map((lead) => (lead.id === id ? { ...lead, isRevealed: true } : lead)),
+    )
   }
 
   const activeCardIndex = leads.findIndex((l) => l.id === activeCardId)
@@ -414,118 +453,18 @@ export default function TokenSystemSection() {
                   }}
                   className={`absolute top-0 left-0 right-0 w-full ${filterClass}`}
                 >
-                  <Card
-                    variant="elevated"
-                    padding="md"
-                    hover
-                    className="h-full flex flex-col"
-                  >
-                    {/* Top edge highlight */}
-                    <div className={`absolute top-0 left-0 right-0 h-[1px] opacity-25 group-hover:opacity-60 bg-gradient-to-r ${urgencyColors[lead.urgency].topLine}`} />
-
-                    {/* Header: Source badge + Urgency badge + Bookmark */}
-                    <div className="flex items-center justify-between mb-5 w-full shrink-0 select-none">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${urgencyColors[lead.urgency].dotColor}`} />
-                        <Badge size="sm" color="purple">
-                          Lead Hunter Club
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge size="sm" color={urgencyColors[lead.urgency].badge}>
-                          <ChartBarSquareIcon className="w-[10px] h-[10px] mr-1" />
-                          {lead.urgency}
-                        </Badge>
-                        <div className="p-1.5 rounded-lg border transition-all cursor-pointer bg-white/5 border-transparent text-text-secondary hover:bg-white/10 hover:text-white hover:border-border-subtle">
-                          <BookmarkIcon className="w-[14px] h-[14px] text-text-secondary/30" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Company title as category */}
-                    <h4 className="text-11 font-semibold tracking-[0.18em] text-text-secondary/60 uppercase mb-3 shrink-0">
-                      {lead.company}
-                    </h4>
-
-                    {/* Signal quote -> Core Scope (Intel) */}
-                    <h3 className="text-[17px] font-normal tracking-tight leading-[1.55] text-text-primary mb-6 flex-grow">
-                      &quot;{lead.taskScope}&quot;
-                    </h3>
-
-                    {/* Tags row + AI Reply Probability */}
-                    <div className="flex flex-wrap gap-2 mb-2 shrink-0">
-                      {lead.replyProbability > 0 && (
-                        <Badge size="sm" color="purple">
-                          {lead.replyProbability}% Reply Match
-                        </Badge>
-                      )}
-                      {lead.nicheTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2.5 py-1 text-[10px] font-medium rounded-md border bg-white/[0.03] text-text-secondary/50 border-white/[0.05] hover:bg-white/[0.07] hover:text-text-secondary hover:border-white/10 transition-all duration-200 cursor-default"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="w-full pt-5 flex items-center justify-between shrink-0 border-t border-border-subtle mt-auto gap-3">
-                      <div className="flex items-center gap-3 select-none min-w-0 flex-1">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center bg-white/5 overflow-hidden shrink-0">
-                          {!lead.isLocked ? (
-                            <span className="text-11 font-bold text-text-primary uppercase">
-                              {lead.name.split(' ').map((n: string) => n[0]).join('')}
-                            </span>
-                          ) : (
-                            <LockClosedIcon className="w-[14px] h-[14px] text-text-secondary" />
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-1.5 pointer-events-none min-w-0">
-                          {!lead.isLocked ? (
-                            <>
-                              <div className="text-sm font-bold text-text-primary truncate">{lead.name}</div>
-                              <div className="text-[10px] text-text-secondary truncate">{lead.email}</div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="h-2 w-24 rounded-[4px] bg-white/10 blur-[1px]" />
-                              <div className="h-2 w-32 rounded-[4px] bg-white/5 blur-[1px]" />
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        {!lead.isLocked ? (
-                          <div className="shrink-0 whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[12px] transition-all cursor-pointer bg-white/5 hover:bg-white/10 border border-transparent hover:border-border-subtle text-text-primary/90">
-                            <SparklesIcon className="w-3 h-3" />
-                            Engage
-                          </div>
-                        ) : (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              if (isActive) handleReveal(lead.id)
-                            }}
-                            disabled={isRevealing !== null || !isActive}
-                            className="shrink-0 whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-[12px] transition-all cursor-pointer bg-white/5 hover:bg-white/10 border border-transparent hover:border-border-subtle text-text-primary/90"
-                          >
-                            {isRevealing === lead.id ? (
-                              <span className="animate-pulse">Decoding...</span>
-                            ) : (
-                              <>
-                                Reveal
-                                <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
-                                  <BanknotesIcon className="w-3 h-3" /> -3
-                                </span>
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
+                  <LeadCard
+                    lead={lead}
+                    index={idx}
+                    isSelected={isActive}
+                    onClick={() => {
+                      if (isBehind) {
+                        setActiveCardId(lead.id)
+                        setActiveTab('leads')
+                      }
+                    }}
+                    onReveal={() => handleReveal(lead.id)}
+                  />
                 </motion.div>
               )
             })}

@@ -1,21 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDownIcon,
-  CheckCircleIcon,
   GlobeAltIcon,
   SparklesIcon,
   ArrowRightIcon,
-  LockClosedIcon,
-  EyeIcon,
-  EnvelopeIcon,
-  PhoneIcon,
-  BookmarkIcon,
-  BoltIcon,
-  ArrowDownTrayIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
 import HeroSection from '@/app/components/HeroSection'
@@ -24,6 +16,8 @@ import WhoItsForGrid from '@/app/components/WhoItsForGrid'
 import FeaturesSection from '@/app/components/FeaturesSection'
 import TestimonialsSection from '@/app/components/TestimonialsSection'
 import { NewsletterSignup } from '@/app/components/NewsletterSignup'
+import LeadCard from '@/app/leads/components/LeadCard'
+import { AppLead } from '@/types/lead'
 const ease = [0.16, 1, 0.3, 1] as const
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -58,45 +52,72 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   )
 }
 
-const SIGNAL_LEADS = [
+const SIGNAL_LEADS: AppLead[] = [
   {
     id: 'checkout',
-    name: 'Alex K.',
+    name: 'Alex Carter',
     company: 'DTC Brands',
     source: 'Twitter',
-    signal:
-      '"Our current checkout page is ugly and conversions are dropping drastically. Need help fast."',
-    urgency: 'Critical',
-    tags: ['E-Commerce', 'UI/UX', 'Conversion'],
+    category: 'UI/UX DESIGN',
+    title: 'Checkout UI/UX Redesign',
+    taskScope:
+      'Our current checkout page is ugly and conversions are dropping drastically. Need high-converting redesign.',
+    signalContext: 'Our current checkout page is ugly and conversions are dropping drastically.',
+    urgency: 'critical',
+    nicheTags: ['E-Commerce', 'UI/UX', 'Conversion'],
     email: 'alex.k@dtcbrands.co',
     phone: '+1 (555) 012-3456',
-    replyProbability: '97%',
+    replyProbability: 97,
+    accent: 'pink',
+    status: 'new',
+    timestamp: '1h ago',
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: false,
   },
   {
     id: 'shopify',
-    name: 'Andy S.',
+    name: 'Andy Shepard',
     company: 'Nexus AI',
     source: 'Reddit',
-    signal:
-      '"Struggling with slow load times and high bounce rates on our Shopify store, losing sales."',
-    urgency: 'High',
-    tags: ['Shopify', 'Web Dev'],
+    category: 'SHOPIFY DEV',
+    title: 'Shopify Speed Optimization',
+    taskScope:
+      'Struggling with slow load times and high bounce rates on our Shopify store, losing checkouts.',
+    signalContext: 'Struggling with slow load times and high bounce rates on our Shopify store.',
+    urgency: 'high',
+    nicheTags: ['Shopify', 'Web Dev', 'Speed'],
     email: 'a.shepard@nexus.ai',
     phone: '+1 (555) 017-8892',
-    replyProbability: '92%',
+    replyProbability: 92,
+    accent: 'purple',
+    status: 'new',
+    timestamp: '3h ago',
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: false,
   },
   {
     id: 'rebrand',
-    name: 'Michael C.',
+    name: 'Michael Carter',
     company: 'Stellar Co',
     source: 'LinkedIn',
-    signal:
-      '"Just raised a seed round and need a full rebrand before our product launch in 6 weeks."',
-    urgency: 'High',
-    tags: ['SaaS', 'Branding'],
+    category: 'BRAND IDENTITY',
+    title: 'Brand Identity & Design System',
+    taskScope:
+      'Just raised a seed round and need a full rebrand and Figma design system before our product launch.',
+    signalContext: 'Just raised a seed round and need a full rebrand before our product launch.',
+    urgency: 'high',
+    nicheTags: ['SaaS', 'Branding', 'Figma'],
     email: 'm.carter@stellar.co',
     phone: '+1 (555) 019-2045',
-    replyProbability: '88%',
+    replyProbability: 88,
+    accent: 'cyan',
+    status: 'new',
+    timestamp: '5h ago',
+    isClaimable: true,
+    revealCost: 3,
+    isRevealed: false,
   },
 ]
 
@@ -105,6 +126,16 @@ function SignalPreviewUI() {
   const [selectedId, setSelectedId] = useState(SIGNAL_LEADS[0].id)
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const selected = SIGNAL_LEADS.find((l) => l.id === selectedId)!
+
+  const leadToDisplay: AppLead = {
+    ...selected,
+    isRevealed: !!revealed[selected.id],
+    status: revealed[selected.id] ? 'saved' : 'new',
+  }
+
+  const handleReveal = (id: string) => {
+    setRevealed((prev) => ({ ...prev, [id]: true }))
+  }
 
   return (
     <div className="w-full overflow-hidden">
@@ -128,12 +159,12 @@ function SignalPreviewUI() {
         </div>
 
         {/* Lead selector pills */}
-        <div className="flex items-center gap-1.5 px-4 pt-3">
+        <div className="flex items-center gap-1.5 px-4 pt-3 pb-3">
           {SIGNAL_LEADS.map((lead) => (
             <button
               key={lead.id}
               onClick={() => setSelectedId(lead.id)}
-              className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-widest transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
                 selectedId === lead.id
                   ? 'bg-accent-purple/15 text-accent-purple border border-accent-purple/25'
                   : 'bg-white/[0.03] text-text-secondary/60 border border-white/[0.06] hover:text-text-primary'
@@ -144,118 +175,14 @@ function SignalPreviewUI() {
           ))}
         </div>
 
-        {/* Signal body */}
-        <div className="p-4 pt-3">
-          {/* Lead identity */}
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-xl bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center text-[11px] font-bold text-accent-purple shrink-0">
-              {selected.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[12px] font-bold text-text-primary truncate">
-                {selected.name}
-              </div>
-              <div className="text-[9.5px] text-text-secondary/70 truncate">
-                {selected.company} · {selected.source}
-              </div>
-            </div>
-            <span className="px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 text-[8.5px] font-bold uppercase tracking-widest text-orange-400 shrink-0">
-              {selected.urgency}
-            </span>
-          </div>
-
-          {/* Buyer signal quote */}
-          <div className="rounded-xl bg-white/[0.03] border border-white/[0.05] px-3 py-2.5 mb-3">
-            <div className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary/50 mb-1 flex items-center gap-1.5">
-              <GlobeAltIcon className="w-[10px] h-[10px] text-accent-purple" /> Buyer Signal
-            </div>
-            <p className="text-[10.5px] text-text-primary/85 leading-relaxed font-light">
-              {selected.signal}
-            </p>
-          </div>
-
-          {/* Tags */}
-          <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-            {selected.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.06] text-[8px] font-bold uppercase tracking-widest text-text-secondary"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Reveal / Contact section */}
-          <div className="rounded-xl bg-surface-secondary/50 border border-white/[0.05] p-3">
-            {revealed[selected.id] ? (
-              <>
-                <div className="text-[8.5px] font-bold uppercase tracking-widest text-text-secondary/50 mb-2 flex items-center gap-1.5">
-                  <CheckCircleIcon className="w-[10px] h-[10px] text-accent-purple" /> Contact
-                  Unlocked
-                </div>
-                <div className="space-y-1.5 mb-3">
-                  <div className="flex items-center gap-2 text-[10px]">
-                    <EnvelopeIcon className="w-3 h-3 text-accent-purple shrink-0" />
-                    <span className="text-text-primary truncate">{selected.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px]">
-                    <PhoneIcon className="w-3 h-3 text-accent-purple shrink-0" />
-                    <span className="text-text-primary">{selected.phone}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-accent-purple text-text-on-accent font-bold text-[8.5px] uppercase tracking-widest flex-1 justify-center">
-                    <BookmarkIcon className="w-[9px] h-[9px]" /> Save to Pipeline
-                  </button>
-                  <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-text-secondary font-bold text-[8.5px] uppercase tracking-widest">
-                    <ArrowDownTrayIcon className="w-[9px] h-[9px]" /> Export
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[9px] font-bold text-text-primary">Contact Locked</div>
-                  <div className="text-[8.5px] text-text-secondary/60">
-                    Reveal email, phone & profile link
-                  </div>
-                </div>
-                <button
-                  onClick={() => setRevealed((prev) => ({ ...prev, [selected.id]: true }))}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-accent-purple text-text-on-accent font-bold text-[8.5px] uppercase tracking-widest hover:bg-accent-purple/90 transition-all"
-                >
-                  <EyeIcon className="w-[10px] h-[10px]" /> Reveal · 3 Credits
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Reply probability meter */}
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex-1">
-              <div className="flex justify-between text-[8px] text-text-secondary/60 mb-1">
-                <span>Reply Probability</span>
-                <span className="text-accent-purple font-bold">{selected.replyProbability}</span>
-              </div>
-              <div className="h-1 w-full bg-white/[0.06] rounded-full overflow-hidden">
-                <motion.div
-                  key={selected.id}
-                  initial={{ width: 0 }}
-                  animate={{ width: selected.replyProbability }}
-                  transition={{ duration: 0.6, ease }}
-                  className="h-full bg-accent-purple/70 rounded-full"
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.03] border border-white/[0.06] shrink-0">
-              <BoltIcon className="w-[10px] h-[10px] text-accent-purple" />
-              <span className="text-[8px] font-bold text-text-secondary">High Intent</span>
-            </div>
-          </div>
+        {/* Real LeadCard matching the exact LeadFeed page card design */}
+        <div className="p-4 pt-0">
+          <LeadCard
+            lead={leadToDisplay}
+            index={SIGNAL_LEADS.findIndex((l) => l.id === selectedId)}
+            isSelected={true}
+            onReveal={() => handleReveal(selected.id)}
+          />
         </div>
       </div>
     </div>
