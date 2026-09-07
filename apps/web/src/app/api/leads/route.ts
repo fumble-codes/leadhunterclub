@@ -121,16 +121,11 @@ export async function GET(request: NextRequest) {
         where: isSavedView
           ? { userId, isSaved: true }
           : { userId, status: { in: ['drafting', 'sent', 'replied', 'follow-up'] } },
+        include: { lead: true },
       })
-      // Batch fetch all leads in one Prisma query instead of N HTTP calls
-      const leadIds = userStates.map((s) => s.leadId)
-      const rawLeads = leadIds.length > 0
-        ? await oracleDb.leadPost.findMany({ where: { id: { in: leadIds }, is_deleted: false } })
-        : []
-      const leadMap = new Map(rawLeads.map((l) => [l.id, mapLeadPostToExternal(l)]))
       data = userStates
-        .filter((s) => leadMap.has(s.leadId))
-        .map((s) => externalPostToAppLead(leadMap.get(s.leadId)!, s))
+        .filter((s) => s.lead && !s.lead.is_deleted)
+        .map((s) => externalPostToAppLead(mapLeadPostToExternal(s.lead), s))
     } else {
       let externalLeads: ExternalPost[] = []
       try {

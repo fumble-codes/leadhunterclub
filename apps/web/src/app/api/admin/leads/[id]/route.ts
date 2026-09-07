@@ -6,6 +6,7 @@ import {
   approvePost,
   rejectPost,
   regenerateIntel,
+  generateTitle,
   reEnrichPost,
   deletePost,
   updatePostLabel,
@@ -90,6 +91,10 @@ export async function POST(
       case 'regenerate-intel': {
         const result = await regenerateIntel(id)
         return NextResponse.json({ success: true, data: result.post, mode: result.mode })
+      }
+      case 'generate-title': {
+        const updated = await generateTitle(id)
+        return NextResponse.json({ success: true, data: updated, message: 'Title generation triggered' })
       }
       case 're-enrich': {
         await reEnrichPost(id)

@@ -4,8 +4,9 @@
  * without changing any downstream mapping logic.
  */
 import type { ExternalPost, ExternalAuthor, ExternalContactInfo } from '@/lib/external-api/client'
+import type { LeadPost } from '@prisma/client'
 
-interface RawLeadPost {
+export interface RawLeadPost {
   id: string
   post_id: string
   url: string
@@ -40,7 +41,7 @@ interface RawLeadPost {
   updated_at: Date
 }
 
-export function mapLeadPostToExternal(p: RawLeadPost): ExternalPost {
+export function mapLeadPostToExternal(p: RawLeadPost | LeadPost): ExternalPost {
   const author = (p.author as ExternalAuthor) || {}
   const postedAt = (p.posted_at as {
     date?: string

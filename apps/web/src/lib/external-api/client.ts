@@ -369,6 +369,12 @@ export async function regenerateIntel(id: string): Promise<{ post: ExternalPost;
   return { post: res.data!, mode: res.mode || 'inline' }
 }
 
+export async function generateTitle(id: string): Promise<ExternalPost> {
+  const res = await fetchApi<AdminActionResponse>(`/posts/${id}/generate-title`, { method: 'POST' })
+  if (!res.data) throw new Error(`External API: generate-title returned no data for post ${id}`)
+  return res.data
+}
+
 export async function bulkApprove(params?: {
   status?: string
   search?: string

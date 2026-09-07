@@ -1,18 +1,11 @@
 /**
- * Direct Prisma client for Oracle's lead_posts table.
- * Connects to the same Supabase DB but oracle schema via ORACLE_DATABASE_URL.
- * Used for user-facing leads feed to avoid HTTP roundtrip to Oracle VM.
+ * Database client for lead_posts table.
+ * Following the schema merger, lead_posts is part of the primary unified schema in db.
+ * This file re-exports `db` as `oracleDb` for full backward compatibility across API routes.
  */
-import { PrismaClient } from '@prisma/oracle-client'
+import { db } from '@/lib/db'
+import type { LeadPost } from '@prisma/client'
 
-const globalForOracle = global as unknown as { oraclePrisma: PrismaClient }
+export const oracleDb = db
 
-export const oracleDb =
-  globalForOracle.oraclePrisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'production' ? ['error'] : ['error', 'warn'],
-  })
-
-if (process.env.NODE_ENV !== 'production') globalForOracle.oraclePrisma = oracleDb
-
-export type OracleLeadPost = Awaited<ReturnType<typeof oracleDb.leadPost.findFirst>> & {}
+export type OracleLeadPost = LeadPost

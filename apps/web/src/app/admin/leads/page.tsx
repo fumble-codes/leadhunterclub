@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   Trash2,
   Plus,
+  Sparkles,
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
@@ -97,6 +98,7 @@ export default function AdminLeadsPage() {
   const [enrichingIds, setEnrichingIds] = useState<string[]>([])
   const [reviewActionIds, setReviewActionIds] = useState<string[]>([])
   const [intelActionIds, setIntelActionIds] = useState<string[]>([])
+  const [titleActionIds, setTitleActionIds] = useState<string[]>([])
   const [deletingIds, setDeletingIds] = useState<string[]>([])
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
   const [bulkSelectionBusy, setBulkSelectionBusy] = useState(false)
@@ -440,6 +442,24 @@ export default function AdminLeadsPage() {
       addToast({ type: 'error', message: 'Failed to generate intelligence.' })
     } finally {
       setIntelActionIds(prev => prev.filter(id => id !== leadId))
+    }
+  }
+
+  const handleGenerateTitle = async (leadId: string) => {
+    try {
+      setTitleActionIds(prev => [...prev, leadId])
+      const res = await apiPost(`/api/admin/leads/${leadId}`, { action: 'generate-title' })
+      const json = await res.json()
+      if (!res.ok || !json.success) {
+        addToast({ type: 'error', message: json?.message || 'Failed to generate title.' })
+        return
+      }
+      addToast({ type: 'success', message: json.message || 'Title generated successfully.' })
+      fetchLeads(currentPage, activeTab, searchQuery, true)
+    } catch (err) {
+      addToast({ type: 'error', message: 'Failed to generate title.' })
+    } finally {
+      setTitleActionIds(prev => prev.filter(id => id !== leadId))
     }
   }
 
@@ -1233,6 +1253,18 @@ export default function AdminLeadsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleGenerateTitle(lead.id)}
+                              disabled={titleActionIds.includes(lead.id)}
+                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all disabled:opacity-50"
+                            >
+                              {titleActionIds.includes(lead.id) ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <Sparkles size={12} />
+                              )}
+                              {titleActionIds.includes(lead.id) ? 'Generating...' : 'Generate Title'}
+                            </button>
                             <button
                               onClick={() => handleRegenerateIntel(lead.id)}
                               disabled={intelActionIds.includes(lead.id)}
