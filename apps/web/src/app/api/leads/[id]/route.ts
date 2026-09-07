@@ -8,6 +8,8 @@ import {
   OnboardingRequiredError,
 } from '@/lib/auth'
 import { getPost } from '@/lib/external-api/client'
+import { oracleDb } from '@/lib/oracle-db'
+import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import { updateLeadSchema } from '@/lib/validators/auth'
 import type { AppLead } from '@/types/lead'
 
@@ -51,7 +53,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const authUser = await requireFullyAuthorized(request)
     const userId = authUser.uid
 
-    const externalLead = await getPost(params.id)
+    const rawLead = await oracleDb.leadPost.findUnique({ where: { id: params.id } })
+    if (!rawLead) {
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'Lead not found' }, { status: 404 })
+    }
+    const externalLead = mapLeadPostToExternal(rawLead)
 
     const userState = await db.userLeadState.findUnique({
       where: {
@@ -171,7 +177,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     const ensureLeadRecord = async () => {
       try {
-        const ext = await getPost(params.id)
+        const raw = await oracleDb.leadPost.findUnique({ where: { id: params.id } })
+        if (!raw) throw new Error(`Lead ${params.id} not found in oracle DB`)
+        const ext = mapLeadPostToExternal(raw)
         await db.lead.upsert({
           where: { id: params.id },
           update: {

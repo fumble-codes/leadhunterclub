@@ -7,8 +7,10 @@ import {
   EmailNotVerifiedError,
   OnboardingRequiredError,
 } from '@/lib/auth'
-import { getPosts, getPost } from '@/lib/external-api/client'
+import { getPost } from '@/lib/external-api/client'
 import type { ExternalPost } from '@/lib/external-api/client'
+import { oracleDb } from '@/lib/oracle-db'
+import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import type { AppLead } from '@/types/lead'
 import { getLeadRevealCost } from '@/lib/config/coins'
 
@@ -111,23 +113,6 @@ export async function GET(request: NextRequest) {
 
     const isSavedView = saved === 'true'
     const isOutreachView = saved === 'outreach'
-    const showAll = isSavedView || isOutreachView
-
-    async function asyncMapConcurrent<T, R>(
-      items: T[],
-      fn: (item: T) => Promise<R>,
-      concurrency: number,
-    ): Promise<R[]> {
-      const results: R[] = []
-      for (let i = 0; i < items.length; i += concurrency) {
-        const batch = items.slice(i, i + concurrency)
-        const batchResults = await Promise.allSettled(batch.map(fn))
-        for (const r of batchResults) {
-          if (r.status === 'fulfilled') results.push(r.value)
-        }
-      }
-      return results
-    }
 
     let data: AppLead[]
 
@@ -137,37 +122,89 @@ export async function GET(request: NextRequest) {
           ? { userId, isSaved: true }
           : { userId, status: { in: ['drafting', 'sent', 'replied', 'follow-up'] } },
       })
-      const results = await asyncMapConcurrent(
-        userStates,
-        (state) => getPost(state.leadId).then((p) => ({ post: p, state })),
-        10,
-      )
-      data = results.map((r) => externalPostToAppLead(r.post, r.state))
+      // Batch fetch all leads in one Prisma query instead of N HTTP calls
+      const leadIds = userStates.map((s) => s.leadId)
+      const rawLeads = leadIds.length > 0
+        ? await oracleDb.leadPost.findMany({ where: { id: { in: leadIds }, is_deleted: false } })
+        : []
+      const leadMap = new Map(rawLeads.map((l) => [l.id, mapLeadPostToExternal(l)]))
+      data = userStates
+        .filter((s) => leadMap.has(s.leadId))
+        .map((s) => externalPostToAppLead(leadMap.get(s.leadId)!, s))
     } else {
       let externalLeads: ExternalPost[] = []
       try {
-        const externalRes = await getPosts({ page, perPage: pageSize, status: 'approved' })
-        externalLeads = externalRes.data.filter(isFeedEligible)
+        // Direct Prisma query to oracle schema — no HTTP roundtrip to Oracle VM
+        const where = {
+          is_deleted: false,
+          review_status: 'approved',
+          intelligence: { not: null as string | null },
+          source: { not: 'seed' },
+        }
+        const [rawLeads, total] = await Promise.all([
+          oracleDb.leadPost.findMany({
+            where,
+            orderBy: { created_at: 'desc' },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+          }),
+          oracleDb.leadPost.count({ where }),
+        ])
+        externalLeads = rawLeads.map(mapLeadPostToExternal)
+        const leadIds = externalLeads.map((l) => l.id)
+        const userStates =
+          leadIds.length > 0
+            ? await db.userLeadState.findMany({
+                where: { userId, leadId: { in: leadIds } },
+              })
+            : []
+        const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
+        const data = externalLeads
+          .map((lead) => externalPostToAppLead(lead, stateMap.get(lead.id)))
+          .filter((l) => l.status === 'new')
+
+        if (search) {
+          const q = search.toLowerCase()
+          return NextResponse.json({
+            data: data.filter(
+              (l) =>
+                l.title.toLowerCase().includes(q) ||
+                l.signalContext.toLowerCase().includes(q) ||
+                l.company.toLowerCase().includes(q) ||
+                l.category.toLowerCase().includes(q) ||
+                l.nicheTags.some((tag) => tag.toLowerCase().includes(q)),
+            ),
+            pagination: {
+              page,
+              pageSize,
+              total,
+              totalPages: Math.ceil(total / pageSize),
+              hasNext: page < Math.ceil(total / pageSize),
+              hasPrev: page > 1,
+            },
+          })
+        }
+
+        return NextResponse.json({
+          data,
+          pagination: {
+            page,
+            pageSize,
+            total,
+            totalPages: Math.ceil(total / pageSize),
+            hasNext: page < Math.ceil(total / pageSize),
+            hasPrev: page > 1,
+          },
+        })
       } catch (oracleErr: unknown) {
         const msg = oracleErr instanceof Error ? oracleErr.message : 'Oracle unreachable'
-        console.error('[Leads API] Oracle unavailable — returning empty feed:', msg)
-        // Return empty feed gracefully instead of 500
+        console.error('[Leads API] Oracle DB unavailable — returning empty feed:', msg)
         return NextResponse.json({
           data: [],
           pagination: { page, pageSize, total: 0, totalPages: 0, hasNext: false, hasPrev: false },
           warning: 'Lead data is temporarily unavailable. Please try again shortly.',
         })
       }
-      const leadIds = externalLeads.map((l) => l.id)
-      const userStates =
-        leadIds.length > 0
-          ? await db.userLeadState.findMany({
-              where: { userId, leadId: { in: leadIds } },
-            })
-          : []
-      const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
-      data = externalLeads.map((lead) => externalPostToAppLead(lead, stateMap.get(lead.id)))
-      data = data.filter((l) => l.status === 'new')
     }
 
     if (search) {

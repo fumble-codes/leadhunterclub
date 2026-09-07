@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { requireFullyAuthorized, AuthRequiredError, InactiveUserError, EmailNotVerifiedError, OnboardingRequiredError } from '@/lib/auth'
-import { getPosts } from '@/lib/external-api/client'
+import { oracleDb } from '@/lib/oracle-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,8 +33,9 @@ export async function GET(request: NextRequest) {
 
     let totalLeadsCount = 0
     try {
-      const postsRes = await getPosts({ perPage: 1 })
-      totalLeadsCount = postsRes.counts?.all || 0
+      totalLeadsCount = await oracleDb.leadPost.count({
+        where: { review_status: 'approved', is_deleted: false },
+      })
     } catch {
       totalLeadsCount = 0
     }

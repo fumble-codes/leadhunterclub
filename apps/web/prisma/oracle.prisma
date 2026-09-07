@@ -1,0 +1,47 @@
+generator oracleClient {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/oracle-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("ORACLE_DATABASE_URL")
+}
+
+model LeadPost {
+  id                   String    @id @default(uuid())
+  post_id              String
+  url                  String
+  content              String
+  platform             String    @default("linkedin")
+  author               Json      @default("{}")
+  posted_at            Json      @default("{}")
+  engagement           Json      @default("{\"likes\":0,\"comments\":0,\"shares\":0}")
+  keyword              String?
+  keyword_id           String?
+  status               String    @default("pending")
+  source               String    @default("scraped")
+  image_url            String?
+  ai_score             Float     @default(0)
+  is_training_data     Boolean   @default(false)
+  is_deleted           Boolean   @default(false)
+  deleted_at           DateTime?
+  email                String?
+  contact_info         Json?
+  source_type          String    @default("keyword")
+  source_profile       String?
+  qualification_reason String?
+  enrichment_status    String?
+  enrichment_message   String?
+  enriched_at          DateTime?
+  intelligence         String?
+  title                String?
+  review_status        String?
+  reviewed_at          DateTime?
+  reviewed_by_id       String?
+  claimed_count        Int       @default(0)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  @@map("lead_posts")
+}

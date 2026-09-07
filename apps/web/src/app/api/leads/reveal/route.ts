@@ -8,6 +8,8 @@ import {
   OnboardingRequiredError,
 } from '@/lib/auth'
 import { claimPost, getPost, ExternalApiError } from '@/lib/external-api/client'
+import { oracleDb } from '@/lib/oracle-db'
+import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
@@ -42,7 +44,11 @@ export async function POST(request: NextRequest) {
 
     const { leadId } = parsed.data
 
-    const externalLead = await getPost(leadId)
+    const rawLead = await oracleDb.leadPost.findUnique({ where: { id: leadId } })
+    if (!rawLead) {
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'Lead not found' }, { status: 404 })
+    }
+    const externalLead = mapLeadPostToExternal(rawLead)
 
     const contactBundle = leadContactBundle(externalLead)
     const CREDIT_COST = getLeadRevealCost(externalLead)
