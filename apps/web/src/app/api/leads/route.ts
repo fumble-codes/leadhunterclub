@@ -144,8 +144,20 @@ export async function GET(request: NextRequest) {
       )
       data = results.map((r) => externalPostToAppLead(r.post, r.state))
     } else {
-      const externalRes = await getPosts({ page, perPage: pageSize, status: 'approved' })
-      const externalLeads = externalRes.data.filter(isFeedEligible)
+      let externalLeads: ExternalPost[] = []
+      try {
+        const externalRes = await getPosts({ page, perPage: pageSize, status: 'approved' })
+        externalLeads = externalRes.data.filter(isFeedEligible)
+      } catch (oracleErr: unknown) {
+        const msg = oracleErr instanceof Error ? oracleErr.message : 'Oracle unreachable'
+        console.error('[Leads API] Oracle unavailable — returning empty feed:', msg)
+        // Return empty feed gracefully instead of 500
+        return NextResponse.json({
+          data: [],
+          pagination: { page, pageSize, total: 0, totalPages: 0, hasNext: false, hasPrev: false },
+          warning: 'Lead data is temporarily unavailable. Please try again shortly.',
+        })
+      }
       const leadIds = externalLeads.map((l) => l.id)
       const userStates =
         leadIds.length > 0

@@ -186,6 +186,7 @@ export async function requireFullyAuthorized(request: Request): Promise<AuthUser
     where: { id: user.uid },
     select: {
       status: true,
+      role: true,
       portfolio: true,
       website: true,
       linkedin: true,
@@ -196,6 +197,9 @@ export async function requireFullyAuthorized(request: Request): Promise<AuthUser
       discoverySource: true,
     },
   })
+
+  // Admins bypass onboarding requirement
+  if (dbUser?.role === 'admin') return user
 
   if (!dbUser || !hasCompletedOnboarding(dbUser)) {
     throw new OnboardingRequiredError()
