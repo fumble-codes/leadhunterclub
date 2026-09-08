@@ -90,7 +90,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
+    <main data-lenis-prevent className="flex-1 h-full min-h-0 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 

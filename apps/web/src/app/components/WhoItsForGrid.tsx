@@ -59,6 +59,13 @@ const mockLead1: AppLead = {
   taskScope:
     'Competitor just outranked them for main keywords. Need a senior SEO strategist to recover organic rankings and rebuild backlink velocity.',
   signalContext: 'Competitor just outranked them for their main keyword. Founder is stressed.',
+  role: 'SEO Strategist',
+  mustHave: 'Technical SEO expertise',
+  nicheBonus: 'B2B SaaS experience',
+  buyerType: 'B2B SaaS',
+  winProb: 'high',
+  hashtags: ['#seo', '#b2b'],
+  niches: ['Marketing'],
   urgency: 'critical',
   nicheTags: ['B2B SaaS', 'SEO', 'Content'],
   replyProbability: 95,
@@ -81,6 +88,13 @@ const mockLead2: AppLead = {
   taskScope:
     'Just hired 3 new SDRs. Need an outbound architecture specialist to setup Clay, Smartlead, and automated lead enrichment.',
   signalContext: 'Just hired 3 new SDRs. Clear indicator they need outbound infrastructure.',
+  role: 'Sales Operations Lead',
+  mustHave: 'Outbound tooling expertise',
+  nicheBonus: 'Clay & Smartlead experience',
+  buyerType: 'B2B Startup',
+  winProb: 'medium',
+  hashtags: ['#sales', '#outbound'],
+  niches: ['Sales'],
   urgency: 'medium',
   nicheTags: ['B2B', 'Sales', 'Systems'],
   replyProbability: 75,
@@ -289,6 +303,13 @@ export default function WhoItsForGrid() {
     title: activePersona.lead.title,
     taskScope: activePersona.lead.taskScope,
     signalContext: activePersona.lead.signalContext,
+    role: activePersona.lead.title,
+    mustHave: activePersona.lead.taskScope,
+    nicheBonus: activePersona.lead.nicheTags.join(', '),
+    buyerType: activePersona.title,
+    winProb: 'high',
+    hashtags: activePersona.lead.nicheTags.map((t) => `#${t.toLowerCase().replace(/[^a-z0-9]+/g, '')}`),
+    niches: [activePersona.lead.category],
     urgency: activePersona.lead.urgency,
     nicheTags: activePersona.lead.nicheTags,
     replyProbability: activePersona.lead.replyProbability,
@@ -328,7 +349,7 @@ export default function WhoItsForGrid() {
   return (
     <section
       id="who"
-      className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
       {/* HEADER BLOCK: Large text left, horizontal navigation segmented buttons right */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-10 relative z-10">
@@ -631,7 +652,7 @@ export default function WhoItsForGrid() {
                 </div>
 
                 {/* Spacious 3-card Lead Feed Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch justify-center overflow-hidden max-w-[1140px] mx-auto w-full">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-stretch justify-center overflow-hidden max-w-[1100px] mx-auto w-full">
                   {/* Card 1: Secondary mock lead (SEO optimization signal) */}
                   <div className="hidden md:flex items-stretch justify-center opacity-70 hover:opacity-100 transition-opacity duration-300">
                     <div className="w-full max-w-[360px]">

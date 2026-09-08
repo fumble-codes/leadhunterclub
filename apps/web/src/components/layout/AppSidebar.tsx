@@ -115,7 +115,10 @@ export default function AppSidebar({
         }`}
       >
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (isSneakPeek && item.name === 'Lead Feed')
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/' && pathname.startsWith(item.href + '/')) ||
+            (isSneakPeek && item.name === 'Lead Feed')
           const isBlurred = isSneakPeek && item.name !== 'Lead Feed'
 
           return (
@@ -202,15 +205,58 @@ export default function AppSidebar({
           </div>
         </div>
       ) : (
-        <div className="px-2 mb-3 shrink-0 flex justify-center">
+        <div className="px-2 mb-3 shrink-0 flex justify-center group/credit relative">
           <div
-            title={`Credits: ${creditTotal} / ${planMax}`}
-            className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center justify-center text-accent-orange hover:bg-white/10 transition-colors cursor-default"
+            className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center relative cursor-default hover:border-accent-orange/30 hover:bg-white/[0.06] transition-all duration-300"
           >
-            <BanknotesIcon className="w-3.5 h-3.5 shrink-0" />
-            <span className="text-[9px] font-extrabold text-text-secondary tracking-tight tabular-nums mt-0.5 leading-none">
-              {creditTotal}
-            </span>
+            {/* Dynamic Radial Progress SVG */}
+            <svg className="w-8 h-8 -rotate-90 transform" viewBox="0 0 36 36">
+              {/* Background ring */}
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                className="text-white/10"
+                strokeWidth="2.5"
+                stroke="currentColor"
+                fill="none"
+              />
+              {/* Progress ring */}
+              <circle
+                cx="18"
+                cy="18"
+                r="14"
+                className="text-accent-orange transition-all duration-700 ease-out"
+                strokeWidth="2.5"
+                strokeDasharray={2 * Math.PI * 14}
+                strokeDashoffset={2 * Math.PI * 14 * (1 - creditPercentage / 100)}
+                strokeLinecap="round"
+                stroke="currentColor"
+                fill="none"
+                style={{
+                  filter: 'drop-shadow(0 0 4px rgba(255, 184, 107, 0.45))',
+                }}
+              />
+            </svg>
+
+            {/* Center Icon */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <BanknotesIcon className="w-3.5 h-3.5 text-accent-orange group-hover/credit:scale-110 transition-transform duration-200" />
+            </div>
+          </div>
+
+          {/* Hover Tooltip */}
+          <div className="absolute left-full ml-2.5 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl bg-surface-elevated border border-white/10 shadow-2xl backdrop-blur-xl opacity-0 pointer-events-none group-hover/credit:opacity-100 group-hover/credit:pointer-events-auto transition-all duration-200 z-50 whitespace-nowrap">
+            <div className="flex items-center gap-1.5 text-xxs font-bold text-text-primary">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
+              <span>Credits: {creditTotal} / {planMax}</span>
+              <span className="text-text-secondary font-normal">({Math.round(creditPercentage)}%)</span>
+            </div>
+            {user?.creditAccount?.rolloverBalance ? (
+              <div className="text-[10px] text-accent-orange font-medium mt-0.5">
+                +{user.creditAccount.rolloverBalance} Rollover
+              </div>
+            ) : null}
           </div>
         </div>
       )}
@@ -238,12 +284,12 @@ export default function AppSidebar({
             className={`flex items-center rounded-xl transition-all duration-200 ${
               isCollapsed
                 ? `w-10 h-10 mx-auto justify-center ${
-                    pathname === '/settings'
+                    pathname === '/settings' || pathname.startsWith('/settings/')
                       ? 'text-accent-orange bg-accent-orange/10 border border-accent-orange/25'
                       : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
                   }`
                 : `gap-3 px-3 py-2.5 ${
-                    pathname === '/settings'
+                    pathname === '/settings' || pathname.startsWith('/settings/')
                       ? 'text-accent-orange bg-accent-orange/10 border border-accent-orange/20'
                       : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.03]'
                   }`

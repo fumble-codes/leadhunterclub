@@ -9,7 +9,7 @@ import {
   ArrowPathIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/solid'
-import { auth, sendEmailVerification } from '@/lib/firebase'
+import { auth, sendEmailVerification, applyActionCode } from '@/lib/firebase'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 
 function VerifyEmailContent() {
@@ -17,6 +17,7 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || ''
   const [resending, setResending] = useState(false)
+  const [resendMessage, setResendMessage] = useState('')
   const [checking, setChecking] = useState(true)
   const [verified, setVerified] = useState(false)
 
@@ -27,6 +28,26 @@ function VerifyEmailContent() {
         : '/onboarding'
     router.replace(target)
   }
+
+  // Handle direct verification link (oobCode) if present
+  useEffect(() => {
+    const oobCode = searchParams.get('oobCode')
+    if (oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(async () => {
+          if (auth.currentUser) {
+            await auth.currentUser.reload()
+            await auth.currentUser.getIdToken(true).catch(() => {})
+          }
+          setVerified(true)
+          setChecking(false)
+        })
+        .catch((err) => {
+          console.error('[Verify Email] Failed to apply action code:', err)
+          setChecking(false)
+        })
+    }
+  }, [searchParams])
 
   useEffect(() => {
     let active = true
@@ -68,10 +89,26 @@ function VerifyEmailContent() {
   const handleResend = async () => {
     if (!auth.currentUser) return
     setResending(true)
+    setResendMessage('')
     try {
-      await sendEmailVerification(auth.currentUser)
+      const token = await auth.currentUser.getIdToken().catch(() => null)
+      const res = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ email: auth.currentUser.email }),
+      })
+      if (res.ok) {
+        setResendMessage('Verification email sent! Check your inbox.')
+      } else {
+        await sendEmailVerification(auth.currentUser)
+        setResendMessage('Verification email sent! Check your inbox.')
+      }
     } catch {
-      // silently fail
+      await sendEmailVerification(auth.currentUser).catch(() => {})
+      setResendMessage('Verification email sent! Check your inbox.')
     } finally {
       setResending(false)
     }
@@ -129,6 +166,12 @@ function VerifyEmailContent() {
               <p className="text-xs text-text-secondary/60 mb-8">
                 Didn&apos;t receive it? Check your spam folder or click Resend below.
               </p>
+
+              {resendMessage && (
+                <div className="mb-4 p-3 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary font-medium">
+                  {resendMessage}
+                </div>
+              )}
 
               <div className="flex flex-col gap-3">
                 <button

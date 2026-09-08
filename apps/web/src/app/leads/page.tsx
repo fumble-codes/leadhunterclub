@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-import AppSidebar from '@/components/layout/AppSidebar'
 import LeadCard from './components/LeadCard'
 import PipelineLeadCard from './components/PipelineLeadCard'
 import LeadDrawer from './components/LeadDrawer'
@@ -94,12 +93,11 @@ export default function LeadsPage() {
   }
 
   const allTags = Array.from(
-    new Set(leadsList.filter((l) => l.status === 'new').flatMap((l) => l.nicheTags)),
+    new Set(leadsList.flatMap((l) => l.nicheTags)),
   )
 
   const filteredLeads = useMemo(() => {
     let result = leadsList.filter((lead) => {
-      if (lead.status !== 'new') return false
       if (activeNiche !== 'All') {
         if (!lead.niches || !lead.niches.some((n) => n.toLowerCase() === activeNiche.toLowerCase())) return false
       }
@@ -145,8 +143,8 @@ export default function LeadsPage() {
 
   return (
     <main
-      className="flex-1 overflow-y-auto px-8 py-8 pb-32 relative scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      data-lenis-prevent
+      className="flex-1 h-full min-h-0 overflow-y-auto px-8 py-8 pb-32 relative scrollbar-hide"
     >
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-purple-medium pointer-events-none" />
       <div className="absolute top-[20%] right-[-5%] w-[600px] h-[600px] glow-mint-soft pointer-events-none" />

@@ -15,7 +15,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const router = useRouter()
   const { user, loading, error, firebaseUser } = useAuth()
 
-  const appRoutes = ['/dashboard', '/leads', '/saved', '/analytics', '/settings']
+  const appRoutes = ['/dashboard', '/leads', '/saved', '/analytics', '/settings', '/support']
   const adminRoutes = ['/admin']
   const authRoutes = ['/login', '/register']
   const onboardingRoutes = ['/onboarding', '/verify-email', '/pending-approval', '/admin-register']
@@ -85,9 +85,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     const isLanding = !isAppRoute
     if (!isLanding) return
 
+    let disposed = false
     let lenisInstance: any = null
 
     import('lenis').then(({ default: Lenis }) => {
+      if (disposed) return
       lenisInstance = new Lenis({
         duration: 1.2,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -96,6 +98,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       })
 
       function raf(time: number) {
+        if (disposed) return
         lenisInstance?.raf(time)
         requestAnimationFrame(raf)
       }
@@ -104,6 +107,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     })
 
     return () => {
+      disposed = true
       if (lenisInstance) {
         lenisInstance.destroy()
       }
@@ -118,6 +122,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     else if (pathname.startsWith('/analytics')) detectedPage = 'analytics'
     else if (pathname.startsWith('/settings')) detectedPage = 'settings'
     else if (pathname.startsWith('/admin')) detectedPage = 'admin'
+    else if (pathname.startsWith('/support')) detectedPage = 'default'
     else if (pathname.startsWith('/onboarding') || pathname.startsWith('/pending-approval')) detectedPage = 'onboarding'
 
     return <CustomLoader page={detectedPage} fullscreen />

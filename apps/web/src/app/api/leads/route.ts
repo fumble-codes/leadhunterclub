@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import type { Lead } from '@prisma/client'
 import {
   requireFullyAuthorized,
   AuthRequiredError,
@@ -130,6 +131,46 @@ function externalPostToAppLead(
   }
 }
 
+function dbLeadToAppLead(
+  lead: Lead,
+  userState?: { isSaved: boolean; isRevealed: boolean; status: string } | null,
+): AppLead {
+  const isRevealed = userState?.isRevealed || false
+  const phone = lead.phone || null
+  const email = lead.email || ''
+
+  return {
+    id: lead.id,
+    name: isRevealed ? lead.name : 'Unlocked Contact',
+    email: isRevealed ? email : 'unlocked@leadhunterclub.com',
+    company: isRevealed ? lead.company : 'Confidential Client',
+    source: lead.source || 'Lead Signal',
+    category: lead.category || 'General',
+    title: lead.title,
+    signalContext: isRevealed ? lead.signalContext : sanitizePublicText(lead.signalContext || ''),
+    role: sanitizePublicText(lead.role || ''),
+    taskScope: sanitizePublicText(lead.taskScope || ''),
+    mustHave: sanitizePublicText(lead.mustHave || ''),
+    nicheBonus: sanitizePublicText(lead.nicheBonus || ''),
+    buyerType: sanitizePublicText(lead.buyerType || ''),
+    urgency: (lead.urgency as AppLead['urgency']) || 'medium',
+    winProb: (lead.winProb as AppLead['winProb']) || 'medium',
+    nicheTags: lead.nicheTags || [],
+    niches: lead.niches || [],
+    hashtags: lead.hashtags || [],
+    replyProbability: lead.replyProbability || 60,
+    accent: (lead.accent as AppLead['accent']) || 'mint',
+    status: (userState?.status || 'saved') as AppLead['status'],
+    timestamp: formatTimeAgo(lead.createdAt.toISOString()),
+    isSaved: userState?.isSaved ?? true,
+    isRevealed,
+    isClaimable: true,
+    hasPhone: !!phone,
+    revealCost: 1,
+    phone: isRevealed ? phone : null,
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const authUser = await requireFullyAuthorized(request)
@@ -165,15 +206,38 @@ export async function GET(request: NextRequest) {
     if (isSavedView || isOutreachView) {
       const userStates = await db.userLeadState.findMany({
         where: isSavedView
-          ? { userId, isSaved: true }
+          ? { userId, isSaved: true, isRevealed: true }
           : { userId, status: { in: ['drafting', 'sent', 'replied', 'follow-up'] } },
+        include: { lead: true },
       })
-      const results = await asyncMapConcurrent(
-        userStates,
-        (state) => getPost(state.leadId).then((p) => ({ post: p, state })),
-        10,
-      )
-      data = results.map((r) => externalPostToAppLead(r.post, r.state))
+      const statesNeedingFetch = userStates.filter((s) => !s.lead)
+      const fetchedMap = new Map<string, ExternalPost>()
+      if (statesNeedingFetch.length > 0) {
+        const fetched = await asyncMapConcurrent(
+          statesNeedingFetch,
+          async (state) => {
+            try {
+              const p = await getPost(state.leadId)
+              return { id: state.leadId, post: p }
+            } catch {
+              return null
+            }
+          },
+          10,
+        )
+        for (const f of fetched) {
+          if (f?.post) fetchedMap.set(f.id, f.post)
+        }
+      }
+      data = userStates
+        .map((s) => {
+          if (s.lead) {
+            return dbLeadToAppLead(s.lead, s)
+          }
+          const p = fetchedMap.get(s.leadId)
+          return p ? externalPostToAppLead(p, s) : null
+        })
+        .filter((l): l is AppLead => l !== null)
     } else {
       const externalRes = await getPosts({ page, perPage: pageSize, status: 'approved' })
       const externalLeads = externalRes.data.filter(isFeedEligible)
@@ -186,7 +250,10 @@ export async function GET(request: NextRequest) {
           : []
       const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
       data = externalLeads.map((lead) => externalPostToAppLead(lead, stateMap.get(lead.id)))
-      data = data.filter((l) => l.status === 'new')
+      const statusFilter = searchParams.get('status')
+      if (statusFilter) {
+        data = data.filter((l) => l.status === statusFilter)
+      }
     }
 
     if (search) {

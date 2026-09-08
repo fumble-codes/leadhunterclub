@@ -785,7 +785,7 @@ export default function HeroSection() {
       {/* ─── 1. Framed Island Card with Custom Wolf Artwork ─── */}
       <div
         ref={heroCardRef}
-        className="relative mx-auto w-full min-h-[520px] md:min-h-[580px] rounded-[24px] border border-white/[0.08] overflow-hidden flex items-center justify-center shadow-[0_25px_85px_-20px_rgba(0,0,0,0.85)] mb-12"
+        className="relative mx-auto w-full min-h-[460px] md:min-h-[500px] rounded-[22px] border border-white/[0.08] overflow-hidden flex items-center justify-center shadow-[0_25px_85px_-20px_rgba(0,0,0,0.85)] mb-10"
       >
         {/* Zooming Background Layer with Custom Wolf Artwork */}
         <motion.div
@@ -793,7 +793,7 @@ export default function HeroSection() {
           className="absolute inset-0 w-full h-full transform-gpu will-change-transform pointer-events-none"
         >
           <Image
-            src="/images/Hero image.png"
+            src="/images/hero image 2.png"
             alt="Wolf overlooking glowing client intent signals in the dark valley"
             fill
             priority
@@ -822,7 +822,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, ease }}
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[62px] font-semibold leading-[1.05] tracking-tight text-white mb-6 [text-wrap:balance]"
+            className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-semibold leading-[1.05] tracking-tight text-white mb-5 [text-wrap:balance]"
           >
             Stop looking for clients.
             <br />
@@ -899,7 +899,7 @@ export default function HeroSection() {
             </div>
 
             {/* App body */}
-            <div className="flex h-[560px] md:h-[600px] bg-bg-main overflow-hidden">
+            <div className="flex h-[480px] md:h-[510px] bg-bg-main overflow-hidden">
               {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
               <div className="w-[210px] lg:w-[215px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
                 <div className="px-5 mb-6 flex items-center gap-3">
@@ -978,9 +978,9 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* Bottom fade-out overlay (opaque gradient — no backdrop-blur to avoid GPU thrash during scroll) */}
-            <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-30">
-              <div className="absolute inset-0 bg-gradient-to-t from-page-bg via-page-bg/90 via-60% to-transparent pointer-events-none" />
+            {/* Bottom fade-out overlay (subtle edge blend) */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none z-30">
+              <div className="absolute inset-0 bg-gradient-to-t from-page-bg/80 to-transparent pointer-events-none" />
             </div>
           </div>
         </motion.div>

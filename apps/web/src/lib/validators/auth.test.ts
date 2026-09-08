@@ -59,13 +59,13 @@ describe('onboardingSchema', () => {
     discoverySource: 'Google Search',
   }
 
-  it('accepts a valid payload with at least one profile link', () => {
-    const result = onboardingSchema.safeParse({ ...validBase, portfolio: 'https://x.dev' })
+  it('accepts a valid payload with linkedin profile link', () => {
+    const result = onboardingSchema.safeParse({ ...validBase, linkedin: 'https://linkedin.com/in/jane' })
     expect(result.success).toBe(true)
   })
 
-  it('rejects when no profile link is provided', () => {
-    const result = onboardingSchema.safeParse({ ...validBase })
+  it('rejects when linkedin is missing even if other links are provided', () => {
+    const result = onboardingSchema.safeParse({ ...validBase, portfolio: 'https://x.dev' })
     expect(result.success).toBe(false)
   })
 
@@ -73,7 +73,7 @@ describe('onboardingSchema', () => {
     const result = onboardingSchema.safeParse({
       ...validBase,
       phone: '',
-      website: 'https://x.com',
+      linkedin: 'https://linkedin.com/in/jane',
     })
     expect(result.success).toBe(false)
   })

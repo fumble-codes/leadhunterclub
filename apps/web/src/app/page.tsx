@@ -55,15 +55,15 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden max-w-[1296px] mx-auto px-4 sm:px-6 md:px-8">
+    <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden max-w-[1100px] mx-auto px-4 sm:px-6">
       <HeroSection />
 
       {/* Precision Beam Divider */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
 
       {/* Problem & How It Works (Bento Grid) */}
-      <section id="funnel" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative">
-        <div className="text-center mb-12 md:mb-14 relative z-10">
+      <section id="funnel" className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto relative">
+        <div className="text-center mb-10 md:mb-12 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.15] max-w-3xl mx-auto"
+            className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight mb-3 leading-[1.15] max-w-2xl mx-auto"
           >
             From Raw Signal
             <br />
@@ -309,7 +309,7 @@ export default function LandingPage() {
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <section
         id="philosophy"
-        className="py-20 md:py-28 px-4 sm:px-6 max-w-[1200px] mx-auto relative"
+        className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto relative"
       >
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-14 relative z-10 max-w-3xl mx-auto">
@@ -329,7 +329,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight mb-4 leading-[1.15] text-text-primary"
+            className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight mb-4 leading-[1.15] text-text-primary"
           >
             Most lead tools chase volume.
             <br />
@@ -416,6 +416,9 @@ export default function LandingPage() {
           <LeadOutreachFlowchart />
         </motion.div>
       </section>
+      {/* Testimonials */}
+      <TestimonialsSection />
+
       {/* Product Capabilities */}
       <FeaturesSection />
 
@@ -425,14 +428,12 @@ export default function LandingPage() {
       {/* Who It's For */}
       <WhoItsForGrid />
 
-      {/* Testimonials */}
-      <TestimonialsSection />
 
       {/* Pricing */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <section
         id="pricing"
-        className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto relative overflow-hidden"
+        className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto relative overflow-hidden"
       >
         {/* Header */}
         <div className="text-center mb-12 md:mb-14 relative z-10">
@@ -628,7 +629,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-20 md:py-24 px-6 max-w-[800px] mx-auto">
+      <section id="faq" className="py-16 md:py-20 px-4 sm:px-6 max-w-[800px] mx-auto">
         <div className="text-center mb-10">
           <span className="text-sm font-semibold text-accent-orange mb-3 block">
             FAQ
@@ -665,13 +666,13 @@ export default function LandingPage() {
 
       {/* Final CTA */}
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
-      <section className="py-20 md:py-24 px-6 max-w-[1000px] mx-auto text-center relative overflow-hidden">
+      <section className="py-16 md:py-20 px-4 sm:px-6 max-w-[1000px] mx-auto text-center relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease }}
-          className="relative z-10 p-10 md:p-14 rounded-3xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
+          className="relative z-10 p-8 md:p-12 rounded-3xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] bg-gradient-to-b from-code-bg-dark to-page-bg overflow-hidden"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--rgb-white),0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
@@ -733,7 +734,7 @@ export default function LandingPage() {
       <div className="w-full h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <footer className="relative overflow-hidden">
         {/* Main footer content */}
-        <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12 relative z-10">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 pt-16 pb-12 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-20">
             {/* Brand Column */}
             <div className="md:col-span-4">

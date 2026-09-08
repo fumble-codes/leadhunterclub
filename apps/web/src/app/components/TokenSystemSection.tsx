@@ -178,7 +178,7 @@ export default function TokenSystemSection() {
   const activeCardIndex = leads.findIndex((l) => l.id === activeCardId)
 
   return (
-    <section id="tokens" className="py-20 md:py-24 px-6 max-w-[1200px] mx-auto overflow-hidden">
+    <section id="tokens" className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto overflow-hidden">
       {/* Centered Header Section with Big Eyebrow */}
       <div className="text-center mb-12 md:mb-14 max-w-4xl mx-auto space-y-4">
         <span className="text-sm font-semibold text-accent-orange mb-3 block">
@@ -272,13 +272,13 @@ export default function TokenSystemSection() {
                         <span>
                           {lead.company} ({lead.source})
                         </span>
-                        {lead.isLocked ? (
-                          <span className="text-[10px] text-badge-amber font-bold uppercase tracking-wider">
-                            Locked
-                          </span>
-                        ) : (
+                        {lead.isRevealed ? (
                           <span className="text-[10px] text-text-secondary hover:text-text-primary transition-colors font-bold uppercase tracking-wider">
                             Revealed
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-badge-amber font-bold uppercase tracking-wider">
+                            Locked
                           </span>
                         )}
                       </button>

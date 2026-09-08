@@ -8,6 +8,7 @@ import {
   OnboardingRequiredError,
 } from '@/lib/auth'
 import { getPost } from '@/lib/external-api/client'
+import type { ExternalPost } from '@/lib/external-api/client'
 import { updateLeadSchema } from '@/lib/validators/auth'
 import type { AppLead } from '@/types/lead'
 import { extractNiches, sanitizePublicText, extractCleanNicheTags, sanitizeHeadline } from '@/lib/claim-reveal'
@@ -261,21 +262,27 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     if (isSaved === true || (status && status !== 'new')) {
-      try {
-        await ensureLeadRecord()
-      } catch (e) {
-        console.warn('[Lead PATCH] ensureLeadRecord failed, creating fallback Lead:', e)
-        await db.lead.upsert({
-          where: { id: params.id },
-          update: {},
-          create: {
-            id: params.id,
-            name: 'Unknown', email: '', company: '', source: '', category: '',
-            title: '', signalContext: '', role: '', taskScope: '', mustHave: '',
-            nicheBonus: '', buyerType: '', urgency: 'medium', winProb: 'medium',
-            nicheTags: [], niches: [], hashtags: [], replyProbability: 0, accent: 'mint',
-          },
-        })
+      const existing = await db.lead.findUnique({
+        where: { id: params.id },
+        select: { id: true },
+      })
+      if (!existing) {
+        try {
+          await ensureLeadRecord()
+        } catch (e) {
+          console.warn('[Lead PATCH] ensureLeadRecord failed, creating fallback Lead:', e)
+          await db.lead.upsert({
+            where: { id: params.id },
+            update: {},
+            create: {
+              id: params.id,
+              name: 'Unknown', email: '', company: '', source: '', category: '',
+              title: '', signalContext: '', role: '', taskScope: '', mustHave: '',
+              nicheBonus: '', buyerType: '', urgency: 'medium', winProb: 'medium',
+              nicheTags: [], niches: [], hashtags: [], replyProbability: 0, accent: 'mint',
+            },
+          })
+        }
       }
     }
 

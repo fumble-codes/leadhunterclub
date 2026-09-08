@@ -10,10 +10,10 @@ import { useAuth } from '@/hooks/useAuth'
 
 const navLinks = [
   { name: 'How It Works', href: '/#funnel' },
+  { name: 'Reviews', href: '/#testimonials' },
   { name: 'Features', href: '/#features' },
   { name: 'Pricing', href: '/#pricing' },
   { name: 'FAQ', href: '/#faq' },
-  { name: 'Reviews', href: '/reviews' },
 ]
 
 const ease = [0.16, 1, 0.3, 1] as const
@@ -38,7 +38,7 @@ export default function Navbar() {
 
   // Active hash sync using Intersection Observer
   useEffect(() => {
-    const sections = ['funnel', 'features', 'pricing', 'faq']
+    const sections = ['funnel', 'testimonials', 'features', 'pricing', 'faq']
     const observerOptions = {
       root: null,
       rootMargin: '-40% 0px -50% 0px',
@@ -110,9 +110,9 @@ export default function Navbar() {
           className={`flex items-center justify-between w-full transition-all duration-500 ease-out ${
             isScrolled
               ? isHovered
-                ? 'max-w-[1296px] bg-background/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] rounded-2xl px-5 py-3'
+                ? 'max-w-[1100px] bg-background/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] rounded-2xl px-5 py-3'
                 : 'max-w-[760px] bg-background/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.6)] rounded-full px-5 py-2.5'
-              : 'max-w-[1296px] bg-transparent border border-transparent rounded-2xl px-5 py-3'
+              : 'max-w-[1100px] bg-transparent border border-transparent rounded-2xl px-5 py-3'
           }`}
         >
           {/* Left: Brand */}
@@ -139,20 +139,20 @@ export default function Navbar() {
                  const isHash = link.href.includes('#')
                  const hashPart = isHash ? link.href.substring(link.href.indexOf('#')) : ''
                  const isActive = isHash 
-                   ? (pathname === '/' && activeHash === hashPart)
+                   ? (pathname === '/' ? activeHash === hashPart : (hashPart === '#testimonials' && (pathname === '/reviews' || pathname === '/wall-of-love')))
                    : pathname === link.href
                  return (
-                   <Link
-                     key={link.name}
-                     href={link.href}
-                     className={`relative px-4 py-2 text-[13px] font-medium transition-all duration-300 tracking-wide rounded-lg whitespace-nowrap ${
-                       isActive
-                         ? 'text-accent-orange bg-accent-orange/[0.04]'
-                         : 'text-text-secondary/70 hover:text-text-primary hover:bg-white/[0.04]'
-                     }`}
-                   >
-                     {link.name}
-                   </Link>
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className={`relative px-4 py-2 text-[13px] font-medium transition-colors duration-300 tracking-wide whitespace-nowrap ${
+                        isActive
+                          ? 'text-accent-orange'
+                          : 'text-text-secondary/70 hover:text-text-primary'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
                  )
                })}
             </div>

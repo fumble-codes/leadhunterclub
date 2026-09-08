@@ -3,923 +3,505 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  AdjustmentsHorizontalIcon,
-  PaperAirplaneIcon,
-  GlobeAltIcon,
-  BanknotesIcon,
-  SparklesIcon,
-  CodeBracketIcon,
-  PaintBrushIcon,
-  ChartBarIcon,
-  ArrowRightIcon,
   CheckIcon,
-  PlayIcon,
+  SparklesIcon,
+  GlobeAltIcon,
+  BoltIcon,
+  ArrowRightIcon,
+  BookmarkIcon,
+  PaperAirplaneIcon,
+  ChatBubbleLeftRightIcon,
+  BanknotesIcon,
+  CheckCircleIcon,
+  UserIcon,
 } from '@heroicons/react/24/solid'
+import { Card } from '@/components/ui/Card'
 
-const ease = [0.16, 1, 0.3, 1] as const
+const springTransition = { type: 'spring', stiffness: 320, damping: 32 } as const
 
 interface CapabilityCard {
   id: string
   indexStr: string
   shortLabel: string
-  tag: string
   title: string
   description: string
-  duration: string
-  browserRoute: string
-  videoUrl?: string
-  videoPoster?: string
+  tag: string
 }
 
-// ─── Telemetry Chip Scatter Pattern for Collapsed Cards ────────────────────────
-function TelemetryChipScatter({ index }: { index: number }) {
-  const telemetryData = [
+// ─── Floating Amber Mosaic Tiles for Inactive Cards (Parley Homage) ────────────
+function AmberMosaicScatter({ cardIndex }: { cardIndex: number }) {
+  const tilePatterns = [
+    // 01. Scatter
     [
-      { label: 'X', val: '2m ago', active: true },
-      { label: 'Li', val: '5m ago', active: true },
-      { label: 'R', val: '8m ago', active: true },
+      { top: '22%', left: '48%', size: 'w-4 h-4', opacity: 'bg-accent-orange/80' },
+      { top: '36%', left: '32%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-400/40' },
+      { top: '46%', left: '60%', size: 'w-3 h-3', opacity: 'bg-accent-orange/60' },
+      { top: '60%', left: '40%', size: 'w-4 h-4', opacity: 'bg-accent-orange/90' },
+      { top: '70%', left: '62%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-500/70' },
     ],
+    // 02. Scatter
     [
-      { label: 'INTENT', val: '98%', active: true },
-      { label: 'BUDGET', val: 'HIGH', active: true },
-      { label: 'URGENCY', val: 'CRIT', active: true },
+      { top: '20%', left: '38%', size: 'w-3.5 h-3.5', opacity: 'bg-accent-orange/85' },
+      { top: '30%', left: '56%', size: 'w-4 h-4', opacity: 'bg-amber-400/50' },
+      { top: '44%', left: '30%', size: 'w-3 h-3', opacity: 'bg-accent-orange/70' },
+      { top: '56%', left: '64%', size: 'w-4 h-4', opacity: 'bg-accent-orange/90' },
+      { top: '68%', left: '44%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-500/60' },
     ],
+    // 03. Scatter
     [
-      { label: '01', val: 'REVEAL', active: true },
-      { label: '02', val: 'SAVED', active: true },
-      { label: '03', val: 'CONTACT', active: true },
+      { top: '20%', left: '55%', size: 'w-3.5 h-3.5', opacity: 'bg-accent-orange/80' },
+      { top: '32%', left: '30%', size: 'w-4 h-4', opacity: 'bg-accent-orange/90' },
+      { top: '36%', left: '68%', size: 'w-3 h-3', opacity: 'bg-amber-400/40' },
+      { top: '48%', left: '45%', size: 'w-4 h-4', opacity: 'bg-amber-500/80' },
+      { top: '54%', left: '20%', size: 'w-3.5 h-3.5', opacity: 'bg-accent-orange/70' },
+      { top: '62%', left: '36%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-400/50' },
+      { top: '60%', left: '72%', size: 'w-3 h-3', opacity: 'bg-accent-orange/60' },
+      { top: '72%', left: '50%', size: 'w-4 h-4', opacity: 'bg-accent-orange/85' },
     ],
+    // 04. Scatter
     [
-      { label: 'CRD', val: '500', active: true },
-      { label: 'PLAN', val: 'PRO', active: true },
-      { label: 'ROLL', val: '100%', active: true },
+      { top: '20%', left: '60%', size: 'w-3.5 h-3.5', opacity: 'bg-accent-orange/85' },
+      { top: '28%', left: '35%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-400/60' },
+      { top: '36%', left: '60%', size: 'w-4 h-4', opacity: 'bg-accent-orange/50' },
+      { top: '48%', left: '48%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-500/70' },
+      { top: '55%', left: '68%', size: 'w-4 h-4', opacity: 'bg-accent-orange/90' },
+      { top: '66%', left: '26%', size: 'w-3.5 h-3.5', opacity: 'bg-accent-orange/80' },
+      { top: '70%', left: '52%', size: 'w-3.5 h-3.5', opacity: 'bg-amber-400/75' },
+      { top: '70%', left: '78%', size: 'w-3.5 h-3.5', opacity: 'bg-accent-orange/60' },
     ],
   ]
 
-  const items = telemetryData[index] || telemetryData[0]
+  const tiles = tilePatterns[cardIndex % tilePatterns.length]
 
   return (
-    <div className="w-full flex flex-col gap-1.5 z-10 px-0.5 select-none pointer-events-none">
-      {items.map((item, i) => (
-        <div
+    <div className="relative w-full h-44 my-auto select-none pointer-events-none">
+      {tiles.map((tile, i) => (
+        <motion.div
           key={i}
-          className="flex items-center justify-between px-2 py-1 rounded-md bg-[#090A0F] border border-white/[0.08] text-[8px] font-mono group-hover:border-white/15 transition-colors"
-        >
-          <span className="font-bold text-white/50 group-hover:text-white/80 transition-colors">
-            {item.label}
-          </span>
-          <span
-            className={`font-semibold tracking-wider ${
-              item.active ? 'text-accent-orange/90' : 'text-text-secondary/40'
-            }`}
-          >
-            {item.val}
-          </span>
-        </div>
+          initial={{ opacity: 0.7, scale: 0.95 }}
+          animate={{
+            opacity: [0.7, 1, 0.7],
+            scale: [0.95, 1.05, 0.95],
+          }}
+          transition={{
+            duration: 3.5 + i * 0.4,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: i * 0.2,
+          }}
+          style={{ top: tile.top, left: tile.left }}
+          className={`absolute ${tile.size} ${tile.opacity} rounded-sm shadow-[0_2px_8px_rgba(255,107,0,0.25)]`}
+        />
       ))}
     </div>
   )
 }
 
-// ─── Card 1 Visual: Live Multi-Platform Notifications ─────────────────────────
-function FreshLeadsVisual({
-  className = '',
-  hoveredPlatform,
-  maxItems = 3,
-}: {
-  className?: string
-  hoveredPlatform: string | null
-  maxItems?: number
-}) {
-  const [hoveredNotif, setHoveredNotif] = React.useState<number | null>(null)
-  const notifications = [
+// ─── Visual 1: Fresh Daily Leads Interceptor Visual ───────────────────────────
+function FreshLeadsInteractiveVisual() {
+  const [activePlatform, setActivePlatform] = useState<'All' | 'Twitter' | 'Reddit' | 'LinkedIn'>('All')
+
+  const leads = [
     {
-      name: 'Sarah K.',
-      signal: 'Looking for Shopify dev',
+      platform: 'Twitter / X',
       time: '2m ago',
+      title: 'Looking for a Shopify Plus developer to rebuild checkout before Black Friday ($6,500)',
+      budget: '$6.5k',
+      intent: '98%',
+      user: '@david_dtc',
+      badgeClass: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+    },
+    {
       platform: 'Reddit',
-      key: 'R',
-    },
-    {
-      name: 'James T.',
-      signal: 'Help with conversion rates',
       time: '5m ago',
-      platform: 'Twitter/X',
-      key: 'X',
+      title: 'Our agency is scaling to $100k/mo and desperately needs an Apollo & Clay cold email RevOps setup',
+      budget: 'High',
+      intent: '95%',
+      user: 'u/growth_founder',
+      badgeClass: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
     },
     {
-      name: 'Priya M.',
-      signal: 'Searching for brand designer',
-      time: '8m ago',
       platform: 'LinkedIn',
-      key: 'Li',
+      time: '11m ago',
+      title: 'Hiring a senior Next.js 15 contract engineer to optimize our Core Web Vitals score',
+      budget: '$8k/mo',
+      intent: '92%',
+      user: 'Sarah M. (CTO)',
+      badgeClass: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
     },
-    {
-      name: 'David L.',
-      signal: 'Website redesign ASAP',
-      time: '12m ago',
-      platform: 'Threads',
-      key: 'Th',
-    },
-  ].slice(0, maxItems)
+  ]
+
+  const filtered = activePlatform === 'All' 
+    ? leads 
+    : leads.filter(l => l.platform.toLowerCase().includes(activePlatform.toLowerCase()))
 
   return (
-    <div className={`w-full flex flex-col justify-center gap-2 ${className}`}>
-      {notifications.map((notif, i) => {
-        const isPlatformHighlighted = hoveredPlatform === notif.key
-        const isSelfHovered = hoveredNotif === i
-        return (
+    <div className="w-full h-full p-4 flex flex-col justify-between bg-[#0B0D14] rounded-xl border border-white/[0.08] shadow-inner relative overflow-hidden">
+      {/* Platform Filter Controls */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-accent-orange animate-pulse" />
+          <span className="text-[10px] font-mono font-bold tracking-wider text-accent-orange uppercase">
+            REAL-TIME RADAR
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {(['All', 'Twitter', 'Reddit', 'LinkedIn'] as const).map((p) => (
+            <button
+              key={p}
+              onClick={() => setActivePlatform(p)}
+              className={`px-2 py-0.5 rounded-full text-[9px] font-mono transition-all ${
+                activePlatform === p
+                  ? 'bg-accent-orange text-black font-bold shadow-sm'
+                  : 'bg-white/5 text-text-secondary/70 hover:text-white'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Leads List */}
+      <div className="space-y-2 my-auto">
+        {filtered.map((lead, i) => (
           <motion.div
-            key={notif.name}
-            onMouseEnter={() => setHoveredNotif(i)}
-            onMouseLeave={() => setHoveredNotif(null)}
-            className={`p-2.5 rounded-xl bg-[#11141D] border transition-all duration-300 flex items-center gap-2.5 relative overflow-hidden ${
-              isSelfHovered
-                ? 'border-border-subtle bg-[#161B26] shadow-[0_8px_24px_rgba(0,0,0,0.6)] -translate-y-0.5'
-                : isPlatformHighlighted
-                  ? 'border-accent-orange/50 bg-[#141824] shadow-[0_4px_16px_rgba(244,141,22,0.15)] scale-102'
-                  : 'border-white/[0.07]'
-            }`}
-          >
-            <div className="w-7 h-7 rounded-full bg-accent-purple/15 border border-accent-purple/30 flex items-center justify-center shrink-0">
-              <span className="text-[9.5px] font-bold text-accent-purple">
-                {notif.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-1.5">
-                <span className="text-[10.5px] font-bold text-text-primary truncate">
-                  {notif.name}
-                </span>
-                <span className="text-[8.5px] text-text-secondary/50 font-mono shrink-0">
-                  {notif.time}
-                </span>
-              </div>
-              <p className="text-[9.5px] text-text-secondary/80 truncate">{notif.signal}</p>
-            </div>
-            <div
-              className={`px-1.5 py-0.5 rounded text-[7.5px] font-bold uppercase tracking-wider shrink-0 transition-colors duration-300 ${
-                isPlatformHighlighted
-                  ? 'bg-accent-orange text-text-on-accent'
-                  : 'bg-white/5 border border-white/[0.08] text-text-secondary/70'
-              }`}
-            >
-              {notif.platform}
-            </div>
-
-            {/* Slide-in qualify indicator on hover */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: isSelfHovered ? 0 : '100%' }}
-              transition={{ duration: 0.2, ease }}
-              className="absolute inset-y-0 right-0 w-[68px] bg-accent-orange flex items-center justify-center cursor-pointer font-bold text-[8px] text-text-on-accent uppercase tracking-wider"
-            >
-              Qualify →
-            </motion.div>
-          </motion.div>
-        )
-      })}
-      <div className="flex items-center gap-1.5 mt-0.5 ml-1">
-        <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
-        <span className="text-[8.5px] text-accent-orange/90 font-bold uppercase tracking-widest font-mono">
-          Live Signal Feed
-        </span>
-      </div>
-    </div>
-  )
-}
-
-// ─── Platform Radar Visual ───────────────────────────────────────────────────
-function PlatformNetworkVisual({
-  className = '',
-  hoveredPlatform,
-  onHoverPlatform,
-}: {
-  className?: string
-  hoveredPlatform: string | null
-  onHoverPlatform: (p: string | null) => void
-}) {
-  const platforms = [
-    {
-      name: 'X',
-      x: '50%',
-      y: '16%',
-      size: 32,
-      delay: 0,
-      tooltip: 'Twitter/X feed active',
-      icon: (
-        <svg className="w-3 h-3 fill-current text-white" viewBox="0 0 24 24">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Li',
-      x: '16%',
-      y: '56%',
-      size: 34,
-      delay: 0.8,
-      tooltip: 'LinkedIn intent stream',
-      icon: (
-        <svg className="w-3.5 h-3.5 fill-current text-[#0A66C2]" viewBox="0 0 24 24">
-          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'R',
-      x: '84%',
-      y: '52%',
-      size: 32,
-      delay: 1.2,
-      tooltip: 'Reddit hiring threads',
-      icon: (
-        <svg className="w-3.5 h-3.5 fill-current text-[#FF4500]" viewBox="0 0 24 24">
-          <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 0-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.203-.094z" />
-        </svg>
-      ),
-    },
-    {
-      name: 'Th',
-      x: '54%',
-      y: '82%',
-      size: 30,
-      delay: 1.8,
-      tooltip: 'Threads query parser',
-      icon: <span className="text-[10px] font-black text-white">@</span>,
-    },
-  ]
-
-  return (
-    <div className={`relative aspect-[190/160] w-full max-w-[190px] mx-auto ${className}`}>
-      {/* Center hub */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-accent-orange/15 border border-accent-orange/30 flex items-center justify-center z-20 shadow-md">
-        <AdjustmentsHorizontalIcon className="w-3.5 h-3.5 text-accent-orange" />
-      </div>
-
-      {/* Connection lines */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 190 160">
-        {[
-          { x1: 95, y1: 80, x2: 95, y2: 25 },
-          { x1: 95, y1: 80, x2: 30, y2: 90 },
-          { x1: 95, y1: 80, x2: 160, y2: 83 },
-          { x1: 95, y1: 80, x2: 103, y2: 131 },
-        ].map((line, i) => (
-          <line
             key={i}
-            x1={line.x1}
-            y1={line.y1}
-            x2={line.x2}
-            y2={line.y2}
-            stroke="rgba(255, 255, 255, 0.12)"
-            strokeWidth="1"
-            strokeDasharray="3 3"
-          />
-        ))}
-      </svg>
-
-      {/* Platform nodes */}
-      {platforms.map((p) => {
-        const isHovered = hoveredPlatform === p.name
-        return (
-          <div
-            key={p.name}
-            onMouseEnter={() => onHoverPlatform(p.name)}
-            onMouseLeave={() => onHoverPlatform(null)}
-            className="absolute z-20 cursor-pointer"
-            style={{ left: p.x, top: p.y, transform: 'translate(-50%, -50%)' }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: i * 0.05 }}
+            className="p-2.5 rounded-lg bg-surface-secondary/60 border border-white/[0.06] hover:border-white/15 transition-all flex flex-col gap-1"
           >
-            <motion.div
-              className={`rounded-full flex items-center justify-center transition-all duration-300 ${
-                isHovered
-                  ? 'border-accent-orange bg-[#1B1F2C] scale-110 shadow-[0_0_15px_rgba(244,141,22,0.35)]'
-                  : 'bg-[#10131B] border border-white/10 hover:border-white/30'
-              }`}
-              style={{ width: p.size, height: p.size }}
-            >
-              {p.icon}
-            </motion.div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className={`text-[9px] font-mono px-2 py-0.5 rounded-full border font-medium ${lead.badgeClass}`}>
+                  {lead.platform}
+                </span>
+                <span className="text-[9px] font-mono text-text-secondary/60">{lead.user}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-mono font-bold text-accent-mint">{lead.intent} INTENT</span>
+                <span className="text-[9px] font-mono text-text-secondary/50">{lead.time}</span>
+              </div>
+            </div>
+            <p className="text-xs text-text-primary/95 font-medium leading-snug line-clamp-1 mt-0.5">
+              {lead.title}
+            </p>
+          </motion.div>
+        ))}
+      </div>
 
-            {/* Tooltip */}
-            <AnimatePresence>
-              {isHovered && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                  className="absolute bottom-[115%] left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-surface border border-border-subtle text-[7.5px] text-text-primary font-bold tracking-wide uppercase whitespace-nowrap z-30 shadow-lg pointer-events-none"
-                >
-                  {p.tooltip}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )
-      })}
+      {/* Footer */}
+      <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-[10px] font-mono text-text-secondary/60">
+        <span>3,480 SIGNALS / HR</span>
+        <span className="text-accent-orange font-medium">SUB-SECOND LATENCY</span>
+      </div>
     </div>
   )
 }
 
-// ─── Card 2 Visual: Lead Intel Dossier & Revealed Contacts ────────────────────
-function LeadIntelVisual({
-  className = '',
-  emailStatus,
-}: {
-  className?: string
-  emailStatus: 'idle' | 'sending' | 'sent'
-}) {
-  const metrics = [
-    {
-      label: 'Intent Score',
-      value: emailStatus === 'sent' ? '98%' : '94%',
-      width: emailStatus === 'sent' ? '98%' : '94%',
-      color: 'bg-accent-orange',
-    },
-    {
-      label: 'Budget Signal',
-      value: 'High',
-      width: '85%',
-      color: 'bg-accent-orange/85',
-    },
-    {
-      label: 'Urgency Level',
-      value: emailStatus === 'sent' ? 'Handled' : 'Critical',
-      width: emailStatus === 'sent' ? '100%' : '92%',
-      color: 'bg-accent-orange/75',
-    },
-  ]
+// ─── Visual 2: Lead Intelligence with Revealed Contacts (Parley Plan Style) ─────
+function LeadIntelligenceInteractiveVisual() {
+  const [revealed, setRevealed] = useState(true)
+  const [checklist, setChecklist] = useState([
+    { label: 'Budget Verified: $8,000+ confirmed via funding signal', done: true },
+    { label: 'Decision Maker Identified: Alex K. (Head of Growth)', done: true },
+    { label: 'Verified Direct Email & Mobile: a.k***@vanguard.io', done: true },
+    { label: 'Pain Point: Scaling CAC on Meta/TikTok in Q4', done: true },
+    { label: 'Outreach Angle Generated & Saved to Pipeline', done: true },
+  ])
+
+  const toggleCheck = (index: number) => {
+    setChecklist((prev) =>
+      prev.map((item, idx) => (idx === index ? { ...item, done: !item.done } : item))
+    )
+  }
 
   return (
-    <div className={`w-full flex flex-col justify-center gap-2.5 ${className}`}>
-      {/* Lead profile box */}
-      <div className="p-3.5 rounded-xl bg-[#11141E] border border-white/[0.08] shadow-lg">
-        <div className="flex items-center gap-2.5 mb-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#181D29] border border-border-subtle flex items-center justify-center shrink-0">
-            <span className="text-[10px] font-bold text-accent-orange">AK</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-bold text-text-primary truncate">Alex K.</span>
-              <span className="px-1.5 py-0.2 rounded bg-accent-orange/15 border border-accent-orange/30 text-accent-orange text-[7.5px] font-bold tracking-wider uppercase">
-                15 Signals
-              </span>
+    <div className="w-full h-full p-4 sm:p-5 flex flex-col justify-between bg-[#0B0D14] rounded-xl border border-white/[0.08] shadow-inner relative overflow-hidden">
+      {/* Floating Card inside (Parley Checklist Homage with LHC Content) */}
+      <div className="max-w-md w-full mx-auto p-4 rounded-xl bg-gradient-to-b from-[#141724] to-[#0E1018] border border-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.7)] my-auto">
+        {/* Top Profile Header */}
+        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/[0.08]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full bg-accent-orange/15 border border-accent-orange/30 flex items-center justify-center text-accent-orange font-bold text-xs">
+              AK
             </div>
-            <p className="text-[8.5px] text-text-secondary/70 truncate">Founder @ Direct Commerce Co.</p>
+            <div>
+              <div className="text-xs font-bold text-text-primary leading-none">Alex K.</div>
+              <div className="text-[10px] text-text-secondary/70 mt-0.5">Vanguard DTC • Shopify Plus</div>
+            </div>
           </div>
-          <span
-            className={`px-1.5 py-0.5 rounded text-[7.5px] font-bold uppercase tracking-wider ${
-              emailStatus === 'sent'
-                ? 'bg-accent-orange text-text-on-accent'
-                : 'bg-white/5 border border-white/[0.08] text-text-secondary/70'
-            }`}
-          >
-            {emailStatus === 'sent' ? 'Saved' : 'Verified'}
+          <span className="text-[9px] font-mono text-accent-orange/90 bg-accent-orange/10 px-2 py-0.5 rounded-full border border-accent-orange/20 font-bold">
+            INTEL REVEALED
           </span>
         </div>
 
-        {/* Metric bars */}
-        <div className="space-y-2">
-          {metrics.map((m) => (
-            <div key={m.label} className="space-y-0.5">
-              <div className="flex justify-between text-[8.5px]">
-                <span className="text-text-secondary/70">{m.label}</span>
-                <span className="text-text-primary font-mono font-bold">{m.value}</span>
+        {/* Action / Intel Checklist */}
+        <div className="space-y-1.5">
+          {checklist.map((item, idx) => (
+            <div
+              key={idx}
+              onClick={() => toggleCheck(idx)}
+              className="flex items-center gap-2.5 cursor-pointer group py-0.5 select-none"
+            >
+              <div
+                className={`w-4 h-4 rounded flex items-center justify-center transition-all ${
+                  item.done
+                    ? 'bg-accent-orange text-black font-bold shadow-[0_0_8px_rgba(255,107,0,0.4)]'
+                    : 'border border-white/25 group-hover:border-white/50 bg-white/5'
+                }`}
+              >
+                {item.done && <CheckIcon className="w-3 h-3 stroke-[3]" />}
               </div>
-              <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: '10%' }}
-                  animate={{ width: m.width }}
-                  transition={{ duration: 0.8, ease }}
-                  className={`h-full ${m.color} rounded-full`}
-                />
-              </div>
+              <span
+                className={`text-xs transition-colors truncate ${
+                  item.done
+                    ? 'text-text-primary font-medium'
+                    : 'text-text-secondary/60 group-hover:text-text-secondary'
+                }`}
+              >
+                {item.label}
+              </span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* AI Context snippet */}
-      <div className="p-2.5 rounded-lg bg-[#141824]/90 border border-border-subtle shadow-sm">
-        <div className="text-[8px] text-accent-orange font-bold uppercase tracking-widest mb-0.5 flex items-center gap-1">
-          <GlobeAltIcon className="w-2.5 h-2.5" /> Context Analysis
-        </div>
-        <p className="text-[9px] text-text-secondary/80 leading-relaxed">
-          {emailStatus === 'sent'
-            ? 'Verified email and direct phone revealed. Pinned to your active pipeline.'
-            : 'Posted about high checkout drop-offs 2h ago. Actively vetting conversion specialists.'}
-        </p>
+      {/* Bottom status */}
+      <div className="flex items-center justify-between text-[10px] font-mono text-text-secondary/60 pt-2 border-t border-white/[0.06]">
+        <span>VERIFIED ENRICHMENT</span>
+        <span className="text-accent-mint font-medium">100% DELIVERABLE</span>
       </div>
     </div>
   )
 }
 
-function EmailComposeVisual({
-  className = '',
-  emailStatus,
-  onSend,
-}: {
-  className?: string
-  emailStatus: 'idle' | 'sending' | 'sent'
-  onSend: () => void
-}) {
-  return (
-    <div className={`w-full overflow-hidden ${className}`}>
-      <div
-        className={`w-full rounded-xl bg-[#11141E] border transition-all duration-300 flex flex-col justify-between p-3.5 min-h-[210px] shadow-lg ${
-          emailStatus === 'sent'
-            ? 'border-accent-orange/50 shadow-[0_8px_24px_rgba(244,141,22,0.15)]'
-            : 'border-white/[0.08]'
-        }`}
-      >
-        <div>
-          {/* Card header */}
-          <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-white/[0.06]">
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/70" />
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70" />
-              <span className="text-[8.5px] text-text-secondary/60 font-mono ml-1">
-                Contact Dossier
-              </span>
-            </div>
-            <span className="text-[8px] font-bold text-accent-orange uppercase tracking-wider">
-              Unlocked
-            </span>
-          </div>
+// ─── Visual 3: Track Every Touch (Pipeline Stages) ────────────────────────────
+function TrackEveryTouchInteractiveVisual() {
+  const [currentStage, setCurrentStage] = useState<number>(2) // Contacted by default
 
-          {/* Contact rows */}
-          <div className="space-y-1.5 text-[9.5px] font-mono mb-2.5">
-            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[#0A0C12] border border-white/[0.05]">
-              <span className="text-text-secondary/60">Email:</span>
-              <span className="text-text-primary font-medium truncate">alex.k@shopifybrand.com</span>
-            </div>
-            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-[#0A0C12] border border-white/[0.05]">
-              <span className="text-text-secondary/60">Phone:</span>
-              <span className="text-text-primary font-medium truncate">+1 (555) 012-3456</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Action button */}
-        <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
-          <span className="text-[8px] text-text-secondary/50 font-mono">
-            {emailStatus === 'sending' ? 'Saving...' : emailStatus === 'sent' ? 'In Pipeline' : 'Ready to save'}
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onSend()
-            }}
-            disabled={emailStatus !== 'idle'}
-            className={`px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all duration-200 ${
-              emailStatus === 'sending'
-                ? 'bg-white/10 text-white/50 cursor-wait'
-                : emailStatus === 'sent'
-                  ? 'bg-accent-orange text-text-on-accent cursor-default shadow-sm'
-                  : 'bg-accent-orange hover:bg-accent-orange/90 text-text-on-accent cursor-pointer hover:scale-102 shadow-sm'
-            }`}
-          >
-            {emailStatus === 'sending' ? (
-              <span className="w-2.5 h-2.5 rounded-full border border-t-transparent border-white animate-spin" />
-            ) : emailStatus === 'sent' ? (
-              <>
-                <CheckIcon className="w-2.5 h-2.5" /> Saved
-              </>
-            ) : (
-              <>
-                <PaperAirplaneIcon className="w-2.5 h-2.5" /> Save to Pipeline
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─── Card 3 Visual: Pipeline Touchpoint Timeline & Context ─────────────────────
-function FollowUpTimelineVisual({
-  className = '',
-  selectedStep,
-  onSelectStep,
-}: {
-  className?: string
-  selectedStep: number
-  onSelectStep: (idx: number) => void
-}) {
-  const steps = [
-    { day: '01', stage: 'Revealed', action: 'Contact Unlocked', status: 'done' },
-    { day: '02', stage: 'Saved', action: 'Added to Pipeline', status: 'done' },
-    { day: '03', stage: 'Contacted', action: 'Direct Touchpoint', status: 'active' },
-    { day: '04', stage: 'Replied', action: 'Conversation Open', status: 'pending' },
+  const stages = [
+    { label: 'Revealed', count: '18 leads', icon: SparklesIcon, desc: 'Contacts unlocked' },
+    { label: 'Saved', count: '12 leads', icon: BookmarkIcon, desc: 'Added to target list' },
+    { label: 'Contacted', count: '7 leads', icon: PaperAirplaneIcon, desc: 'Outreach dispatched' },
+    { label: 'Replied', count: '4 deals', icon: ChatBubbleLeftRightIcon, desc: 'Conversation active' },
   ]
 
   return (
-    <div className={`w-full flex flex-col justify-center ${className}`}>
-      <div className="space-y-2 relative">
-        {/* Connecting spine */}
-        <div className="absolute left-[13px] top-3 bottom-3 w-px bg-white/[0.12]" />
+    <div className="w-full h-full p-4 flex flex-col justify-between bg-[#0B0D14] rounded-xl border border-white/[0.08] shadow-inner relative overflow-hidden">
+      {/* Top Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-accent-orange animate-pulse" />
+          <span className="text-[10px] font-mono font-bold tracking-wider text-accent-orange uppercase">
+            PIPELINE STAGE TRACKER
+          </span>
+        </div>
+        <span className="text-[10px] font-mono text-accent-mint font-bold">+92% CONVERSION RATE</span>
+      </div>
 
-        {steps.map((step, i) => {
-          const isSelected = selectedStep === i
+      {/* Interactive Stages Row */}
+      <div className="grid grid-cols-4 gap-2 my-auto">
+        {stages.map((stage, idx) => {
+          const Icon = stage.icon
+          const isSelected = currentStage === idx
+          const isPassed = currentStage >= idx
+
           return (
             <div
-              key={step.day}
-              onClick={(e) => {
-                e.stopPropagation()
-                onSelectStep(i)
-              }}
-              className="flex items-center gap-2.5 cursor-pointer relative z-10 group"
+              key={stage.label}
+              onClick={() => setCurrentStage(idx)}
+              className={`p-3 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                isSelected
+                  ? 'bg-accent-orange/15 border-accent-orange/40 shadow-[0_4px_16px_rgba(255,107,0,0.2)]'
+                  : 'bg-surface-secondary/60 border-white/[0.06] hover:border-white/20'
+              }`}
             >
-              <div
-                className={`w-7 h-7 rounded-full border shrink-0 flex items-center justify-center font-mono text-[9px] font-bold transition-all duration-300 ${
-                  isSelected
-                    ? 'border-accent-orange bg-[#1B1F2C] text-accent-orange scale-105 shadow-[0_0_12px_rgba(244,141,22,0.35)]'
-                    : step.status === 'done'
-                      ? 'border-white/20 bg-[#11141E] text-white/80 group-hover:border-white/40'
-                      : 'border-white/10 bg-[#0E1017] text-white/40'
-                }`}
-              >
-                {step.day}
-              </div>
-
-              <div
-                className={`flex-1 px-3 py-2 rounded-xl border transition-all duration-300 flex items-center justify-between ${
-                  isSelected
-                    ? 'border-accent-orange/50 bg-[#161B27] shadow-md'
-                    : 'border-white/[0.07] bg-[#11141D] hover:bg-[#151A25] hover:border-white/15'
-                }`}
-              >
-                <div>
-                  <span className="text-[10.5px] font-bold text-text-primary block leading-none mb-0.5">
-                    {step.stage}
-                  </span>
-                  <span className="text-[8px] text-text-secondary/70 leading-none">
-                    {step.action}
-                  </span>
-                </div>
-                <span
-                  className={`text-[8px] font-mono font-bold uppercase tracking-wider ${
-                    isSelected
-                      ? 'text-accent-orange'
-                      : step.status === 'done'
-                        ? 'text-emerald-400'
-                        : 'text-text-secondary/50'
+              <div className="flex items-center justify-between mb-2">
+                <div
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                    isPassed ? 'bg-accent-orange/20 text-accent-orange' : 'bg-white/5 text-text-secondary'
                   }`}
                 >
-                  {isSelected ? 'Active' : step.status === 'done' ? 'Logged' : 'Next'}
-                </span>
+                  <Icon className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-[9px] font-mono text-text-secondary/70">{stage.count}</span>
+              </div>
+              <div>
+                <div className="text-xs font-bold text-text-primary leading-tight">{stage.label}</div>
+                <div className="text-[9px] text-text-secondary/60 truncate mt-0.5">{stage.desc}</div>
               </div>
             </div>
           )
         })}
       </div>
-    </div>
-  )
-}
 
-function StageDetailsPanel({ selectedStep }: { selectedStep: number }) {
-  const details = [
-    {
-      badge: 'Step 01',
-      title: 'Intercept & Unlock',
-      metric: '100% Unlocked',
-      desc: 'Buyer intent query intercepted live from Reddit/X. Direct contact details and social handle verified without manual digging.',
-    },
-    {
-      badge: 'Step 02',
-      title: 'Organize Pipeline',
-      metric: 'Folder: High Intent',
-      desc: 'Lead pinned into your active outreach sprint. Intent tags, budget cues, and company size saved for zero context loss.',
-    },
-    {
-      badge: 'Step 03',
-      title: 'Contextual First Touch',
-      metric: 'Response in < 2h',
-      desc: 'Reach out directly referencing their exact problem statement while their intent is at peak urgency.',
-    },
-    {
-      badge: 'Step 04',
-      title: 'Conversation & Close',
-      metric: 'Active Deal',
-      desc: 'Prospect responds favorably to your personalized hook. Deal moves immediately to active client negotiation.',
-    },
-  ]
-
-  const current = details[selectedStep] || details[0]
-
-  return (
-    <div className="w-full h-full flex flex-col justify-between p-3.5 rounded-xl bg-[#11141E] border border-white/[0.08] shadow-lg">
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <span className="px-1.5 py-0.5 rounded bg-accent-orange/15 border border-accent-orange/30 text-[7.5px] font-bold text-accent-orange uppercase tracking-wider">
-            {current.badge}
-          </span>
-          <span className="text-[9px] font-mono text-emerald-400 font-bold">
-            {current.metric}
-          </span>
+      {/* Pipeline Progression Bar */}
+      <div className="pt-2 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between text-[10px] font-mono text-text-secondary/60 mb-1.5">
+          <span>PIPELINE VELOCITY</span>
+          <span className="text-white font-medium">STAGE {currentStage + 1} OF 4 ACTIVE</span>
         </div>
-        <h5 className="text-[11.5px] font-bold text-text-primary mb-1.5">
-          {current.title}
-        </h5>
-        <p className="text-[10px] text-text-secondary/85 leading-relaxed">
-          {current.desc}
-        </p>
-      </div>
-
-      <div className="pt-2 border-t border-white/[0.06] flex items-center gap-1.5 text-[8px] text-text-secondary/60 font-mono">
-        <SparklesIcon className="w-2.5 h-2.5 text-accent-orange" />
-        <span>Click any stage step to inspect workflow</span>
+        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-accent-orange to-accent-mint rounded-full transition-all duration-300"
+            style={{ width: `${((currentStage + 1) / 4) * 100}%` }}
+          />
+        </div>
       </div>
     </div>
   )
 }
 
-// ─── Card 4 Visual: Credit Token Meter & Persona Scaling ───────────────────────
-function TokenMeterVisual({
-  className = '',
-  selectedPersona,
-}: {
-  className?: string
-  selectedPersona: string | null
-}) {
-  const getValues = () => {
-    switch (selectedPersona) {
-      case 'free':
-        return { count: 50, offset: 0.15, label: 'Reveal: 3', label2: 'Email: 2' }
-      case 'agency':
-        return { count: 1000, offset: 0.02, label: 'Reveal: 3', label2: 'Email: 2' }
-      case 'freelancer':
-      default:
-        return { count: 500, offset: 0.05, label: 'Reveal: 3', label2: 'Email: 2' }
-    }
+// ─── Visual 4: Credits Based, Not Seat Based (Credit Economics) ────────────────
+function CreditEconomicsInteractiveVisual() {
+  const [selectedTier, setSelectedTier] = useState<'solo' | 'growth' | 'agency'>('growth')
+
+  const tiers = {
+    solo: { credits: '250', cost: '3 / reveal', label: 'Solo Operator', rollover: '100% Rollover' },
+    growth: { credits: '750', cost: '3 / reveal', label: 'Growth Agency', rollover: '100% Rollover' },
+    agency: { credits: '2,000', cost: '3 / reveal', label: 'Scale Operations', rollover: '100% Rollover' },
   }
 
-  const current = getValues()
+  const current = tiers[selectedTier]
 
   return (
-    <div className={`flex flex-col items-center justify-center ${className}`}>
-      {/* Circular meter */}
-      <div className="relative w-[105px] h-[105px]">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-          <circle
-            cx="60"
-            cy="60"
-            r="48"
-            fill="none"
-            stroke="rgba(255, 255, 255, 0.08)"
-            strokeWidth="7"
-          />
-          <motion.circle
-            key={selectedPersona || 'default'}
-            cx="60"
-            cy="60"
-            r="48"
-            fill="none"
-            stroke="#F48D16"
-            strokeWidth="7"
-            strokeLinecap="round"
-            strokeDasharray={2 * Math.PI * 48}
-            initial={{ strokeDashoffset: 2 * Math.PI * 48 }}
-            animate={{ strokeDashoffset: 2 * Math.PI * 48 * current.offset }}
-            transition={{ duration: 0.8, ease }}
-          />
-        </svg>
-
-        {/* Center content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <motion.span
-            key={current.count}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-xl font-bold text-text-primary font-mono"
-          >
-            {current.count}
-          </motion.span>
-          <span className="text-[8px] text-text-secondary/60 font-bold uppercase tracking-widest">
-            credits
+    <div className="w-full h-full p-4 flex flex-col justify-between bg-[#0B0D14] rounded-xl border border-white/[0.08] shadow-inner relative overflow-hidden">
+      {/* Top Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse" />
+          <span className="text-[10px] font-mono font-bold tracking-wider text-accent-mint uppercase">
+            CREDIT BALANCE ENGINE
           </span>
         </div>
+        <span className="text-[10px] font-mono text-text-secondary/60">0 SEAT LOCK-INS</span>
       </div>
 
-      {/* Credit breakdown pills */}
-      <div className="flex items-center gap-1.5 mt-3">
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#0A0C12] border border-white/[0.08]">
-          <BanknotesIcon className="w-2.5 h-2.5 text-accent-orange" />
-          <span className="text-[8px] font-mono font-bold text-text-secondary/80 uppercase">
-            {current.label}
-          </span>
-        </div>
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#0A0C12] border border-white/[0.08]">
-          <BanknotesIcon className="w-2.5 h-2.5 text-accent-orange" />
-          <span className="text-[8px] font-mono font-bold text-text-secondary/80 uppercase">
-            {current.label2}
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function PersonaCardsVisual({
-  className = '',
-  selectedPersona,
-  onSelectPersona,
-}: {
-  className?: string
-  selectedPersona: string | null
-  onSelectPersona: (p: string | null) => void
-}) {
-  const personas = [
-    {
-      id: 'free',
-      role: 'Starter',
-      icon: CodeBracketIcon,
-      desc: '50 credits',
-      sub: 'Try free',
-    },
-    {
-      id: 'freelancer',
-      role: 'Freelancer',
-      icon: PaintBrushIcon,
-      desc: '500 credits',
-      sub: 'Solo growth',
-    },
-    {
-      id: 'agency',
-      role: 'Agency',
-      icon: ChartBarIcon,
-      desc: '1,000 credits',
-      sub: 'Scale team',
-    },
-  ]
-
-  return (
-    <div className={`w-full flex items-center justify-center ${className}`}>
-      <div className="grid grid-cols-3 gap-2 w-full">
-        {personas.map((p) => {
-          const Icon = p.icon
-          const isSelected = selectedPersona === p.id
-          return (
-            <motion.div
-              key={p.role}
-              onMouseEnter={() => onSelectPersona(p.id)}
-              onClick={() => onSelectPersona(p.id)}
-              className={`p-2.5 rounded-xl border transition-all duration-200 flex flex-col items-center text-center cursor-pointer ${
-                isSelected
-                  ? 'border-accent-orange/50 bg-[#171C28] shadow-md scale-102'
-                  : 'bg-[#11141D] border-white/[0.07] hover:border-white/20'
+      {/* Tier Selector Buttons */}
+      <div className="my-auto space-y-3">
+        <div className="grid grid-cols-3 gap-2">
+          {(['solo', 'growth', 'agency'] as const).map((tierKey) => (
+            <button
+              key={tierKey}
+              onClick={() => setSelectedTier(tierKey)}
+              className={`py-2 px-3 rounded-lg text-xs font-semibold capitalize transition-all border ${
+                selectedTier === tierKey
+                  ? 'bg-accent-orange text-black border-accent-orange font-bold shadow-md'
+                  : 'bg-white/5 text-text-secondary border-white/10 hover:border-white/20'
               }`}
             >
-              <div
-                className={`w-7 h-7 rounded-lg flex items-center justify-center mb-1.5 transition-colors ${
-                  isSelected ? 'bg-accent-orange/20 text-accent-orange' : 'bg-white/5 text-white/60'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-              </div>
-              <h6 className="text-[10px] font-bold text-text-primary tracking-tight mb-0.5">
-                {p.role}
-              </h6>
-              <p className="text-[8.5px] text-text-secondary/70 leading-tight mb-1 font-mono">
-                {p.desc}
-              </p>
-              <span
-                className={`text-[7px] font-bold uppercase tracking-wider mt-auto ${
-                  isSelected ? 'text-accent-orange font-bold' : 'text-text-secondary/50'
-                }`}
-              >
-                {isSelected ? 'Selected' : p.sub}
-              </span>
-            </motion.div>
-          )
-        })}
+              {tierKey}
+            </button>
+          ))}
+        </div>
+
+        {/* Big Credit Meter Card */}
+        <div className="p-3.5 rounded-xl bg-gradient-to-r from-surface-secondary/80 to-[#121520] border border-white/[0.08] flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-mono text-text-secondary/70 uppercase">MONTHLY REVEAL CREDITS</div>
+            <div className="text-2xl font-display font-bold text-white tracking-tight mt-0.5">
+              {current.credits} <span className="text-xs font-mono font-normal text-accent-orange">Credits</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px] font-mono text-accent-mint font-bold px-2 py-0.5 rounded bg-accent-mint/10 border border-accent-mint/20">
+              {current.rollover}
+            </div>
+            <div className="text-[9px] font-mono text-text-secondary/60 mt-1">NO EXPIRATION DATE</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Features */}
+      <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-[10px] font-mono text-text-secondary/60">
+        <span>PAY PER VALUE</span>
+        <span className="text-white/80">SCALE SEATLESSLY</span>
       </div>
     </div>
   )
 }
 
-// ─── Exported AI text helper (retained for backward compatibility) ────────────
-export function AIWriterVisual({
-  className = '',
-  selectedStep,
-}: {
-  className?: string
-  selectedStep: number
-}) {
-  const copies = [
-    {
-      title: 'Day 1: Personal Value Hook',
-      text: "Hey Sarah, noticed you're scaling your Shopify store...",
-      rate: '96% Reply',
-      badge: 'Spam Safe',
-    },
-    {
-      title: 'Day 3: Case Study & Proof',
-      text: 'Hi Sarah, just wanted to share a quick metric...',
-      rate: '89% Reply',
-      badge: 'Social Proof',
-    },
-  ]
-  const current = copies[selectedStep] || copies[0]
-  return (
-    <div className={`p-4 rounded-xl bg-surface border border-white/[0.04] ${className}`}>
-      <div className="text-[10px] text-accent-orange font-bold mb-1">{current.title}</div>
-      <p className="text-[10px] text-text-secondary">{current.text}</p>
-    </div>
-  )
-}
-
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── MAIN CAPABILITIES SECTION ────────────────────────────────────────────────
+// ─── MAIN CAPABILITIES SECTION (Parley Layout + LHC Original Content) ─────────
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function FeaturesSection() {
-  const [activeCardIndex, setActiveCardIndex] = useState<number>(0)
-  const [hoveredPlatform, setHoveredPlatform] = useState<string | null>(null)
-  const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
-  const [selectedStep, setSelectedStep] = useState<number>(0)
-  const [selectedPersona, setSelectedPersona] = useState<string | null>('freelancer')
-
-  const handleSendEmail = () => {
-    if (emailStatus !== 'idle') return
-    setEmailStatus('sending')
-    setTimeout(() => {
-      setEmailStatus('sent')
-    }, 1200)
-  }
+  const [activeCardIndex, setActiveCardIndex] = useState<number>(1) // Card 2 active by default, exactly like Parley screenshot!
 
   const cards: CapabilityCard[] = [
     {
-      id: 'interception',
+      id: 'fresh-leads',
       indexStr: '01.',
-      shortLabel: 'Real-time leads',
+      shortLabel: 'Fresh Daily Leads',
       tag: 'Real-time interception',
       title: 'Fresh Daily Leads from Multiple Platforms',
       description:
         'Opportunities surface in real-time from obscure forums, social networks, and intent sites. Monitor high-intent queries across LinkedIn, Reddit, Twitter/X, and Threads the exact second buyers ask for help.',
-      duration: '0:18',
-      browserRoute: 'app.leadhunterclub.com/feed/social-radar',
-      // videoUrl: '/videos/lead-interception.mp4', // Drop in screen recording video when ready
     },
     {
-      id: 'intelligence',
+      id: 'lead-intel',
       indexStr: '02.',
-      shortLabel: 'Deep intelligence',
+      shortLabel: 'Lead Intelligence',
       tag: 'Deep intelligence',
-      title: 'Lead Intelligence & Verified Contacts',
+      title: 'Lead Intelligence with Revealed Contacts',
       description:
-        'Analyze and enrich prospect profiles instantly to understand who you are speaking to. See urgency levels, budget cues, and comprehensive buyer context with verified contact details ready to save.',
-      duration: '0:14',
-      browserRoute: 'app.leadhunterclub.com/intel/alex-k',
-      // videoUrl: '/videos/lead-intelligence.mp4',
+        'Analyze and enrich prospect profiles instantly to understand exactly who you are speaking to. See urgency levels, budget cues, and comprehensive buyer context with verified contact details ready to act on.',
     },
     {
-      id: 'momentum',
+      id: 'pipeline-momentum',
       indexStr: '03.',
-      shortLabel: 'Pipeline tracking',
+      shortLabel: 'Track Every Touch',
       tag: 'Pipeline momentum',
       title: 'Track Every Touch',
       description:
-        'Keep your pipeline moving by logging every touchpoint. Move leads smoothly through stages from Revealed to Contacted and Replied so zero high-value opportunities slip through the cracks.',
-      duration: '0:22',
-      browserRoute: 'app.leadhunterclub.com/pipeline/active',
-      // videoUrl: '/videos/pipeline-momentum.mp4',
+        'Keep your pipeline moving by logging every interaction. Reveal a lead, save it, mark when you reach out, and see where each conversation stands at a glance.',
     },
     {
-      id: 'economics',
+      id: 'credit-economics',
       indexStr: '04.',
-      shortLabel: 'Credit economics',
+      shortLabel: 'Credit Economics',
       tag: 'Credit economics',
       title: 'Credits Based, Not Seat Based',
       description:
-        'Pay only for the specific actions you perform. Solo builders, growth consultancies, and digital agencies scale usage smoothly without complex monthly seat commitments or locked tiers.',
-      duration: '0:16',
-      browserRoute: 'app.leadhunterclub.com/credits/rollover',
-      // videoUrl: '/videos/credit-economics.mp4',
+        'Pay only for the specific actions you perform. Solo builders, growth consultancies, and digital agencies can scale usage smoothly without complex monthly seat commitments or locked features.',
     },
   ]
+
+  const renderActiveVisual = (index: number) => {
+    switch (index) {
+      case 0:
+        return <FreshLeadsInteractiveVisual />
+      case 1:
+        return <LeadIntelligenceInteractiveVisual />
+      case 2:
+        return <TrackEveryTouchInteractiveVisual />
+      case 3:
+        return <CreditEconomicsInteractiveVisual />
+      default:
+        return <LeadIntelligenceInteractiveVisual />
+    }
+  }
 
   return (
     <section
       id="features"
-      className="py-20 md:py-24 px-4 sm:px-6 max-w-[1296px] mx-auto relative overflow-hidden border-t border-white/[0.04]"
+      className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto relative overflow-hidden border-t border-white/[0.04]"
     >
-      {/* ═══ ASYMMETRIC HEADER (Parley inspired) ═══ */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-14 relative z-10">
+      {/* ═══ ASYMMETRIC HEADER (Parley Layout Reference + LHC Content) ═══ */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-14 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, ease }}
+          transition={{ duration: 0.6 }}
           className="max-w-xl"
         >
+          {/* Normal eyebrow inspired by Parley */}
           <span className="text-sm font-semibold text-accent-orange mb-3 block">
             Capabilities
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-[42px] font-semibold tracking-tight text-white leading-[1.15]">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight text-white leading-[1.15]">
             Engineered for speed,
             <br />
             <span className="text-text-secondary/70">built for conversion.</span>
@@ -930,7 +512,7 @@ export default function FeaturesSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1, ease }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="max-w-md"
         >
           <p className="text-sm md:text-base text-text-secondary font-light leading-relaxed">
@@ -940,338 +522,124 @@ export default function FeaturesSection() {
         </motion.div>
       </div>
 
-      {/* ═══ MACHINED HARDWARE TRAY CHASSIS (Adds tangible structural weight) ═══ */}
-      <div className="hidden md:flex p-2.5 lg:p-3 rounded-[26px] bg-[#0B0D14]/90 border border-white/[0.08] shadow-[0_30px_90px_-20px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl relative z-10">
-        <div className="flex flex-row gap-3 items-stretch min-h-[580px] h-[590px] w-full">
-          {cards.map((card, i) => {
-            const isActive = activeCardIndex === i
+      {/* ═══ DESKTOP ACCORDION CARDS (Parley Layout Match) ═══ */}
+      <div className="hidden md:flex flex-row gap-3 lg:gap-4 items-stretch min-h-[460px] h-[480px] w-full relative z-10">
+        {cards.map((card, i) => {
+          const isActive = activeCardIndex === i
 
-            return (
-              <motion.div
-                key={card.id}
-                layout
-                transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-                onMouseEnter={() => setActiveCardIndex(i)}
-                onClick={() => setActiveCardIndex(i)}
-                className={`relative overflow-hidden transition-all duration-300 ${
-                  isActive
-                    ? 'flex-[2.6] bg-[#141722] border border-white/15 shadow-[0_24px_70px_-15px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.12)] rounded-[20px] p-5 lg:p-6 flex flex-col justify-between cursor-default'
-                    : 'flex-1 bg-[#101219] hover:bg-[#141722] border border-white/[0.08] hover:border-white/20 rounded-[18px] p-4 lg:p-5 flex flex-col justify-between cursor-pointer group shadow-md'
-                }`}
-              >
-                {isActive ? (
-                  /* ── Expanded Active Card ── */
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="h-full flex flex-col justify-between"
-                  >
-                    {/* ── Screen Recording Video / Interactive Viewport ── */}
-                    <div className="w-full h-[340px] rounded-xl bg-[#090B10] border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)] flex flex-col overflow-hidden relative">
-                      {/* Machined Window & Player Header */}
-                      <div className="h-8 px-3.5 bg-[#0F121A] border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-red-500/70" />
-                            <span className="w-2 h-2 rounded-full bg-yellow-500/70" />
-                            <span className="w-2 h-2 rounded-full bg-emerald-500/70" />
-                          </div>
-                          <div className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06] text-[8.5px] font-mono text-text-secondary/70 flex items-center gap-1">
-                            <span className="text-accent-orange/70">https://</span>
-                            <span className="truncate max-w-[190px]">{card.browserRoute}</span>
-                          </div>
-                        </div>
+          return (
+            <Card
+              variant="elevated"
+              padding="md"
+              hover={true}
+              className={isActive
+                ? 'flex-[2.4] bg-[#141724] border border-white/20 shadow-[0_24px_70px_-15px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.12)] rounded-[24px] p-6 flex flex-col justify-between cursor-default'
+                : 'flex-1 bg-[#10121A] hover:bg-[#141722] border border-white/[0.08] hover:border-white/20 rounded-[20px] p-5 flex flex-col justify-between cursor-pointer group shadow-md'}
+              onMouseEnter={() => setActiveCardIndex(i)}
+              onClick={() => setActiveCardIndex(i)}
+            >
+              {isActive ? (
+                /* ─── Active Expanded Card ─── */
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="h-full flex flex-col justify-between"
+                >
+                  {/* Top: Rich Interactive Capability Preview */}
+                  <div className="w-full h-[260px] rounded-xl overflow-hidden relative">
+                    {renderActiveVisual(i)}
+                  </div>
 
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent-orange/15 border border-accent-orange/30 text-[8px] font-mono font-bold text-accent-orange uppercase tracking-wider">
-                            <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
-                            <span>{card.videoUrl ? 'VIDEO PLAYING' : 'DEMO PREVIEW'}</span>
-                          </div>
-                          <span className="text-[8.5px] font-mono text-white/50">{card.duration}</span>
-                        </div>
-                      </div>
-
-                      {/* Viewport Content Body */}
-                      <div className="flex-1 w-full h-full relative overflow-hidden flex items-center justify-center p-3 lg:p-4 bg-gradient-to-b from-[#090B10] to-[#0D1017]">
-                        {card.videoUrl ? (
-                          <video
-                            src={card.videoUrl}
-                            poster={card.videoPoster}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="w-full h-full object-cover rounded-lg shadow-2xl"
-                          />
-                        ) : (
-                          <>
-                            {i === 0 && (
-                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                                <div className="col-span-5 flex justify-center items-center">
-                                  <PlatformNetworkVisual
-                                    hoveredPlatform={hoveredPlatform}
-                                    onHoverPlatform={setHoveredPlatform}
-                                  />
-                                </div>
-                                <div className="col-span-7 flex flex-col justify-center">
-                                  <FreshLeadsVisual
-                                    hoveredPlatform={hoveredPlatform}
-                                    maxItems={3}
-                                  />
-                                </div>
-                              </div>
-                            )}
-
-                            {i === 1 && (
-                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                                <div className="col-span-6 flex flex-col justify-center">
-                                  <LeadIntelVisual emailStatus={emailStatus} />
-                                </div>
-                                <div className="col-span-6 flex flex-col justify-center">
-                                  <EmailComposeVisual
-                                    emailStatus={emailStatus}
-                                    onSend={handleSendEmail}
-                                  />
-                                </div>
-                              </div>
-                            )}
-
-                            {i === 2 && (
-                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                                <div className="col-span-6 flex flex-col justify-center">
-                                  <FollowUpTimelineVisual
-                                    selectedStep={selectedStep}
-                                    onSelectStep={setSelectedStep}
-                                  />
-                                </div>
-                                <div className="col-span-6 flex flex-col justify-center h-full">
-                                  <StageDetailsPanel selectedStep={selectedStep} />
-                                </div>
-                              </div>
-                            )}
-
-                            {i === 3 && (
-                              <div className="grid grid-cols-12 gap-4 items-center w-full h-full">
-                                <div className="col-span-5 flex justify-center items-center">
-                                  <TokenMeterVisual selectedPersona={selectedPersona} />
-                                </div>
-                                <div className="col-span-7 flex flex-col justify-center">
-                                  <PersonaCardsVisual
-                                    selectedPersona={selectedPersona}
-                                    onSelectPersona={setSelectedPersona}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Narrative Details Block */}
-                    <div className="mt-4 pt-3 border-t border-white/[0.08] flex flex-col justify-end">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
-                        <span className="text-[10px] font-bold text-accent-orange uppercase tracking-wider font-mono">
-                          {card.tag}
-                        </span>
-                      </div>
-                      <h3 className="font-display text-xl lg:text-2xl font-bold tracking-tight text-white mb-2 leading-snug">
-                        {card.title}
-                      </h3>
-                      <p className="text-text-secondary text-xs lg:text-sm leading-relaxed font-light line-clamp-2">
-                        {card.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                ) : (
-                  /* ── Collapsed Inactive Card ── */
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.25 }}
-                    className="h-full flex flex-col justify-between items-start select-none"
-                  >
-                    {/* Top: Index + Duration */}
-                    <div className="w-full flex items-center justify-between">
-                      <span className="text-2xl lg:text-3xl font-display font-bold text-white/30 group-hover:text-white/60 transition-colors font-mono tracking-tighter">
-                        {card.indexStr}
-                      </span>
-                      <span className="text-[8.5px] font-mono font-bold text-white/30 group-hover:text-accent-orange transition-colors">
-                        {card.duration}
+                  {/* Bottom: Narrative Display Title & Description */}
+                  <div className="mt-3 pt-2.5 flex flex-col justify-end">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
+                      <span className="text-[10px] font-mono font-bold text-accent-orange uppercase tracking-wider">
+                        {card.tag}
                       </span>
                     </div>
+                    <h3 className="font-display text-xl lg:text-2xl font-bold tracking-tight text-white mb-1.5 leading-snug">
+                      {card.title}
+                    </h3>
+                    <p className="text-text-secondary text-xs lg:text-sm leading-relaxed font-light line-clamp-3">
+                      {card.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ) : (
+                /* ─── Inactive Collapsed Card (Parley Amber Mosaic + LHC Content) ─── */
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25 }}
+                  className="h-full flex flex-col justify-between items-start select-none"
+                >
+                  {/* Top: Large Numeric Indicator */}
+                  <span className="text-3xl lg:text-4xl font-display font-bold text-white/20 group-hover:text-white/40 transition-colors font-mono tracking-tighter">
+                    {card.indexStr}
+                  </span>
 
-                    {/* Center: Mini Screen-Recording Slate Frame with Play Glyph */}
-                    <div className="w-full flex-1 flex flex-col justify-center items-center py-3 gap-3">
-                      <div className="w-full aspect-[16/10] rounded-xl bg-[#080A0F] border border-white/[0.08] group-hover:border-white/25 transition-all p-2 flex flex-col justify-between relative overflow-hidden shadow-inner group-hover:shadow-[0_8px_24px_rgba(0,0,0,0.7)]">
-                        {/* Matrix scanline backdrop */}
-                        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:8px_8px] pointer-events-none" />
+                  {/* Center: Abstract Floating Amber Mosaic */}
+                  <AmberMosaicScatter cardIndex={i} />
 
-                        <div className="flex items-center justify-between text-[7px] font-mono text-white/40">
-                          <span className="flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-accent-orange" />
-                            <span>REC</span>
-                          </span>
-                          <span>60FPS</span>
-                        </div>
-
-                        {/* Play button glyph */}
-                        <div className="self-center my-auto w-8 h-8 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/60 group-hover:text-accent-orange group-hover:bg-accent-orange/15 group-hover:border-accent-orange/40 group-hover:scale-110 transition-all duration-300 shadow-md">
-                          <PlayIcon className="w-3.5 h-3.5 fill-current ml-0.5" />
-                        </div>
-
-                        <div className="flex items-center justify-between text-[7px] font-mono text-white/40">
-                          <span className="truncate max-w-[65px]">{card.shortLabel}</span>
-                          <span>{card.duration}</span>
-                        </div>
-                      </div>
-
-                      {/* Compact Telemetry Badges */}
-                      <TelemetryChipScatter index={i} />
-                    </div>
-
-                    {/* Bottom: Title Label & Expand Arrow */}
-                    <div className="w-full flex items-center justify-between border-t border-white/[0.06] pt-3">
-                      <span className="text-xs font-semibold text-text-secondary/80 group-hover:text-white transition-colors tracking-tight truncate">
-                        {card.shortLabel}
-                      </span>
-                      <ArrowRightIcon className="w-3.5 h-3.5 text-accent-orange opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0 -translate-x-1 group-hover:translate-x-0" />
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
-            )
-          })}
-        </div>
+                  {/* Bottom: Clean Title Label */}
+                  <div className="w-full border-t border-white/[0.06] pt-3">
+                    <span className="text-sm font-semibold text-text-secondary/80 group-hover:text-white transition-colors tracking-tight line-clamp-1 block">
+                      {card.shortLabel}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </Card>
+          )
+        })}
       </div>
 
-      {/* ═══ MOBILE TOUCH-FRIENDLY CONTROLS (< md) ═══ */}
-      <div className="md:hidden flex flex-col gap-4 relative z-10">
-        {/* Horizontal Segmented Pill Selector */}
-        <div className="grid grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-[#0E1017] border border-white/[0.08]">
-          {cards.map((card, i) => {
-            const isActive = activeCardIndex === i
-            return (
-              <button
+      {/* ═══ MOBILE ACCORDION (Vertical Fallback for < md screens) ═══ */}
+      <div className="md:hidden flex flex-col gap-3 relative z-10">
+        {cards.map((card, i) => {
+          const isActive = activeCardIndex === i
+
+          return (
+            <Card
                 key={card.id}
+                hover={false}
+                variant="elevated"
+                padding="md"
                 onClick={() => setActiveCardIndex(i)}
-                className={`py-2 px-1 rounded-xl text-center transition-all duration-200 flex flex-col items-center gap-0.5 ${
-                  isActive
-                    ? 'bg-[#181C28] text-accent-orange border border-white/15 shadow-sm'
-                    : 'text-text-secondary/60 hover:text-text-primary'
-                }`}
+                className={isActive ? 'bg-[#141724] border-white/20 shadow-lg' : 'bg-[#10121A] border-white/[0.08]'}
               >
-                <span className="text-[10px] font-mono font-bold">{card.indexStr}</span>
-                <span className="text-[8.5px] font-medium truncate max-w-full">
-                  {card.shortLabel.split(' ')[0]}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Mobile Active Card Panel */}
-        <motion.div
-          key={activeCardIndex}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease }}
-          className="bg-[#141722] border border-white/15 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 shadow-2xl"
-        >
-          {/* Micro-UI or Video container with browser chrome */}
-          <div className="w-full rounded-xl bg-[#090B10] border border-white/10 overflow-hidden shadow-inner">
-            <div className="h-7 px-3 bg-[#0F121A] border-b border-white/[0.08] flex items-center justify-between select-none">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
-                <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/70" />
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70" />
-                <span className="text-[7.5px] font-mono text-text-secondary/60 ml-1 truncate max-w-[140px]">
-                  {cards[activeCardIndex].browserRoute}
-                </span>
-              </div>
-              <span className="text-[7.5px] font-mono text-accent-orange font-bold">
-                {cards[activeCardIndex].duration}
-              </span>
-            </div>
-
-            <div className="min-h-[260px] p-3 flex items-center justify-center">
-              {cards[activeCardIndex].videoUrl ? (
-                <video
-                  src={cards[activeCardIndex].videoUrl}
-                  poster={cards[activeCardIndex].videoPoster}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover rounded-lg shadow-xl"
+              <div className="flex items-center justify-between cursor-pointer">
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-sm font-bold text-accent-orange">
+                    {card.indexStr}
+                  </span>
+                  <span className="text-base font-semibold text-white">{card.shortLabel}</span>
+                </div>
+                <ArrowRightIcon
+                  className={`w-4 h-4 text-accent-orange transition-transform duration-300 ${
+                    isActive ? 'rotate-90' : ''
+                  }`}
                 />
-              ) : (
-                <>
-                  {activeCardIndex === 0 && (
-                    <div className="flex flex-col gap-3 w-full">
-                      <PlatformNetworkVisual
-                        hoveredPlatform={hoveredPlatform}
-                        onHoverPlatform={setHoveredPlatform}
-                      />
-                      <FreshLeadsVisual
-                        hoveredPlatform={hoveredPlatform}
-                        maxItems={2}
-                      />
-                    </div>
-                  )}
+              </div>
 
-                  {activeCardIndex === 1 && (
-                    <div className="flex flex-col gap-3 w-full">
-                      <LeadIntelVisual emailStatus={emailStatus} />
-                      <EmailComposeVisual
-                        emailStatus={emailStatus}
-                        onSend={handleSendEmail}
-                      />
-                    </div>
-                  )}
-
-                  {activeCardIndex === 2 && (
-                    <div className="flex flex-col gap-3 w-full">
-                      <FollowUpTimelineVisual
-                        selectedStep={selectedStep}
-                        onSelectStep={setSelectedStep}
-                      />
-                      <StageDetailsPanel selectedStep={selectedStep} />
-                    </div>
-                  )}
-
-                  {activeCardIndex === 3 && (
-                    <div className="flex flex-col gap-3 w-full items-center">
-                      <TokenMeterVisual selectedPersona={selectedPersona} />
-                      <PersonaCardsVisual
-                        selectedPersona={selectedPersona}
-                        onSelectPersona={setSelectedPersona}
-                      />
-                    </div>
-                  )}
-                </>
+              {isActive && (
+                <div className="mt-4 pt-3 border-t border-white/[0.08]">
+                  <div className="h-[260px] w-full rounded-xl overflow-hidden mb-3">
+                    {renderActiveVisual(i)}
+                  </div>
+                  <h4 className="font-display text-lg font-bold text-white mb-1.5">
+                    {card.title}
+                  </h4>
+                  <p className="text-xs text-text-secondary leading-relaxed font-light">
+                    {card.description}
+                  </p>
+                </div>
               )}
-            </div>
-          </div>
-
-          {/* Text narrative */}
-          <div className="pt-1">
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-orange" />
-              <span className="text-[9.5px] font-bold text-accent-orange uppercase tracking-wider font-mono">
-                {cards[activeCardIndex].tag}
-              </span>
-            </div>
-            <h3 className="font-display text-xl font-bold tracking-tight text-white mb-1.5 leading-snug">
-              {cards[activeCardIndex].title}
-            </h3>
-            <p className="text-text-secondary text-xs leading-relaxed font-light">
-              {cards[activeCardIndex].description}
-            </p>
-          </div>
-        </motion.div>
+            </Card>
+          )
+        })}
       </div>
     </section>
   )

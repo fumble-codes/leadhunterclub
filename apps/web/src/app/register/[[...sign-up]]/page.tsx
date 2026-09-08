@@ -95,14 +95,28 @@ export default function RegisterPage() {
     setResending(true)
     try {
       if (auth.currentUser) {
-        await sendEmailVerification(auth.currentUser)
+        const token = await auth.currentUser.getIdToken().catch(() => null)
+        const res = await fetch('/api/auth/send-verification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ email: auth.currentUser.email }),
+        })
+        if (!res.ok) {
+          await sendEmailVerification(auth.currentUser).catch(() => {})
+        }
       }
     } catch {
-      // silently fail
+      if (auth.currentUser) {
+        await sendEmailVerification(auth.currentUser).catch(() => {})
+      }
     } finally {
       setResending(false)
     }
   }
+
 
   const handleSendOtp = async () => {
     if (!phoneNumber.trim()) return
@@ -177,7 +191,22 @@ export default function RegisterPage() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password)
-      await sendEmailVerification(auth.currentUser!)
+      try {
+        const token = await auth.currentUser?.getIdToken().catch(() => null)
+        const res = await fetch('/api/auth/send-verification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ email }),
+        })
+        if (!res.ok) {
+          await sendEmailVerification(auth.currentUser!).catch(() => {})
+        }
+      } catch {
+        await sendEmailVerification(auth.currentUser!).catch(() => {})
+      }
       setPhoneStep('send')
     } catch (err: unknown) {
       setError(

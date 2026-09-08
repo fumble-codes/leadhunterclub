@@ -22,11 +22,32 @@ import {
   ThumbsDown,
   Sparkles,
   Share2,
+  Star,
+  Reply,
+  Forward,
+  Video,
+  Phone,
+  MoreVertical,
+  Mic,
+  CheckCheck,
 } from 'lucide-react'
 
 // ==========================================
 // OFFICIAL BRAND SVG LOGOS (MINIMAL & ACCURATE)
 // ==========================================
+
+export function WhatsAppOfficialLogo({ className = 'w-3.5 h-3.5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" aria-label="WhatsApp">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 2C6.477 2 2 6.477 2 12C2 13.89 2.525 15.66 3.441 17.18L2.067 21.734C1.983 22.012 2.247 22.268 2.523 22.174L7.021 20.655C8.508 21.517 10.207 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2ZM17.482 15.358C17.253 15.996 16.347 16.529 15.659 16.678C15.187 16.779 14.577 16.858 12.502 16.002C9.849 14.908 8.143 12.221 8.01 12.046C7.88 11.871 6.94 10.622 6.94 9.327C6.94 8.033 7.604 7.404 7.842 7.14C8.044 6.915 8.351 6.811 8.665 6.811C8.766 6.811 8.857 6.816 8.938 6.821C9.176 6.831 9.295 6.845 9.451 7.218C9.646 7.686 10.12 8.847 10.178 8.966C10.237 9.085 10.295 9.245 10.216 9.403C10.141 9.564 10.073 9.638 9.954 9.776C9.835 9.914 9.726 10.024 9.607 10.171C9.498 10.299 9.373 10.437 9.507 10.666C9.641 10.895 10.103 11.647 10.785 12.253C11.664 13.034 12.38 13.284 12.637 13.391C12.828 13.471 13.054 13.454 13.192 13.307C13.368 13.119 13.585 12.805 13.808 12.492C13.966 12.268 14.167 12.239 14.375 12.318C14.587 12.392 15.719 12.951 15.952 13.067C16.185 13.183 16.34 13.241 16.398 13.342C16.456 13.443 16.456 13.921 16.227 14.558H17.482Z"
+        fill="#25D366"
+      />
+    </svg>
+  )
+}
 
 export function LinkedinOfficialLogo({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -181,6 +202,7 @@ const AI_MODELS: Record<AiModelId, ModelConfig> = {
 export function LeadOutreachFlowchart() {
   const [activeModel, setActiveModel] = useState<AiModelId>('claude')
   const [activeAngleIdx, setActiveAngleIdx] = useState<number>(0)
+  const [conversionChannel, setConversionChannel] = useState<'email' | 'whatsapp'>('email')
   const [copied, setCopied] = useState<boolean>(false)
   const reduceMotion = useReducedMotion()
 
@@ -295,10 +317,10 @@ export function LeadOutreachFlowchart() {
           </span>
         </div>
 
-        {/* NOTATION PILL 4: Centered between 04 & 05 (Clean 110px gap) */}
-        <div className="absolute left-[460px] top-[582px] z-20 pointer-events-none">
+        {/* NOTATION PILL 4: Centered between 04 & 05 */}
+        <div className="absolute left-[510px] -translate-x-1/2 top-[575px] z-20 pointer-events-none">
           <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest/95 border border-secondary/30 text-[8.5px] font-mono text-secondary font-medium tracking-wide shadow-md whitespace-nowrap">
-            4. Sent &amp; delivered →
+            Sent →
           </span>
         </div>
 
@@ -339,23 +361,11 @@ export function LeadOutreachFlowchart() {
               </span>
             </div>
             <span className="text-[8.5px] font-mono text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded font-semibold">
-              Live Intel Dossier
+              Score: 9.4/10
             </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-surface-container border border-white/[0.1] shadow-xl hover:border-primary/40 transition-colors">
-            {/* Title / Headline */}
-            <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.08]">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-xs">🔥</span>
-                <span className="text-[11px] font-bold text-text-primary tracking-tight truncate">
-                  Lead Intelligence: Luxury 3D Visualizer
-                </span>
-              </div>
-              <span className="text-[9px] font-mono text-text-secondary/70 shrink-0">
-                Score: <strong className="text-primary font-bold">9.4/10</strong>
-              </span>
-            </div>
 
             {/* Dossier Structured Sections */}
             <div className="p-2.5 rounded-xl bg-surface-container-lowest/90 border border-white/[0.04] space-y-1.5 mb-2.5">
@@ -540,23 +550,19 @@ export function LeadOutreachFlowchart() {
                     <span className="text-[11px] font-semibold text-[#f0eee6]">Claude 3.5 Sonnet</span>
                     <ChevronDown size={11} className="text-zinc-500" />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveAngleIdx((prev) => (prev === 0 ? 1 : 0))}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#2c2a27] border border-[#D97757]/30 text-[9.5px] font-mono text-[#D97757] hover:bg-[#34322e] transition-colors"
-                  >
-                    <RotateCcw size={10} />
-                    <span>Angle {activeAngleIdx + 1}/2: {currentAngle.title}</span>
-                  </button>
+                  <div className="flex items-center gap-2 text-zinc-500 text-[9.5px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>200k context</span>
+                  </div>
                 </div>
 
                 {/* Claude User Prompt Bubble */}
                 <div className="bg-[#292825] border border-white/[0.05] rounded-xl p-2.5 text-[10.5px] text-zinc-300 mb-2.5 font-sans">
-                  <p className="line-clamp-2 leading-tight">{currentAngle.userPrompt}</p>
+                  <p className="leading-snug">{currentAngle.userPrompt}</p>
                 </div>
 
                 {/* Claude Assistant Response Block */}
-                <div className="bg-[#242320] border border-[#D97757]/25 rounded-xl p-3 text-[11px] text-[#f2efe9] relative">
+                <div className="bg-[#242320] border border-[#D97757]/20 rounded-xl p-3 text-[11px] text-[#f2efe9] relative">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-4 h-4 rounded-full bg-[#D97757]/20 flex items-center justify-center">
                       <AnthropicOfficialLogo className="w-2.5 h-2.5" />
@@ -568,11 +574,11 @@ export function LeadOutreachFlowchart() {
                     Subject: <span className="text-white font-medium">{currentAngle.subject}</span>
                   </div>
                   <p className="text-[11px] text-[#e5e2da] leading-relaxed font-sans">
-                    &quot;{currentAngle.body}&quot;
+                    {currentAngle.body}
                   </p>
 
                   {/* Claude Bottom Toolbar */}
-                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9.5px] text-zinc-400 font-mono">
+                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9.5px] text-zinc-400">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -580,17 +586,21 @@ export function LeadOutreachFlowchart() {
                         className="flex items-center gap-1 hover:text-white transition-colors"
                       >
                         {copied ? <Check size={11} className="text-[#B8F36B]" /> : <Copy size={11} />}
-                        <span>{copied ? 'Copied' : 'Copy Draft'}</span>
+                        <span>{copied ? 'Copied' : 'Copy'}</span>
                       </button>
                       <span className="text-white/10">|</span>
                       <ThumbsUp size={11} className="hover:text-white cursor-pointer" />
                       <ThumbsDown size={11} className="hover:text-white cursor-pointer" />
                     </div>
-                    <RotateCcw
-                      size={11}
+                    <button
+                      type="button"
                       onClick={() => setActiveAngleIdx((prev) => (prev === 0 ? 1 : 0))}
-                      className="hover:text-white cursor-pointer"
-                    />
+                      className="flex items-center gap-1 hover:text-white transition-colors"
+                      title="Regenerate with different angle"
+                    >
+                      <RotateCcw size={11} />
+                      <span className="font-mono text-[9px]">Retry</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -605,23 +615,19 @@ export function LeadOutreachFlowchart() {
                     <span className="text-[11px] font-semibold text-white">ChatGPT 4o</span>
                     <ChevronDown size={11} className="text-zinc-400" />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveAngleIdx((prev) => (prev === 0 ? 1 : 0))}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#2f2f2f] border border-[#10A37F]/30 text-[9.5px] font-mono text-[#10A37F] hover:bg-[#383838] transition-colors"
-                  >
-                    <RotateCcw size={10} />
-                    <span>Angle {activeAngleIdx + 1}/2: {currentAngle.title}</span>
-                  </button>
+                  <div className="flex items-center gap-1 text-zinc-500 text-[9.5px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10A37F]" />
+                    <span>Memory Full</span>
+                  </div>
                 </div>
 
                 {/* ChatGPT User Speech Bubble (Aligned Right) */}
                 <div className="bg-[#2f2f2f] text-white rounded-2xl rounded-tr-sm px-3 py-2 text-[10.5px] max-w-[88%] ml-auto mb-2.5 border border-white/[0.04]">
-                  <p className="line-clamp-2 leading-tight">{currentAngle.userPrompt}</p>
+                  <p className="leading-snug">{currentAngle.userPrompt}</p>
                 </div>
 
                 {/* ChatGPT Assistant Response Block */}
-                <div className="bg-[#171717] border border-[#10A37F]/25 rounded-xl p-3 text-[11px] text-[#ececec]">
+                <div className="bg-[#171717] border border-[#10A37F]/20 rounded-xl p-3 text-[11px] text-[#ececec]">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-4 h-4 rounded-full bg-[#10A37F] flex items-center justify-center text-white">
                       <OpenAIOfficialLogo className="w-2.5 h-2.5" />
@@ -633,11 +639,11 @@ export function LeadOutreachFlowchart() {
                     Subject: <span className="text-white font-medium">{currentAngle.subject}</span>
                   </div>
                   <p className="text-[11px] text-zinc-200 leading-relaxed font-sans">
-                    &quot;{currentAngle.body}&quot;
+                    {currentAngle.body}
                   </p>
 
                   {/* ChatGPT Action Row */}
-                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9.5px] text-zinc-400 font-mono">
+                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9.5px] text-zinc-400">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -651,11 +657,15 @@ export function LeadOutreachFlowchart() {
                       <ThumbsUp size={11} className="hover:text-white cursor-pointer" />
                       <ThumbsDown size={11} className="hover:text-white cursor-pointer" />
                     </div>
-                    <RotateCcw
-                      size={11}
+                    <button
+                      type="button"
                       onClick={() => setActiveAngleIdx((prev) => (prev === 0 ? 1 : 0))}
-                      className="hover:text-white cursor-pointer"
-                    />
+                      className="flex items-center gap-1 hover:text-white transition-colors"
+                      title="Regenerate"
+                    >
+                      <RotateCcw size={11} />
+                      <span className="font-mono text-[9px]">Regenerate</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -671,23 +681,19 @@ export function LeadOutreachFlowchart() {
                     <span className="text-[11px] font-semibold text-white">Gemini Advanced 1.5 Pro</span>
                     <ChevronDown size={11} className="text-zinc-400" />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveAngleIdx((prev) => (prev === 0 ? 1 : 0))}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#1e1f20] border border-[#8AB4F8]/30 text-[9.5px] font-mono text-[#8AB4F8] hover:bg-[#28292c] transition-colors"
-                  >
-                    <RotateCcw size={10} />
-                    <span>Angle {activeAngleIdx + 1}/2: {currentAngle.title}</span>
-                  </button>
+                  <div className="flex items-center gap-1 text-zinc-500 text-[9.5px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#8AB4F8]" />
+                    <span>2M context</span>
+                  </div>
                 </div>
 
                 {/* Gemini User Prompt Pill */}
                 <div className="bg-[#1e1f20] border border-white/[0.06] rounded-xl px-3 py-1.5 text-[10.5px] text-zinc-300 mb-2.5 font-sans">
-                  <p className="line-clamp-2 leading-tight">{currentAngle.userPrompt}</p>
+                  <p className="leading-snug">{currentAngle.userPrompt}</p>
                 </div>
 
                 {/* Gemini Assistant Response Block */}
-                <div className="bg-[#191a1b] border border-[#8AB4F8]/25 rounded-xl p-3 text-[11px] text-white">
+                <div className="bg-[#191a1b] border border-[#8AB4F8]/20 rounded-xl p-3 text-[11px] text-white">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Sparkles size={13} className="text-[#8AB4F8]" />
                     <span className="text-[10px] font-semibold text-[#8AB4F8]">Gemini</span>
@@ -697,11 +703,11 @@ export function LeadOutreachFlowchart() {
                     Subject: <span className="text-white font-medium">{currentAngle.subject}</span>
                   </div>
                   <p className="text-[11px] text-zinc-100 leading-relaxed font-sans">
-                    &quot;{currentAngle.body}&quot;
+                    {currentAngle.body}
                   </p>
 
                   {/* Gemini Action Row */}
-                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9.5px] text-zinc-400 font-mono">
+                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9.5px] text-zinc-400">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -712,14 +718,18 @@ export function LeadOutreachFlowchart() {
                         <span>{copied ? 'Copied' : 'Copy'}</span>
                       </button>
                       <span className="text-white/10">|</span>
-                      <Share2 size={11} className="hover:text-white cursor-pointer" />
-                      <Mail size={11} className="hover:text-white cursor-pointer" />
+                      <ThumbsUp size={11} className="hover:text-white cursor-pointer" />
+                      <ThumbsDown size={11} className="hover:text-white cursor-pointer" />
                     </div>
-                    <RotateCcw
-                      size={11}
+                    <button
+                      type="button"
                       onClick={() => setActiveAngleIdx((prev) => (prev === 0 ? 1 : 0))}
-                      className="hover:text-white cursor-pointer"
-                    />
+                      className="flex items-center gap-1 hover:text-white transition-colors"
+                      title="Modify"
+                    >
+                      <RotateCcw size={11} />
+                      <span className="font-mono text-[9px]">Modify</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -728,103 +738,220 @@ export function LeadOutreachFlowchart() {
         </div>
 
         {/* ======================================================== */}
-        {/* STAGE 05: Realistic Email Compose & Client Conversion    */}
-        {/* (Clean, Authentic, No Fake BS)                          */}
+        {/* STAGE 05: Client Conversion (Email / WhatsApp Switcher)  */}
         {/* ======================================================== */}
-        <div className="absolute left-[565px] top-[480px] z-10 w-[350px]">
-          {/* Stage Annotation Header */}
-          <div className="flex items-center gap-1 mb-1.5 px-1">
+        <div className="absolute left-[565px] top-[480px] z-10 w-[355px]">
+          {/* Stage Annotation Header & Channel Switcher */}
+          <div className="flex items-center justify-between mb-1.5 px-1">
             <span className="text-[10px] font-mono uppercase tracking-wider text-secondary font-bold">
               05 // CLIENT CONVERSION
             </span>
-          </div>
 
-          {/* REALISTIC EMAIL DRAFT COMPOSE POPUP */}
-          <div className="rounded-2xl bg-[#1a1b1e] border border-white/[0.12] shadow-2xl overflow-hidden mb-3">
-            {/* Window Header with macOS Window Controls */}
-            <div className="bg-[#222428] px-3.5 py-1.5 border-b border-white/[0.08] flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-white/90 font-sans">
-                New Message
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57] inline-block opacity-80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e] inline-block opacity-80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#28c840] inline-block opacity-80" />
-              </div>
-            </div>
-
-            {/* Recipient Row */}
-            <div className="px-3.5 py-1.5 border-b border-white/[0.05] flex items-center gap-2 text-[10.5px]">
-              <span className="text-zinc-500 font-mono text-[9.5px] shrink-0">To:</span>
-              <div className="bg-[#282a2e] border border-white/[0.08] px-2 py-0.5 rounded-md text-white flex items-center gap-1 font-sans text-[10px] truncate">
-                <span className="font-semibold">Marcus Vance</span>
-                <span className="text-zinc-400 font-mono text-[9px]">&lt;marcus@vesperjewelry.co&gt;</span>
-              </div>
-            </div>
-
-            {/* Subject Row */}
-            <div className="px-3.5 py-1.5 border-b border-white/[0.05] flex items-center gap-2 text-[10.5px]">
-              <span className="text-zinc-500 font-mono text-[9.5px] shrink-0">Subject:</span>
-              <span className="text-white/90 font-medium truncate font-sans text-[10.5px]">
-                {currentAngle.subject}
-              </span>
-            </div>
-
-            {/* Email Draft Body */}
-            <div className="px-3.5 py-2.5 text-[10.5px] text-zinc-300 font-sans leading-relaxed min-h-[55px]">
-              <p>&quot;{currentAngle.body}&quot;</p>
-            </div>
-
-            {/* Email Compose Bottom Action Bar */}
-            <div className="px-3 py-1.5 bg-[#202226] border-t border-white/[0.06] flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  className="bg-[#0b57d0] hover:bg-[#0b57d0]/90 text-white font-medium text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm transition-colors"
-                >
-                  <Send size={10} />
-                  <span>Send</span>
-                  <ChevronDown size={10} className="opacity-70" />
-                </button>
-              </div>
-
-              {/* Formatting & Attachment Icons */}
-              <div className="flex items-center gap-2.5 text-zinc-400">
-                <Paperclip size={11} className="hover:text-white cursor-pointer transition-colors" />
-                <Link2 size={11} className="hover:text-white cursor-pointer transition-colors" />
-                <Smile size={11} className="hover:text-white cursor-pointer transition-colors" />
-                <span className="text-white/10">|</span>
-                <Trash2 size={11} className="text-zinc-500 hover:text-red-400 cursor-pointer transition-colors" />
-              </div>
+            {/* Email / WhatsApp Channel Switcher */}
+            <div className="flex items-center gap-0.5 bg-surface-container-lowest p-0.5 rounded-lg border border-white/[0.08]">
+              <button
+                type="button"
+                onClick={() => setConversionChannel('email')}
+                className={`flex items-center gap-1 py-0.5 px-2 rounded-md text-[9.5px] font-medium transition-all ${
+                  conversionChannel === 'email'
+                    ? 'bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 font-semibold shadow-sm'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <Mail size={10} />
+                <span>Email</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setConversionChannel('whatsapp')}
+                className={`flex items-center gap-1 py-0.5 px-2 rounded-md text-[9.5px] font-medium transition-all ${
+                  conversionChannel === 'whatsapp'
+                    ? 'bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/40 font-semibold shadow-sm'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <WhatsAppOfficialLogo className="w-2.5 h-2.5" />
+                <span>WhatsApp</span>
+              </button>
             </div>
           </div>
 
-          {/* REAL CLIENT RESULT / CONVERSION CARD */}
-          <div className="p-3 rounded-xl bg-surface border border-secondary/30 shadow-lg">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5 min-w-0">
-                <div className="w-5 h-5 rounded-full bg-[#11150C] text-[#B8F36B] border border-[#B8F36B]/30 flex items-center justify-center font-bold text-[8.5px] uppercase shrink-0">
-                  MV
+          {/* CHANNEL 1: AUTHENTIC EMAIL APP INTERFACE */}
+          {conversionChannel === 'email' && (
+            <div>
+              {/* AUTHENTIC EMAIL CLIENT DRAFT WINDOW */}
+              <div className="rounded-2xl bg-[#1e1f23] border border-white/[0.1] shadow-2xl overflow-hidden mb-2.5">
+                {/* Window Header with macOS Window Controls */}
+                <div className="bg-[#26282d] px-3.5 py-2 border-b border-white/[0.08] flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-zinc-300 font-sans">
+                    New Message
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block opacity-85" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block opacity-85" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block opacity-85" />
+                  </div>
                 </div>
-                <div className="text-[10.5px] font-bold text-text-primary truncate">
-                  Marcus Vance · Vesper
+
+                {/* Recipient Row */}
+                <div className="px-3.5 py-1.5 border-b border-white/[0.05] flex items-center justify-between text-[11px]">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-zinc-500 font-medium text-[10px] w-6 shrink-0">To</span>
+                    <div className="bg-[#2b2d33] border border-white/[0.08] px-2 py-0.5 rounded-full text-zinc-100 flex items-center gap-1.5 font-sans text-[10px] truncate">
+                      <div className="w-3.5 h-3.5 rounded-full bg-[#3d4452] text-[8px] font-bold text-zinc-200 flex items-center justify-center shrink-0">
+                        M
+                      </div>
+                      <span className="font-semibold text-zinc-200">Marcus Vance</span>
+                      <span className="text-zinc-400 font-mono text-[9px]">&lt;marcus@vesperjewelry.co&gt;</span>
+                    </div>
+                  </div>
+                  <span className="text-zinc-500 text-[10px] shrink-0 font-sans">Cc Bcc</span>
+                </div>
+
+                {/* Subject Row */}
+                <div className="px-3.5 py-1.5 border-b border-white/[0.05] flex items-center gap-2 text-[11px]">
+                  <span className="text-zinc-500 font-medium text-[10px] w-6 shrink-0">Subj</span>
+                  <span className="text-zinc-200 font-medium truncate font-sans text-[10.5px]">
+                    {currentAngle.subject}
+                  </span>
+                </div>
+
+                {/* Email Draft Body */}
+                <div className="px-3.5 py-2.5 text-[11px] text-zinc-300 font-sans leading-relaxed min-h-[55px]">
+                  <p>{currentAngle.body}</p>
+                </div>
+
+                {/* Email Compose Bottom Action Bar */}
+                <div className="px-3 py-1.5 bg-[#26282d] border-t border-white/[0.06] flex items-center justify-between">
+                  <button
+                    type="button"
+                    className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium text-[10.5px] px-3 py-1 rounded-md flex items-center gap-1.5 shadow-sm transition-colors"
+                  >
+                    <Send size={10} className="fill-current" />
+                    <span>Send</span>
+                    <span className="border-l border-white/20 pl-1 ml-0.5 text-[8.5px]">▾</span>
+                  </button>
+
+                  {/* Formatting & Attachment Icons */}
+                  <div className="flex items-center gap-2 text-zinc-400">
+                    <Paperclip size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                    <Link2 size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                    <Smile size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                    <span className="text-white/10">|</span>
+                    <Trash2 size={11} className="text-zinc-500 hover:text-red-400 cursor-pointer transition-colors" />
+                  </div>
                 </div>
               </div>
-              <span className="text-[9px] font-mono text-secondary shrink-0">
-                Replied in 18m
-              </span>
-            </div>
 
-            <div className="p-2 rounded-lg bg-surface-container-lowest border border-white/[0.04] text-[10.5px] text-text-secondary italic leading-snug mb-1.5 font-sans">
-              &quot;{currentAngle.clientReply}&quot;
-            </div>
+              {/* REAL CLIENT INBOX THREAD / REPLY */}
+              <div className="rounded-xl bg-[#1e1f23] border border-white/[0.08] shadow-lg overflow-hidden">
+                <div className="px-3 py-1.5 bg-[#26282d] border-b border-white/[0.06] flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="w-4 h-4 rounded-full bg-[#3d4452] text-zinc-200 flex items-center justify-center font-bold text-[8px] uppercase shrink-0">
+                      MV
+                    </div>
+                    <span className="text-[10.5px] font-semibold text-zinc-200 truncate">
+                      Marcus Vance
+                    </span>
+                    <span className="text-[9px] text-zinc-500 font-mono truncate hidden sm:inline">
+                      &lt;marcus@vesperjewelry.co&gt;
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 text-zinc-400">
+                    <span className="text-[9px] font-mono">18m ago</span>
+                    <Star size={10} className="text-amber-400 fill-amber-400/20" />
+                  </div>
+                </div>
 
-            <div className="flex items-center justify-end pt-1 border-t border-white/[0.06] text-[9px] font-mono">
-              <span className="text-secondary font-bold flex items-center gap-1">
-                ● Meeting Requested
-              </span>
+                <div className="p-3 text-[11px] text-zinc-200 font-sans leading-relaxed bg-[#18191c]/80 border-b border-white/[0.04]">
+                  {currentAngle.clientReply}
+                </div>
+
+                {/* Email Action Bar: Standard Reply / Forward */}
+                <div className="px-3 py-1.5 bg-[#26282d] flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] hover:bg-[#3d4047] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06] transition-colors"
+                  >
+                    <Reply size={10} />
+                    <span>Reply</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] hover:bg-[#3d4047] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06] transition-colors"
+                  >
+                    <Forward size={10} />
+                    <span>Forward</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* CHANNEL 2: AUTHENTIC WHATSAPP CHAT INTERFACE */}
+          {conversionChannel === 'whatsapp' && (
+            <div className="rounded-2xl bg-[#111b21] border border-white/[0.1] shadow-2xl overflow-hidden">
+              {/* WhatsApp Header Bar */}
+              <div className="bg-[#202c33] px-3 py-2 border-b border-white/[0.08] flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-full bg-[#00a884] text-[#111b21] font-bold text-[9px] flex items-center justify-center shrink-0">
+                    MV
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-semibold text-[#e9edef] truncate leading-tight">
+                      Marcus Vance
+                    </div>
+                    <div className="text-[9px] text-[#00a884] leading-tight flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00a884]" />
+                      <span>online</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-zinc-400">
+                  <Video size={12} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                  <Phone size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                  <MoreVertical size={12} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                </div>
+              </div>
+
+              {/* WhatsApp Messages Canvas */}
+              <div className="p-3 bg-[#0b141a] space-y-2.5 min-h-[195px] flex flex-col justify-end">
+                {/* Date Divider */}
+                <div className="text-center my-0.5">
+                  <span className="px-2 py-0.5 rounded bg-[#182229] text-[8.5px] font-medium text-zinc-400 shadow-sm">
+                    TODAY
+                  </span>
+                </div>
+
+                {/* Outgoing Message (Sent by Hunter) */}
+                <div className="ml-auto max-w-[86%] bg-[#005c4b] text-[#e9edef] rounded-lg rounded-tr-none px-2.5 py-1.5 text-[10.5px] shadow-sm font-sans">
+                  <p className="leading-snug">{currentAngle.body}</p>
+                  <div className="flex items-center justify-end gap-1 mt-1 text-[8.5px] text-emerald-200/70 font-mono">
+                    <span>10:24 AM</span>
+                    <CheckCheck size={11} className="text-[#53bdeb]" />
+                  </div>
+                </div>
+
+                {/* Incoming Message (Client Reply from Marcus) */}
+                <div className="mr-auto max-w-[86%] bg-[#202c33] text-[#e9edef] rounded-lg rounded-tl-none px-2.5 py-1.5 text-[10.5px] shadow-sm font-sans">
+                  <p className="leading-snug">{currentAngle.clientReply}</p>
+                  <div className="flex items-center justify-end mt-1 text-[8.5px] text-zinc-400 font-mono">
+                    <span>10:42 AM</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* WhatsApp Input Bar */}
+              <div className="bg-[#202c33] px-2.5 py-2 border-t border-white/[0.06] flex items-center gap-2">
+                <Smile size={13} className="text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" />
+                <Paperclip size={13} className="text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" />
+                <div className="flex-1 bg-[#2a3942] rounded-lg px-2.5 py-1 text-[10px] text-zinc-400 font-sans">
+                  Type a message
+                </div>
+                <Mic size={13} className="text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -859,10 +986,6 @@ export function LeadOutreachFlowchart() {
             </span>
           </div>
 
-          <div className="text-[11.5px] font-bold text-text-primary mb-2 flex items-center gap-1">
-            <span>🔥</span>
-            <span>Lead Intelligence: Luxury 3D Visualizer</span>
-          </div>
 
           <div className="p-2.5 rounded-xl bg-surface-container-lowest border border-white/[0.04] space-y-2 mb-2.5">
             <div>
@@ -952,23 +1075,123 @@ export function LeadOutreachFlowchart() {
               Subject: <span className="text-white font-medium">{currentAngle.subject}</span>
             </div>
             <p className="text-xs text-text-secondary font-sans leading-relaxed">
-              &quot;{currentAngle.body}&quot;
+              {currentAngle.body}
             </p>
           </div>
         </div>
 
         {/* Step 5: Result */}
-        <div className="p-4 rounded-2xl bg-surface border border-secondary/30">
-          <div className="flex items-center justify-between text-[10px] font-mono text-secondary mb-1">
-            <span>05 // CLIENT CONVERSION</span>
-            <span>Replied in 18m</span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-secondary font-bold">
+              05 // CLIENT CONVERSION
+            </span>
+            <div className="flex items-center gap-0.5 bg-surface-container-lowest p-0.5 rounded-lg border border-white/[0.08]">
+              <button
+                type="button"
+                onClick={() => setConversionChannel('email')}
+                className={`flex items-center gap-1 py-0.5 px-2 rounded-md text-[9.5px] font-medium ${
+                  conversionChannel === 'email'
+                    ? 'bg-[#1a73e8]/20 text-[#8ab4f8] border border-[#1a73e8]/40 font-semibold'
+                    : 'text-zinc-400'
+                }`}
+              >
+                <Mail size={10} />
+                <span>Email</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setConversionChannel('whatsapp')}
+                className={`flex items-center gap-1 py-0.5 px-2 rounded-md text-[9.5px] font-medium ${
+                  conversionChannel === 'whatsapp'
+                    ? 'bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/40 font-semibold'
+                    : 'text-zinc-400'
+                }`}
+              >
+                <WhatsAppOfficialLogo className="w-2.5 h-2.5" />
+                <span>WhatsApp</span>
+              </button>
+            </div>
           </div>
-          <p className="text-xs text-text-secondary italic mb-2">
-            &quot;{currentAngle.clientReply}&quot;
-          </p>
-          <span className="text-[10px] font-mono text-secondary block text-right font-bold">
-            ● Meeting Requested
-          </span>
+
+          {conversionChannel === 'email' ? (
+            <div className="rounded-2xl bg-[#1e1f23] border border-white/[0.1] shadow-lg overflow-hidden">
+              <div className="px-3.5 py-2 bg-[#26282d] border-b border-white/[0.08] flex items-center justify-between text-[10px]">
+                <span className="font-sans text-zinc-300 font-medium">Inbox Conversation</span>
+                <div className="flex items-center gap-1.5 text-zinc-400 text-[9px] font-mono">
+                  <span>18m ago</span>
+                  <Star size={10} className="text-amber-400 fill-amber-400/20" />
+                </div>
+              </div>
+              <div className="p-3 bg-[#18191c]/80 border-b border-white/[0.04]">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <div className="w-4 h-4 rounded-full bg-[#3d4452] text-zinc-200 flex items-center justify-center font-bold text-[8px] uppercase shrink-0">
+                    MV
+                  </div>
+                  <span className="text-[11px] font-semibold text-zinc-200">Marcus Vance</span>
+                  <span className="text-[9px] text-zinc-500 font-mono">&lt;marcus@vesperjewelry.co&gt;</span>
+                </div>
+                <p className="text-xs text-zinc-200 font-sans leading-relaxed">
+                  {currentAngle.clientReply}
+                </p>
+              </div>
+              <div className="px-3.5 py-1.5 bg-[#26282d] flex items-center gap-2">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06]"
+                >
+                  <Reply size={10} />
+                  <span>Reply</span>
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06]"
+                >
+                  <Forward size={10} />
+                  <span>Forward</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-[#111b21] border border-white/[0.1] shadow-lg overflow-hidden">
+              <div className="bg-[#202c33] px-3.5 py-2 border-b border-white/[0.08] flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-full bg-[#00a884] text-[#111b21] font-bold text-[9px] flex items-center justify-center shrink-0">
+                    MV
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-semibold text-[#e9edef] truncate">
+                      Marcus Vance
+                    </div>
+                    <div className="text-[9px] text-[#00a884] flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00a884]" />
+                      <span>online</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 text-zinc-400">
+                  <Video size={12} />
+                  <Phone size={11} />
+                  <MoreVertical size={12} />
+                </div>
+              </div>
+              <div className="p-3 bg-[#0b141a] space-y-2">
+                <div className="ml-auto max-w-[88%] bg-[#005c4b] text-[#e9edef] rounded-lg rounded-tr-none px-2.5 py-1.5 text-[11px] font-sans">
+                  <p>{currentAngle.body}</p>
+                  <div className="flex items-center justify-end gap-1 mt-1 text-[8.5px] text-emerald-200/70 font-mono">
+                    <span>10:24 AM</span>
+                    <CheckCheck size={11} className="text-[#53bdeb]" />
+                  </div>
+                </div>
+                <div className="mr-auto max-w-[88%] bg-[#202c33] text-[#e9edef] rounded-lg rounded-tl-none px-2.5 py-1.5 text-[11px] font-sans">
+                  <p>{currentAngle.clientReply}</p>
+                  <div className="flex items-center justify-end mt-1 text-[8.5px] text-zinc-400 font-mono">
+                    <span>10:42 AM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
