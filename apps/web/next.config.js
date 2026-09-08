@@ -10,6 +10,7 @@ const CSP_DIRECTIVES = {
     'https://www.google.com',
     'https://www.google-analytics.com',
     'https://www.googletagmanager.com',
+    'https://checkout.razorpay.com',
     "'unsafe-eval'",
     "'unsafe-inline'",
   ],
@@ -40,10 +41,12 @@ const CSP_DIRECTIVES = {
     'https://api.resend.com',
     'https://api.openai.com',
     'https://api.anthropic.com',
-    process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL : '',
+    'https://api.razorpay.com',
+    'https://lumberjack.razorpay.com',
+    // NEXT_PUBLIC_API_URL is only used server-side now — do not expose Oracle IP in CSP
     process.env.UPSTASH_REDIS_REST_URL ? process.env.UPSTASH_REDIS_REST_URL : '',
   ].filter(Boolean),
-  'frame-src': ["'self'", 'https://www.google.com', 'https://apis.google.com'],
+  'frame-src': ["'self'", 'https://www.google.com', 'https://apis.google.com', 'https://api.razorpay.com'],
   'frame-ancestors': ["'none'"],
   'form-action': [
     "'self'",

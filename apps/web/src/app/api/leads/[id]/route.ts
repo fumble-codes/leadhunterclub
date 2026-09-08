@@ -8,6 +8,8 @@ import {
   OnboardingRequiredError,
 } from '@/lib/auth'
 import { getPost } from '@/lib/external-api/client'
+import { oracleDb } from '@/lib/oracle-db'
+import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import { updateLeadSchema } from '@/lib/validators/auth'
 import type { AppLead } from '@/types/lead'
 import { extractNiches } from '@/lib/claim-reveal'
@@ -69,7 +71,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const authUser = await requireFullyAuthorized(request)
     const userId = authUser.uid
 
-    const externalLead = await getPost(params.id)
+    const rawLead = await oracleDb.leadPost.findUnique({ where: { id: params.id } })
+    if (!rawLead) {
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'Lead not found' }, { status: 404 })
+    }
+    const externalLead = mapLeadPostToExternal(rawLead)
 
     const userState = await db.userLeadState.findUnique({
       where: {
@@ -187,83 +193,13 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       updateData.status = 'new'
     }
 
-    const ensureLeadRecord = async () => {
-      try {
-        const ext = await getPost(params.id)
-        await db.lead.upsert({
-          where: { id: params.id },
-          update: {
-            name: ext.author?.name || 'Unknown',
-            email: ext.email || ext.contact_info?.emails?.[0]?.email || '',
-            phone: ext.contact_info?.phone_numbers?.[0]?.number || null,
-            company: ext.contact_info?.company_name || ext.author?.name || ext.platform || '',
-            source: ext.platform || 'Unknown',
-            category: ext.keyword?.replace(/^watchlist:/, '') || ext.platform || 'General',
-            title: ext.author?.info || ext.keyword || ext.platform || 'Lead Signal',
-            signalContext: ext.content || '',
-            role: ext.author?.info || '',
-            taskScope: '',
-            mustHave: '',
-            nicheBonus: '',
-            buyerType: '',
-            urgency: 'medium',
-            winProb: 'medium',
-            nicheTags: [],
-            niches: [],
-            hashtags: [],
-            replyProbability: Math.max(ext.ai_score || 0, 60),
-            accent: 'mint',
-          },
-          create: {
-            id: params.id,
-            name: ext.author?.name || 'Unknown',
-            email: ext.email || ext.contact_info?.emails?.[0]?.email || '',
-            phone: ext.contact_info?.phone_numbers?.[0]?.number || null,
-            company: ext.contact_info?.company_name || ext.author?.name || ext.platform || '',
-            source: ext.platform || 'Unknown',
-            category: ext.keyword?.replace(/^watchlist:/, '') || ext.platform || 'General',
-            title: ext.author?.info || ext.keyword || ext.platform || 'Lead Signal',
-            signalContext: ext.content || '',
-            role: ext.author?.info || '',
-            taskScope: '',
-            mustHave: '',
-            nicheBonus: '',
-            buyerType: '',
-            urgency: 'medium',
-            winProb: 'medium',
-            nicheTags: [],
-            niches: [],
-            hashtags: [],
-            replyProbability: Math.max(ext.ai_score || 0, 60),
-            accent: 'mint',
-          },
-        })
-      } catch (e) {
-        console.warn('[Lead PATCH] getPost failed, creating minimal Lead:', e)
-        await db.lead.upsert({
-          where: { id: params.id },
-          update: { name: 'Unknown', email: '', company: '', source: '', category: '', title: '', signalContext: '', role: '', taskScope: '', mustHave: '', nicheBonus: '', buyerType: '', urgency: 'medium', winProb: 'medium', nicheTags: [], niches: [], hashtags: [], replyProbability: 0, accent: 'mint' },
-          create: { id: params.id, name: 'Unknown', email: '', company: '', source: '', category: '', title: '', signalContext: '', role: '', taskScope: '', mustHave: '', nicheBonus: '', buyerType: '', urgency: 'medium', winProb: 'medium', nicheTags: [], niches: [], hashtags: [], replyProbability: 0, accent: 'mint' },
-        })
-      }
-    }
-
     if (isSaved === true || (status && status !== 'new')) {
-      try {
-        await ensureLeadRecord()
-      } catch (e) {
-        console.warn('[Lead PATCH] ensureLeadRecord failed, creating fallback Lead:', e)
-        await db.lead.upsert({
-          where: { id: params.id },
-          update: {},
-          create: {
-            id: params.id,
-            name: 'Unknown', email: '', company: '', source: '', category: '',
-            title: '', signalContext: '', role: '', taskScope: '', mustHave: '',
-            nicheBonus: '', buyerType: '', urgency: 'medium', winProb: 'medium',
-            nicheTags: [], niches: [], hashtags: [], replyProbability: 0, accent: 'mint',
-          },
-        })
+      const leadExists = await db.leadPost.findUnique({
+        where: { id: params.id },
+        select: { id: true },
+      })
+      if (!leadExists) {
+        return NextResponse.json({ code: 'NOT_FOUND', message: 'Lead not found' }, { status: 404 })
       }
     }
 

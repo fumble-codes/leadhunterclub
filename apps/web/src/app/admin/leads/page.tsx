@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   Trash2,
   Plus,
+  Sparkles,
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
@@ -97,6 +98,7 @@ export default function AdminLeadsPage() {
   const [enrichingIds, setEnrichingIds] = useState<string[]>([])
   const [reviewActionIds, setReviewActionIds] = useState<string[]>([])
   const [intelActionIds, setIntelActionIds] = useState<string[]>([])
+  const [titleActionIds, setTitleActionIds] = useState<string[]>([])
   const [deletingIds, setDeletingIds] = useState<string[]>([])
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
   const [bulkSelectionBusy, setBulkSelectionBusy] = useState(false)
@@ -110,10 +112,19 @@ export default function AdminLeadsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [counts, setCounts] = useState<LeadCounts>({})
   const [isTrainingAi, setIsTrainingAi] = useState(false)
+  const [isBulkTitling, setIsBulkTitling] = useState(false)
+  const [isBulkInteling, setIsBulkInteling] = useState(false)
   const [intelConfigured, setIntelConfigured] = useState<boolean | null>(null)
   const [intelModel, setIntelModel] = useState('')
   const { addToast } = useToast()
   const perPage = 10
+
+  // Manual contact state — keyed by lead ID
+  const [manualContactOpen, setManualContactOpen] = useState<string | null>(null)
+  const [manualContactEmail, setManualContactEmail] = useState('')
+  const [manualContactPhone, setManualContactPhone] = useState('')
+  const [manualContactNote, setManualContactNote] = useState('')
+  const [savingManualContact, setSavingManualContact] = useState(false)
 
   const apiGet = useCallback(async (path: string) => {
     const token = await getFirebaseToken()
@@ -143,6 +154,37 @@ export default function AdminLeadsPage() {
     })
     return res
   }, [])
+
+  const handleSaveManualContact = async (leadId: string) => {
+    if (!manualContactEmail.trim() && !manualContactPhone.trim()) return
+    setSavingManualContact(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/admin/leads/${leadId}/contact`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: manualContactEmail.trim() || undefined,
+          phone: manualContactPhone.trim() || undefined,
+          note: manualContactNote.trim() || undefined,
+        }),
+      })
+      const json = await res.json()
+      if (json.success) {
+        setLeads((prev) => prev.map((l) => l.id === leadId ? { ...l, ...json.data } : l))
+        setManualContactOpen(null)
+        setManualContactEmail('')
+        setManualContactPhone('')
+        setManualContactNote('')
+        addToast({ type: 'success', message: 'Contact details saved successfully' })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to save contact' })
+      }
+    } catch (e) {
+      addToast({ type: 'error', message: 'Failed to save contact' })
+    }
+    setSavingManualContact(false)
+  }
 
   const fetchAiMetrics = useCallback(async () => {
     try {
@@ -404,6 +446,24 @@ export default function AdminLeadsPage() {
     }
   }
 
+  const handleGenerateTitle = async (leadId: string) => {
+    try {
+      setTitleActionIds(prev => [...prev, leadId])
+      const res = await apiPost(`/api/admin/leads/${leadId}`, { action: 'generate-title' })
+      const json = await res.json()
+      if (!res.ok || !json.success) {
+        addToast({ type: 'error', message: json?.message || 'Failed to generate title.' })
+        return
+      }
+      addToast({ type: 'success', message: json.message || 'Title generated successfully.' })
+      fetchLeads(currentPage, activeTab, searchQuery, true)
+    } catch (err) {
+      addToast({ type: 'error', message: 'Failed to generate title.' })
+    } finally {
+      setTitleActionIds(prev => prev.filter(id => id !== leadId))
+    }
+  }
+
   const handleDeleteLead = async (lead: ExternalPost) => {
     const label = lead.author?.name || lead.keyword || 'this lead'
     if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) return
@@ -465,8 +525,34 @@ export default function AdminLeadsPage() {
     }
   }
 
-  const handleBulkApproveSelected = async () => {
-    if (selectedLeadIds.length === 0) return
+  const handleBulkTitle = async () => {
+    try {
+      setIsBulkTitling(true)
+      const res = await apiPost('/api/admin/leads', { action: 'bulk-title', filters: getBulkFilters() })
+      const json = await res.json()
+      addToast({ type: 'success', message: json?.message || `Queued ${json?.queued || 0} leads for titling` })
+    } catch {
+      addToast({ type: 'error', message: 'Failed to queue titles' })
+    } finally {
+      setIsBulkTitling(false)
+    }
+  }
+
+  const handleBulkIntel = async () => {
+    try {
+      setIsBulkInteling(true)
+      const res = await apiPost('/api/admin/leads', { action: 'bulk-intelligence', filters: getBulkFilters() })
+      const json = await res.json()
+      addToast({ type: 'success', message: json?.message || `Queued ${json?.queued || 0} leads for intelligence generation` })
+      fetchLeads(currentPage, activeTab, searchQuery, true)
+    } catch {
+      addToast({ type: 'error', message: 'Failed to queue intelligence' })
+    } finally {
+      setIsBulkInteling(false)
+    }
+  }
+
+  const handleBulkApproveSelected = async () => {    if (selectedLeadIds.length === 0) return
     try {
       setBulkSelectionBusy(true)
       const res = await apiPost('/api/admin/leads', { action: 'bulk-approve', ids: selectedLeadIds })
@@ -854,6 +940,22 @@ export default function AdminLeadsPage() {
                 {bulkRejecting ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
                 {bulkRejecting ? 'Rejecting...' : 'Reject All'}
               </button>
+              <button
+                onClick={handleBulkTitle}
+                disabled={isBulkTitling}
+                className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all disabled:opacity-50"
+              >
+                {isBulkTitling ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                {isBulkTitling ? 'Queueing...' : 'Generate Titles'}
+              </button>
+              <button
+                onClick={handleBulkIntel}
+                disabled={isBulkInteling}
+                className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+              >
+                {isBulkInteling ? <Loader2 size={14} className="animate-spin" /> : <BrainCircuit size={14} />}
+                {isBulkInteling ? 'Queueing...' : 'Generate Intel'}
+              </button>
             </>
           )}
           <button
@@ -1027,6 +1129,13 @@ export default function AdminLeadsPage() {
                       </div>
                     </div>
 
+                    {/* Lead Title */}
+                    {(lead as any).title && (
+                      <div className="mb-3 flex items-center gap-2">
+                        <span className="text-sm font-bold text-white">{(lead as any).title}</span>
+                      </div>
+                    )}
+
                     {lead.qualification_reason && lead.status !== 'pending' && (
                       <div className={`mb-4 p-3 border border-l-2 rounded-lg ${
                         lead.status === 'relevant'
@@ -1167,18 +1276,34 @@ export default function AdminLeadsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleRegenerateIntel(lead.id)}
-                              disabled={intelActionIds.includes(lead.id)}
-                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
-                            >
-                              {intelActionIds.includes(lead.id) ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <BrainCircuit size={12} />
-                              )}
-                              {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
-                            </button>
+                            {leadHasContactDetails(lead) && (
+                              <>
+                                <button
+                                  onClick={() => handleGenerateTitle(lead.id)}
+                                  disabled={titleActionIds.includes(lead.id)}
+                                  className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all disabled:opacity-50"
+                                >
+                                  {titleActionIds.includes(lead.id) ? (
+                                    <Loader2 size={12} className="animate-spin" />
+                                  ) : (
+                                    <Sparkles size={12} />
+                                  )}
+                                  {titleActionIds.includes(lead.id) ? 'Generating...' : 'Generate Title'}
+                                </button>
+                                <button
+                                  onClick={() => handleRegenerateIntel(lead.id)}
+                                  disabled={intelActionIds.includes(lead.id)}
+                                  className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+                                >
+                                  {intelActionIds.includes(lead.id) ? (
+                                    <Loader2 size={12} className="animate-spin" />
+                                  ) : (
+                                    <BrainCircuit size={12} />
+                                  )}
+                                  {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
+                                </button>
+                              </>
+                            )}
                             <button
                               onClick={() => handleReEnrichLead(lead.id)}
                               disabled={enrichingIds.includes(lead.id)}
@@ -1200,6 +1325,62 @@ export default function AdminLeadsPage() {
                         )}
                         {lead.enrichment_message && (
                           <p className="text-xs text-zinc-400">{lead.enrichment_message}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Manual Contact Input */}
+                    {lead.status === 'relevant' && (
+                      <div className="mb-4">
+                        {manualContactOpen === lead.id ? (
+                          <div className="p-4 bg-surface/50 border border-accent-mint/20 rounded-xl">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-accent-mint mb-3">Add Contact Manually</p>
+                            <div className="flex flex-col gap-2">
+                              <input
+                                type="email"
+                                placeholder="Email address"
+                                value={manualContactEmail}
+                                onChange={(e) => setManualContactEmail(e.target.value)}
+                                className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50"
+                              />
+                              <input
+                                type="tel"
+                                placeholder="Phone number (optional)"
+                                value={manualContactPhone}
+                                onChange={(e) => setManualContactPhone(e.target.value)}
+                                className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Note (optional)"
+                                value={manualContactNote}
+                                onChange={(e) => setManualContactNote(e.target.value)}
+                                className="w-full bg-surface-elevated border border-white/10 text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-accent-mint/50"
+                              />
+                              <div className="flex gap-2 mt-1">
+                                <button
+                                  onClick={() => handleSaveManualContact(lead.id)}
+                                  disabled={savingManualContact}
+                                  className="flex-1 py-2 rounded-lg bg-accent-mint text-black text-xs font-black uppercase tracking-widest hover:bg-accent-mint/90 transition-all disabled:opacity-50"
+                                >
+                                  {savingManualContact ? 'Saving...' : 'Save Contact'}
+                                </button>
+                                <button
+                                  onClick={() => { setManualContactOpen(null); setManualContactEmail(''); setManualContactPhone(''); setManualContactNote('') }}
+                                  className="px-4 py-2 rounded-lg bg-white/5 text-zinc-400 text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setManualContactOpen(lead.id)}
+                            className="w-full py-2 rounded-lg border border-dashed border-white/10 text-zinc-500 text-xs font-black uppercase tracking-widest hover:border-accent-mint/30 hover:text-accent-mint transition-all"
+                          >
+                            + Add Contact Manually
+                          </button>
                         )}
                       </div>
                     )}

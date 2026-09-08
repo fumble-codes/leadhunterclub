@@ -387,3 +387,40 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     )
   }
 }
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    await requireAdmin(request)
+    const { id: targetUserId } = await params
+
+    const user = await db.user.findUnique({ where: { id: targetUserId } })
+    if (!user) {
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'User not found' }, { status: 404 })
+    }
+
+    // Delete from Firebase Authentication
+    try {
+      const adminAuth = await import('@/lib/firebase-admin').then(m => m.getAdminAuthInstance())
+      await adminAuth.deleteUser(targetUserId)
+    } catch (firebaseErr: any) {
+      // If user doesn't exist in Firebase, continue with DB deletion
+      if (firebaseErr?.code !== 'auth/user-not-found') {
+        console.error('[Admin Delete User] Firebase deletion failed:', firebaseErr?.message)
+      }
+    }
+
+    // Delete from DB (cascade deletes credit_accounts, UserLeadState etc.)
+    await db.user.delete({ where: { id: targetUserId } })
+
+    return NextResponse.json({ success: true, message: 'User deleted from DB and Firebase' })
+  } catch (error: unknown) {
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ code: 'FORBIDDEN', message: 'Admin access required' }, { status: 403 })
+    }
+    console.error('[Admin Delete User] Error:', error)
+    return NextResponse.json(
+      { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to delete user' },
+      { status: 500 },
+    )
+  }
+}

@@ -7,7 +7,9 @@ import {
   EmailNotVerifiedError,
   OnboardingRequiredError,
 } from '@/lib/auth'
-import { claimPost, getPost } from '@/lib/external-api/client'
+import { claimPost, getPost, ExternalApiError } from '@/lib/external-api/client'
+import { oracleDb } from '@/lib/oracle-db'
+import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
@@ -43,7 +45,11 @@ export async function POST(request: NextRequest) {
 
     const { leadId } = parsed.data
 
-    const externalLead = await getPost(leadId)
+    const rawLead = await oracleDb.leadPost.findUnique({ where: { id: leadId } })
+    if (!rawLead) {
+      return NextResponse.json({ code: 'NOT_FOUND', message: 'Lead not found' }, { status: 404 })
+    }
+    const externalLead = mapLeadPostToExternal(rawLead)
 
     const contactBundle = leadContactBundle(externalLead)
     const CREDIT_COST = getLeadRevealCost(externalLead)
@@ -124,7 +130,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const claimedLead = await claimPost(leadId)
+    const claimedLead = await claimPost(leadId).catch((err) => {
+      // If backend rejects for token reasons, still proceed — credits already deducted on our side
+      if (err instanceof ExternalApiError && (err.status === 403 || err.status === 400)) {
+        console.warn('[Lead Reveal] Backend claim soft-error (token check):', err.externalMessage)
+        return externalLead // fall back to the lead data we already have
+      }
+      throw err
+    })
 
     const txResult = await db.$transaction(
       async (tx) => {

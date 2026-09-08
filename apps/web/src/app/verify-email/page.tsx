@@ -3,13 +3,12 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import {
   EnvelopeIcon,
   ArrowPathIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/solid'
-import { auth, sendEmailVerification } from '@/lib/firebase'
+import { auth, sendEmailVerification, firebaseSignOut } from '@/lib/firebase'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 
 function VerifyEmailContent() {
@@ -172,12 +171,15 @@ function VerifyEmailContent() {
           )}
 
           <div className="mt-8">
-            <Link
-              href="/login"
+            <button
+              onClick={async () => {
+                await firebaseSignOut(auth)
+                router.push('/login')
+              }}
               className="text-xs text-text-secondary/50 hover:text-text-secondary transition-colors"
             >
               Sign in with a different account
-            </Link>
+            </button>
           </div>
         </div>
       </motion.div>

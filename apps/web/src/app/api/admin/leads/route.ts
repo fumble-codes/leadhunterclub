@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
-import { ExternalApiError } from '@/lib/external-api/client'
+import { ExternalApiError, fetchApi } from '@/lib/external-api/client'
 import {
   getPosts,
   bulkApprove,
@@ -73,6 +73,22 @@ export async function POST(request: NextRequest) {
       case 'train-ai': {
         const trainResult = await trainAiNow()
         return NextResponse.json(trainResult)
+      }
+
+      case 'bulk-title': {
+        const titleRes = await fetchApi<{ success: boolean; queued: number; message: string }>(
+          '/posts/bulk-title',
+          { method: 'POST', body: JSON.stringify(filters || {}) },
+        )
+        return NextResponse.json(titleRes)
+      }
+
+      case 'bulk-intelligence': {
+        const intelRes = await fetchApi<{ success: boolean; queued: number; message: string }>(
+          '/posts/bulk-intelligence',
+          { method: 'POST', body: JSON.stringify(filters || {}) },
+        )
+        return NextResponse.json(intelRes)
       }
 
       default:

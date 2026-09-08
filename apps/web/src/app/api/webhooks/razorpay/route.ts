@@ -68,7 +68,8 @@ async function handleSubscriptionPayment(
     const noteUserId = notes?.userId ? String(notes.userId) : null
     user = noteUserId ? await db.user.findUnique({ where: { id: noteUserId } }) : null
     resolvedPlanId = subscription.plan_id || planId
-    resolvedPeriodEnd = subscription.current_period_end ?? periodEndSeconds
+    resolvedPeriodEnd =
+      (subscription as any).current_period_end ?? (subscription as any).current_end ?? periodEndSeconds
   }
 
   if (!user) {

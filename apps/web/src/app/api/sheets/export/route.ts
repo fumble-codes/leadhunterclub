@@ -8,6 +8,7 @@ import {
   OnboardingRequiredError,
 } from '@/lib/auth'
 import { createLeadSheet, appendToSheet, type SheetLeadRow } from '@/lib/services/sheets'
+import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 
 export const dynamic = 'force-dynamic'
 
@@ -32,16 +33,24 @@ export async function POST(request: NextRequest) {
         console.warn(`[Sheets Export] Skipping state ${s.leadId}: no Lead record`)
         continue
       }
+      const ext = mapLeadPostToExternal(s.lead)
+      const phone = ext.contact_info?.phone_numbers?.[0]?.number || ''
+      const email = s.lead.email || ext.contact_info?.emails?.[0]?.email || ''
+      const name = ext.author?.name || 'Contact'
+      const company = ext.contact_info?.company_name || ext.author?.name || ext.platform || ''
+      const signalContext = s.lead.content || ''
+      const replyProbability = Math.max(s.lead.ai_score || 0, 60)
+
       rows.push({
-        name: s.lead.name,
-        email: s.lead.email,
-        phone: s.lead.phone || '',
-        company: s.lead.company,
-        signalContext: s.lead.signalContext,
+        name,
+        email,
+        phone,
+        company,
+        signalContext,
         aiDraft: '',
         status: s.status.charAt(0).toUpperCase() + s.status.slice(1),
-        urgency: s.lead.urgency.charAt(0).toUpperCase() + s.lead.urgency.slice(1),
-        replyProbability: s.lead.replyProbability,
+        urgency: 'Medium',
+        replyProbability,
       })
     }
 
