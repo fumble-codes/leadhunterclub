@@ -8,11 +8,13 @@ import {
   OnboardingRequiredError,
 } from '@/lib/auth'
 import { getPost } from '@/lib/external-api/client'
+import type { ExternalPost } from '@/lib/external-api/client'
 import { oracleDb } from '@/lib/oracle-db'
 import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import { updateLeadSchema } from '@/lib/validators/auth'
 import type { AppLead } from '@/types/lead'
-import { extractNiches } from '@/lib/claim-reveal'
+import { extractNiches, sanitizePublicText, extractCleanNicheTags, sanitizeHeadline } from '@/lib/claim-reveal'
+import { getLeadRevealCost } from '@/lib/config/coins'
 
 export const dynamic = 'force-dynamic'
 
@@ -92,32 +94,42 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const isClaimable = externalLead.source === 'seed' || (externalLead.review_status === 'approved' && !!externalLead.intelligence)
     const intel = externalLead.intelligence || ''
 
+    const niches = extractNiches(externalLead.keyword, externalLead.content || '', externalLead.intelligence)
+    const cleanTags = extractCleanNicheTags(externalLead, niches)
+    const cleanTitle = sanitizeHeadline(externalLead.author?.info || externalLead.keyword || '', niches[0])
+    const cleanScope = sanitizePublicText(
+      extractSection(intel, 'Context You Might Miss') ||
+        extractSection(intel, 'What They Actually Want') ||
+        extractSection(intel, 'One-Liner') ||
+        externalLead.content ||
+        '',
+    )
+
     const lead: AppLead = {
       id: externalLead.id,
       name: isRevealed ? externalLead.author?.name || 'Unknown' : 'Unlocked Contact',
       email: isRevealed
         ? externalLead.email || externalLead.contact_info?.emails?.[0]?.email || ''
         : 'unlocked@leadhunterclub.com',
-      company:
-        externalLead.contact_info?.company_name ||
-        externalLead.author?.name ||
-        externalLead.platform ||
-        '',
-      source: externalLead.platform || 'Unknown',
-      category:
-        extractSection(intel, 'One-Liner') || externalLead.author?.info || externalLead.keyword?.replace(/^watchlist:/, '') || externalLead.platform || 'General',
-      title:
-        externalLead.author?.info || externalLead.keyword || externalLead.platform || 'Lead Signal',
-      signalContext: isRevealed ? externalLead.content || '' : redactContact(externalLead.content || ''),
-      role: externalLead.author?.info || '',
-      taskScope: '',
-      mustHave: '',
-      nicheBonus: '',
-      buyerType: '',
+      company: isRevealed
+        ? externalLead.contact_info?.company_name ||
+          externalLead.author?.name ||
+          externalLead.platform ||
+          ''
+        : 'Confidential Client',
+      source: 'Lead Signal',
+      category: niches[0] || 'General',
+      title: cleanTitle,
+      signalContext: isRevealed ? externalLead.content || '' : sanitizePublicText(externalLead.content || ''),
+      role: sanitizePublicText(externalLead.author?.info || extractSection(intel, 'One-Liner')),
+      taskScope: cleanScope,
+      mustHave: sanitizePublicText(extractSection(intel, 'What They Actually Want')),
+      nicheBonus: sanitizePublicText(extractSection(intel, 'How to Win')),
+      buyerType: sanitizePublicText(intel),
       urgency: 'medium',
       winProb: 'medium',
-      nicheTags: extractTags(externalLead),
-      niches: extractNiches(externalLead.keyword, externalLead.content || '', externalLead.intelligence),
+      nicheTags: cleanTags,
+      niches,
       hashtags: [],
       replyProbability: Math.max(externalLead.ai_score || 0, 60),
       accent: 'mint',
@@ -127,7 +139,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       isRevealed,
       isClaimable,
       hasPhone: !!phone,
-      phone,
+      revealCost: getLeadRevealCost(externalLead),
+      phone: isRevealed ? phone : null,
     }
 
     return NextResponse.json({ data: lead })

@@ -76,11 +76,8 @@ export function ReviewScreenshotCard({
         '--bg-hover-color': isFeatured ? 'rgba(var(--rgb-accent-orange), 0.05)' : `rgba(var(--rgb-accent-${accent}), 0.02)`,
       } as React.CSSProperties}
     >
-      {/* Dynamic Glow Corner on Hover */}
-      <div
-        className="absolute -top-12 -right-12 w-24 h-24 blur-xl rounded-full pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-30"
-        style={{ background: isFeatured ? 'var(--accent-orange)' : `var(--accent-${accent})` }}
-      />
+      {/* Specular Top Edge on Hover */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       {/* Screenshot Container */}
       <div className="relative rounded-lg overflow-hidden flex items-center justify-center flex-1">
         <img
@@ -133,7 +130,7 @@ export default function TestimonialsSection() {
   return (
     <section
       id="testimonials"
-      className="py-36 px-6 max-w-[1200px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
+      className="py-16 md:py-20 px-4 sm:px-6 max-w-[1100px] mx-auto relative overflow-hidden border-t border-white/[0.03]"
     >
       {/* Self-contained float-heart & drift animations */}
       <style jsx global>{`
@@ -164,19 +161,16 @@ export default function TestimonialsSection() {
         }
       `}</style>
 
-      {/* Ambient glow decoration */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] glow-purple-medium pointer-events-none z-0" />
-
       {/* Header */}
-      <div className="text-center mb-12 relative z-10">
+      <div className="text-center mb-10 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
         >
-          <span className="text-[10px] font-bold tracking-ultra uppercase mb-6 block text-accent-orange">
-            Reviews (what people say)
+          <span className="text-sm font-semibold text-accent-orange mb-3 block">
+            What people say
           </span>
         </motion.div>
 
@@ -185,7 +179,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.08, ease }}
-          className="font-display text-[38px] md:text-[52px] font-semibold tracking-tight text-text-primary leading-[1.1] mb-5 max-w-3xl mx-auto"
+          className="font-display text-2xl sm:text-3xl md:text-[38px] font-semibold tracking-tight text-text-primary leading-[1.15] mb-4 max-w-2xl mx-auto"
         >
           Real results from real people.
           <br />
@@ -197,7 +191,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.15, ease }}
-          className="text-base text-text-secondary/60 max-w-lg mx-auto leading-relaxed"
+          className="text-sm sm:text-base text-text-secondary/60 max-w-lg mx-auto leading-relaxed"
         >
           Freelancers, designers, and agency owners share exactly what changed after switching to
           LeadHunterClub.
@@ -207,7 +201,7 @@ export default function TestimonialsSection() {
       {/* Live Feed Status Notice */}
       <div className="flex items-center justify-center gap-2.5 text-[12px] text-text-secondary/45 leading-relaxed mb-12 relative z-10">
         <span>✨</span>
-        <span>These screenshots are shared directly by active members inside our club — this feed is live.</span>
+        <span>These screenshots are shared directly by active members inside our club: this feed is live.</span>
       </div>
 
       {/* Reviews Grid & Hover Interactive Zone */}
@@ -223,7 +217,7 @@ export default function TestimonialsSection() {
                 onMouseEnter={isMiddleTrigger ? () => setIsHovered(true) : undefined}
               >
                 {isMiddleTrigger && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-orange text-bg-main border border-accent-orange/40 text-[10px] font-bold tracking-wider uppercase shadow-[0_4px_14px_rgba(var(--rgb-accent-orange),0.35)] animate-pulse whitespace-nowrap">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent-orange text-bg-main border border-accent-orange/40 text-[10px] font-mono font-bold tracking-wider uppercase shadow-[0_4px_14px_rgba(var(--rgb-accent-orange),0.35)] whitespace-nowrap">
                     <span>✨</span>
                     <span>Reviews (what people say)</span>
                   </div>

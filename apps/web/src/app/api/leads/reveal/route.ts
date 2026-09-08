@@ -14,7 +14,7 @@ import { leadRevealSchema } from '@/lib/validators/auth'
 import { rateLimitByKey } from '@/lib/rate-limit'
 import { creditService, InsufficientCreditsError } from '@/lib/services/credits'
 import { getLeadRevealCost, leadContactBundle } from '@/lib/config/coins'
-import { extractNiches } from '@/lib/claim-reveal'
+import { extractNiches, extractCleanNicheTags } from '@/lib/claim-reveal'
 
 export const dynamic = 'force-dynamic'
 
@@ -167,7 +167,10 @@ export async function POST(request: NextRequest) {
             buyerType: intel,
             urgency: 'medium',
             winProb: 'medium',
-            nicheTags: extractTags(claimedLead),
+            nicheTags: extractCleanNicheTags(
+              claimedLead,
+              extractNiches(claimedLead.keyword, claimedLead.content || '', claimedLead.intelligence),
+            ),
             niches: extractNiches(claimedLead.keyword, claimedLead.content || '', claimedLead.intelligence),
             hashtags: [],
             replyProbability: Math.max(claimedLead.ai_score || 0, 60),

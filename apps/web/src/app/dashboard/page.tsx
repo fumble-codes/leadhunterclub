@@ -75,7 +75,7 @@ export default function DashboardPage() {
     return (
       <main className="flex-1 flex items-center justify-center">
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl max-w-md">
-          <h3 className="text-base font-bold text-text-primary mb-2">Couldn't load your dashboard</h3>
+          <h3 className="text-base font-bold text-text-primary mb-2">Couldn&apos;t load your dashboard</h3>
           <p className="text-sm text-text-secondary/70 mb-6">{error}</p>
           <button
             onClick={() => load(true)}
@@ -90,7 +90,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="flex-1 overflow-y-auto px-10 py-12 relative scrollbar-hide">
+    <main data-lenis-prevent className="flex-1 h-full min-h-0 overflow-y-auto px-10 py-12 relative scrollbar-hide">
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[400px] glow-mint-soft pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] glow-purple-soft pointer-events-none" />
 

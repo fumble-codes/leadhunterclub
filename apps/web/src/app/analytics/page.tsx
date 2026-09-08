@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import AppSidebar from '@/components/layout/AppSidebar'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 import { getFirebaseToken } from '@/lib/firebase'
 import {
@@ -70,9 +69,7 @@ export default function AnalyticsPage() {
   const totalDistribution = distribution.reduce((sum, d) => sum + d.count, 0)
 
   return (
-    <div className="flex min-h-screen">
-      <AppSidebar />
-      <main className="flex-1 overflow-y-auto px-8 py-10 relative">
+    <main data-lenis-prevent className="flex-1 h-full min-h-0 overflow-y-auto px-8 py-10 relative">
         <div className="max-w-[1400px] mx-auto">
           <header className="mb-10">
             <h1 className="text-3xl font-bold text-text-primary tracking-tight">Analytics</h1>
@@ -83,7 +80,7 @@ export default function AnalyticsPage() {
             <CustomLoader page="analytics" />
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-surface-secondary/20 border border-white/[0.04] rounded-3xl max-w-md mx-auto">
-              <h3 className="text-base font-bold text-text-primary mb-2">Couldn't load analytics</h3>
+              <h3 className="text-base font-bold text-text-primary mb-2">Couldn&apos;t load analytics</h3>
               <p className="text-sm text-text-secondary/70 mb-6">{error}</p>
               <button
                 onClick={load}
@@ -220,6 +217,5 @@ export default function AnalyticsPage() {
           )}
         </div>
       </main>
-    </div>
   )
 }
