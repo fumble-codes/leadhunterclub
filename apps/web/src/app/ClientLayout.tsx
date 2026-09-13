@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { ToastProvider } from '@/components/ui/Toast'
 import { CustomLoader, type LoaderPageType } from '@/components/ui/CustomLoader'
 import { UpgradeNudgePopup, type UpgradeNudgeVariant } from '@/components/ui'
+import { getFirebaseToken } from '@/lib/firebase'
 
 
 
@@ -175,7 +176,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       ) : (
         children
       )}
-      {/* TODO(you): wire onUpgrade to your billing/upgrade flow */}
+      {/* 1-Time Dashboard Popup Nudge */}
       <UpgradeNudgePopup
         open={nudgeOpen}
         variant={nudgeVariant}
@@ -183,8 +184,48 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         creditsRemaining={nudgeMeta.creditsRemaining}
         planMax={nudgeMeta.planMax}
         renewalDate={nudgeMeta.renewalDate}
-        onClose={() => setNudgeOpen(false)}
-        onUpgrade={() => setNudgeOpen(false)}
+        onClose={async () => {
+          setNudgeOpen(false)
+          try {
+            const token = await getFirebaseToken()
+            if (token && nudgeVariant) {
+              await fetch('/api/notifications/popup-status', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ variant: nudgeVariant }),
+              })
+            }
+          } catch (e) {
+            console.error('[Nudge] Dismiss error:', e)
+          }
+        }}
+        onUpgrade={async () => {
+          setNudgeOpen(false)
+          try {
+            const token = await getFirebaseToken()
+            if (token && nudgeVariant) {
+              await fetch('/api/notifications/popup-status', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ variant: nudgeVariant }),
+              })
+            }
+          } catch (e) {
+            console.error('[Nudge] Dismiss error:', e)
+          }
+
+          if (nudgeVariant === 'low-credits' || nudgeVariant === 'out-of-credits') {
+            router.push('/refill')
+          } else {
+            router.push('/pricing')
+          }
+        }}
       />
     </ToastProvider>
   )
