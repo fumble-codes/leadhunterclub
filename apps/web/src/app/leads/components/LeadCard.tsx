@@ -96,6 +96,7 @@ function LeadCard({
   onClick,
   onSaveToggle,
   onReveal,
+  isHeroPreview = false,
 }: {
   lead: AppLead
   index?: number
@@ -103,6 +104,7 @@ function LeadCard({
   onClick?: () => void
   onSaveToggle?: (isSaved: boolean) => void
   onReveal?: (leadId: string, name: string, email: string, phone?: string | null) => void
+  isHeroPreview?: boolean
 }) {
   const { addToast } = useToast()
 
@@ -342,7 +344,7 @@ function LeadCard({
                 type="button"
                 onClick={handleReveal}
                 disabled={isRevealing}
-                className={`h-11 px-3 rounded-xl font-bold text-[10.5px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 whitespace-nowrap ${theme.button} ${
+                className={`${isHeroPreview ? 'h-8' : 'h-11'} px-3 rounded-xl font-bold text-[10.5px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 whitespace-nowrap ${theme.button} ${
                   isRevealing ? 'opacity-85 cursor-wait pointer-events-none' : 'cursor-pointer'
                 }`}
               >
@@ -403,7 +405,7 @@ function LeadCard({
             <button
               type="button"
               onClick={handleSave}
-              className={`w-[66px] h-11 rounded-xl text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
+              className={`${isHeroPreview ? 'w-[56px] h-8' : 'w-[66px] h-11'} rounded-xl text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
                 isSaved ? theme.savedButton : theme.saveButton
               }`}
             >
