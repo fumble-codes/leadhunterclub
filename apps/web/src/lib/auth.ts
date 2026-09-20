@@ -192,8 +192,8 @@ export async function requireFullyAuthorized(request: Request): Promise<AuthUser
   const dbUser = await db.user.findUnique({
     where: { id: user.uid },
     select: {
-      status: true,
       role: true,
+      status: true,
       portfolio: true,
       website: true,
       linkedin: true,
