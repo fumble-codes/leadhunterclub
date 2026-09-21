@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { requireFullyAuthorized, AuthRequiredError, InactiveUserError, EmailNotVerifiedError, OnboardingRequiredError } from '@/lib/auth'
+import {
+  requireFullyAuthorized,
+  handleAuthApiError,
+  AuthRequiredError,
+  InactiveUserError,
+  EmailNotVerifiedError,
+  OnboardingRequiredError,
+  PendingApprovalError,
+} from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,33 +20,43 @@ export async function GET(request: NextRequest) {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 
     const [user, totalLeadsCount, userStates] = await Promise.all([
-      db.user.findUnique({
-        where: { id: userId },
-        select: {
-          plan: true,
-          creditAccount: {
-            select: {
-              subscriptionBalance: true,
-              bonusBalance: true,
-              rolloverBalance: true,
+      db.user
+        .findUnique({
+          where: { id: userId },
+          select: {
+            plan: true,
+            creditAccount: {
+              select: {
+                subscriptionBalance: true,
+                bonusBalance: true,
+                rolloverBalance: true,
+              },
             },
           },
-        },
-      }),
+        })
+        .catch((err) => {
+          console.warn('[Dashboard API] Failed to fetch user info:', err)
+          return null
+        }),
       db.leadPost
         .count({
           where: { review_status: 'approved', is_deleted: false },
         })
         .catch(() => 0),
-      db.userLeadState.findMany({
-        where: { userId },
-        select: {
-          status: true,
-          isSaved: true,
-          lastActionDate: true,
-          lead: { select: { keyword: true, platform: true } },
-        },
-      }),
+      db.userLeadState
+        .findMany({
+          where: { userId },
+          select: {
+            status: true,
+            isSaved: true,
+            lastActionDate: true,
+            lead: { select: { keyword: true, platform: true } },
+          },
+        })
+        .catch((err) => {
+          console.warn('[Dashboard API] Failed to fetch user lead states:', err)
+          return []
+        }),
     ])
 
     const totalCredits =
@@ -61,11 +79,14 @@ export async function GET(request: NextRequest) {
     dayNames.forEach((d) => activityMap.set(d, 0))
     const nicheCounts = new Map<string, number>()
 
-    for (const state of userStates) {
+    for (const state of userStates || []) {
       const s = state.status
+      const actionDate = state.lastActionDate ? new Date(state.lastActionDate) : null
+      const isValidDate = actionDate && !isNaN(actionDate.getTime())
+
       if (['drafting', 'sent', 'replied', 'follow-up'].includes(s)) {
         activeConversationsCount++
-        if (state.lastActionDate && state.lastActionDate >= sevenDaysAgo) {
+        if (isValidDate && actionDate >= sevenDaysAgo) {
           activeConversationsThisWeek++
         }
       }
@@ -83,9 +104,11 @@ export async function GET(request: NextRequest) {
         const tag = state.lead?.keyword?.replace(/^watchlist:/, '') || state.lead?.platform || 'General'
         nicheCounts.set(tag, (nicheCounts.get(tag) || 0) + 1)
       }
-      if (state.lastActionDate && state.lastActionDate >= sevenDaysAgo) {
-        const dayName = dayNames[state.lastActionDate.getDay()]
-        activityMap.set(dayName, (activityMap.get(dayName) || 0) + 1)
+      if (isValidDate && actionDate >= sevenDaysAgo) {
+        const dayName = dayNames[actionDate.getDay()]
+        if (dayName) {
+          activityMap.set(dayName, (activityMap.get(dayName) || 0) + 1)
+        }
       }
     }
 
@@ -145,30 +168,41 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error: unknown) {
-    if (error instanceof AuthRequiredError) {
+    const authResponse = handleAuthApiError(error)
+    if (authResponse) return authResponse
+
+    const errName = (error as any)?.name || (error instanceof Error ? error.constructor.name : '')
+    if (error instanceof AuthRequiredError || errName === 'AuthRequiredError') {
       return NextResponse.json(
         { code: 'UNAUTHORIZED', message: 'Authentication required' },
         { status: 401 },
       )
     }
-    if (error instanceof InactiveUserError) {
+    if (error instanceof InactiveUserError || errName === 'InactiveUserError') {
       return NextResponse.json(
-        { code: 'INACTIVE', message: 'Your account is not active' },
+        { code: 'INACTIVE', message: (error as Error)?.message || 'Your account is not active' },
         { status: 403 },
       )
     }
-    if (error instanceof EmailNotVerifiedError) {
+    if (error instanceof PendingApprovalError || errName === 'PendingApprovalError') {
+      return NextResponse.json(
+        { code: 'PENDING_APPROVAL', message: 'Your application is under review' },
+        { status: 403 },
+      )
+    }
+    if (error instanceof EmailNotVerifiedError || errName === 'EmailNotVerifiedError') {
       return NextResponse.json(
         { code: 'EMAIL_NOT_VERIFIED', message: 'Please verify your email address first' },
         { status: 403 },
       )
     }
-    if (error instanceof OnboardingRequiredError) {
+    if (error instanceof OnboardingRequiredError || errName === 'OnboardingRequiredError') {
       return NextResponse.json(
         { code: 'ONBOARDING_REQUIRED', message: 'Please complete onboarding first' },
         { status: 403 },
       )
     }
+
     console.error('[Dashboard API] GET error:', error)
     return NextResponse.json(
       { code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve dashboard statistics' },
