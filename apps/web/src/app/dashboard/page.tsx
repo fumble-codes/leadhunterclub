@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { getFirebaseToken } from '@/lib/firebase'
+import { useAuth } from '@/hooks/useAuth'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 
 import {
@@ -24,6 +26,8 @@ const iconMap: Record<string, typeof ViewfinderCircleIcon> = {
 const accentColors = ['mint', 'purple'] as const
 
 export default function DashboardPage() {
+  const router = useRouter()
+  const { user, firebaseUser, loading: authLoading } = useAuth()
   const [stats, setStats] = useState<any[]>([])
   const [activity, setActivity] = useState<{ day: string; value: number }[]>([])
   const [distribution, setDistribution] = useState<
@@ -34,13 +38,19 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const load = async (userInitiated = false) => {
+  const load = useCallback(async (userInitiated = false) => {
     try {
       if (userInitiated) setLoading(true)
       setError(null)
-      const token = await getFirebaseToken()
+      const token = (await firebaseUser?.getIdToken()) || (await getFirebaseToken())
+      if (!token) {
+        if (!authLoading) {
+          router.push('/login')
+        }
+        return
+      }
       const res = await fetch('/api/dashboard', {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: { Authorization: `Bearer ${token}` },
       })
       const json = await res.json()
       if (res.ok && json.data) {
@@ -50,6 +60,22 @@ export default function DashboardPage() {
         if (json.data.readyForOutreachCount !== undefined)
           setReadyLeadCount(json.data.readyForOutreachCount)
       } else {
+        if (res.status === 401) {
+          router.push('/login')
+          return
+        }
+        if (json.code === 'EMAIL_NOT_VERIFIED') {
+          router.push('/verify-email')
+          return
+        }
+        if (json.code === 'ONBOARDING_REQUIRED') {
+          router.push('/onboarding')
+          return
+        }
+        if (json.code === 'INACTIVE' || json.code === 'PENDING_APPROVAL') {
+          router.push('/pending-approval')
+          return
+        }
         setError(json.message || 'Failed to load dashboard data.')
       }
     } catch (err) {
@@ -58,11 +84,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [firebaseUser, authLoading, router])
 
   useEffect(() => {
-    load()
-  }, [])
+    if (!authLoading) {
+      load()
+    }
+  }, [authLoading, load])
 
   if (loading) {
     return (
