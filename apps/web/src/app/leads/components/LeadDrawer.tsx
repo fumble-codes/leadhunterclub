@@ -518,7 +518,7 @@ export default function LeadDrawer({
           </div>
 
           {/* Action buttons: copy dropdown + copy lead intel (or unlock when locked) */}
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-2.5">
             {!lead.isRevealed ? (
               lead.isClaimedByOther ? (
                 <div className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/15 px-3 py-2 text-xs font-bold text-amber-500 select-none">
@@ -532,7 +532,7 @@ export default function LeadDrawer({
                   size="sm"
                   onClick={handleRevealClick}
                   loading={isRevealing}
-                  className="min-h-[44px] w-full shrink-0 text-[13px] sm:w-auto sm:min-w-[180px]"
+                  className="h-11 min-h-0 shrink-0 rounded-xl px-3.5 text-[11px] sm:h-11"
                 >
                   {isRevealing ? (
                     <>
@@ -541,9 +541,9 @@ export default function LeadDrawer({
                     </>
                   ) : (
                     <>
-                      Unlock & Save Lead
-                      <span className="ml-1 flex items-center gap-1 text-[10px] uppercase tracking-widest text-text-secondary">
-                        <BanknotesIcon className="w-3 h-3" /> -{tokenCost ?? '–'}
+                      Unlock & Save
+                      <span className="flex items-center gap-0.5 text-[10px] font-bold tabular-nums text-text-secondary">
+                        <BanknotesIcon className="w-3 h-3" />{tokenCost ?? '–'}
                       </span>
                     </>
                   )}
@@ -559,7 +559,7 @@ export default function LeadDrawer({
                 aria-label="Copy contact options"
                 aria-expanded={copyMenuOpen}
                 title="Copy contact"
-                className={`flex h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border px-3.5 text-xs font-bold transition-all active:scale-95 sm:w-auto ${
+                className={`flex h-11 items-center justify-center gap-1.5 rounded-xl border px-3.5 text-[11px] font-bold transition-all active:scale-95 ${
                   copyMenuOpen
                     ? 'border-primary/45 bg-primary/12 text-primary'
                     : lead.isRevealed
@@ -608,7 +608,7 @@ export default function LeadDrawer({
               onClick={handleCopyIntel}
               title="Copy lead intel"
               aria-label="Copy lead intel"
-              className="flex h-[44px] w-full shrink-0 items-center justify-center gap-1.5 rounded-xl border border-secondary/35 bg-secondary/12 px-3.5 text-xs font-bold text-secondary transition-all hover:border-secondary/55 hover:bg-secondary/18 active:scale-95 sm:w-auto"
+              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-secondary/35 bg-secondary/12 px-3.5 text-[11px] font-bold text-secondary transition-all hover:border-secondary/55 hover:bg-secondary/18 active:scale-95"
             >
               <DocumentDuplicateIcon className="h-3.5 w-3.5 shrink-0" />
               <span>Copy lead intel</span>
