@@ -5,14 +5,12 @@ import {
   XMarkIcon,
   LockClosedIcon,
   BanknotesIcon,
-  CheckCircleIcon,
-  ChartBarSquareIcon,
-  UserIcon,
-  EnvelopeIcon,
   ArrowPathIcon,
   PhoneIcon,
   ClockIcon,
   SparklesIcon,
+  UserIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/solid'
 import { AppLead } from '@/types/lead'
 import { Badge, Modal, Button } from '@/components/ui'
@@ -23,29 +21,6 @@ import { sanitizePublicText } from '@/lib/claim-reveal'
 import { triggerUnlockConfetti } from '@/lib/confetti'
 import { NicheBadge } from '@/components/ui/NicheBadge'
 
-const themeMap = {
-  mint: {
-    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
-    bgAccent: 'bg-surface-secondary',
-  },
-  purple: {
-    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
-    bgAccent: 'bg-surface-secondary',
-  },
-  cyan: {
-    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
-    bgAccent: 'bg-surface-secondary',
-  },
-  orange: {
-    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
-    bgAccent: 'bg-surface-secondary',
-  },
-  pink: {
-    textAccent: 'text-text-secondary hover:text-text-primary transition-colors',
-    bgAccent: 'bg-surface-secondary',
-  },
-}
-
 export default function LeadDrawer({
   lead,
   onClose,
@@ -55,7 +30,6 @@ export default function LeadDrawer({
   onClose: () => void
   onReveal: (name: string, email: string, phone?: string | null) => void
 }) {
-  const theme = themeMap[(lead.accent as keyof typeof themeMap) || 'mint']
   const [isRevealing, setIsRevealing] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [showCreditModal, setShowCreditModal] = useState(false)
@@ -152,7 +126,7 @@ export default function LeadDrawer({
   }
 
   return (
-    <div className="h-full w-full bg-surface-secondary border border-border-subtle rounded-2xl flex flex-col shadow-2xl relative overflow-hidden">
+    <div className="relative flex h-full w-full flex-col overflow-hidden rounded-t-3xl border border-white/[0.1] bg-surface-container-low/98 shadow-[0_24px_80px_-16px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl sm:rounded-[22px]">
       {/* Credit confirmation modal */}
       <Modal
         open={showCreditModal}
@@ -179,188 +153,223 @@ export default function LeadDrawer({
         </p>
       </Modal>
 
-      {/* Subtle top accent gradient */}
+      {/* Obsidian shell: rim light + grain + ambient glow */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/55 to-transparent" />
       <div
-        className={`absolute top-0 left-0 right-0 h-[2px] opacity-40 bg-gradient-to-r from-transparent via-current to-transparent ${theme.textAccent}`}
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-56 rounded-full bg-primary/10 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 128 128\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+        }}
+        aria-hidden
       />
 
-      {/* Drag handle (mobile bottom-sheet affordance) */}
-      <div className="md:hidden flex justify-center pt-2.5 pb-1 shrink-0">
-        <div className="w-10 h-1 rounded-full bg-white/20" aria-hidden="true" />
+      {/* Drag handle (mobile) */}
+      <div className="flex justify-center pt-2.5 pb-1 shrink-0 sm:hidden" aria-hidden>
+        <div className="w-10 h-1 rounded-full bg-white/20" />
       </div>
 
-      {/* Header with Close button */}
-      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 pt-2 sm:pt-6 pb-4 border-b border-border-subtle shrink-0">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap">
-          <div className={`w-2.5 h-2.5 rounded-full bg-current shrink-0 ${theme.textAccent}`} />
-          <NicheBadge niche={lead.niche} keyword={lead.category} content={lead.signalContext} />
-          <Badge size="sm" color="purple">
-            Lead Hunter Club
-          </Badge>
+      {/* Header */}
+      <div className="relative z-10 flex items-start justify-between gap-3 border-b border-white/[0.08] bg-gradient-to-b from-surface-container-high/70 to-surface-elevated/25 px-4 pt-3 pb-3.5 sm:px-6 sm:pt-5 sm:pb-4 shrink-0">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-primary">
+              Lead intel
+            </span>
+            <span className="h-px w-8 bg-gradient-to-r from-primary/40 to-transparent" aria-hidden />
+            <NicheBadge niche={lead.niche} keyword={lead.category} content={lead.signalContext} />
+            <Badge size="sm" color="purple">
+              Lead Hunter Club
+            </Badge>
+          </div>
+
+          <h2 className="text-lg sm:text-[22px] font-bold tracking-[-0.01em] text-white leading-[1.25]">
+            {displayTitle}
+          </h2>
+
+          <div className="mt-2.5 flex flex-wrap items-center gap-2 select-none text-[11px]">
+            {lead.timestamp && (
+              <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-text-secondary">
+                <ClockIcon className="w-3 h-3 text-text-secondary/70" />
+                Posted {lead.timestamp}
+              </span>
+            )}
+            {lead.replyProbability > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-lg border border-accent-purple/25 bg-accent-purple/10 px-2.5 py-1 font-medium text-accent-purple">
+                <SparklesIcon className="w-3 h-3" />
+                {lead.replyProbability}% AI Match
+              </span>
+            )}
+            {lead.winProb === 'high' && (
+              <span className="inline-flex items-center gap-1 rounded-lg border border-secondary/30 bg-secondary/10 px-2.5 py-1 font-medium text-secondary">
+                High win odds
+              </span>
+            )}
+          </div>
         </div>
+
         <button
           onClick={onClose}
           aria-label="Close lead details"
-          className="p-2.5 -m-1 rounded-lg hover:bg-white/10 text-text-secondary transition-colors shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.06] bg-black/30 text-text-secondary transition-all hover:border-white/15 hover:text-white active:scale-90"
         >
-          <XMarkIcon className="w-[18px] h-[18px]" />
+          <XMarkIcon className="w-[17px] h-[17px]" />
         </button>
       </div>
 
-      {/* Scrollable Content */}
-      <div
-        className="flex-1 overflow-y-auto p-4 sm:p-6 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        <div className="flex items-start justify-between gap-4 mb-2">
-          <h2 className="text-xl sm:text-[24px] font-bold tracking-tight text-text-primary leading-[1.25]">
-            {displayTitle}
-          </h2>
-        </div>
+      {/* Scrollable content */}
+      <div className="relative z-10 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-5 scrollbar-hide">
+        {/* Summary + skills layout */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="min-w-0">
+            {detailsSummaryDisplay && detailsSummaryDisplay.trim() !== '' && (
+              <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-surface-elevated/55 p-4">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-secondary/50 via-secondary/10 to-transparent" aria-hidden />
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-secondary">
+                    Lead summary
+                  </span>
+                  <span className="h-px flex-1 bg-white/[0.06]" aria-hidden />
+                </div>
+                <p className="text-[13.5px] font-medium leading-relaxed text-text-primary whitespace-pre-line">
+                  {detailsSummaryDisplay}
+                </p>
+              </section>
+            )}
 
-        {/* Scraped & Source Metadata Bar */}
-        <div className="flex flex-wrap items-center gap-2 mb-5 select-none text-[11px]">
+            {lead.nicheTags && lead.nicheTags.length > 0 && (
+              <section className="mt-5">
+                <div className="mb-2.5 flex items-center gap-2">
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-text-muted">
+                    Required skills
+                  </span>
+                  <span className="h-px flex-1 bg-white/[0.06]" aria-hidden />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {lead.nicheTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:border-primary/35 hover:bg-primary/10"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
 
-          {lead.timestamp && (
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-text-secondary">
-              <ClockIcon className="w-3 h-3 text-text-secondary/70" />
-              <span>Posted {lead.timestamp}</span>
-            </div>
-          )}
-
-          {lead.replyProbability > 0 && (
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent-purple/10 border border-accent-purple/20 text-accent-purple font-medium">
-              <SparklesIcon className="w-3 h-3 text-accent-purple" />
-              <span>{lead.replyProbability}% AI Match</span>
-            </div>
-          )}
-        </div>
-
-        {detailsSummaryDisplay && detailsSummaryDisplay.trim() !== '' && (
-          <div className="mb-6 p-4 rounded-xl bg-surface-elevated/70 border border-white/[0.08]">
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-mint">
-                Lead Summary
-              </span>
-            </div>
-            <p className="text-[13.5px] sm:text-[14px] font-medium leading-relaxed text-text-primary/95 whitespace-pre-line">
-              {detailsSummaryDisplay}
-            </p>
+            {lead.hashtags && lead.hashtags.length > 0 && (
+              <section className="mt-5">
+                <div className="mb-2.5 flex items-center gap-2">
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-text-muted">
+                    Tags
+                  </span>
+                  <span className="h-px flex-1 bg-white/[0.06]" aria-hidden />
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {lead.hashtags.map((t) => (
+                    <span
+                      key={t}
+                      className="rounded-md border border-white/[0.07] bg-white/[0.03] px-2 py-1 text-[12px] font-medium text-text-secondary"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
-        )}
 
-        {lead.nicheTags && lead.nicheTags.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap mb-6">
-            <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider mr-1">
-              Required Skills:
-            </span>
-            {lead.nicheTags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white/5 hover:bg-white/10 text-white border border-white/10 transition-colors"
+          {/* Deep intel */}
+          <section className="relative min-w-0">
+            <div className="mb-2.5 flex items-center gap-2">
+              <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
+                Deep intel
+              </span>
+              <span className="h-px flex-1 bg-gradient-to-r from-primary/35 to-transparent" aria-hidden />
+            </div>
+
+            <div className="relative rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+              {!lead.isRevealed && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl border border-white/[0.06] bg-surface-container-low/70 backdrop-blur-[7px]">
+                  <div className="grid h-11 w-11 place-items-center rounded-full border border-primary/30 bg-primary/10 mb-2.5">
+                    <LockClosedIcon className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+                    AI intel locked
+                  </p>
+                  <p className="mt-1 max-w-[200px] text-center text-[11px] text-text-secondary">
+                    Reveal contact to unlock buyer, scope & requirements
+                  </p>
+                </div>
+              )}
+
+              <div
+                className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 ${
+                  !lead.isRevealed ? 'opacity-30 blur-[2.5px] select-none' : ''
+                }`}
               >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className="w-full h-px bg-border-subtle mb-8" />
-
-        <div className="flex flex-col gap-6 relative">
-          {!lead.isRevealed && (
-            <div className="absolute inset-0 z-10 backdrop-blur-[6px] bg-surface-secondary/50 flex flex-col items-center justify-center rounded-xl border border-white/5">
-              <LockClosedIcon className="w-6 h-6 text-text-secondary mb-2" />
-              <p className="text-[12px] font-bold text-text-primary tracking-widest uppercase">
-                AI Intel Locked
-              </p>
-              <p className="text-[10px] text-text-secondary mt-1">
-                Reveal contact to unlock deep intelligence
-              </p>
+                <IntelBlock label="Target buyer" value={lead.buyerType} />
+                <IntelBlock label="Ideal candidate" value={lead.role} />
+                <IntelBlock label="Core scope" value={lead.taskScope} />
+                <IntelBlock label="Requirements" value={lead.mustHave} />
+                <IntelBlock label="Bonus points" value={lead.nicheBonus} />
+              </div>
             </div>
-          )}
-          <div className={!lead.isRevealed ? 'opacity-30 blur-[2px] select-none' : ''}>
-            <IntelBlock label="Target Buyer" value={lead.buyerType} theme={theme} />
-            <IntelBlock label="Ideal Candidate" value={lead.role} theme={theme} />
-            <IntelBlock label="Core Scope" value={lead.taskScope} theme={theme} />
-            <IntelBlock label="Requirements" value={lead.mustHave} theme={theme} />
-            <IntelBlock label="Bonus Points" value={lead.nicheBonus} theme={theme} />
-          </div>
+          </section>
         </div>
-
-        <div className="w-full h-px bg-border-subtle my-8" />
-
-        {lead.hashtags && lead.hashtags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            <span className="text-[12px] text-text-secondary font-medium mr-2 self-center">
-              Tags:
-            </span>
-            {lead.hashtags.map((t) => (
-              <span
-                key={t}
-                className="text-[12px] font-medium text-text-secondary/80 px-2 py-1 rounded bg-white/5"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {lead.winProb === 'high' && (
-          <div className="flex items-center gap-4">
-            <div className="text-[12px] font-medium text-emerald-400">
-              Win Probability: <span className="font-bold">HIGH</span>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Footer Area */}
-      <div className="p-4 sm:p-6 bg-surface border-t border-border-subtle shrink-0 rounded-b-2xl pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
-        {lead.isRevealed ? (
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-accent-mint/10 text-accent-mint shrink-0">
-                <UserIcon className="w-4 h-4" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[14px] font-bold text-text-primary truncate">
-                  {lead.name}
-                </span>
-                <a
-                  href={`mailto:${lead.email}`}
-                  className="text-[12px] font-medium text-accent-mint hover:underline flex items-center gap-1 truncate"
-                >
-                  <EnvelopeIcon className="w-3 h-3 shrink-0" />{' '}
-                  <span className="truncate">{lead.email}</span>
-                </a>
-                {lead.phone && (
+      {/* Sticky footer */}
+      <div className="relative z-10 shrink-0 border-t border-white/[0.08] bg-surface-container-high/55 px-4 py-3.5 sm:px-6 sm:py-4 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:pb-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 flex-1">
+            {lead.isRevealed ? (
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-secondary/35 bg-secondary/12 text-secondary">
+                  <UserIcon className="w-4 h-4" />
+                </div>
+                <div className="flex min-w-0 flex-col">
+                  <span className="truncate text-sm font-bold text-white">{lead.name}</span>
                   <a
-                    href={`tel:${lead.phone}`}
-                    className="text-[12px] font-medium text-accent-purple hover:underline flex items-center gap-1 mt-1 truncate"
+                    href={`mailto:${lead.email}`}
+                    className="flex items-center gap-1 truncate text-xs font-medium text-secondary hover:underline"
                   >
-                    <PhoneIcon className="w-3 h-3 shrink-0" />{' '}
-                    <span className="truncate">{lead.phone}</span>
+                    <EnvelopeIcon className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{lead.email}</span>
                   </a>
-                )}
+                  {lead.phone && (
+                    <a
+                      href={`tel:${lead.phone}`}
+                      className="mt-0.5 flex items-center gap-1 truncate text-xs font-medium text-accent-purple hover:underline"
+                    >
+                      <PhoneIcon className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{lead.phone}</span>
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex min-w-0 items-center gap-3 select-none">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/[0.08] bg-white/[0.04]">
+                  <LockClosedIcon className="w-4 h-4 text-text-secondary" />
+                </div>
+                <div className="flex flex-col gap-1.5 pointer-events-none">
+                  <div className="h-2 w-32 rounded-full bg-white/10 blur-[1px]" />
+                  <div className="h-2 w-24 rounded-full bg-white/5 blur-[1px]" />
+                </div>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 select-none">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5">
-                <LockClosedIcon className="w-4 h-4 text-text-secondary" />
-              </div>
-              <div className="flex flex-col gap-1.5 pointer-events-none">
-                <div className="h-2 w-32 rounded-[4px] bg-white/10 blur-[1px]" />
-                <div className="h-2 w-24 rounded-[4px] bg-white/5 blur-[1px]" />
-              </div>
-            </div>
 
-            {lead.isClaimedByOther ? (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold select-none">
-                <LockClosedIcon className="w-4 h-4 text-amber-500 shrink-0" />
+          {!lead.isRevealed &&
+            (lead.isClaimedByOther ? (
+              <div className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/15 px-3 py-2 text-xs font-bold text-amber-500 select-none">
+                <LockClosedIcon className="h-4 w-4 shrink-0" />
                 <span>Claimed by a member</span>
               </div>
             ) : (
@@ -370,40 +379,37 @@ export default function LeadDrawer({
                 size="sm"
                 onClick={handleRevealClick}
                 loading={isRevealing}
-                className="min-h-[52px] w-full sm:w-auto text-[13px] sm:text-xs"
+                className="min-h-[48px] w-full shrink-0 text-[13px] sm:w-auto sm:min-w-[200px]"
               >
                 {isRevealing ? (
                   <>
-                    <ArrowPathIcon className="w-3 h-3 animate-spin" />
+                    <ArrowPathIcon className="w-3.5 h-3.5 animate-spin" />
                     Unlocking...
                   </>
                 ) : (
                   <>
                     Unlock & Save Lead
-                    <span className="flex items-center gap-1 text-[10px] text-text-secondary uppercase tracking-widest ml-1">
+                    <span className="ml-1 flex items-center gap-1 text-[10px] uppercase tracking-widest text-text-secondary">
                       <BanknotesIcon className="w-3 h-3" /> -{tokenCost ?? '–'}
                     </span>
                   </>
                 )}
               </Button>
-            )}
-          </div>
-        )}
-        {errorMsg && <div className="text-11 text-red-400 mt-3 font-medium">{errorMsg}</div>}
+            ))}
+        </div>
+        {errorMsg && <div className="mt-2.5 text-xs font-medium text-red-400">{errorMsg}</div>}
       </div>
     </div>
   )
 }
 
-function IntelBlock({ label, value, theme }: { label: string; value: string; theme: any }) {
+function IntelBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <span
-        className={`block text-11 font-bold tracking-[0.15em] uppercase mb-2 opacity-80 ${theme.textAccent}`}
-      >
+    <div className="min-w-0">
+      <span className="mb-1.5 block font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-primary/85">
         {label}
       </span>
-      <span className="block text-[14px] text-text-primary/95 leading-relaxed font-medium">
+      <span className="block break-words text-[13px] font-medium leading-relaxed text-text-primary">
         {value}
       </span>
     </div>

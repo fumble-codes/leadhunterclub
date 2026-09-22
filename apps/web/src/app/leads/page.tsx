@@ -710,30 +710,31 @@ export default function LeadsPage() {
 
           <AnimatePresence>
             {selectedLead && (
-              <>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
+              >
+                <div
                   onClick={closeLead}
-                  className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+                  className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                   aria-hidden="true"
                 />
                 <motion.div
-                  initial={{ opacity: 0, y: 48 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 48 }}
-                  transition={{ type: 'spring', damping: 30, stiffness: 280 }}
+                  initial={{ opacity: 0, y: 36, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 24, scale: 0.97 }}
+                  transition={{ type: 'spring', damping: 32, stiffness: 300 }}
                   role="dialog"
                   aria-modal="true"
                   aria-label={`Lead details: ${selectedLead.title}`}
-                  className="fixed z-50 bg-surface-secondary border border-border-subtle shadow-2xl overflow-hidden left-0 right-0 bottom-0 top-[8vh] max-h-[92dvh] rounded-t-3xl md:left-auto md:right-6 md:top-24 md:bottom-6 md:w-[440px] md:max-h-none md:rounded-2xl"
+                  className="relative h-[88dvh] w-full max-h-[88dvh] overflow-hidden rounded-t-3xl sm:h-auto sm:max-h-[min(88vh,840px)] sm:w-[min(720px,100%)] sm:max-w-[720px] sm:rounded-[22px]"
                 >
                   <LeadDrawer
                     lead={selectedLead}
                     onClose={closeLead}
-                    onSaveToggle={(isSaved) => handleSaveToggle(selectedLead.id, isSaved)}
                     onReveal={(name, email, phone) => {
                       setLeadsList((prev) =>
                         prev.map((l) =>
@@ -745,7 +746,7 @@ export default function LeadsPage() {
                     }}
                   />
                 </motion.div>
-              </>
+              </motion.div>
             )}
           </AnimatePresence>
       </div>
