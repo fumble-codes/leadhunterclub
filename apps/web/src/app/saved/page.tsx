@@ -908,7 +908,7 @@ export default function SavedLeadsPage() {
                                   className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-text-primary hover:bg-white/5 transition-colors"
                                 >
                                   <ClipboardDocumentListIcon className="w-3.5 h-3.5 text-accent-mint shrink-0" />
-                                  Copy lead info
+                                  Copy lead intel
                                 </button>
 
                                 <button

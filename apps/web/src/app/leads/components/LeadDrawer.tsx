@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   XMarkIcon,
   LockClosedIcon,
@@ -11,6 +11,8 @@ import {
   SparklesIcon,
   UserIcon,
   EnvelopeIcon,
+  ChevronDownIcon,
+  DocumentDuplicateIcon,
 } from '@heroicons/react/24/solid'
 import { AppLead } from '@/types/lead'
 import { Badge, Modal, Button } from '@/components/ui'
@@ -33,8 +35,28 @@ export default function LeadDrawer({
   const [isRevealing, setIsRevealing] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [showCreditModal, setShowCreditModal] = useState(false)
+  const [copyMenuOpen, setCopyMenuOpen] = useState(false)
+  const copyMenuRef = useRef<HTMLDivElement | null>(null)
   const { addToast } = useToast()
   const tokenCost = lead.revealCost ?? null
+
+  useEffect(() => {
+    if (!copyMenuOpen) return
+    const onPointerDown = (e: MouseEvent) => {
+      if (copyMenuRef.current && !copyMenuRef.current.contains(e.target as Node)) {
+        setCopyMenuOpen(false)
+      }
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setCopyMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [copyMenuOpen])
 
   const displayTitle = !lead.isRevealed
     ? lead.title || 'OPPORTUNITY FOR —'
@@ -49,6 +71,82 @@ export default function LeadDrawer({
       : lead.summary && lead.summary.trim() !== ''
         ? (lead.isRevealed ? lead.summary : sanitizePublicText(lead.summary))
         : taskScopeDisplay
+
+  const copyText = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = text
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.select()
+        const ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+        return ok
+      } catch {
+        return false
+      }
+    }
+  }, [])
+
+  const buildIntelText = useCallback(() => {
+    const lines = [
+      `${displayTitle}`,
+      detailsSummaryDisplay ? `Summary: ${detailsSummaryDisplay}` : '',
+      `Buyer: ${lead.buyerType || lead.role || '—'}`,
+      `Scope: ${lead.taskScope || lead.category || '—'}`,
+      `Requirements: ${lead.mustHave || '—'}`,
+      `Tags: ${(lead.nicheTags || []).join(', ') || '—'}`,
+      lead.replyProbability > 0 ? `Reply probability: ${lead.replyProbability}%` : '',
+      lead.isRevealed
+        ? `Contact: ${lead.name}${lead.email ? ` <${lead.email}>` : ''}${lead.phone ? ` · ${lead.phone}` : ''}`
+        : 'Contact: Locked — reveal to view',
+      `via Lead Hunter Club${lead.timestamp ? ` · ${lead.timestamp}` : ''}`,
+    ]
+    return lines.filter(Boolean).join('\n')
+  }, [displayTitle, detailsSummaryDisplay, lead])
+
+  const handleCopyIntel = async () => {
+    const ok = await copyText(buildIntelText())
+    setCopyMenuOpen(false)
+    addToast(
+      ok
+        ? { type: 'success', message: 'Lead intel copied to clipboard' }
+        : { type: 'error', message: 'Could not copy — select and copy manually' },
+    )
+  }
+
+  const handleCopyEmail = async () => {
+    setCopyMenuOpen(false)
+    if (!lead.isRevealed || !lead.email || lead.email.includes('hidden')) {
+      addToast({ type: 'info', message: 'Reveal contact info to copy email' })
+      return
+    }
+    const ok = await copyText(lead.email)
+    addToast(
+      ok
+        ? { type: 'success', message: `✓ Copied ${lead.email}` }
+        : { type: 'error', message: 'Clipboard access blocked' },
+    )
+  }
+
+  const handleCopyContact = async () => {
+    setCopyMenuOpen(false)
+    if (!lead.isRevealed) {
+      addToast({ type: 'info', message: 'Reveal contact info to copy contact details' })
+      return
+    }
+    const ok = await copyText([lead.name, lead.email, lead.phone].filter(Boolean).join('\n'))
+    addToast(
+      ok
+        ? { type: 'success', message: 'Contact details copied to clipboard' }
+        : { type: 'error', message: 'Clipboard access blocked' },
+    )
+  }
 
   const handleRevealClick = async () => {
     if (lead.isClaimedByOther) {
@@ -325,16 +423,19 @@ export default function LeadDrawer({
             )}
           </div>
 
-          {/* Deep intel */}
-          <section className="relative min-w-0">
-            <div className="mb-2.5 flex items-center gap-2">
+          {/* Deep intel — nested scroller so outer layout stays put */}
+          <section className="relative flex min-w-0 flex-col">
+            <div className="mb-2.5 flex items-center gap-2 shrink-0">
               <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
                 Deep intel
               </span>
               <span className="h-px flex-1 bg-gradient-to-r from-primary/35 to-transparent" aria-hidden />
+              <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-text-muted">
+                Scroll
+              </span>
             </div>
 
-            <div className="relative rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+            <div className="relative flex min-h-[240px] max-h-[min(58vh,520px)] flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.025] lg:sticky lg:top-0">
               {!lead.isRevealed && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl border border-white/[0.06] bg-surface-container-low/70 backdrop-blur-[7px]">
                   <div className="grid h-11 w-11 place-items-center rounded-full border border-primary/30 bg-primary/10 mb-2.5">
@@ -350,16 +451,25 @@ export default function LeadDrawer({
               )}
 
               <div
-                className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 ${
+                className={`min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 scrollbar-hide ${
                   !lead.isRevealed ? 'opacity-30 blur-[2.5px] select-none' : ''
                 }`}
+                style={{ WebkitOverflowScrolling: 'touch' }}
               >
-                <IntelBlock label="Target buyer" value={lead.buyerType} />
-                <IntelBlock label="Ideal candidate" value={lead.role} />
-                <IntelBlock label="Core scope" value={lead.taskScope} />
-                <IntelBlock label="Requirements" value={lead.mustHave} />
-                <IntelBlock label="Bonus points" value={lead.nicheBonus} />
+                <div className="grid grid-cols-1 gap-4">
+                  <IntelBlock label="Target buyer" value={lead.buyerType} />
+                  <IntelBlock label="Ideal candidate" value={lead.role} />
+                  <IntelBlock label="Core scope" value={lead.taskScope} />
+                  <IntelBlock label="Requirements" value={lead.mustHave} />
+                  <IntelBlock label="Bonus points" value={lead.nicheBonus} />
+                </div>
               </div>
+
+              {/* Fade hint when more content below */}
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-surface-container-low/90 to-transparent"
+                aria-hidden
+              />
             </div>
           </section>
         </div>
@@ -367,7 +477,7 @@ export default function LeadDrawer({
 
       {/* Sticky footer */}
       <div className="relative z-10 shrink-0 border-t border-white/[0.08] bg-surface-container-high/55 px-4 py-3.5 sm:px-6 sm:py-4 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:pb-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
             {lead.isRevealed ? (
               <div className="flex min-w-0 items-center gap-3">
@@ -407,36 +517,103 @@ export default function LeadDrawer({
             )}
           </div>
 
-          {!lead.isRevealed &&
-            (lead.isClaimedByOther ? (
-              <div className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/15 px-3 py-2 text-xs font-bold text-amber-500 select-none">
-                <LockClosedIcon className="h-4 w-4 shrink-0" />
-                <span>Claimed by a member</span>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                color="mint"
-                size="sm"
-                onClick={handleRevealClick}
-                loading={isRevealing}
-                className="min-h-[48px] w-full shrink-0 text-[13px] sm:w-auto sm:min-w-[200px]"
+          {/* Action buttons: copy dropdown + copy lead intel (or unlock when locked) */}
+          <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+            {!lead.isRevealed ? (
+              lead.isClaimedByOther ? (
+                <div className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/15 px-3 py-2 text-xs font-bold text-amber-500 select-none">
+                  <LockClosedIcon className="h-4 w-4 shrink-0" />
+                  <span>Claimed by a member</span>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  color="mint"
+                  size="sm"
+                  onClick={handleRevealClick}
+                  loading={isRevealing}
+                  className="min-h-[44px] w-full shrink-0 text-[13px] sm:w-auto sm:min-w-[180px]"
+                >
+                  {isRevealing ? (
+                    <>
+                      <ArrowPathIcon className="w-3.5 h-3.5 animate-spin" />
+                      Unlocking...
+                    </>
+                  ) : (
+                    <>
+                      Unlock & Save Lead
+                      <span className="ml-1 flex items-center gap-1 text-[10px] uppercase tracking-widest text-text-secondary">
+                        <BanknotesIcon className="w-3 h-3" /> -{tokenCost ?? '–'}
+                      </span>
+                    </>
+                  )}
+                </Button>
+              )
+            ) : null}
+
+            {/* Copy contact dropdown */}
+            <div className="relative shrink-0" ref={copyMenuRef}>
+              <button
+                type="button"
+                onClick={() => setCopyMenuOpen((v) => !v)}
+                aria-label="Copy contact options"
+                aria-expanded={copyMenuOpen}
+                title="Copy contact"
+                className={`flex h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border px-3.5 text-xs font-bold transition-all active:scale-95 sm:w-auto ${
+                  copyMenuOpen
+                    ? 'border-primary/45 bg-primary/12 text-primary'
+                    : lead.isRevealed
+                      ? 'border-white/[0.12] bg-white/[0.05] text-text-primary hover:border-primary/35 hover:text-primary'
+                      : 'border-white/[0.08] bg-white/[0.03] text-text-secondary/60'
+                }`}
               >
-                {isRevealing ? (
-                  <>
-                    <ArrowPathIcon className="w-3.5 h-3.5 animate-spin" />
-                    Unlocking...
-                  </>
-                ) : (
-                  <>
-                    Unlock & Save Lead
-                    <span className="ml-1 flex items-center gap-1 text-[10px] uppercase tracking-widest text-text-secondary">
-                      <BanknotesIcon className="w-3 h-3" /> -{tokenCost ?? '–'}
-                    </span>
-                  </>
-                )}
-              </Button>
-            ))}
+                <EnvelopeIcon className="h-3.5 w-3.5 shrink-0" />
+                <span>Copy contact</span>
+                <ChevronDownIcon
+                  className={`h-3.5 w-3.5 shrink-0 transition-transform ${copyMenuOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+
+              {copyMenuOpen && (
+                <div className="absolute bottom-[calc(100%+8px)] right-0 z-40 w-52 rounded-xl border border-white/[0.1] bg-surface-container-high p-1.5 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.85)]">
+                  <button
+                    type="button"
+                    onClick={handleCopyEmail}
+                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[11px] font-semibold text-text-primary transition-colors hover:bg-white/5"
+                  >
+                    <EnvelopeIcon className="h-3.5 w-3.5 shrink-0 text-text-secondary" />
+                    Copy email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyContact}
+                    disabled={!lead.isRevealed}
+                    title={lead.isRevealed ? 'Copy all contact details' : 'Unlock the lead to copy contact details'}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[11px] font-semibold transition-colors ${
+                      lead.isRevealed
+                        ? 'text-text-primary hover:bg-white/5'
+                        : 'cursor-not-allowed text-text-secondary/50'
+                    }`}
+                  >
+                    <PhoneIcon className="h-3.5 w-3.5 shrink-0" />
+                    Copy contact details
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Copy lead intel */}
+            <button
+              type="button"
+              onClick={handleCopyIntel}
+              title="Copy lead intel"
+              aria-label="Copy lead intel"
+              className="flex h-[44px] w-full shrink-0 items-center justify-center gap-1.5 rounded-xl border border-secondary/35 bg-secondary/12 px-3.5 text-xs font-bold text-secondary transition-all hover:border-secondary/55 hover:bg-secondary/18 active:scale-95 sm:w-auto"
+            >
+              <DocumentDuplicateIcon className="h-3.5 w-3.5 shrink-0" />
+              <span>Copy lead intel</span>
+            </button>
+          </div>
         </div>
         {errorMsg && <div className="mt-2.5 text-xs font-medium text-red-400">{errorMsg}</div>}
       </div>

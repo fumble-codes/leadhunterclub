@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, memo } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { motion } from 'framer-motion'
 import { Lock, Coins, Mail, Phone, Loader2 } from 'lucide-react'
-import { EllipsisHorizontalIcon, DocumentDuplicateIcon } from '@heroicons/react/24/solid'
 import { AppLead } from '@/types/lead'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -110,8 +109,6 @@ function PipelineLeadCard({
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
   const [isRevealing, setIsRevealing] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setIsSaved(lead.status === 'saved')
@@ -120,25 +117,6 @@ function PipelineLeadCard({
   useEffect(() => {
     setIsRevealed(lead.isRevealed)
   }, [lead.isRevealed])
-
-  // Close the actions menu on outside click / Escape
-  useEffect(() => {
-    if (!menuOpen) return
-    const onPointerDown = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
-    document.addEventListener('mousedown', onPointerDown)
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown)
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  }, [menuOpen])
 
   // Alternate pastel accents across leads (cycles Purple, Pink, Cyan, Mint, Orange)
   const resolvedAccent: keyof typeof themeMap =
@@ -171,70 +149,6 @@ function PipelineLeadCard({
         : 'Verified service demand opportunity.'
 
   const quoteContent = sanitizePublicText(rawQuote)
-
-  const copyText = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      return true
-    } catch {
-      try {
-        const ta = document.createElement('textarea')
-        ta.value = text
-        ta.style.position = 'fixed'
-        ta.style.opacity = '0'
-        document.body.appendChild(ta)
-        ta.select()
-        const ok = document.execCommand('copy')
-        document.body.removeChild(ta)
-        return ok
-      } catch {
-        return false
-      }
-    }
-  }
-
-  const buildIntelText = () => {
-    const lines = [
-      `${displayHeadline} — ${topCategory}`,
-      quoteContent ? `"${quoteContent}"` : '',
-      `Buyer: ${lead.buyerType || lead.role || '—'}`,
-      `Scope: ${lead.taskScope || lead.category || '—'}`,
-      `Tags: ${(lead.nicheTags || []).join(', ') || '—'}`,
-      `Reply probability: ${lead.replyProbability}% · Urgency: ${lead.urgency}`,
-    ]
-    if (isRevealed) {
-      lines.push(
-        `Contact: ${lead.name}${lead.email ? ` <${lead.email}>` : ''}${lead.phone ? ` · ${lead.phone}` : ''}`,
-      )
-    }
-    lines.push(`via Lead Hunter Club${lead.timestamp ? ` · ${lead.timestamp}` : ''}`)
-    return lines.join('\n')
-  }
-
-  const handleCopyIntel = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    const ok = await copyText(buildIntelText())
-    setMenuOpen(false)
-    addToast(
-      ok
-        ? { type: 'success', message: 'Lead intel copied to clipboard' }
-        : { type: 'error', message: 'Could not copy — select and copy manually' },
-    )
-  }
-
-  const handleCopyContact = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!isRevealed) return
-    const ok = await copyText(
-      [lead.name, lead.email, lead.phone].filter(Boolean).join('\n'),
-    )
-    setMenuOpen(false)
-    addToast(
-      ok
-        ? { type: 'success', message: 'Contact details copied to clipboard' }
-        : { type: 'error', message: 'Could not copy — select and copy manually' },
-    )
-  }
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -490,51 +404,6 @@ function PipelineLeadCard({
                   </span>
                 )}
               </button>
-              {/* Actions menu */}
-              <div className="relative shrink-0" ref={menuRef}>
-                <button
-                  type="button"
-                  aria-label="Lead actions"
-                  title="Lead actions"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setMenuOpen((v) => !v)
-                  }}
-                  className={`w-11 sm:w-8 h-11 sm:h-8 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
-                    menuOpen
-                      ? 'border-primary/40 bg-primary/10 text-primary'
-                      : 'border-border-subtle bg-surface-container-high text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  <EllipsisHorizontalIcon className="w-4 h-4" />
-                </button>
-                {menuOpen && (
-                  <div className="absolute bottom-[calc(100%+8px)] right-0 w-52 rounded-xl bg-surface-container-high border border-border-subtle shadow-elevation-3 p-1.5 z-30">
-                    <button
-                      type="button"
-                      onClick={handleCopyIntel}
-                      className="w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-semibold text-text-primary hover:bg-white/5 transition-colors flex items-center gap-2 cursor-pointer"
-                    >
-                      <DocumentDuplicateIcon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
-                      Copy lead intel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCopyContact}
-                      disabled={!isRevealed}
-                      title={isRevealed ? 'Copy contact details' : 'Unlock the lead to copy contact details'}
-                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-semibold transition-colors flex items-center gap-2 ${
-                        isRevealed
-                          ? 'text-text-primary hover:bg-white/5 cursor-pointer'
-                          : 'text-text-secondary/50 cursor-not-allowed'
-                      }`}
-                    >
-                      <Mail size={12} className="shrink-0" />
-                      Copy contact details
-                    </button>
-                  </div>
-                )}
-              </div>
               </div>
             )}
           </>
