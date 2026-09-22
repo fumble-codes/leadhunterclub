@@ -126,7 +126,7 @@ export default function LeadDrawer({
   }
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden rounded-t-3xl border border-white/[0.1] bg-surface-container-low/98 shadow-[0_24px_80px_-16px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl sm:rounded-[22px]">
+    <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-t-3xl border border-white/[0.1] bg-surface-container-low/98 shadow-[0_24px_80px_-16px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl sm:rounded-[22px]">
       {/* Credit confirmation modal */}
       <Modal
         open={showCreditModal}
@@ -222,10 +222,51 @@ export default function LeadDrawer({
       </div>
 
       {/* Scrollable content */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-5 scrollbar-hide">
+      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6 sm:py-5 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
         {/* Summary + skills layout */}
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="min-w-0">
+            {lead.isRevealed && (
+              <section className="relative mb-5 overflow-hidden rounded-2xl border border-secondary/30 bg-secondary/[0.07] p-4">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-secondary/60 via-secondary/15 to-transparent" aria-hidden />
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-secondary">
+                    Contact details
+                  </span>
+                  <span className="h-px flex-1 bg-white/[0.06]" aria-hidden />
+                  <span className="rounded-full border border-secondary/35 bg-secondary/15 px-2 py-px font-mono text-[8px] font-bold uppercase tracking-[0.14em] text-secondary">
+                    Unlocked
+                  </span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-secondary/40 bg-secondary/15 text-secondary">
+                    <UserIcon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-bold text-white">{lead.name}</p>
+                    <div className="mt-1.5 flex flex-col gap-1">
+                      <a
+                        href={`mailto:${lead.email}`}
+                        className="flex items-center gap-1.5 truncate text-[13px] font-medium text-secondary hover:underline"
+                      >
+                        <EnvelopeIcon className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{lead.email}</span>
+                      </a>
+                      {lead.phone && (
+                        <a
+                          href={`tel:${lead.phone}`}
+                          className="flex items-center gap-1.5 truncate text-[13px] font-medium text-accent-purple hover:underline"
+                        >
+                          <PhoneIcon className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{lead.phone}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {detailsSummaryDisplay && detailsSummaryDisplay.trim() !== '' && (
               <section className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-surface-elevated/55 p-4">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-secondary/50 via-secondary/10 to-transparent" aria-hidden />

@@ -730,7 +730,7 @@ export default function LeadsPage() {
                   role="dialog"
                   aria-modal="true"
                   aria-label={`Lead details: ${selectedLead.title}`}
-                  className="relative h-[88dvh] w-full max-h-[88dvh] overflow-hidden rounded-t-3xl sm:h-auto sm:max-h-[min(88vh,840px)] sm:w-[min(720px,100%)] sm:max-w-[720px] sm:rounded-[22px]"
+                  className="relative h-[88dvh] w-full max-h-[88dvh] overflow-hidden rounded-t-3xl sm:h-[min(86vh,820px)] sm:max-h-[min(86vh,820px)] sm:w-[min(720px,100%)] sm:max-w-[720px] sm:rounded-[22px]"
                 >
                   <LeadDrawer
                     lead={selectedLead}
