@@ -241,7 +241,7 @@ export default function LeadsPage() {
   const [activeNiche, setActiveNiche] = useState<string>('All')
   const [hasInitializedNiche, setHasInitializedNiche] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('newest')
-  const [viewMode, setViewMode] = useState<'grid' | 'pipeline'>('pipeline')
+  const [viewMode] = useState<'grid' | 'pipeline'>('pipeline')
 
   const [leadsList, setLeadsList] = useState<AppLead[]>([])
   const [loading, setLoading] = useState(true)
@@ -481,40 +481,6 @@ export default function LeadsPage() {
           </div>
 
           <div className="relative shrink-0 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto justify-end">
-            {/* View Mode Toggle */}
-            <div className="flex items-center bg-[#1b1c1d] border border-white/[0.08] rounded-xl p-1 shadow-lg shrink-0">
-              <button
-                onClick={() => setViewMode('grid')}
-                type="button"
-                aria-label="Grid view"
-                className={`p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-white/10 text-white shadow-sm'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
-                }`}
-                title="Classic Grid View"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setViewMode('pipeline')}
-                type="button"
-                aria-label="Pipeline view"
-                className={`p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all ${
-                  viewMode === 'pipeline'
-                    ? 'bg-primary/20 text-primary border border-primary/20 shadow-sm'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
-                }`}
-                title="Pipeline Card View"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v13.5c0 .621.504 1.125 1.125 1.125Z" />
-                </svg>
-              </button>
-            </div>
-
             <Select
               options={[
                 { label: 'Newest First', value: 'newest' },
@@ -755,14 +721,14 @@ export default function LeadsPage() {
                   aria-hidden="true"
                 />
                 <motion.div
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 40 }}
-                  transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+                  initial={{ opacity: 0, y: 48 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 48 }}
+                  transition={{ type: 'spring', damping: 30, stiffness: 280 }}
                   role="dialog"
                   aria-modal="true"
                   aria-label={`Lead details: ${selectedLead.title}`}
-                  className="fixed z-50 bg-surface-secondary border border-border-subtle shadow-2xl overflow-hidden left-4 right-4 bottom-4 top-auto max-h-[85vh] rounded-2xl md:left-auto md:right-6 md:top-24 md:bottom-6 md:w-[440px] md:max-h-none md:rounded-2xl"
+                  className="fixed z-50 bg-surface-secondary border border-border-subtle shadow-2xl overflow-hidden left-0 right-0 bottom-0 top-[8vh] max-h-[92dvh] rounded-t-3xl md:left-auto md:right-6 md:top-24 md:bottom-6 md:w-[440px] md:max-h-none md:rounded-2xl"
                 >
                   <LeadDrawer
                     lead={selectedLead}

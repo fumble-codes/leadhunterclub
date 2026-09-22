@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, memo } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import { motion } from 'framer-motion'
 import { Lock, Coins, Mail, Phone, Loader2 } from 'lucide-react'
+import { EllipsisHorizontalIcon, DocumentDuplicateIcon } from '@heroicons/react/24/solid'
 import { AppLead } from '@/types/lead'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -109,6 +110,8 @@ function PipelineLeadCard({
   const [isSaved, setIsSaved] = useState(lead.status === 'saved')
   const [isRevealed, setIsRevealed] = useState(lead.isRevealed)
   const [isRevealing, setIsRevealing] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setIsSaved(lead.status === 'saved')
@@ -117,6 +120,25 @@ function PipelineLeadCard({
   useEffect(() => {
     setIsRevealed(lead.isRevealed)
   }, [lead.isRevealed])
+
+  // Close the actions menu on outside click / Escape
+  useEffect(() => {
+    if (!menuOpen) return
+    const onPointerDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [menuOpen])
 
   // Alternate pastel accents across leads (cycles Purple, Pink, Cyan, Mint, Orange)
   const resolvedAccent: keyof typeof themeMap =
@@ -149,6 +171,70 @@ function PipelineLeadCard({
         : 'Verified service demand opportunity.'
 
   const quoteContent = sanitizePublicText(rawQuote)
+
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = text
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.select()
+        const ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+        return ok
+      } catch {
+        return false
+      }
+    }
+  }
+
+  const buildIntelText = () => {
+    const lines = [
+      `${displayHeadline} — ${topCategory}`,
+      quoteContent ? `"${quoteContent}"` : '',
+      `Buyer: ${lead.buyerType || lead.role || '—'}`,
+      `Scope: ${lead.taskScope || lead.category || '—'}`,
+      `Tags: ${(lead.nicheTags || []).join(', ') || '—'}`,
+      `Reply probability: ${lead.replyProbability}% · Urgency: ${lead.urgency}`,
+    ]
+    if (isRevealed) {
+      lines.push(
+        `Contact: ${lead.name}${lead.email ? ` <${lead.email}>` : ''}${lead.phone ? ` · ${lead.phone}` : ''}`,
+      )
+    }
+    lines.push(`via Lead Hunter Club${lead.timestamp ? ` · ${lead.timestamp}` : ''}`)
+    return lines.join('\n')
+  }
+
+  const handleCopyIntel = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const ok = await copyText(buildIntelText())
+    setMenuOpen(false)
+    addToast(
+      ok
+        ? { type: 'success', message: 'Lead intel copied to clipboard' }
+        : { type: 'error', message: 'Could not copy — select and copy manually' },
+    )
+  }
+
+  const handleCopyContact = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!isRevealed) return
+    const ok = await copyText(
+      [lead.name, lead.email, lead.phone].filter(Boolean).join('\n'),
+    )
+    setMenuOpen(false)
+    addToast(
+      ok
+        ? { type: 'success', message: 'Contact details copied to clipboard' }
+        : { type: 'error', message: 'Could not copy — select and copy manually' },
+    )
+  }
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -262,7 +348,7 @@ function PipelineLeadCard({
       onClick={onClick}
       whileHover={{ y: -3, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className={`group relative text-left flex flex-col justify-between p-5 rounded-[22px] overflow-hidden h-[260px] min-h-[260px] max-h-[260px] w-full col-span-1 shadow-elevation-3 transition-all duration-300 cursor-pointer ${
+      className={`group relative text-left flex flex-col justify-between p-4 sm:p-5 rounded-[22px] overflow-hidden h-auto min-h-[240px] sm:h-[260px] sm:min-h-[260px] sm:max-h-[260px] w-full col-span-1 shadow-elevation-3 transition-all duration-300 cursor-pointer ${
         theme.cardBg
       } ${isSelected ? 'ring-1 ring-primary/60' : ''}`}
     >
@@ -295,14 +381,14 @@ function PipelineLeadCard({
         </h4>
 
         {/* Scaled-down Quote: fixed height container ensures 100% uniform card layout regardless of copy length */}
-        <div className="h-[52px] mb-2.5 flex items-start select-none overflow-hidden shrink-0">
-          <h3 className={`text-[13px] sm:text-[13.5px] font-semibold tracking-tight leading-[1.35] line-clamp-2 ${theme.text}`}>
+        <div className="h-auto sm:h-[52px] mb-2.5 flex items-start select-none overflow-hidden shrink-0">
+          <h3 className={`text-[15px] sm:text-[13.5px] font-semibold tracking-tight leading-[1.4] sm:leading-[1.35] line-clamp-3 sm:line-clamp-2 ${theme.text}`}>
             &quot;{quoteContent}&quot;
           </h3>
         </div>
 
         {/* Clean Tags Row without match score badge */}
-        <div className="flex items-center gap-1.5 mb-2.5 shrink-0 select-none overflow-hidden flex-nowrap h-[22px]">
+        <div className="flex items-center gap-1.5 mb-2.5 shrink-0 select-none overflow-hidden flex-wrap sm:flex-nowrap h-auto sm:h-[22px]">
           {visibleTags.map((tag, i) => (
             <span
               key={tag}
@@ -314,8 +400,50 @@ function PipelineLeadCard({
         </div>
       </div>
 
+      {/* Hover overlay: quick contact peek (revealed leads only — locked ones stay locked)
+          Hidden on touch/coarse pointers: group-hover never fires there (dead interaction) */}
+      <div className="hidden md:flex absolute inset-x-0 top-0 bottom-[54px] z-10 rounded-t-[22px] bg-[#0d0e0f]/95 p-5 flex-col justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none select-none">
+        {isRevealed ? (
+          <>
+            <span className={`text-[9px] font-bold tracking-[0.2em] uppercase ${theme.accentText}`}>
+              Contact details
+            </span>
+            <span className={`text-[15px] font-bold truncate ${theme.text}`}>{lead.name}</span>
+            {lead.company && (
+              <span className={`text-[11px] font-medium truncate ${theme.textMuted}`}>
+                {lead.company}{lead.role ? ` · ${lead.role}` : ''}
+              </span>
+            )}
+            {lead.email && (
+              <span className={`text-[11.5px] truncate flex items-center gap-1.5 ${theme.textMuted}`}>
+                <Mail size={11} className="shrink-0" />
+                <span className="truncate">{lead.email}</span>
+              </span>
+            )}
+            {lead.phone && (
+              <span className={`text-[11.5px] truncate flex items-center gap-1.5 ${theme.textMuted}`}>
+                <Phone size={11} className="shrink-0" />
+                <span className="truncate">{lead.phone}</span>
+              </span>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-2 text-center h-full">
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center ${theme.blurBg}`}>
+              <Lock size={14} className={theme.textMuted} />
+            </div>
+            <span className={`text-[11px] font-black uppercase tracking-widest ${theme.text}`}>
+              Contact locked
+            </span>
+            <span className={`text-[10px] font-medium ${theme.textMuted}`}>
+              Unlock &amp; Save to reveal contact
+            </span>
+          </div>
+        )}
+      </div>
+
       {/* Footer Area: Cute scaled-down lock and reveal button */}
-      <div className="w-full h-[34px] flex items-center justify-between shrink-0 mt-auto pt-1 border-t border-border-subtle">
+      <div className="w-full min-h-[44px] sm:h-[34px] flex items-center justify-between gap-2 shrink-0 mt-auto pt-2 sm:pt-1 border-t border-border-subtle">
         {!isRevealed ? (
           <>
             {/* Cute Micro Locked Placeholder */}
@@ -338,11 +466,12 @@ function PipelineLeadCard({
                 <span>Claimed by a member</span>
               </div>
             ) : (
+              <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={handleReveal}
                 disabled={isRevealing}
-                className={`h-11 px-3 rounded-xl font-bold text-[10.5px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 whitespace-nowrap ${theme.button} ${
+                className={`h-11 sm:h-8 px-3 sm:px-2.5 rounded-lg font-bold text-[11px] sm:text-[10px] shadow-sm flex items-center justify-center gap-1.5 transition-all active:scale-95 shrink-0 whitespace-nowrap ${theme.button} ${
                   isRevealing ? 'opacity-85 cursor-wait pointer-events-none' : 'cursor-pointer'
                 }`}
               >
@@ -361,6 +490,52 @@ function PipelineLeadCard({
                   </span>
                 )}
               </button>
+              {/* Actions menu */}
+              <div className="relative shrink-0" ref={menuRef}>
+                <button
+                  type="button"
+                  aria-label="Lead actions"
+                  title="Lead actions"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setMenuOpen((v) => !v)
+                  }}
+                  className={`w-11 sm:w-8 h-11 sm:h-8 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
+                    menuOpen
+                      ? 'border-primary/40 bg-primary/10 text-primary'
+                      : 'border-border-subtle bg-surface-container-high text-text-secondary hover:text-text-primary'
+                  }`}
+                >
+                  <EllipsisHorizontalIcon className="w-4 h-4" />
+                </button>
+                {menuOpen && (
+                  <div className="absolute bottom-[calc(100%+8px)] right-0 w-52 rounded-xl bg-surface-container-high border border-border-subtle shadow-elevation-3 p-1.5 z-30">
+                    <button
+                      type="button"
+                      onClick={handleCopyIntel}
+                      className="w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-semibold text-text-primary hover:bg-white/5 transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <DocumentDuplicateIcon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
+                      Copy lead intel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopyContact}
+                      disabled={!isRevealed}
+                      title={isRevealed ? 'Copy contact details' : 'Unlock the lead to copy contact details'}
+                      className={`w-full text-left px-2.5 py-2 rounded-lg text-[11px] font-semibold transition-colors flex items-center gap-2 ${
+                        isRevealed
+                          ? 'text-text-primary hover:bg-white/5 cursor-pointer'
+                          : 'text-text-secondary/50 cursor-not-allowed'
+                      }`}
+                    >
+                      <Mail size={12} className="shrink-0" />
+                      Copy contact details
+                    </button>
+                  </div>
+                )}
+              </div>
+              </div>
             )}
           </>
         ) : (
@@ -403,7 +578,7 @@ function PipelineLeadCard({
             <button
               type="button"
               onClick={handleSave}
-              className={`w-[66px] h-11 rounded-xl text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
+              className={`w-[72px] sm:w-[60px] h-11 sm:h-8 rounded-lg text-[10px] sm:text-[9.5px] font-extrabold tracking-wider uppercase transition-all shrink-0 cursor-pointer border flex items-center justify-center ${
                 isSaved ? theme.savedButton : theme.saveButton
               }`}
             >

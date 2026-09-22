@@ -184,10 +184,15 @@ export default function LeadDrawer({
         className={`absolute top-0 left-0 right-0 h-[2px] opacity-40 bg-gradient-to-r from-transparent via-current to-transparent ${theme.textAccent}`}
       />
 
+      {/* Drag handle (mobile bottom-sheet affordance) */}
+      <div className="md:hidden flex justify-center pt-2.5 pb-1 shrink-0">
+        <div className="w-10 h-1 rounded-full bg-white/20" aria-hidden="true" />
+      </div>
+
       {/* Header with Close button */}
-      <div className="flex items-center justify-between p-6 pb-4 border-b border-border-subtle shrink-0">
-        <div className="flex items-center gap-3">
-          <div className={`w-2.5 h-2.5 rounded-full bg-current ${theme.textAccent}`} />
+      <div className="flex items-center justify-between gap-2 px-4 sm:px-6 pt-2 sm:pt-6 pb-4 border-b border-border-subtle shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap">
+          <div className={`w-2.5 h-2.5 rounded-full bg-current shrink-0 ${theme.textAccent}`} />
           <NicheBadge niche={lead.niche} keyword={lead.category} content={lead.signalContext} />
           <Badge size="sm" color="purple">
             Lead Hunter Club
@@ -195,7 +200,8 @@ export default function LeadDrawer({
         </div>
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-text-secondary transition-colors"
+          aria-label="Close lead details"
+          className="p-2.5 -m-1 rounded-lg hover:bg-white/10 text-text-secondary transition-colors shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <XMarkIcon className="w-[18px] h-[18px]" />
         </button>
@@ -203,11 +209,11 @@ export default function LeadDrawer({
 
       {/* Scrollable Content */}
       <div
-        className="flex-1 overflow-y-auto p-6 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="flex-1 overflow-y-auto p-4 sm:p-6 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <div className="flex items-start justify-between gap-4 mb-2">
-          <h2 className="text-[24px] font-bold tracking-tight text-text-primary leading-[1.2]">
+          <h2 className="text-xl sm:text-[24px] font-bold tracking-tight text-text-primary leading-[1.25]">
             {displayTitle}
           </h2>
         </div>
@@ -310,7 +316,7 @@ export default function LeadDrawer({
       </div>
 
       {/* Footer Area */}
-      <div className="p-6 bg-surface border-t border-border-subtle shrink-0 rounded-b-2xl">
+      <div className="p-4 sm:p-6 bg-surface border-t border-border-subtle shrink-0 rounded-b-2xl pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
         {lead.isRevealed ? (
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -364,6 +370,7 @@ export default function LeadDrawer({
                 size="sm"
                 onClick={handleRevealClick}
                 loading={isRevealing}
+                className="min-h-[52px] w-full sm:w-auto text-[13px] sm:text-xs"
               >
                 {isRevealing ? (
                   <>

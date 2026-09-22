@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import {
   BanknotesIcon,
   BookmarkIcon,
@@ -308,7 +309,7 @@ function LeadsContent() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 items-stretch w-full mx-auto">
           {displayLeads.map((lead, i) => (
             <div key={lead.id} className="w-full flex justify-center">
-              <div className="w-full max-w-[320px]">
+              <div className="w-full max-w-full sm:max-w-[320px]">
                 <LeadCard lead={lead} index={i} isHeroPreview />
               </div>
             </div>
@@ -594,6 +595,8 @@ function PipelineContent() {
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState('leads')
   const heroCardRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile(768)
+  const reduceMotion = useReducedMotion()
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroCardRef,
@@ -607,13 +610,17 @@ export default function HeroSection() {
   const { scrollY } = useScroll()
 
   // Direct scroll-linked transforms — no spring wrapper to avoid fighting Lenis
-  const rotateX = useTransform(scrollY, [0, 600], [22, 0])
-  const scale = useTransform(scrollY, [0, 600], [0.95, 1])
-  const y = useTransform(scrollY, [0, 600], [0, 0])
+  // Mobile / reduced-motion: static values (no scroll-linked 3D tilt / GPU jank)
+  const scrollRotateX = useTransform(scrollY, [0, 600], [22, 0])
+  const scrollScale = useTransform(scrollY, [0, 600], [0.95, 1])
+  const tiltOff = isMobile || reduceMotion
+  const rotateX = tiltOff ? 0 : scrollRotateX
+  const scale = tiltOff ? 1 : scrollScale
+  const y = 0
 
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-0"
+      className="relative min-h-[100dvh] flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-0"
     >
       {/* Crisp geometric grid background (Engineering precision) */}
       <div
@@ -730,7 +737,7 @@ export default function HeroSection() {
             scale,
             y,
           }}
-          className="w-full transform-gpu will-change-transform"
+          className={`w-full ${tiltOff ? '' : 'transform-gpu will-change-transform'}`}
         >
           <div className="rounded-t-[24px] overflow-hidden shadow-[0_-25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)] border border-white/[0.08] border-b-0 relative">
             {/* Glass reflection sheen overlay */}
@@ -745,10 +752,37 @@ export default function HeroSection() {
               </span>
             </div>
 
+            {/* Mobile top tab bar (replaces sidebar <768px) */}
+            <div className="flex md:hidden bg-code-header border-b border-white/[0.06] overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-px">
+              {tabs.map((t) => {
+                const isActive = activeTab === t.id
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setActiveTab(t.id)}
+                    className={`flex items-center gap-2 px-4 min-h-[48px] shrink-0 snap-start text-[13px] font-medium whitespace-nowrap border-b-2 transition-colors ${
+                      isActive
+                        ? 'border-accent-purple text-accent-purple bg-accent-purple/10'
+                        : 'border-transparent text-text-secondary'
+                    }`}
+                  >
+                    <t.icon className="w-4 h-4" />
+                    <span>{t.label}</span>
+                  </button>
+                )
+              })}
+              {/* Credits pill for mobile (sidebar token widget hidden) */}
+              <div className="flex items-center gap-1.5 ml-auto pr-4 pl-3 shrink-0">
+                <BanknotesIcon className="w-3.5 h-3.5 text-text-secondary" />
+                <span className="text-[11px] font-mono text-text-secondary">750/1k</span>
+              </div>
+            </div>
+
             {/* App body */}
-            <div className="flex h-[480px] md:h-[510px] bg-bg-main overflow-hidden">
-              {/* Sidebar — matches AppSidebar visually, uses state instead of router */}
-              <div className="w-[210px] lg:w-[215px] shrink-0 bg-code-header border-r border-white/[0.04] flex flex-col py-4">
+            <div className="flex h-[520px] sm:h-[480px] md:h-[510px] bg-bg-main overflow-hidden">
+              {/* Sidebar — matches AppSidebar visually, uses state instead of router (desktop only) */}
+              <div className="hidden md:flex w-[210px] lg:w-[215px] shrink-0 bg-code-header border-r border-white/[0.04] flex-col py-4">
                 <div className="px-5 mb-6 flex items-center gap-3">
                   <Image
                     src="/logo.svg"
