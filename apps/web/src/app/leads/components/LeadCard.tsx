@@ -292,15 +292,15 @@ function LeadCard({
         </div>
 
         {/* Scaled-down Headline */}
-        <h4 className={`text-[10.5px] font-bold tracking-[0.12em] uppercase mb-1.5 line-clamp-1 select-none opacity-90 shrink-0 h-[16px] ${theme.text}`}>
+        <p className={`text-[10.5px] font-bold tracking-[0.12em] uppercase mb-1.5 line-clamp-1 select-none opacity-90 shrink-0 h-[16px] ${theme.text}`}>
           {displayHeadline}
-        </h4>
+        </p>
 
         {/* Scaled-down Quote: fixed height container ensures 100% uniform card layout regardless of copy length */}
         <div className="h-auto sm:h-[52px] mb-2.5 flex items-start select-none overflow-hidden shrink-0">
-          <h3 className={`text-[15px] sm:text-[13.5px] font-semibold tracking-tight leading-[1.4] sm:leading-[1.35] line-clamp-3 sm:line-clamp-2 ${theme.text}`}>
+          <p className={`text-[15px] sm:text-[13.5px] font-semibold tracking-tight leading-[1.4] sm:leading-[1.35] line-clamp-3 sm:line-clamp-2 ${theme.text}`}>
             &quot;{quoteContent}&quot;
-          </h3>
+          </p>
         </div>
 
         {/* Clean Tags Row without match score badge */}

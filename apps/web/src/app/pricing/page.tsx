@@ -259,7 +259,7 @@ export default function PricingPage() {
                   <button
                     onClick={() => handleSelectPlan(plan)}
                     disabled={isCurrent || subscribingPlan === plan.id}
-                    className={`w-full py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg disabled:opacity-50 ${isCurrent
+                    className={`w-full min-h-[44px] py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg disabled:opacity-50 ${isCurrent
                         ? 'bg-white/5 text-text-secondary border border-white/10 cursor-default'
                         : isPopular
                           ? 'bg-primary text-black hover:bg-primary/90 shadow-primary/20'

@@ -310,7 +310,7 @@ function CreditEconomicsInteractiveVisual() {
             <button
               key={tierKey}
               onClick={() => setSelectedTier(tierKey)}
-              className={`py-2 px-3 rounded-lg text-xs font-semibold capitalize transition-all border ${
+              className={`min-h-[44px] py-2.5 px-3 rounded-lg text-xs font-semibold capitalize transition-all border ${
                 selectedTier === tierKey
                   ? 'bg-accent-orange text-black border-accent-orange font-bold shadow-md'
                   : 'bg-white/5 text-text-secondary border-white/10 hover:border-white/20'
@@ -453,6 +453,7 @@ export default function FeaturesSection() {
 
           return (
             <Card
+              key={card.id}
               variant="metallic"
               padding="md"
               hover={true}
@@ -534,7 +535,7 @@ export default function FeaturesSection() {
                 onClick={() => setActiveCardIndex(i)}
                 className="!rounded-xl"
               >
-              <div className="flex items-center justify-between cursor-pointer">
+              <div className="flex items-center justify-between cursor-pointer min-h-[44px]">
                 <div className="flex items-center gap-2.5">
                   <span className="font-mono text-sm font-bold text-accent-orange">
                     {card.indexStr}
@@ -550,12 +551,12 @@ export default function FeaturesSection() {
 
               {isActive && (
                   <div className="mt-4 pt-3 border-t border-border-subtle">
-                  <div className="h-[260px] w-full rounded-xl overflow-hidden mb-3">
+                  <div className="h-[240px] sm:h-[260px] w-full rounded-xl overflow-hidden mb-3">
                     {renderActiveVisual(i)}
                   </div>
-                  <h4 className="font-display text-lg font-bold text-text-primary mb-1.5">
+                  <h3 className="font-display text-lg font-bold text-text-primary mb-1.5">
                     {card.title}
-                  </h4>
+                  </h3>
                   <p className="text-xs text-text-secondary leading-relaxed font-light">
                     {card.description}
                   </p>

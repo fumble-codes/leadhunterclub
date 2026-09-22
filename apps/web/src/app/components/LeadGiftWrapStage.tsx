@@ -196,7 +196,7 @@ export function LeadGiftWrapStage() {
                 opacity: 1,
                 scale: 1,
               }}
-              exit={reduceMotion ? false : { y: -80, opacity: 0, scale: 1.04 }}
+              exit={reduceMotion ? { opacity: 0 } : { y: -80, opacity: 0, scale: 1.04 }}
               transition={{ type: 'spring', stiffness: 350, damping: 25 }}
               className="relative w-full z-10"
             >
