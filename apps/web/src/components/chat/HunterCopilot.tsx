@@ -287,24 +287,23 @@ export function HunterCopilot() {
               setIsMinimized(false)
             }}
             title="Open Hunter Copilot 24/7 Support"
-            className="group relative flex items-center gap-3 rounded-full border border-white/10 bg-surface-container/95 py-2 pl-2 pr-4 shadow-elevation-4 backdrop-blur-md transition-all duration-300 hover:border-primary/40 hover:bg-surface-container-high/95 hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.85),0_0_28px_-6px_rgba(255,184,0,0.25)] active:scale-95"
+            aria-label="Open Hunter Copilot"
+            className="group relative grid h-[56px] w-[56px] place-items-center rounded-full border border-white/10 bg-surface-container/95 shadow-elevation-4 backdrop-blur-md transition-all duration-300 hover:border-primary/45 hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.85),0_0_28px_-6px_rgba(255,184,0,0.3)] active:scale-95"
           >
-            <div className="absolute inset-0 rounded-full bg-primary/10 opacity-0 blur-md transition-opacity group-hover:opacity-100 -z-10" />
-            <div className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-            <WolfOrb size="sm" state="idle" showRing />
-
-            <div className="flex flex-col items-start pr-1 text-left">
-              <span className="flex items-center gap-1.5 text-xs font-bold tracking-tight text-white">
-                Hunter Copilot
-                <span className="rounded border border-primary/30 bg-primary/15 px-1.5 py-px font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-primary">
-                  Live
-                </span>
-              </span>
-              <span className="text-[10px] font-medium text-text-secondary">
-                Answers, policies & tickets
-              </span>
-            </div>
+            <span
+              className="pointer-events-none absolute inset-0 rounded-full bg-primary/15 opacity-0 blur-lg transition-opacity group-hover:opacity-100"
+              aria-hidden
+            />
+            <span
+              className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-full bg-gradient-to-r from-transparent via-white/25 to-transparent"
+              aria-hidden
+            />
+            <WolfOrb size="sm" state="idle" showRing={false} showStatus={false} />
+            {/* Live status pip */}
+            <span
+              className="pointer-events-none absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border-2 border-surface-container bg-secondary shadow-[0_0_8px_rgba(67,237,158,0.7)]"
+              aria-hidden
+            />
           </button>
         </motion.div>
       )}
