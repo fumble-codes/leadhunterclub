@@ -40,6 +40,7 @@ export default function AdminPlansPage() {
 
   const [plans, setPlans] = useState<PlanItem[]>([])
   const [refillPacks, setRefillPacks] = useState<RefillPackItem[]>([])
+  const [featureDrafts, setFeatureDrafts] = useState<Record<number, string>>({})
 
   useEffect(() => {
     fetchConfig()
@@ -69,6 +70,27 @@ export default function AdminPlansPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
+      // Automatically commit any pending feature bullet draft currently typed in an input box
+      const finalPlans = plans.map((p, idx) => {
+        const domInput = typeof document !== 'undefined' ? (document.getElementById(`add-feat-${idx}`) as HTMLInputElement | null) : null
+        const draft = (featureDrafts[idx] || domInput?.value || '').trim()
+        if (draft) {
+          const alreadyExists = p.features.some((f) => f.toLowerCase() === draft.toLowerCase())
+          if (!alreadyExists) {
+            return { ...p, features: [...p.features, draft] }
+          }
+        }
+        return p
+      })
+
+      setPlans(finalPlans)
+      setFeatureDrafts({})
+      if (typeof document !== 'undefined') {
+        document.querySelectorAll('input[id^="add-feat-"]').forEach((el) => {
+          ;(el as HTMLInputElement).value = ''
+        })
+      }
+
       const token = await getFirebaseToken()
       const res = await fetch('/api/admin/plans', {
         method: 'POST',
@@ -76,7 +98,7 @@ export default function AdminPlansPage() {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ plans, refillPacks }),
+        body: JSON.stringify({ plans: finalPlans, refillPacks }),
       })
       const json = await res.json()
       if (json.success) {
@@ -350,17 +372,46 @@ export default function AdminPlansPage() {
                     {/* Add Feature input */}
                     <div className="flex gap-1.5 mt-2">
                       <input
+                        id={`add-feat-${idx}`}
                         type="text"
-                        placeholder="Add feature bullet..."
+                        value={featureDrafts[idx] ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setFeatureDrafts((prev) => ({ ...prev, [idx]: val }))
+                        }}
+                        placeholder="Add feature bullet (Press Enter to add)..."
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault()
-                            addPlanFeature(idx, e.currentTarget.value)
-                            e.currentTarget.value = ''
+                            const val = (featureDrafts[idx] || '').trim()
+                            if (val) {
+                              addPlanFeature(idx, val)
+                              setFeatureDrafts((prev) => ({ ...prev, [idx]: '' }))
+                            }
+                          }
+                        }}
+                        onBlur={() => {
+                          const val = (featureDrafts[idx] || '').trim()
+                          if (val) {
+                            addPlanFeature(idx, val)
+                            setFeatureDrafts((prev) => ({ ...prev, [idx]: '' }))
                           }
                         }}
                         className="flex-1 bg-surface-elevated border border-white/10 text-xs text-white px-2.5 py-1 rounded-lg outline-none focus:border-accent-mint"
                       />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const val = (featureDrafts[idx] || '').trim()
+                          if (val) {
+                            addPlanFeature(idx, val)
+                            setFeatureDrafts((prev) => ({ ...prev, [idx]: '' }))
+                          }
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-accent-mint hover:text-black text-xs font-semibold text-zinc-300 transition-all cursor-pointer"
+                      >
+                        + Add
+                      </button>
                     </div>
                   </div>
                 </div>
