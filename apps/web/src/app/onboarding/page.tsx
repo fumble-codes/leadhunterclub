@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { api } from '@/lib/api/client'
-import { normalizePhone } from '@/lib/phone'
+import { normalizePhone, isValidPhoneNumber } from '@/lib/phone'
 import { PhoneInputWithCountry } from '@/components/ui/PhoneInputWithCountry'
 import { extractCountryAndLocalNumber } from '@/lib/countries'
 import {
@@ -170,11 +170,9 @@ const CLIENT_NICHE_CATEGORIES: CategoryGroup[] = [
 ]
 
 const EXPERIENCE_LEVELS = [
-  { value: 'none', label: 'No experience yet' },
-  { value: 'beginner', label: 'Beginner (1-3 months)' },
-  { value: 'intermediate', label: 'Intermediate (3-12 months)' },
-  { value: 'advanced', label: 'Advanced (1-3 years)' },
-  { value: 'expert', label: 'Expert (3+ years)' },
+  { value: 'beginner', label: 'Beginner (6-12 months)' },
+  { value: 'intermediate', label: 'Intermediate (1-3 years)' },
+  { value: 'expert', label: 'Expert (3-6 years)' },
 ]
 
 const DISCOVERY_SOURCES = [
@@ -314,7 +312,13 @@ export default function OnboardingPage() {
         setTwitter(data.twitter || '')
         setServicesOffered(data.servicesOffered || [])
         setPreferredLeadCategories(data.preferredLeadCategories || [])
-        setOutreachExperience(data.outreachExperience || '')
+        // Reset stale experience values from before the 3-option list
+        setOutreachExperience(
+          data.outreachExperience &&
+            EXPERIENCE_LEVELS.some((el) => el.value === data.outreachExperience)
+            ? data.outreachExperience
+            : '',
+        )
         setDiscoverySource(data.discoverySource || '')
         if (data.countryCode) {
           setCountryCode(data.countryCode)
@@ -571,6 +575,7 @@ export default function OnboardingPage() {
     if (!discoverySource) return
     if (!linkedin.trim()) { setError('LinkedIn profile link is required'); return }
     if (!phoneNumber.trim()) { setError('Phone number is required'); return }
+    if (!isValidPhoneNumber(phoneNumber)) { setError('Enter a valid phone number (7\u201315 digits)'); return }
     if (servicesOffered.length === 0) { setError('Select at least one service'); return }
     if (preferredLeadCategories.length === 0) { setError('Select at least one lead category'); return }
     if (!outreachExperience) { setError('Select your outreach experience'); return }
@@ -803,11 +808,30 @@ export default function OnboardingPage() {
                             setPhoneNumber(num)
                             setStep1Error('')
                           }}
-                          error={step1Error && !phoneNumber.trim() ? step1Error : undefined}
+                          error={
+                            phoneNumber.trim() && !isValidPhoneNumber(phoneNumber)
+                              ? 'Enter a valid phone number'
+                              : step1Error && !phoneNumber.trim()
+                                ? step1Error
+                                : undefined
+                          }
                         />
                         <p className="text-xs text-text-secondary/60 mt-0.5">
                           Defaulted to India (+91). Select your country code if outside India.
                         </p>
+                        {phoneNumber.trim().length > 0 && (
+                          <p
+                            className={`text-xs mt-0.5 flex items-center gap-1 ${
+                              isValidPhoneNumber(phoneNumber)
+                                ? 'text-accent-mint'
+                                : 'text-red-400'
+                            }`}
+                          >
+                            {isValidPhoneNumber(phoneNumber)
+                              ? '\u2713 Valid phone number'
+                              : 'Enter a valid phone number (7\u201315 digits)'}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -827,6 +851,10 @@ export default function OnboardingPage() {
                         }
                         if (!phoneNumber.trim()) {
                           setStep1Error('Phone number is required')
+                          return
+                        }
+                        if (!isValidPhoneNumber(phoneNumber)) {
+                          setStep1Error('Enter a valid phone number (7\u201315 digits)')
                           return
                         }
                         setStep1Error('')
