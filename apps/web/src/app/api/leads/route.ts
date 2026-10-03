@@ -23,35 +23,13 @@ import {
   sanitizeHeadline,
 } from '@/lib/claim-reveal'
 
+import {
+  getCachedFeed,
+  setCachedFeed,
+  getCachedRevealCounts,
+  setCachedRevealCounts,
+} from '@/lib/feed-cache'
 export const dynamic = 'force-dynamic'
-
-interface FeedCacheEntry {
-  rawLeads: any[]
-  total: number
-  cachedAt: number
-}
-
-const feedCache = new Map<string, FeedCacheEntry>()
-const FEED_CACHE_TTL = 30_000 // 30 seconds
-const MAX_FEED_CACHE_SIZE = 50
-
-function getCachedFeed(key: string): FeedCacheEntry | null {
-  const entry = feedCache.get(key)
-  if (!entry) return null
-  if (Date.now() - entry.cachedAt > FEED_CACHE_TTL) {
-    feedCache.delete(key)
-    return null
-  }
-  return entry
-}
-
-function setCachedFeed(key: string, data: { rawLeads: any[]; total: number }) {
-  if (feedCache.size >= MAX_FEED_CACHE_SIZE) {
-    const oldestKey = feedCache.keys().next().value
-    if (oldestKey) feedCache.delete(oldestKey)
-  }
-  feedCache.set(key, { ...data, cachedAt: Date.now() })
-}
 
 function formatTimeAgo(dateStr: string): string {
   const diffMs = new Date().getTime() - new Date(dateStr).getTime()
@@ -354,29 +332,47 @@ export async function GET(request: NextRequest) {
         externalLeads = rawLeads.map(mapLeadPostToExternal)
         const leadIds = externalLeads.map((l) => l.id)
 
-        const [userStates, otherRevealedStates] = await Promise.all([
-          leadIds.length > 0
-            ? db.userLeadState.findMany({
+        let otherRevealCounts: Map<string, number>
+        const revealCacheKey = [...leadIds].sort().join(',')
+        const cachedReveals = getCachedRevealCounts(revealCacheKey)
+
+        let userStates: any[] = []
+        if (cachedReveals) {
+          otherRevealCounts = cachedReveals
+          userStates = leadIds.length > 0
+            ? await db.userLeadState.findMany({
                 where: { userId, leadId: { in: leadIds } },
               })
-            : [],
-          leadIds.length > 0
-            ? db.userLeadState.findMany({
-                where: { leadId: { in: leadIds }, isRevealed: true, userId: { not: userId } },
-                select: { leadId: true },
-              })
-            : [],
-        ])
-        const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
-        const otherRevealCounts = new Map<string, number>()
-        for (const s of otherRevealedStates) {
-          otherRevealCounts.set(s.leadId, (otherRevealCounts.get(s.leadId) || 0) + 1)
+            : []
+        } else {
+          const [fetchedUserStates, otherRevealedStates] = await Promise.all([
+            leadIds.length > 0
+              ? db.userLeadState.findMany({
+                  where: { userId, leadId: { in: leadIds } },
+                })
+              : [],
+            leadIds.length > 0
+              ? db.userLeadState.findMany({
+                  where: { leadId: { in: leadIds }, isRevealed: true },
+                  select: { leadId: true, userId: true },
+                })
+              : [],
+          ])
+          userStates = fetchedUserStates
+          otherRevealCounts = new Map<string, number>()
+          for (const s of otherRevealedStates) {
+            otherRevealCounts.set(s.leadId, (otherRevealCounts.get(s.leadId) || 0) + 1)
+          }
+          setCachedRevealCounts(revealCacheKey, otherRevealCounts)
         }
+        const stateMap = new Map(userStates.map((s) => [s.leadId, s]))
 
         const data = externalLeads
           .map((lead) => {
-            const otherCount = otherRevealCounts.get(lead.id) || 0
-            const totalClaims = Math.max(lead.claimed_count || 0, otherCount)
+            const rawOtherCount = otherRevealCounts.get(lead.id) || 0
+            const userUnlocked = stateMap.get(lead.id)?.isRevealed ? 1 : 0
+            const otherCount = Math.max(0, rawOtherCount - userUnlocked)
+            const totalClaims = Math.max(lead.claimed_count || 0, rawOtherCount)
             const isLimitReached = totalClaims >= 25 || lead.is_claimed
             return externalPostToAppLead(
               { ...lead, claimed_count: totalClaims },

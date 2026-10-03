@@ -17,6 +17,12 @@ import {
   type ConfirmationResult,
 } from '@/lib/firebase'
 import { normalizePhone } from '@/lib/phone'
+import { PhoneInputWithCountry } from '@/components/ui/PhoneInputWithCountry'
+import {
+  findCountryByDialCode,
+  validatePhoneNumberLength,
+  DEFAULT_COUNTRY,
+} from '@/lib/countries'
 import { motion } from 'framer-motion'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useToast } from '@/components/ui/Toast'
@@ -39,6 +45,7 @@ import {
   KeyIcon,
   EyeIcon,
   EyeSlashIcon,
+  CreditCardIcon,
 } from '@heroicons/react/24/solid'
 
 const PLAN_LABELS: Record<string, string> = {
@@ -86,16 +93,62 @@ export default function SettingsPage() {
   const [phoneConfirmationResult, setPhoneConfirmationResult] = useState<ConfirmationResult | null>(
     null,
   )
+  const [phoneCountryCode, setPhoneCountryCode] = useState('+91')
   const [phoneFormPhone, setPhoneFormPhone] = useState('')
   const [phoneError, setPhoneError] = useState('')
   const [phoneLoading, setPhoneLoading] = useState(false)
   const [phoneStep, setPhoneStep] = useState<'idle' | 'send' | 'verify'>('idle')
   const [otpCountdown, setOtpCountdown] = useState(0)
 
+  const selectedPhoneCountry = useMemo(
+    () => findCountryByDialCode(phoneCountryCode) || DEFAULT_COUNTRY,
+    [phoneCountryCode],
+  )
+  const phoneValidation = useMemo(
+    () => validatePhoneNumberLength(selectedPhoneCountry, phoneFormPhone),
+    [selectedPhoneCountry, phoneFormPhone],
+  )
+
   const { addToast } = useToast()
   const [billingLoading, setBillingLoading] = useState(false)
   const [planModalOpen, setPlanModalOpen] = useState(false)
   const [planCredits, setPlanCredits] = useState<Record<string, number>>(PLAN_CREDITS)
+
+  // Payment History State
+  const [payments, setPayments] = useState<Array<{
+    id: string
+    createdAt: string
+    amount: number
+    currency: string
+    status: string
+    itemType: 'plan' | 'topup'
+    itemLabel: string
+    paymentId: string
+    orderId: string
+    tokensAdded: number
+  }>>([])
+  const [loadingPayments, setLoadingPayments] = useState(true)
+
+  useEffect(() => {
+    async function loadPayments() {
+      try {
+        const token = await getFirebaseToken()
+        if (!token) return
+        const res = await fetch('/api/user/payments', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const json = await res.json()
+        if (json.success && Array.isArray(json.payments)) {
+          setPayments(json.payments)
+        }
+      } catch (err) {
+        console.error('Failed to load user payments:', err)
+      } finally {
+        setLoadingPayments(false)
+      }
+    }
+    loadPayments()
+  }, [])
 
   useEffect(() => {
     fetch('/api/plans')
@@ -171,7 +224,10 @@ export default function SettingsPage() {
   }, [phoneStep])
 
   const handlePhoneSendOtp = async () => {
-    if (!phoneFormPhone.trim()) return
+    if (!phoneValidation.valid) {
+      setPhoneError(phoneValidation.message || 'Please enter a valid phone number')
+      return
+    }
     setPhoneLoading(true)
     setPhoneError('')
     try {
@@ -180,7 +236,8 @@ export default function SettingsPage() {
         setPhoneError('Could not initialize verification. Please try again.')
         return
       }
-      const normalized = normalizePhone(phoneFormPhone.trim())
+      const fullPhone = `${phoneCountryCode}${phoneFormPhone.trim()}`
+      const normalized = normalizePhone(fullPhone)
       const result = await signInWithPhoneNumber(auth, normalized, verifier)
       setPhoneConfirmationResult(result)
       setPhoneStep('verify')
@@ -202,6 +259,22 @@ export default function SettingsPage() {
         phoneVerificationCode.trim(),
       )
       await linkWithCredential(auth.currentUser!, cred)
+
+      const fullPhone = `${phoneCountryCode}${phoneFormPhone.trim()}`
+      const normalized = normalizePhone(fullPhone)
+
+      const token = await auth.currentUser?.getIdToken().catch(() => null)
+      if (token) {
+        await fetch('/api/auth/me', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ phone: normalized }),
+        }).catch(() => {})
+      }
+
       setPhoneStep('idle')
       setPhoneFormPhone('')
       setPhoneVerificationCode('')
@@ -543,17 +616,45 @@ export default function SettingsPage() {
 
                 {phoneStep === 'send' && (
                   <>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                        Phone number
-                      </label>
-                      <input
-                        value={phoneFormPhone}
-                        onChange={(e) => setPhoneFormPhone(e.target.value)}
-                        type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-3 max-w-xs"
+                    <div className="flex flex-col gap-1.5 max-w-sm">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                          Phone number
+                        </label>
+                        <span className="text-[11px] text-text-secondary/70">
+                          {selectedPhoneCountry.name} ({selectedPhoneCountry.digits ? `${selectedPhoneCountry.digits} digits` : `${selectedPhoneCountry.minDigits}-${selectedPhoneCountry.maxDigits} digits`})
+                        </span>
+                      </div>
+
+                      <PhoneInputWithCountry
+                        countryCode={phoneCountryCode}
+                        onCountryCodeChange={(code) => {
+                          setPhoneCountryCode(code)
+                          setPhoneError('')
+                        }}
+                        phoneNumber={phoneFormPhone}
+                        onPhoneNumberChange={(num) => {
+                          setPhoneFormPhone(num)
+                          setPhoneError('')
+                        }}
+                        error={phoneError}
                       />
+
+                      {phoneFormPhone.trim().length > 0 && (
+                        <p
+                          className={`text-xs mt-0.5 flex items-center gap-1 ${
+                            phoneValidation.valid ? 'text-accent-mint' : 'text-red-400'
+                          }`}
+                        >
+                          {phoneValidation.valid ? (
+                            <>
+                              <span aria-hidden>✓</span> Valid {selectedPhoneCountry.name} phone number
+                            </>
+                          ) : (
+                            phoneValidation.message
+                          )}
+                        </p>
+                      )}
                     </div>
 
                     {phoneError && (
@@ -1024,6 +1125,100 @@ export default function SettingsPage() {
                     You&apos;ll be taken to a secure Razorpay checkout to complete your subscription.
                   </p>
                 </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Payment & Transaction History */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="metallic-card p-6 sm:p-8"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center">
+                  <CreditCardIcon className="w-6 h-6 text-accent-mint" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-text-primary">Payment History</h2>
+                  <p className="text-sm text-text-secondary">Your subscription and credit refill transactions</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-white/5 border border-white/10 text-text-secondary">
+                {payments.length} Transaction{payments.length === 1 ? '' : 's'}
+              </span>
+            </div>
+
+            {loadingPayments ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-3">
+                <div className="w-6 h-6 rounded-full border-2 border-accent-mint/20 border-t-accent-mint animate-spin" />
+                <span className="text-xs text-text-secondary">Loading payment records...</span>
+              </div>
+            ) : payments.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-surface-elevated/40 border border-subtle/50 text-center">
+                <CreditCardIcon className="w-10 h-10 text-text-secondary/40 mx-auto mb-3" />
+                <p className="text-sm font-semibold text-text-primary">No payment history yet</p>
+                <p className="text-xs text-text-secondary mt-1 max-w-sm mx-auto">
+                  When you purchase a subscription or refill credits, your payment records, receipts, and Razorpay transaction IDs will be displayed here.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-white/[0.08] text-text-secondary/70 uppercase tracking-wider text-[10px]">
+                      <th className="pb-3 px-3 font-semibold">Date & Time</th>
+                      <th className="pb-3 px-3 font-semibold">Description</th>
+                      <th className="pb-3 px-3 font-semibold">Amount</th>
+                      <th className="pb-3 px-3 font-semibold">Payment ID</th>
+                      <th className="pb-3 px-3 font-semibold">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.04]">
+                    {payments.map((p) => (
+                      <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-3.5 px-3 text-text-secondary whitespace-nowrap">
+                          {new Date(p.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </td>
+                        <td className="py-3.5 px-3">
+                          <span className="font-semibold text-text-primary block">{p.itemLabel}</span>
+                          {p.tokensAdded > 0 && (
+                            <span className="text-[10px] text-accent-mint font-medium">
+                              +{p.tokensAdded} Credits
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-3 whitespace-nowrap">
+                          <span className="font-bold text-text-primary text-sm">
+                            ₹{p.amount?.toLocaleString('en-IN') || 0}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-3 font-mono text-[11px] text-text-secondary">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-text-primary font-medium">{p.paymentId}</span>
+                            {p.orderId && p.orderId !== '—' && (
+                              <span className="text-[10px] text-text-secondary/60">Order: {p.orderId}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-3 whitespace-nowrap">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <CheckCircleIcon className="w-3 h-3" />
+                            Paid
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </motion.div>
