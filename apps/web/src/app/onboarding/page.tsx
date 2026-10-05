@@ -14,6 +14,7 @@ import {
   validatePhoneNumberLength,
   DEFAULT_COUNTRY,
 } from '@/lib/countries'
+import { isValidSocialProfile } from '@/lib/social'
 import {
   auth,
   signInWithPhoneNumber,
@@ -247,6 +248,46 @@ export default function OnboardingPage() {
   const [emailVerified, setEmailVerified] = useState(false)
   const [resending, setResending] = useState(false)
   const [checkingVerification, setCheckingVerification] = useState(true)
+
+  const getErrorButtonLabel = (errText: string) => {
+    const lower = errText.toLowerCase()
+    if (lower.includes('linkedin') || lower.includes('social') || lower.includes('portfolio') || lower.includes('website')) {
+      return 'Fix on Step 1'
+    }
+    if (lower.includes('phone') || lower.includes('mobile')) {
+      return 'Fix on Step 1'
+    }
+    if (lower.includes('service') || lower.includes('category') || lower.includes('experience')) {
+      return 'Fix on Step 2'
+    }
+    return 'Retry'
+  }
+
+  const handleErrorAction = (errText: string) => {
+    const lower = errText.toLowerCase()
+    if (
+      lower.includes('linkedin') ||
+      lower.includes('social') ||
+      lower.includes('phone') ||
+      lower.includes('mobile') ||
+      lower.includes('portfolio') ||
+      lower.includes('website')
+    ) {
+      setStep1Error(errText)
+      setStep(1)
+      return
+    }
+    if (
+      lower.includes('service') ||
+      lower.includes('category') ||
+      lower.includes('categories') ||
+      lower.includes('experience')
+    ) {
+      setStep(2)
+      return
+    }
+    handleSubmit()
+  }
 
   const [countryCode, setCountryCode] = useState('+91')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -599,18 +640,31 @@ export default function OnboardingPage() {
 
   const handleSubmit = async () => {
     if (!discoverySource) return
-    if (!linkedin.trim()) { setError('LinkedIn profile link is required'); return }
-    if (!phoneNumber.trim()) { setError('Phone number is required'); return }
+    if (!linkedin.trim()) {
+      setError('LinkedIn profile link is required')
+      setStep1Error('LinkedIn profile link is required')
+      setStep(1)
+      return
+    }
+    if (!isValidSocialProfile(linkedin)) {
+      const msg = 'Please provide a valid direct link to your personal or company LinkedIn profile (e.g. linkedin.com/in/yourname)'
+      setError(msg)
+      setStep1Error(msg)
+      setStep(1)
+      return
+    }
+    if (!phoneNumber.trim()) { setError('Phone number is required'); setStep(1); return }
     const selectedCountry = findCountryByDialCode(countryCode) || DEFAULT_COUNTRY
     const phoneValidation = validatePhoneNumberLength(selectedCountry, phoneNumber)
     if (!phoneValidation.valid) {
       setError(phoneValidation.message || 'Invalid phone number length')
+      setStep1Error(phoneValidation.message || 'Invalid phone number length')
       setStep(1)
       return
     }
-    if (servicesOffered.length === 0) { setError('Select at least one service'); return }
-    if (preferredLeadCategories.length === 0) { setError('Select at least one lead category'); return }
-    if (!outreachExperience) { setError('Select your outreach experience'); return }
+    if (servicesOffered.length === 0) { setError('Select at least one service'); setStep(2); return }
+    if (preferredLeadCategories.length === 0) { setError('Select at least one lead category'); setStep(2); return }
+    if (!outreachExperience) { setError('Select your outreach experience'); setStep(2); return }
 
     setIsSubmitting(true)
     setError('')
@@ -640,8 +694,13 @@ export default function OnboardingPage() {
       localStorage.removeItem('onboarding_data')
       router.push('/pending-approval')
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to submit onboarding')
+      const msg = err instanceof Error ? err.message : 'Failed to submit onboarding'
+      setError(msg)
       setSubmitRetry(true)
+      if (msg.toLowerCase().includes('linkedin') || msg.toLowerCase().includes('phone')) {
+        setStep1Error(msg)
+        setStep(1)
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -877,6 +936,10 @@ export default function OnboardingPage() {
                     onClick={() => {
                       if (!linkedin.trim()) {
                         setStep1Error('LinkedIn profile link is required')
+                        return
+                      }
+                      if (!isValidSocialProfile(linkedin)) {
+                        setStep1Error('Please provide a valid direct link to your personal or company LinkedIn profile (e.g. linkedin.com/in/yourname)')
                         return
                       }
                       if (!phoneNumber.trim()) {
@@ -1224,15 +1287,17 @@ export default function OnboardingPage() {
                     </div>
 
                     {error && (
-                      <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
-                        <ShieldExclamationIcon className="w-4 h-4 shrink-0" />
-                        <span>{error}</span>
+                      <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <ShieldExclamationIcon className="w-4 h-4 shrink-0" />
+                          <span className="break-words">{error}</span>
+                        </div>
                         {submitRetry && (
                           <button
-                            onClick={handleSubmit}
-                            className="ml-auto shrink-0 px-3 py-1 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 text-[11px] font-medium transition-colors"
+                            onClick={() => handleErrorAction(error)}
+                            className="shrink-0 px-3 py-1.5 rounded-lg bg-red-500/25 text-red-200 hover:bg-red-500/35 hover:text-white text-[11px] font-semibold transition-all whitespace-nowrap active:scale-95 ml-2"
                           >
-                            Retry
+                            {getErrorButtonLabel(error)} &rarr;
                           </button>
                         )}
                       </div>
