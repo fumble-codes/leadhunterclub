@@ -11,6 +11,7 @@ import { CustomLoader, type LoaderPageType } from '@/components/ui/CustomLoader'
 import { UpgradeNudgePopup, type UpgradeNudgeVariant, CommunityWinPopup, type CommunityPopupPost } from '@/components/ui'
 import { getFirebaseToken } from '@/lib/firebase'
 import { HunterCopilot } from '@/components/chat/HunterCopilot'
+import { COMING_SOON } from '@/lib/launch'
 
 
 
@@ -356,7 +357,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <ToastProvider>
-      {(pathname === '/' || pathname === '/reviews' || pathname === '/wall-of-love') && <Navbar />}
+      {((pathname === '/' && !COMING_SOON) ||
+        pathname === '/reviews' ||
+        pathname === '/wall-of-love') && <Navbar />}
       {isAppRoute ? (
         <div className="flex h-screen bg-bg-main overflow-hidden font-sans">
           <div className="hidden md:block shrink-0">

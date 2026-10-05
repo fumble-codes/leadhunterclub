@@ -13,7 +13,7 @@
 
 | # | Item | Status |
 |---|------|--------|
-| 1 | Hero image — replace `/images/hero image 2.png` in `HeroSection.tsx:2243` | ⛔ blocked (needs asset from user) |
+| 1 | Hero image — full-bleed wolf background (hero text → end of app demo) | ✅ done + browser-verified |
 | 2 | Hero font mismatch — headline line 2 used undefined `font-serif` | ✅ done |
 | 3 | Bento grid — Step 02 overlap on hover + unify Step 01–04 labels | ✅ done |
 | 4 | Capabilities card 4 — interactive credit-ledger UI (superseded the original "replace with video" ask) | ✅ done + browser-verified (16/16 checks desktop+mobile) |
@@ -25,6 +25,7 @@
 | 10 | Saved leads — wire `LeadDrawer` popup on lead name click (like lead feed) | ✅ code + compile-verified (click-through needs login) |
 | 11 | FAQ reorder — landing FAQ `page.tsx` from 1,2,3,4 → 1,4,2,3 | ✅ done + visually verified |
 | 12 | "Firebase auth panel" change | ❓ unclear — awaiting user clarification |
+| 13 | Landing copy → `docs/landingpagecontent.md` (hero/how/why/testimonials/pricing/final CTA) | ✅ done + browser-verified (desktop + mobile) |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 
@@ -54,6 +55,25 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
 - Note: this is the **landing** FAQ. HeroSection has a separate support/FAQ area — untouched.
 
 ### Out-of-band fixes (not on the original 12)
+
+- **Coming-soon landing (2026-10-05):** `/` now serves `app/components/ComingSoon.tsx` —
+  full-bleed looping bg video (`public/videos/1003.mp4`, 436 KB H.264, converted from user's
+  `D:\Downloads\1003.mov`; .mov is not Firefox-playable) + wolf poster fallback, **asymmetric
+  left-anchored layout** (left-weighted scrims, footage breathes right; no centered pill-badge
+  hero): mono kicker "Stop chasing clients." → **H1 "Coming soon."** (big display, amber
+  period; user asked for big coming-soon text) → H2 "Find people already looking for what you
+  sell." → user-supplied LeadHunter paragraph verbatim → single CTA **Create your account →
+  /register** (existing members onboard pre-launch; sign-in link removed from this page by
+  request) + note "platform isn't fully live yet… start onboarding" (added so the page states
+  the coming-soon + onboard-now message explicitly).
+  Marketing `Navbar` hidden on `/` while gate is on
+  (`ClientLayout.tsx:359`). Gate = `src/lib/launch.ts` plain boolean `COMING_SOON = true` —
+  flip to `false`, commit, deploy to restore the hero landing. **Both directions
+  browser-verified 2026-10-05:** false → hero sections + navbar back; true → coming soon +
+  navbar hidden. (Early env-var version `NEXT_PUBLIC_COMING_SOON` was abandoned — unproven,
+  unnecessary.) NOTE: write launch.ts as UTF-8 — a PowerShell `Get-Content | Set-Content`
+  round-trip corrupts its non-ASCII comment chars. Verified: lint clean, HTTP 200,
+  video src + CTA in served HTML, `/videos/1003.mp4` 200, old landing sections absent.
 
 - **#4 Credit-ledger widget** (`FeaturesSection.tsx`): replaced stale tier selector
   (250/750/2000 credits, "3/reveal" — all wrong vs product) with a live ledger demo:
@@ -85,6 +105,44 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   subresource) → use `domcontentloaded`.
 
 ## 2. Completed work (don't redo)
+
+### #1 Hero image → full-bleed wolf background (done)
+- **Asset:** user pasted "Wolf Stalking Through Darkness.png" in chat (no file path — extracted
+  the base64 part from the opencode session DB) → saved as
+  `apps/web/public/images/hero-wolf.png` (1578×997, ~1.2 MB).
+- **`HeroSection.tsx`:** artwork lifted OUT of the island card → new **section-level
+  `absolute inset-0` motion layer** (keeps the scroll-scrub `bgScale` 1.1→1.35 and the same
+  calibrated gradient + radial scrims). The section runs nav-top → demo-end (`pb-0`), so the
+  image covers exactly "till the dashboard demo ends". Island card now sits on the artwork
+  with a light local radial scrim (`rgba(11,13,19,0.45)` center) to keep headline contrast.
+  Old `/images/hero image 2.png` reference removed (file kept on disk).
+- **Verified:** lint clean; `tsc` 0 errors in HeroSection; browser screenshots desktop +
+  mobile — art behind hero text ✓, glowing eyes visible in the gap above the demo ✓, demo
+  bottom → next-section transition clean ✓, console clean (1 pre-existing Lenis warn).
+- **Pre-existing quirk found (untouched):** the "Trusted by 3500+" strip is fully covered by
+  the demo window on lg+ (demo `mt-[-48px]` pulls it over the strip) — was already hidden
+  before this change; visible again on <lg viewports.
+- **Full-bleed fix (user follow-up):** the gutters came from `page.tsx:58`'s
+  `<main className="... max-w-[1280px] mx-auto px-4 sm:px-6">` (screenshot math: ~1580px
+  viewport → 1280 centered → content starts at x=174 ✓). Restructured so only the hero
+  artwork breaks out, zero change to the rest of the layout:
+  1. `page.tsx` main keeps `min-h-screen bg-bg-main ... overflow-x-hidden` but LOST
+     `max-w-[1280px] mx-auto px-4 sm:px-6`; a new wrapper `<div className="mx-auto
+     max-w-[1280px] px-4 sm:px-6">` now wraps **everything after `<HeroSection />`**
+     (divider → footer) → below-hero geometry byte-identical to before.
+  2. `HeroSection.tsx`: card + social strip + demo wrapped in `<div className="w-full
+     max-w-[1280px] px-4 sm:px-6 mx-auto">` → hero content keeps its exact old width;
+     the bg layer (absolute inset-0 on the section) now spans the **full viewport**.
+  - Verified: lint clean (both files), `tsc` clean (both files), page HTTP 200, served HTML
+    contains both new wrappers + `hero-wolf.png` srcset (13 refs). Browser screenshot pass
+    pending (chrome-devtools tools unavailable that session).
+- **Glass-panel removal (user follow-up 2):** island card's `rounded-[22px] border
+  border-white/[0.08] shadow-[0_25px_85px...] overflow-hidden` + the local radial film
+  (`rgba(11,13,19,0.45)`) behind the text — all removed. Hero copy is now frameless,
+  sitting directly on the full-bleed artwork; legibility relies on the section-level
+  calibrated scrims only (gradient + vignette, unchanged). Kept: layout box (min-h/flex/
+  mb-10 + `heroCardRef` for the scroll-zoom). Verified: lint + tsc clean, HTTP 200,
+  served HTML has 0× old panel classes / 0× film gradient / 1× new frameless div.
 
 ### #2 Hero font (done)
 - `apps/web/src/app/components/HeroSection.tsx:2276`: removed `italic font-normal font-serif`
@@ -250,6 +308,43 @@ Changed in `apps/web/src/app/page.tsx` footer (~line 735+):
 - **Still needs from user:** real social profile URLs; Privacy/Terms/Cookie decision
   (currently `href="#"`).
 
+### #13 Landing copy → docs/landingpagecontent.md (done)
+Content-only rewrite of 6 sections across 3 files (layouts/components untouched):
+- **`HeroSection.tsx`** — h1 → "Stop chasing clients. / Find people already looking for what
+  you sell."; sub → LeadHunter public-conversations line (max-w 480→560 for the longer copy);
+  NEW secondary CTA **"See How It Works"** → `#funnel` anchor (verified scrolls); NEW
+  "50 free credits · No credit card required" line under CTAs.
+- **`page.tsx` #funnel** — H2 → "From buyer signal / to sales conversation." (old sub removed);
+  steps → 01 Find fresh demand (+ kicker "Real people. Real needs. Happening now.") /
+  02 Filter the noise / 03 Understand the opportunity (+ mono line "Need · Pain point · Budget
+  signals · Urgency · Context · Intent") / 04 Act while the opportunity is fresh (chip now
+  carries "Find the signal. Understand the buyer. Make your move."). Step-label styling from
+  #3 preserved; visuals untouched. Stale CARD-4 comment updated.
+- **`page.tsx` #philosophy** — eyebrow → "Why LeadHunter"; H2 → "Most lead tools give you
+  contacts. / LeadHunter gives you context."; sub → "Thousands of contacts don't mean…";
+  comparison cards repurposed: left "A database can tell you: → Who someone is." (single bullet
+  vertically centered via flex so the stretched grid cell doesn't look empty), right
+  "LeadHunter helps you understand:" → 5 spec bullets; reply-rate badges KEPT; NEW closer
+  "Less cold outreach. / More relevant conversations." above the flowchart.
+- **`TestimonialsSection.tsx`** — eyebrow → "Don't take our word for it."; h2 → "See what
+  hunters are finding."; sub → the one-question line. Screenshot grid/feed notice untouched
+  (already satisfies the spec's "real screenshots" ask).
+- **`page.tsx` #pricing** — H2 → "Start hunting for free. / Pay when you want to hunt harder.";
+  sub → spec line; plans → **Scout Hunt** (₹0 / month, 4 spec features, CTA "Start Hunting Free")
+  + **Alpha Hunt** (₹999, 6 spec features, CTA "Start Hunting"); `{p.cta}` replaces
+  "Get Started with {name}"; numbers unchanged (50 / 1,000 / ₹999 per spec note); trust note kept.
+- **`page.tsx` final CTA** — h2 → "Stop searching for clients. / Start finding demand."; sub →
+  spec line; button → "Start Hunting Free"; NEW "50 free credits · No credit card required"
+  under the button; dot chips + supporting row kept.
+- **Verified:** lint clean (3 files), tsc 0 new errors, old-string grep sweep = 0 hits, browser
+  22/22 DOM checks + "See How It Works" anchor click scroll ✓, desktop 1440 + mobile screenshots
+  clean (no overflow: bodyScrollW == clientWidth, 0 text overflow), console = 1 pre-existing
+  Lenis warn only. `/pricing` page + API defaults intentionally untouched (landing-only ask).
+- **⚠️ Launch gate discovered:** `src/lib/launch.ts` `COMING_SOON = true` (untracked user WIP)
+  makes `/` render `ComingSoon.tsx` instead of the landing page — the new copy was verified with
+  the gate temporarily flipped to `false`, then **restored to `true`**. Flip it to ship the page.
+  ComingSoon already carries the new hero lines.
+
 ### Test baseline after this session
 `vitest run`: **18 failed | 167 passed (185)**. All 18 in untouched backend files
 (`plans` 2, `payment` 4, `credits` 9, `reveal route` 3 — the known stale-expectation set;
@@ -266,15 +361,14 @@ must be implemented first. `tsc` flags these as 2 of the ~49 pre-existing errors
 
 ## 3. Blocked — waiting on user input
 
-1. **Hero image asset** (#1) — new file to replace `/images/hero image 2.png`.
-2. **Video asset for capabilities card 4** (#4).
-3. **Footer URLs — part 2** (#7 nav columns DONE): (a) real social profile URLs
+1. **Video asset for capabilities card 4** (#4).
+2. **Footer URLs — part 2** (#7 nav columns DONE): (a) real social profile URLs
    (X/LinkedIn/YouTube — icons hidden until then), (b) Privacy/Terms/Cookie decision —
    give URLs or say "make placeholder pages" (currently `href="#"`).
-4. **Pricing confirmation** (#6 — DONE with code's own values): proceeded as
+3. **Pricing confirmation** (#6 — DONE with code's own values): proceeded as
    ₹999 = 1,000 credits, Free = 50, Agency dropped from sale. Shout if any value differs.
    DB plan rows = backend guy (still no `plans_config` row; API serves code defaults).
-5. **"Firebase auth panel change"** (#12) — what exactly?
+4. **"Firebase auth panel change"** (#12) — what exactly?
 
 ---
 
@@ -325,7 +419,7 @@ must be implemented first. `tsc` flags these as 2 of the ~49 pre-existing errors
 2. **Live sweeps (need a logged-in session):** #9 admin dropdowns (`/admin/users`,
    `/admin/review`) + #10 drawer click-through + #8 onboarding dropdown — ask user for a
    test login.
-3. Blocked on user: #1 hero image, #4 card-4 video, #7 social/legal URLs (nav columns
+3. Blocked on user: #4 card-4 video, #7 social/legal URLs (nav columns
    done), #12 Firebase panel.
 4. Pre-launch: rotate Razorpay test keys / set Vercel env vars (see §4); hand backend guy
    the dashboard/copilot copy inconsistencies logged in #6.

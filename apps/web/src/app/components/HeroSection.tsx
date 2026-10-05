@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useState, useRef, useMemo } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { useIsMobile } from '@/hooks/useMediaQuery'
@@ -2215,6 +2214,34 @@ export default function HeroSection() {
     <section
       className="relative min-h-[100dvh] flex flex-col items-center grain-texture overflow-hidden bg-page-bg pt-20 pb-0 px-0"
     >
+      {/* ─── Full-bleed wolf artwork — spans from nav down to the end of the app demo ─── */}
+      <motion.div
+        style={{ scale: bgScale }}
+        className="absolute inset-0 z-0 pointer-events-none transform-gpu will-change-transform"
+      >
+        <video
+          src="/videos/hero-bg.mp4"
+          poster="/videos/hero-poster.jpg"
+          autoPlay={!reduceMotion}
+          muted
+          loop
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-[center_40%] select-none"
+        />
+        {/* Calibrated Dark Contrast Scrim for 100% WCAG Typography Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-page-bg/95 via-black/50 to-black/40" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(ellipse at 50% 45%, rgba(11,13,19,0.15) 0%, rgba(11,13,19,0.75) 100%)',
+          }}
+        />
+      </motion.div>
+
       {/* Crisp geometric grid background (Engineering precision) */}
       <div
         className="absolute inset-0 pointer-events-none z-0 opacity-100"
@@ -2229,36 +2256,13 @@ export default function HeroSection() {
         }}
       />
 
-      {/* ─── 1. Framed Island Card with Custom Wolf Artwork ─── */}
+      {/* Content frame — keeps the original 1280px geometry; the artwork above bleeds past it to the viewport edges */}
+      <div className="w-full max-w-[1280px] px-4 sm:px-6 mx-auto">
+      {/* ─── 1. Frameless hero copy — text sits directly on the full-bleed artwork (no panel/film) ─── */}
       <div
         ref={heroCardRef}
-        className="relative mx-auto w-full min-h-[460px] md:min-h-[500px] rounded-[22px] border border-white/[0.08] overflow-hidden flex items-center justify-center shadow-[0_25px_85px_-20px_rgba(0,0,0,0.85)] mb-10"
+        className="relative mx-auto w-full min-h-[460px] md:min-h-[500px] flex items-center justify-center mb-10"
       >
-        {/* Zooming Background Layer with Custom Wolf Artwork */}
-        <motion.div
-          style={{ scale: bgScale }}
-          className="absolute inset-0 w-full h-full transform-gpu will-change-transform pointer-events-none"
-        >
-          <Image
-            src="/images/hero image 2.png"
-            alt="Wolf overlooking glowing client intent signals in the dark valley"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[center_35%] select-none"
-          />
-
-          {/* Calibrated Dark Contrast Scrim for 100% WCAG Typography Legibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-page-bg/95 via-black/50 to-black/40" />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(ellipse at 50% 45%, rgba(11,13,19,0.15) 0%, rgba(11,13,19,0.75) 100%)',
-            }}
-          />
-        </motion.div>
-
         {/* Centered Content Stack */}
         <motion.div
           style={{ opacity: textOpacity }}
@@ -2271,10 +2275,10 @@ export default function HeroSection() {
             transition={{ duration: 0.75, ease }}
             className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-semibold leading-[1.05] tracking-tight text-white mb-5 [text-wrap:balance]"
           >
-            Stop looking for clients.
+            Stop chasing clients.
             <br />
             <span className="font-light text-white/90">
-              Start intercepting them.
+              Find people already looking for what you sell.
             </span>
           </motion.h1>
 
@@ -2283,10 +2287,11 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease }}
-            className="text-sm sm:text-base text-white/80 font-light leading-relaxed max-w-[480px] mx-auto mb-8 [text-wrap:balance]"
+            className="text-sm sm:text-base text-white/80 font-light leading-relaxed max-w-[560px] mx-auto mb-8 [text-wrap:balance]"
           >
-            Lead Hunter Club monitors active service demand in real-time, compiles deep social
-            intelligence, and unlocks verified contact details so you close deals first.
+            LeadHunter monitors public conversations for fresh buying signals, filters out the
+            noise, and gives you the context and contact information you need to turn real demand
+            into real conversations.
           </motion.p>
 
           {/* CTA Row */}
@@ -2307,7 +2312,26 @@ export default function HeroSection() {
                 Start Hunting Free
               </span>
             </Link>
+
+            <Link
+              href="#funnel"
+              className="group/secondary inline-flex items-center justify-center px-6 py-3 rounded-xl border border-white/15 bg-white/[0.04] backdrop-blur-md text-white/70 hover:text-white hover:border-white/30 transition-all active:scale-[0.98]"
+            >
+              <span className="text-xs sm:text-sm font-medium tracking-wide">
+                See How It Works
+              </span>
+            </Link>
           </motion.div>
+
+          {/* Plan reassurance */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35, ease }}
+            className="mt-5 text-[11px] sm:text-xs font-mono text-white/50 tracking-wide"
+          >
+            50 free credits · No credit card required
+          </motion.p>
         </motion.div>
       </div>
 
@@ -2421,6 +2445,7 @@ export default function HeroSection() {
             </div>
           </div>
         </motion.div>
+      </div>
       </div>
     </section>
   )
