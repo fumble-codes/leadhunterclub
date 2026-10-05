@@ -303,8 +303,12 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     const saved = localStorage.getItem('onboarding_step')
-    if (saved) setStep(parseInt(saved))
     const savedData = localStorage.getItem('onboarding_data')
+    let restoredStep = 1
+    if (saved) {
+      const parsed = parseInt(saved)
+      if (!Number.isNaN(parsed) && parsed >= 1 && parsed <= 3) restoredStep = parsed
+    }
     if (savedData) {
       try {
         const data = JSON.parse(savedData)
@@ -336,8 +340,22 @@ export default function OnboardingPage() {
           setCountryCode(parsed.dialCode)
           setPhoneNumber(parsed.localNumber)
         }
+
+        // Clamp restored step so a hand-edited onboarding_step cannot skip
+        // steps whose required data was never filled in.
+        const phone = (data.phoneNumber || '').trim() || (data.phone || '').trim()
+        if (restoredStep > 1 && (!data.linkedin?.trim() || !phone)) restoredStep = 1
+        if (
+          restoredStep > 2 &&
+          (!(data.servicesOffered?.length > 0) ||
+            !(data.preferredLeadCategories?.length > 0) ||
+            !data.outreachExperience)
+        ) {
+          restoredStep = 2
+        }
       } catch {}
     }
+    setStep(restoredStep)
   }, [])
 
   useEffect(() => {
@@ -914,7 +932,9 @@ export default function OnboardingPage() {
                     <div className="flex flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
-                          <span>Services you offer</span>
+                          <span>
+                            Services you offer <span className="text-primary">*</span>
+                          </span>
                           {servicesOffered.length > 0 && (
                             <span className="text-[11px] text-primary font-bold normal-case">
                               ({servicesOffered.length} selected)
@@ -1018,7 +1038,9 @@ export default function OnboardingPage() {
                     <div className="flex flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
-                          <span>Target Client Niches</span>
+                          <span>
+                            Target Client Niches <span className="text-primary">*</span>
+                          </span>
                           {preferredLeadCategories.length > 0 && (
                             <span className="text-[11px] text-primary font-bold normal-case">
                               ({preferredLeadCategories.length} selected)
@@ -1122,7 +1144,7 @@ export default function OnboardingPage() {
 
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                        Outreach experience
+                        Outreach experience <span className="text-primary">*</span>
                       </label>
                       <select
                         value={outreachExperience}
@@ -1179,7 +1201,8 @@ export default function OnboardingPage() {
                       Almost there!
                     </h1>
                     <p className="text-sm text-text-secondary mt-2">
-                      One last thing: how did you find us?
+                      One last thing: how did you find us?{' '}
+                      <span className="text-primary font-medium">(required)</span>
                     </p>
                   </div>
 
