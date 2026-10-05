@@ -20,6 +20,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   const router = useRouter()
   const { user, loading, error, firebaseUser } = useAuth()
 
+  const [previewLanding, setPreviewLanding] = useState(false)
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      new URLSearchParams(window.location.search).get('preview') === '1'
+    ) {
+      setPreviewLanding(true)
+    }
+  }, [])
+
   const appRoutes = ['/dashboard', '/leads', '/saved', '/analytics', '/settings', '/support', '/referrals', '/rewards', '/community']
   const adminRoutes = ['/admin']
   const authRoutes = ['/login', '/register']
@@ -357,7 +367,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <ToastProvider>
-      {((pathname === '/' && !COMING_SOON) ||
+      {((pathname === '/' && (!COMING_SOON || previewLanding)) ||
         pathname === '/reviews' ||
         pathname === '/wall-of-love') && <Navbar />}
       {isAppRoute ? (

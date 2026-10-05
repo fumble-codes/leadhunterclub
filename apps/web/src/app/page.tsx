@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDownIcon,
@@ -56,8 +56,20 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 // Launch gate — flip COMING_SOON in src/lib/launch.ts to restore this landing page.
+// Dev-only preview: open /?preview=1 to see this landing while the gate is on.
 export default function LandingPage() {
-  if (COMING_SOON) return <ComingSoon />
+  const [preview, setPreview] = useState(false)
+
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      new URLSearchParams(window.location.search).get('preview') === '1'
+    ) {
+      setPreview(true)
+    }
+  }, [])
+
+  if (COMING_SOON && !preview) return <ComingSoon />
 
   return (
     <main className="min-h-screen bg-bg-main text-text-primary font-sans overflow-x-hidden">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import {
@@ -2188,6 +2188,49 @@ export default function HeroSection() {
   const isMobile = useIsMobile(768)
   const reduceMotion = useReducedMotion()
 
+  // Staged intro: the bg video plays alone for ~3.5s (counted from its first `play`),
+  // then the hero content reveals in a staggered cascade. Falls back to a 7s safety
+  // reveal if autoplay never starts; reduced-motion skips straight to revealed.
+  const [revealed, setRevealed] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setRevealed(true)
+      return
+    }
+    const safety = setTimeout(() => setRevealed(true), 7000)
+    const startHold = () => {
+      if (holdTimer.current) return
+      holdTimer.current = setTimeout(() => setRevealed(true), 3500)
+    }
+    const v = videoRef.current
+    if (v) {
+      if (!v.paused && v.currentTime > 0) startHold()
+      else v.addEventListener('play', startHold, { once: true })
+    }
+    return () => {
+      clearTimeout(safety)
+      if (holdTimer.current) {
+        clearTimeout(holdTimer.current)
+        holdTimer.current = null
+      }
+      v?.removeEventListener('play', startHold)
+    }
+  }, [reduceMotion])
+
+  const reveal = (delay: number, fromY: number, duration = 0.75) => ({
+    initial: { opacity: 0, y: fromY },
+    animate: revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: fromY },
+    transition: {
+      duration: reduceMotion ? 0 : duration,
+      delay: reduceMotion ? 0 : delay,
+      ease,
+    },
+  })
+
+
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroCardRef,
     offset: ['start start', 'end start'],
@@ -2220,6 +2263,7 @@ export default function HeroSection() {
         className="absolute inset-0 z-0 pointer-events-none transform-gpu will-change-transform"
       >
         <video
+          ref={videoRef}
           src="/videos/hero-bg.mp4"
           poster="/videos/hero-poster.jpg"
           autoPlay={!reduceMotion}
@@ -2270,9 +2314,7 @@ export default function HeroSection() {
         >
           {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, ease }}
+            {...reveal(0, 22, 0.85)}
             className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-semibold leading-[1.05] tracking-tight text-white mb-5 [text-wrap:balance]"
           >
             Stop chasing clients.
@@ -2284,9 +2326,7 @@ export default function HeroSection() {
 
           {/* Description */}
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15, ease }}
+            {...reveal(0.3, 16)}
             className="text-sm sm:text-base text-white/80 font-light leading-relaxed max-w-[560px] mx-auto mb-8 [text-wrap:balance]"
           >
             LeadHunter monitors public conversations for fresh buying signals, filters out the
@@ -2296,9 +2336,8 @@ export default function HeroSection() {
 
           {/* CTA Row */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25, ease }}
+            {...reveal(0.6, 12)}
+            style={{ pointerEvents: revealed ? 'auto' : 'none' }}
             className="flex flex-wrap items-center justify-center gap-3.5"
           >
             <Link
@@ -2325,9 +2364,7 @@ export default function HeroSection() {
 
           {/* Plan reassurance */}
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35, ease }}
+            {...reveal(0.85, 10, 0.7)}
             className="mt-5 text-[11px] sm:text-xs font-mono text-white/50 tracking-wide"
           >
             50 free credits · No credit card required
@@ -2336,15 +2373,23 @@ export default function HeroSection() {
       </div>
 
       {/* ─── Social Proof Strip ─── */}
-      <div className="mb-8 flex flex-col items-center justify-center gap-2 text-center">
+      <motion.div
+        {...reveal(1.1, 14, 0.7)}
+        className="relative z-10 mb-8 lg:mb-16 flex flex-col items-center justify-center gap-2 text-center"
+      >
         <span className="text-xs font-mono font-medium text-text-secondary/70 uppercase tracking-widest">
           Trusted by 3500+ freelancers, contractors & growth agencies
         </span>
-      </div>
+      </motion.div>
 
       {/* 3D Perspective Container for Clario-style tilt reveal */}
-      <div
-        style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
+      <motion.div
+        {...reveal(1.4, 60, 1)}
+        style={{
+          perspective: '1200px',
+          transformStyle: 'preserve-3d',
+          pointerEvents: revealed ? 'auto' : 'none',
+        }}
         className="relative z-10 w-full mt-[-24px] lg:mt-[-48px] group/appwindow"
       >
         <motion.div
@@ -2445,7 +2490,7 @@ export default function HeroSection() {
             </div>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
       </div>
     </section>
   )
