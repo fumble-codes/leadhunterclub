@@ -13,7 +13,7 @@
 
 | # | Item | Status |
 |---|------|--------|
-| 1 | Hero image — full-bleed wolf background (hero text → end of app demo) | ✅ done + browser-verified |
+| 1 | Hero background — full-bleed wolf video (image → video, hero text → end of app demo) | ✅ done + browser-verified |
 | 2 | Hero font mismatch — headline line 2 used undefined `font-serif` | ✅ done |
 | 3 | Bento grid — Step 02 overlap on hover + unify Step 01–04 labels | ✅ done |
 | 4 | Capabilities card 4 — interactive credit-ledger UI (superseded the original "replace with video" ask) | ✅ done + browser-verified (16/16 checks desktop+mobile) |
@@ -75,6 +75,17 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   round-trip corrupts its non-ASCII comment chars. Verified: lint clean, HTTP 200,
   video src + CTA in served HTML, `/videos/1003.mp4` 200, old landing sections absent.
 
+- **Dev preview link (2026-10-05):** `http://localhost:3000/?preview=1` renders the **real
+  hero landing** (wolf video, 3500+ strip, navbar, `/#…` anchors all working) while
+  `COMING_SOON` stays `true` — no flag flip needed to view it. How: `page.tsx` +
+  `ClientLayout.tsx` each read the param in a mount-time `useEffect` and bypass the gate /
+  navbar-hide when `NODE_ENV === 'development'` (inlined at build → param is a **no-op in
+  production**, gate can't be bypassed publicly; first visit flashes ComingSoon ~1–2 s until
+  hydration, then swaps). Deliberately a query param on `/` (not a `/preview` route) because
+  the Navbar's links are `/#funnel`-style — pathname must stay `/`. Verified: preview URL =
+  landing + navbar + visible strip + hero video playing/looping, 0 console errors; plain `/`
+  still serves ComingSoon with navbar hidden.
+
 - **#4 Credit-ledger widget** (`FeaturesSection.tsx`): replaced stale tier selector
   (250/750/2000 credits, "3/reveal" — all wrong vs product) with a live ledger demo:
   8 demo leads, real costs from `coins.ts` (email 5 / phone 8 / both 10 / profile 2),
@@ -119,9 +130,17 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
 - **Verified:** lint clean; `tsc` 0 errors in HeroSection; browser screenshots desktop +
   mobile — art behind hero text ✓, glowing eyes visible in the gap above the demo ✓, demo
   bottom → next-section transition clean ✓, console clean (1 pre-existing Lenis warn).
-- **Pre-existing quirk found (untouched):** the "Trusted by 3500+" strip is fully covered by
-  the demo window on lg+ (demo `mt-[-48px]` pulls it over the strip) — was already hidden
-  before this change; visible again on <lg viewports.
+- **Pre-existing quirk — "Trusted by 3500+" strip (FIXED 2026-10-05):** the strip was
+  invisible on **every** viewport since the full-bleed restructure — two stacked causes:
+  (a) demo window's `lg:mt-[-48px]` pulled it over the strip (only `mb-8` clearance) on lg+;
+  (b) the section-level bg layer is `absolute … z-0` (positioned → paints ABOVE static
+  in-flow content), so the plain static strip div rendered *underneath* the video/scrims at
+  all sizes (hero copy survived because it lives in transformed `motion.div`s = positioned
+  layer; demo has `z-10`). Fix: strip wrapper got `relative z-10` + `lg:mb-16` (64 − 48 =
+  16px gap above the demo; mobile keeps `mb-8`/`mt-[-24px]` = 8px gap). Verified headless
+  (gate flipped false): full-viewport screenshot shows the tan mono strip between the credits
+  line and the demo, hit-test returns the span itself, 0 console errors, lint clean; gate
+  restored to `true` after (ComingSoon markers re-verified on `/`).
 - **Full-bleed fix (user follow-up):** the gutters came from `page.tsx:58`'s
   `<main className="... max-w-[1280px] mx-auto px-4 sm:px-6">` (screenshot math: ~1580px
   viewport → 1280 centered → content starts at x=174 ✓). Restructured so only the hero
@@ -143,6 +162,36 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   calibrated scrims only (gradient + vignette, unchanged). Kept: layout box (min-h/flex/
   mb-10 + `heroCardRef` for the scroll-zoom). Verified: lint + tsc clean, HTTP 200,
   served HTML has 0× old panel classes / 0× film gradient / 1× new frameless div.
+- **Background video (user follow-up 3, 2026-10-05):** the still artwork was replaced with a
+  **looping video** of the same wolf footage. Asset: user's `D:\Downloads\1003.mov` (H.264
+  1920×1080 30 fps 5.17 s) remuxed losslessly → `apps/web/public/videos/hero-bg.mp4`
+  (3.16 MB, `-c copy -movflags +faststart`); poster frame → `public/videos/hero-poster.jpg`
+  (35 KB, 1600w). `HeroSection.tsx`: the `<Image>` in the bg layer became
+  `<video src="/videos/hero-bg.mp4" poster="/videos/hero-poster.jpg" autoPlay={!reduceMotion}
+  muted loop playsInline preload="auto" disablePictureInPicture aria-hidden>` with
+  `object-[center_40%]`; unused `next/image` import removed. Scroll-zoom `bgScale` 1.1→1.35
+  and both scrims unchanged (no JS touch — scrub still drives the video's containing layer).
+  - **Verified:** lint + tsc clean; `/videos/hero-bg.mp4` 200 (3155627 B) + poster 200;
+    Playwright with gate flipped false: `paused:false, readyState:4, error:null, 1920×1080,
+    muted:true, loop:true`, playhead advanced 3.04→4.57 s, screenshot = wolf video behind the
+    frameless hero copy ✓. Flag then **restored to `true`** and re-verified `/` serves
+    ComingSoon (`1003.mp4` ×1, hero headline absent, HTTP 200).
+  - **Two copies of the same footage now exist:** hero uses `/videos/hero-bg.mp4` (3.16 MB
+    lossless remux), the coming-soon page uses `/videos/1003.mp4` (436 KB re-encode — kept
+    small because it's the default landing). Don't dedupe blindly: sizes serve different pages.
+- **Staged intro choreography (user follow-up 4, 2026-10-05):** the hero content now waits
+  for the video — bg video plays **alone for ~3.5 s** (hold counted from the video's first
+  `play` event, not page load), then a slow staggered cascade reveals: headline (+0 s,
+  0.85 s ease) → subcopy (+0.3) → CTA row (+0.6) → credits line (+0.85) → 3500+ strip
+  (+1.1) → demo window (+1.4, y 60→0 over 1 s). Implementation: `revealed` state in
+  `HeroSection.tsx` + shared `reveal(delay, fromY, duration)` helper replacing the old
+  mount-immediate entrance anims; CTA row + demo get `pointer-events: none` until revealed
+  (no invisible-click traps). Guards: `reduceMotion` → instant reveal (no hold, no stagger),
+  **7 s safety timer** if autoplay never fires (poster stays, content still appears),
+  StrictMode-safe timer cleanup. Content stays in the DOM at opacity 0 during the hold
+  (SEO/text unaffected). Verified with a Playwright opacity timeline on `/?preview=1`:
+  video alone at t≈2 s, h1 full at 4.7 s, strip 5.5 s, demo 6.0 s (cascade order correct),
+  video looping, 0 console errors; hold + final screenshots match; lint + tsc clean.
 
 ### #2 Hero font (done)
 - `apps/web/src/app/components/HeroSection.tsx:2276`: removed `italic font-normal font-serif`
@@ -357,6 +406,26 @@ route throws into its own catch and always answers `isAvailable: true`. It also 
 frontend callers** (grep-verified) — dead code today, but if you wire it up later the helpers
 must be implemented first. `tsc` flags these as 2 of the ~49 pre-existing errors.
 
+### Mistyped-email recovery + sign-out fix (2026-10-05) — DONE, browser-verified
+- **Shipped:** `RecoveryEmailPanel` on `/verify-email` + `/onboarding`: single button
+  "Wrong email? Go back and sign up again" → confirm step → deletes the unverified account →
+  blank `/register`. Inline change-email mode was designed first then **dropped**: the Firebase
+  project blocks email changes without reauth (400 `OPERATION_NOT_ALLOWED` +
+  `CREDENTIAL_TOO_OLD_LOGIN_AGAIN` even ~7 min after signup) — do not resurrect it.
+- **`DELETE /api/auth/me`:** rate-limit 5/60s, 403 if `emailVerified` (DB row or JWT claim),
+  admin-SDK `deleteUser(uid)` **first** (no recent-login wall; `FIREBASE_SERVICE_ACCOUNT_PATH`
+  set in dev, fallback = client `user.delete()` try/catch), then hard DB delete (all FKs
+  cascade), returns `referralCode` → client re-saves `lh_ref_code`. ⚠️ Backend guy: referrer
+  may double-dip the +10 on re-signup (5 re-applies to user, referrer bonus not reversed).
+- **816c7da regression fixed:** "Sign in with a different account" restored on
+  `/verify-email`. Both exits use `window.location.assign` (hard nav) — `router.replace`
+  after `firebaseSignOut` raced ClientLayout's stale-user state and bounced back to
+  `/verify-email` → signed-out infinite loader (seen live during testing).
+- **E2E proof:** signup → start-over → **same email re-registers clean** (proves both Firebase
+  account and DB row were deleted — no `email-already-in-use`, no P2025) → sign-out lands on
+  `/login` with no bounce; console 0 errors; lint clean; tsc 38 = pre-existing; vitest
+  18f/167p = unchanged baseline.
+
 ---
 
 ## 3. Blocked — waiting on user input
@@ -368,7 +437,9 @@ must be implemented first. `tsc` flags these as 2 of the ~49 pre-existing errors
 3. **Pricing confirmation** (#6 — DONE with code's own values): proceeded as
    ₹999 = 1,000 credits, Free = 50, Agency dropped from sale. Shout if any value differs.
    DB plan rows = backend guy (still no `plans_config` row; API serves code defaults).
-4. **"Firebase auth panel change"** (#12) — what exactly?
+4. **"Firebase auth panel change"** (#12) — what exactly? Shipped 2026-10-05: mistyped-email
+   recovery panel (start-over button on verify-email/onboarding) + fixed "Sign in with a
+   different account". Confirm #12 is this; if not, clarify.
 
 ---
 
