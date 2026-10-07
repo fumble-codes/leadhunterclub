@@ -26,7 +26,7 @@
 | 11 | FAQ reorder — landing FAQ `page.tsx` from 1,2,3,4 → 1,4,2,3 | ✅ done + visually verified |
 | 12 | "Firebase auth panel" change | ❓ unclear — awaiting user clarification |
 | 13 | Landing copy → `docs/landingpagecontent.md` (hero/how/why/testimonials/pricing/final CTA) | ✅ done + browser-verified (desktop + mobile) |
-| 14 | Admin dashboard insights — persona/growth/revenue/activation/ops on `/admin` | ✅ code + endpoint-verified (visual check needs admin login) |
+| 14 | Admin dashboard insights — persona/growth/revenue/activation/ops on `/admin` | ✅ shipped — API 200 + browser render verified |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 
@@ -600,7 +600,7 @@ refreshed).
   pre-pop state via `git restore --source=HEAD`, stash entry kept intact at `stash@{0}`
   (+ `stash@{1}` = "WIP before feed rebase" — both belong to older sessions, leave alone).
 
-### Admin dashboard insights (2026-10-07) — code complete, needs admin login to see
+### Admin dashboard insights (2026-10-07) — shipped (API + browser verified)
 User ask: real-data persona/growth/revenue/activation/ops insights on the main `/admin`
 dashboard. **All 5 blocks live on the main page** (user's placement choice).
 - **New `GET /api/admin/insights`** (`src/app/api/admin/insights/route.ts`): `requireAdmin`,
