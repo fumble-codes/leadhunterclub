@@ -563,6 +563,42 @@ the API returns.
 - **Verified:** lint clean · tsc **0 errors total** (backend's fixes included) · vitest
   **17 failed | 192 passed (209)** = baseline + 6 new.
 
+### Coin-expiry copy sweep (2026-10-07)
+User ask: coins DO expire — remove every "never expire / no expiry" claim across the webapp.
+Real mechanic = `lib/services/rollover.ts` `ROLLOVER_VALIDITY_DAYS = 15`: unused balance rolls
+over for 15 days after the user renews/updates their plan (full leftover carries, expiry
+refreshed).
+- **11 violations removed across 6 files:** landing FAQ (`page.tsx` "Top-up coins never
+  expire"), `/pricing` pack badge "Never Expires" → "Top-Up Pack" + assurance banner
+  "Purchased Credits Never Expire" → "Credits Roll Over on Renewal", `/refill` hero
+  ("credits that never expire as long as your account is active"), Hunter Copilot — 5 spots
+  (`api/copilot/route.ts` system prompt + direct FAQ + deterministic KB + "(never expire)"
+  bullet + fallback), admin broadcast templates (topup "They never expire…" + renewal
+  reminder "so you never lose what you've earned" → both now state the 15-day rollover),
+  `/referrals` "Never expires" sub-label → "Added to your balance". Replacement copy = the
+  accurate 15-day rollover wording (matches code + pricing's existing feature bullet).
+- **Kept on purpose:** admin `users/[id]` "Lifetime successful charges" (spend stat, not a
+  coin claim) and HeroSection support-ticket subject "How do rollover credits expire?"
+  (implies expiry — fine).
+- **Verified:** re-grep for `never expire|no expiry|Never Expires|forever|yours to keep|
+  never lose|while your membership|as long as your` = 0 hits in `apps/web/src` · lint clean
+  (all 6 files) · vitest **17 failed | 192 passed (209)** = baseline.
+- **⚠️ Bare `npx tsc --noEmit` now reports 44 pre-existing errors** (broadcast routes use
+  `admin.id` on `AuthUser` which has no `id`; sheets/export select fields; cron/newsletter/
+  razorpay typings; Prisma mock args in credits/verify-session/coins tests; 1 `ButtonColor`
+  in leads page + 2 support-page types). **Zero are from this sweep** — the 2 in the
+  broadcast route exist verbatim at HEAD (`git show HEAD:…`), everything else is at exact
+  HEAD state; earlier "tsc 0" baselines were almost certainly incremental-cache replays
+  (`incremental: true`). Builds unaffected (`next.config.js` → `ignoreBuildErrors: true`).
+  Owner = backend guy (routes/tests) — flag, don't fix (frontend-only directive); if a
+  clean full-check tsc is wanted, note the count is 44 + transient `.next/types` stubs from
+  the parallel session's dev server.
+- **Git incident (recovered):** a chained `git stash push` (failed — pathspec relative to
+  wrong workdir) left its `git stash pop` to pop an unrelated pre-existing stash
+  (`fumble-mobile-plus-teammate-wip-2026-09-20`, ~40 conflicted files). Fully reverted to
+  pre-pop state via `git restore --source=HEAD`, stash entry kept intact at `stash@{0}`
+  (+ `stash@{1}` = "WIP before feed rebase" — both belong to older sessions, leave alone).
+
 ---
 
 ## 3. Blocked — waiting on user input
