@@ -543,6 +543,26 @@ User report: every login bounced straight to `/onboarding` (esp. yashnandan, dua
 - **Verified:** lint clean · tsc 44 = baseline, **0 in touched files** (my earlier 49 was a
   test-typing mistake, fixed) · vitest **18 failed | 185 passed (203)** = baseline + 2 new.
 
+### Saved-leads export now ships real API intel (2026-10-07)
+User ask: the Export button (CSV/TSV/XLSX) on `/saved` wasn't exporting the actual lead intel
+the API returns.
+- **Root cause:** `leadsToRows` (lib/csv.ts) built its own weak `formatIntel` mash — 5 labelled
+  pieces **hard-truncated to 400 chars**, no summary, no signal, no tags, no status/urgency/reply%
+  — while the UI's Deep Intel (`buildLeadIntelText`/`parseIntelSections`) shows the full parsed
+  sections from `buyerType`. Same intel, different (lossy) code path.
+- **Fix:** rewrote `leadsToRows` in `src/lib/csv.ts` — Lead Intelligence cell = every parsed
+  Deep Intel section (`Verdict: … • Context: … • Requirements: …`, same parser as the drawer),
+  fallback to the classic labelled pieces then the raw blob; added columns Title, One-Liner,
+  Category, Source, Status, Urgency, Reply Probability, Summary (detailsSummary→summary→taskScope),
+  Signal Context, Tags. Contact columns stay reveal-gated (blank until unlocked); intel passes
+  through whatever the API serves (server already sanitizes unrevealed previews). Cells capped
+  at 5000 chars (Excel max 32k) — old 400-char truncation gone. `WIDE_COLS` += Summary,
+  Signal Context. Single consumer = saved page (dashboard has no export path).
+- **New `src/lib/csv.test.ts`** — 6 tests: full sections >400 chars intact, structured columns,
+  reveal gating, fallback labels, cell cap, CSV/TSV parseability.
+- **Verified:** lint clean · tsc **0 errors total** (backend's fixes included) · vitest
+  **17 failed | 192 passed (209)** = baseline + 6 new.
+
 ---
 
 ## 3. Blocked — waiting on user input
