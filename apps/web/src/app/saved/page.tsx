@@ -585,8 +585,8 @@ export default function SavedLeadsPage() {
         </div>
 
         {/* Table Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-3 sm:gap-8 min-w-0 w-full md:w-auto">
+        <div className="flex flex-col md:flex-row flex-wrap items-center md:justify-between gap-4 mb-8">
+          <div className="flex flex-col md:flex-row items-center gap-3 sm:gap-8 min-w-0">
             <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3 whitespace-nowrap shrink-0">
               <BookmarkIcon className="w-6 h-6 text-text-secondary" />
               Saved Leads
