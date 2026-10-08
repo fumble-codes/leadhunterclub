@@ -366,10 +366,10 @@ export default function LeadDrawer({
             <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-primary">
               Lead intel
             </span>
-            <span className="h-px w-8 bg-gradient-to-r from-primary/40 to-transparent" aria-hidden />
+            <span className="hidden h-px w-8 bg-gradient-to-r from-primary/40 to-transparent sm:block" aria-hidden />
             <NicheBadge niche={lead.niche} keyword={lead.category} content={lead.signalContext} />
             <span
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/[0.06] border border-white/[0.1] text-text-secondary select-none"
+              className="hidden items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/[0.06] border border-white/[0.1] text-text-secondary select-none sm:inline-flex"
               title={`${lead.claimedCount ?? 0} out of 25 members have claimed this lead`}
             >
               <span className="text-white font-bold">{lead.claimedCount ?? 0}</span>/25 claimed
@@ -395,6 +395,12 @@ export default function LeadDrawer({
           )}
 
           <div className="mt-2.5 flex flex-wrap items-center gap-2 select-none text-[11px]">
+            <span
+              className="inline-flex items-center gap-1 rounded-lg border border-white/[0.1] bg-white/[0.06] px-2.5 py-1 text-text-secondary sm:hidden"
+              title={`${lead.claimedCount ?? 0} out of 25 members have claimed this lead`}
+            >
+              <span className="text-white font-bold">{lead.claimedCount ?? 0}</span>/25 claimed
+            </span>
             {lead.timestamp && (
               <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-text-secondary">
                 <ClockIcon className="w-3 h-3 text-text-secondary/70" />

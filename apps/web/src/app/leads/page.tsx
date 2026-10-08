@@ -789,6 +789,7 @@ export default function LeadsPage() {
                 )
               )}
             </div>
+      </div>
 
           <AnimatePresence>
             {selectedLead && (
@@ -855,7 +856,6 @@ export default function LeadsPage() {
               </motion.div>
             )}
           </AnimatePresence>
-      </div>
     </main>
   )
 }
