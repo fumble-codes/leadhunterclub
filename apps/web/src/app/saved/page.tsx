@@ -586,17 +586,17 @@ export default function SavedLeadsPage() {
 
         {/* Table Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex flex-wrap items-center gap-4 sm:gap-8 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-8 min-w-0 w-full md:w-auto">
             <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3 whitespace-nowrap shrink-0">
               <BookmarkIcon className="w-6 h-6 text-text-secondary" />
               Saved Leads
             </h2>
-            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 shrink-0">
+            <div className="flex flex-wrap items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 min-w-0">
               {['All Leads', 'In Progress', 'Archived'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 min-h-[44px] rounded-lg text-11 font-bold uppercase tracking-widest transition-all ${
+                  className={`px-3 sm:px-4 py-2 min-h-[44px] rounded-lg text-11 font-bold uppercase tracking-widest transition-all ${
                     activeTab === tab
                       ? 'bg-accent-purple text-text-on-accent shadow-lg'
                       : 'text-text-secondary hover:text-text-primary'
