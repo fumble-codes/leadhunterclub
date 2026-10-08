@@ -553,7 +553,7 @@ export default function SavedLeadsPage() {
     <main
       ref={mainRef}
       data-lenis-prevent
-      className="flex-1 h-full min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 md:py-10 relative scrollbar-hide"
+      className="flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-4 sm:px-6 lg:px-8 pt-8 pb-28 md:py-10 relative scrollbar-hide"
     >
       <div className="max-w-[1400px] mx-auto relative z-10">
         {/* Summary Cards Row */}

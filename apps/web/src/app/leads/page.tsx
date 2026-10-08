@@ -555,7 +555,7 @@ export default function LeadsPage() {
     return (
       <main
         data-lenis-prevent
-        className="flex-1 h-full min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 relative scrollbar-hide"
+        className="flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-4 sm:px-6 lg:px-8 py-8 pb-32 relative scrollbar-hide"
       >
         <div className="max-w-[1400px] mx-auto relative z-10">
           <div className="flex items-center justify-between mb-8 mt-2">
@@ -627,7 +627,7 @@ export default function LeadsPage() {
   return (
     <main
       data-lenis-prevent
-      className="flex-1 h-full min-h-0 overflow-y-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 relative scrollbar-hide"
+      className="flex-1 h-full min-h-0 overflow-y-auto overflow-x-hidden px-4 sm:px-6 lg:px-8 py-8 pb-32 relative scrollbar-hide"
     >
       <div className="max-w-[1400px] mx-auto relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10 mt-2">
