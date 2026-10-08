@@ -685,7 +685,7 @@ export default function LeadDrawer({
               </button>
 
               {copyMenuOpen && (
-                <div className="absolute bottom-[calc(100%+8px)] right-0 z-40 w-52 rounded-xl border border-white/[0.1] bg-surface-container-high p-1.5 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.85)]">
+                <div className="absolute bottom-[calc(100%+8px)] left-0 right-0 z-40 w-52 rounded-xl border border-white/[0.1] bg-surface-container-high p-1.5 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.85)] sm:left-auto sm:right-0">
                   <button
                     type="button"
                     onClick={handleCopyEmail}
