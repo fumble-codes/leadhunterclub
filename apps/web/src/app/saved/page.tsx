@@ -586,12 +586,12 @@ export default function SavedLeadsPage() {
 
         {/* Table Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex flex-wrap items-center gap-3 sm:gap-8 min-w-0 w-full md:w-auto">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-3 sm:gap-8 min-w-0 w-full md:w-auto">
             <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3 whitespace-nowrap shrink-0">
               <BookmarkIcon className="w-6 h-6 text-text-secondary" />
               Saved Leads
             </h2>
-            <div className="flex flex-wrap items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 min-w-0">
+            <div className="flex flex-wrap items-center justify-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 min-w-0 self-center md:self-auto">
               {['All Leads', 'In Progress', 'Archived'].map((tab) => (
                 <button
                   key={tab}
