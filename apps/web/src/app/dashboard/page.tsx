@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import { CustomLoader } from '@/components/ui/CustomLoader'
+import { TutorialPopup } from '@/components/onboarding/TutorialPopup'
 
 import {
   ArrowTopRightOnSquareIcon,
@@ -262,6 +263,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <TutorialPopup />
     </main>
   )
 }
