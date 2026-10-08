@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
+import { subscribeToLeadsUpdated } from '@/lib/sync-events'
 
 import LeadCard from './components/LeadCard'
 import PipelineLeadCard from './components/PipelineLeadCard'
@@ -278,6 +279,9 @@ export default function LeadsPage() {
   const { user } = useAuth()
 
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
+  const selectedLeadIdRef = useRef<string | null>(null)
+  selectedLeadIdRef.current = selectedLeadId
+
   const [drawerLeadDetail, setDrawerLeadDetail] = useState<AppLead | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const debouncedSearch = useDebounce(searchQuery, 250)
@@ -291,30 +295,87 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchLeads = async () => {
+  const fetchLeads = async (quiet = false) => {
     try {
-      setLoading(true)
+      if (!quiet) setLoading(true)
       setError(null)
       const token = await getFirebaseToken()
-      const res = await fetch('/api/leads?pageSize=100', {
+      const url = quiet ? '/api/leads?pageSize=100&refresh=true' : '/api/leads?pageSize=100'
+      const res = await fetch(url, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       const json = await res.json()
-      if (res.ok && json.data) {
+      if (res.ok && Array.isArray(json.data)) {
         setLeadsList(json.data)
+        // If drawer is currently open on a lead, keep its details quietly updated
+        if (selectedLeadIdRef.current) {
+          const updated = json.data.find((l: AppLead) => l.id === selectedLeadIdRef.current)
+          if (updated) {
+            setDrawerLeadDetail(updated)
+          }
+        }
       } else {
-        setError(json.message || 'Failed to load leads.')
+        if (!quiet) setError(json.message || 'Failed to load leads.')
       }
     } catch (err) {
       console.error('Failed to fetch leads:', err)
-      setError('Could not reach the lead feed. Check your connection and try again.')
+      if (!quiet) setError('Could not reach the lead feed. Check your connection and try again.')
     } finally {
-      setLoading(false)
+      if (!quiet) setLoading(false)
     }
   }
 
   useEffect(() => {
     fetchLeads()
+
+    // Real-time live polling: quietly fetch new scraped leads every 6 seconds when tab is active
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchLeads(true)
+      }
+    }, 6_000)
+
+    // Re-sync immediately when user switches focus back to this tab
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchLeads(true)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // Accelerated burst polling when a scrape is initiated or leads update
+    let burstInterval: NodeJS.Timeout | null = null
+    let burstTimeout: NodeJS.Timeout | null = null
+
+    const startBurstPoll = () => {
+      if (burstInterval) clearInterval(burstInterval)
+      if (burstTimeout) clearTimeout(burstTimeout)
+
+      fetchLeads(true)
+
+      burstInterval = setInterval(() => {
+        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          fetchLeads(true)
+        }
+      }, 3000)
+
+      burstTimeout = setTimeout(() => {
+        if (burstInterval) clearInterval(burstInterval)
+        burstInterval = null
+      }, 45000)
+    }
+
+    const unsubscribe = subscribeToLeadsUpdated(() => {
+      startBurstPoll()
+    })
+
+    return () => {
+      clearInterval(pollInterval)
+      if (burstInterval) clearInterval(burstInterval)
+      if (burstTimeout) clearTimeout(burstTimeout)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      unsubscribe()
+    }
   }, [])
 
   // Deep-link: ?lead=<id> opens the drawer on load / share
