@@ -936,3 +936,49 @@ floating UI).
 - Pipeline repeat: 10 chunks (wv_chunks2) -> concat filter -> decode clean (870f, 29.077s) -> two-pass loudnorm (measured -24.80/-7.12/3.20, linear=false) -> **-16.34 LUFS, TP -1.07**.
 - Delivered `out\welcome-video.mp4` (15.9MB, 1920x1080@30, h264+aac, 29.1s). QA grid frames f160/f330/f530/f560 confirmed all overlays + subtitles + track clip.
 
+### Wolf SVG avatar exploration (2026-10-09) — DROPPED by user, do not redo
+- Tried building a logo-inspired wolf avatar from `bible-strong/avatar-lab` geometry
+  (diamond head + cone ears/cheeks/snout, eyes as only second color) baked to static
+  SVGs + a scripted detail pass (nose, muzzle bars, inner ears). Iterated v1→v4 with
+  screenshots; best version read as a wolf but user judged it garbage and killed it.
+- **Decision: reuse the existing `WolfOrb` (`src/components/chat/WolfOrb.tsx`) instead** —
+  the hunter-copilot 3D blob already in the app UI. All baked files
+  (`public/brand/*`, `src/components/WolfAvatar.tsx`) were deleted; nothing was ever
+  imported. Parametric sources remain outside the repo (`...\Temp\opencode\bsal\`).
+- Next: onboarding guide companion plan (WolfOrb + cursor/input tracking + hints).
+
+### Onboarding hunter-pup companion (2026-10-09) — code complete, browser QA needs login
+User ask: the Hunter Copilot's 3D wolf blob (`WolfOrb`) as a free-floating overlay
+pet on `/onboarding` — NOT a dock/chat box. It watches the cursor (gaze follows),
+glides beside the focused field, and talks through auto-flipping speech bubbles
+in playful pet voice ("ooh, that link looks off…").
+- **`WolfOrb.tsx` (+11):** new optional `gaze` prop (`{x,y}` MotionValues,
+  normalized -0.5..0.5). Controlled mode bypasses the local pointer handler and
+  the leave-reset; all 4 existing call sites unaffected.
+- **New `src/app/onboarding/guideCopy.ts`:** `GuideStatus` + `pickHint()` pure
+  hint script (submit/error priority, then per-step: focus → listening, valid →
+  online celebration, empty/invalid → idle/thinking). Pet fills `focused`
+  itself via focusin observer; page passes `focused: null`.
+- **New `src/app/onboarding/guideCopy.test.ts`:** 10 tests (priority order,
+  step 1/2/3 walkthroughs) — all pass.
+- **New `src/app/onboarding/OnboardingPet.tsx` (~330 lines):** fixed overlay,
+  `pointer-events-none` except mute × (persist `lh_guide_muted=1`; muted shows a
+  tiny orb restore button). Anchor mode (focused element or `cta-<step>`) →
+  trail mode (cursor + offset, fine pointers) → parked home corner (mobile /
+  reduced-motion). Springs on motion values only (no re-render per mousemove);
+  bubble side flips by quadrant; online-transition bounce; StrictMode-clean
+  listeners (pointermove/focusin/focusout/scroll/resize + step-change rAF).
+- **`onboarding/page.tsx` (+~30, attributes only + status + render):**
+  `data-guide-anchor` on linkedin/phone/socials/cta-1 (step 1), services/niches/
+  experience/cta-2 (step 2), discovery/discoveryOther/cta-3 (step 3);
+  read-only `guideStatus` from existing state (`isValidSocialProfile` /
+  `isValidPhoneNumber` already imported); `<OnboardingPet/>` before `</main>`.
+  No validation logic moved; gate/draft/submit untouched.
+- **Verified:** lint clean (4 files) · tsc 47 total = 44 baseline + transient
+  noise, **0 in touched files** · vitest **17 failed | 204 passed (221)** = same
+  17 pre-existing failures (payment 4, credits 9, auth 1, reveal 3) + 10 new
+  passing. No dev server running (`:3000` closed) so no compile probe.
+- **⚠️ NOT browser-verified (needs login, standing gap §6.2):** gaze-follows-cursor,
+  glide-to-focus, bubble side flips at edges, mobile park, mute/unmute, reduced
+  motion, 0 console errors on a real onboarding run.
+
