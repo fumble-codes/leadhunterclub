@@ -42,7 +42,7 @@ export default function LandingPet() {
     section: 'hero',
     seen: 1,
   })
-  const [ctaHover, setCtaHover] = useState(false)
+  const [cta, setCta] = useState({ hover: false, hits: 0 })
   const seenRef = useRef<Record<string, number>>({ hero: 1 })
 
   useEffect(() => {
@@ -76,13 +76,20 @@ export default function LandingPet() {
   useEffect(() => {
     const isCta = (t: EventTarget | null) =>
       !!(t as HTMLElement | null)?.closest?.('[data-guide-anchor]')
-    const onOver = (e: MouseEvent) => setCtaHover(isCta(e.target))
+    const engage = () =>
+      setCta((prev) => (prev.hover ? prev : { hover: true, hits: prev.hits + 1 }))
+    const disengage = () => setCta((prev) => (prev.hover ? { ...prev, hover: false } : prev))
+    const onOver = (e: MouseEvent) => {
+      if (isCta(e.target)) engage()
+    }
     const onOut = (e: MouseEvent) => {
       const to = (e as FocusEvent).relatedTarget as HTMLElement | null
-      if (!to?.closest?.('[data-guide-anchor]')) setCtaHover(false)
+      if (!to?.closest?.('[data-guide-anchor]')) disengage()
     }
-    const onFocusIn = (e: FocusEvent) => setCtaHover(isCta(e.target))
-    const onFocusOut = () => window.setTimeout(() => setCtaHover(false), 0)
+    const onFocusIn = (e: FocusEvent) => {
+      if (isCta(e.target)) engage()
+    }
+    const onFocusOut = () => window.setTimeout(() => disengage(), 0)
     window.addEventListener('mouseover', onOver, { passive: true })
     window.addEventListener('mouseout', onOut, { passive: true })
     window.addEventListener('focusin', onFocusIn)
@@ -97,7 +104,7 @@ export default function LandingPet() {
 
   if (!ready) return null
 
-  const hint = pickLandingHint({ section: sig.section, seenCount: sig.seen, ctaHover })
+  const hint = pickLandingHint({ section: sig.section, seenCount: sig.seen, ctaHover: cta.hover, ctaHits: cta.hits })
 
   return (
     <PupCompanion

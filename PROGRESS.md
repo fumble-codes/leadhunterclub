@@ -862,6 +862,18 @@ Root cause is platform behavior, not a bug in our code: vertical wheel input bub
   is temporarily unreachable"** in dev (seen ~11× incl. the new 6s `refresh=true` poll),
   so `/leads` renders its error state locally. Not frontend — passing through.
 
+### Admin wheel-scroll follow-up (2026-10-10, `d3e1939` pushed)
+User: same scrollability issue in some admin pages. Audit found only 1 interactive strip
+in admin (`rewards` status tabs) + 3 table wrappers (`payments`, `broadcast` logs,
+`users/[id]` transactions) — wired the same `useHorizontalWheelScroll` hook (3 lines each;
+tables scroll horizontally first while they overflow, page scroll resumes at edges).
+- **Verified live:** `/admin/rewards` tabs overflowed in-browser (373px content in 136px —
+  crowded controls row) → synthetic wheel now moves + consumes. Tables couldn't overflow
+  locally (no data: payments empty state) but wiring is the proven callback-ref pattern.
+  Lint: clean on 3 files; `payments` exhaustive-deps warning + `broadcast` unescaped-quote
+  errors are pre-existing; tsc still 47 with 0 on touched lines.
+- Tables elsewhere (`settings`, `referrals`, `saved`, hero demo) intentionally left native.
+
 ---
 
 ## 3. Blocked — waiting on user input
@@ -1079,6 +1091,22 @@ Refactored the engine out so both pages share it:
   session's `537862d` scroll fix). **No gate flip needed:** `COMING_SOON` is
   already `false` in the tree (flipped by user/another session), so the Vercel
   preview of this branch serves the real landing + pet directly (the
-  `?preview=1` trick is dev-only, dead in prod builds). `main` untouched until
-  QA passes.
+  `?preview=1` trick is dev-only, dead in prod builds). **MERGED LIVE 2026-10-10:**
+  fast-forward to `main` (`537862d..3078128`), pushed, `0 0` vs origin. Other
+  session's admin-pages WIP stashed for the push, popped back intact.
+
+### Landing pup: full dialogue script (2026-10-10) — shipped live
+User ask: more dialogues for the landing pet. Expanded `landingCopy.ts` from
+5 lines to a full script — every tracked section gets a first-sighting line
+(philosophy "contacts are cheap…", features "this is the arsenal…", tokens
+"wolf coins 101 / reveals run 5–15 coins", testimonials "the wall of love…",
+who "which one are you?…", faq "questions? good.…"); hero/funnel/pricing/final
+get second-sighting comebacks ("still thinking?", "told you. live demand.",
+"do the maths", "ok, final push"); third sightings go quiet. CTA hover
+alternates two nudges via a new `ctaHits` counter in `LandingPet`
+("go on, click it" ↔ "no, really"). All copy kept consistent with site truth
+(50 free/no card, ₹999 ≈ 100+, 5–15 coins). Tests 4 → still 4 its but covering
+the whole matrix (14/14 pup tests green with onboarding's 10). Verified: lint
+clean, tsc 0 in touched files, full suite 18f/207p = same pre-existing set.
+Merged to `main`, pushed live.
 
