@@ -93,6 +93,46 @@ export default function PupCompanion({
   const gx = useMotionValue(0)
   const gy = useMotionValue(0)
 
+  // Cursor-to-pet distance (px) for restrained proximity expressions.
+  const dist = useMotionValue(Number.POSITIVE_INFINITY)
+  const [petLine, setPetLine] = useState<{ title: string; sub: string } | null>(null)
+  const petCount = useRef(0)
+  const petTimer = useRef<number | null>(null)
+
+  const handlePetted = useCallback(() => {
+    const lines = [
+      { title: 'heh.', sub: 'carry on.' },
+      { title: "careful — i'm working here.", sub: 'back to it.' },
+    ]
+    const line = lines[petCount.current % lines.length]
+    petCount.current += 1
+    setPetLine(line)
+    if (petTimer.current !== null) window.clearTimeout(petTimer.current)
+    petTimer.current = window.setTimeout(() => {
+      petTimer.current = null
+      setPetLine(null)
+    }, 2200)
+  }, [])
+
+  useEffect(
+    () => () => {
+      if (petTimer.current !== null) window.clearTimeout(petTimer.current)
+    },
+    [],
+  )
+
+  useEffect(() => {
+    if (reduceMotion) return
+    let raf = 0
+    const tick = () => {
+      const c = cursor.current
+      if (c) dist.set(Math.hypot(c.x - tx.get(), c.y - ty.get()))
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [dist, reduceMotion, tx, ty])
+
   const petSize = isMobile ? PET_MOBILE : PET_DESKTOP
 
   const setSideIfChanged = useCallback((next: BubbleSide) => {
@@ -305,6 +345,8 @@ export default function PupCompanion({
               size={isMobile ? 'xs' : 'sm'}
               state={mood}
               gaze={reduceMotion ? undefined : { x: gx, y: gy }}
+              petting={reduceMotion ? undefined : { d: dist }}
+              onPetted={handlePetted}
               trackPointer={false}
               showStatus={false}
               ariaLabel="Hunter pup watching your progress"
@@ -312,7 +354,11 @@ export default function PupCompanion({
           </motion.div>
 
           {/* Speech bubble attached to the pet */}
-          {!quiet && (
+          {!quiet &&
+            (() => {
+              const showTitle = petLine?.title ?? title
+              const showSub = petLine?.sub ?? sub
+              return (
           <div
             className={`absolute w-max max-w-[210px] ${bubblePos} ${
               side.v === 'up' ? 'top-1/2 -translate-y-1/2' : 'top-[calc(100%+12px)]'
@@ -321,20 +367,20 @@ export default function PupCompanion({
             <div className="relative rounded-2xl border border-white/10 bg-black/85 px-3 py-2 shadow-[0_12px_32px_rgba(0,0,0,0.6)] backdrop-blur-md">
               <AnimatePresence mode="wait">
                 {reduceMotion ? (
-                  <div key={title}>
-                    <p className="text-xs font-semibold text-white">{title}</p>
-                    <p className="mt-0.5 line-clamp-2 text-[11px] text-text-secondary">{sub}</p>
+                  <div key={showTitle}>
+                    <p className="text-xs font-semibold text-white">{showTitle}</p>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] text-text-secondary">{showSub}</p>
                   </div>
                 ) : (
                   <motion.div
-                    key={title}
+                    key={showTitle}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.18 }}
                   >
-                    <p className="text-xs font-semibold text-white">{title}</p>
-                    <p className="mt-0.5 line-clamp-2 text-[11px] text-text-secondary">{sub}</p>
+                    <p className="text-xs font-semibold text-white">{showTitle}</p>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] text-text-secondary">{showSub}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -348,7 +394,8 @@ export default function PupCompanion({
               </button>
             </div>
           </div>
-          )}
+              )
+            })()}
         </div>
       </motion.div>
     </div>

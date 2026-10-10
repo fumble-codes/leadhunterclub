@@ -1112,6 +1112,26 @@ Refactored the engine out so both pages share it:
   fast-forward to `main` (`537862d..3078128`), pushed, `0 0` vs origin. Other
   session's admin-pages WIP stashed for the push, popped back intact.
 
+### Pup proximity expressions (2026-10-10) — code complete, preview QA pending
+User ask: hover expressions for the wolf pet, but NOT cheesy. No spins, no
+sparkles, no giggling — restrained only. Key constraint: the pet root is
+`pointer-events-none` (never eats clicks), so true hover is impossible;
+expressions are **proximity-based** (cursor distance, already tracked):
+- **New `src/components/pup/proximity.ts` (+ 4-test file):** pure
+  `proximityTier(dPx, dwellOk, cooling)` — idle >90px, excited ≤90px, petted
+  ≤30px + 0.4s dwell. All green.
+- **`WolfOrb.tsx`:** optional `petting={{d}}` MV prop + `onPetted`. Internal
+  `idle|excited|petted` state: excited = subtle lean (scale 1.05, rotate ±4°
+  once); petted = single small bounce (scale 1→1.1→1, 0.45s). One-shot per
+  approach, re-arms past 160px. Copilot call sites unaffected (no prop).
+- **`PupCompanion.tsx`:** rAF distance loop (no re-render), dry petting lines
+  rotating between "heh. / carry on." and "careful — i'm working here. /
+  back to it." (2.2s, then back to contextual hint). Gaze+petting disabled
+  under reduced-motion. Onboarding + landing get it free, no page edits.
+- Verified: lint clean, tsc 0 in touched files, **18 failed | 211 passed** =
+  same pre-existing 18 + 4 new passing. Branch `pup-expressions`, pushed for
+  preview QA (feel-work: lean/bounce amplitude tuned from user reaction).
+
 ### Landing pup: full dialogue script (2026-10-10) — shipped live
 User ask: more dialogues for the landing pet. Expanded `landingCopy.ts` from
 5 lines to a full script — every tracked section gets a first-sighting line

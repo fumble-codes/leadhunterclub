@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
-import { motion, useMotionValue, useSpring, useTransform, type MotionStyle, type MotionValue } from 'framer-motion'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform, type MotionStyle, type MotionValue } from 'framer-motion'
 
 type WolfOrbState = 'idle' | 'online' | 'thinking' | 'listening'
 export type { WolfOrbState }
@@ -17,6 +17,13 @@ interface WolfOrbProps {
    * pointer-over-orb handler is disabled. Values are normalized -0.5..0.5.
    */
   gaze?: { x: MotionValue<number>; y: MotionValue<number> }
+  /**
+   * Petting mode: distance (px) from cursor to orb center, owned by the
+   * wrapper. Drives restrained proximity expressions (nearby lean-in, dwell
+   * bounce). Fires onPetted once per approach; re-arms past 160px.
+   */
+  petting?: { d: MotionValue<number> }
+  onPetted?: () => void
   showStatus?: boolean
   showRing?: boolean
   showGlow?: boolean
@@ -81,6 +88,8 @@ export function WolfOrb({
   state = 'idle',
   trackPointer = true,
   gaze,
+  petting,
+  onPetted,
   showStatus = true,
   showRing = true,
   showGlow = true,
@@ -96,6 +105,59 @@ export function WolfOrb({
   const myInner = useMotionValue(0)
   const mx = gaze?.x ?? mxInner
   const my = gaze?.y ?? myInner
+
+  // Restrained proximity expressions (petting mode only).
+  const distInner = useMotionValue(Number.POSITIVE_INFINITY)
+  const dist = petting?.d ?? distInner
+  const [expr, setExpr] = useState<'idle' | 'excited' | 'petted'>('idle')
+  const exprRef = useRef(expr)
+  exprRef.current = expr
+  const coolRef = useRef(false)
+  const dwellRef = useRef<number | null>(null)
+  const onPettedRef = useRef(onPetted)
+  onPettedRef.current = onPetted
+
+  useEffect(
+    () => () => {
+      if (dwellRef.current !== null) window.clearTimeout(dwellRef.current)
+    },
+    [],
+  )
+
+  useMotionValueEvent(dist, 'change', (v) => {
+    if (typeof v !== 'number') return
+    if (coolRef.current) {
+      if (v > 160) coolRef.current = false
+      return
+    }
+    if (v <= 30) {
+      if (exprRef.current !== 'petted' && dwellRef.current === null) {
+        dwellRef.current = window.setTimeout(() => {
+          dwellRef.current = null
+          if (dist.get() <= 30) {
+            exprRef.current = 'petted'
+            setExpr('petted')
+            coolRef.current = true
+            onPettedRef.current?.()
+          }
+        }, 400)
+      }
+      if (exprRef.current === 'idle') {
+        exprRef.current = 'excited'
+        setExpr('excited')
+      }
+      return
+    }
+    if (dwellRef.current !== null) {
+      window.clearTimeout(dwellRef.current)
+      dwellRef.current = null
+    }
+    const next = v <= 90 ? 'excited' : 'idle'
+    if (exprRef.current !== next) {
+      exprRef.current = next
+      setExpr(next)
+    }
+  })
   const spring = { stiffness: 220, damping: 22, mass: 0.4 }
   const sx = useSpring(mx, spring)
   const sy = useSpring(my, spring)
@@ -237,8 +299,17 @@ export function WolfOrb({
       <motion.div
         className="relative h-full w-full"
         style={{ ...layerStyle, rotateX, rotateY, transformStyle: 'preserve-3d' }}
-        animate={{ scale: hovered ? 1.04 : 1 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+        animate={{
+          scale: hovered ? 1.04 : expr === 'petted' ? [1, 1.1, 1] : expr === 'excited' ? 1.05 : 1,
+          rotate: expr === 'excited' ? [0, -4, 4, 0] : 0,
+        }}
+        transition={
+          expr === 'petted'
+            ? { duration: 0.45, ease: 'easeOut' }
+            : expr === 'excited'
+              ? { duration: 0.5, ease: 'easeInOut' }
+              : { type: 'spring', stiffness: 320, damping: 20 }
+        }
       >
         {/* Sphere shell */}
         <div
