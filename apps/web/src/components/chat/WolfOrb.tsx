@@ -4,6 +4,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring, useTransform, type MotionStyle, type MotionValue } from 'framer-motion'
 
 type WolfOrbState = 'idle' | 'online' | 'thinking' | 'listening'
+export type { WolfOrbState }
 type WolfOrbSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 
 interface WolfOrbProps {

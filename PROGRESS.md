@@ -1048,3 +1048,37 @@ re-enablement") — dead code, not user-facing; resurrecting/removing is a
 separate call. Verified again: lint clean, 10/10 hint tests, tsc 0 in touched
 files. Merged `onboarding-pet-preview` → `main`, pushed (see deploy §4).
 
+### Landing-page pup (2026-10-10) — code complete, preview QA pending
+User ask: same floating wolf pet on the marketing landing (not a dock/chat).
+Refactored the engine out so both pages share it:
+- **New `src/components/pup/PupCompanion.tsx`:** the full overlay engine moved
+  from OnboardingPet, parameterized (`mood/title/sub`, `defaultAnchor`,
+  `homeCorner`, `hidden`, `quiet`, `onFocusedChange`). `OnboardingPet.tsx` is
+  now a ~20-line wrapper (same behavior; its 10 hint tests still green).
+- **`WolfOrb.tsx` (+1):** `export type { WolfOrbState }` for shared typing.
+- **New `src/app/landingCopy.ts` + 4-test file:** `pickLandingHint()` — hero
+  greeting, funnel/pricing/final one-time nudges, CTA-hover line, null (quiet,
+  pet just watches) everywhere else + all revisits. Same pet voice.
+- **New `src/app/components/LandingPet.tsx`:** section observer (page-owned
+  `data-landing-section` attrs + existing `#features/#tokens/#testimonials/#who`
+  ids), per-section visit counts, CTA hover/focus, hides while copilot chat is
+  open (`useCopilot()`), 4.5s mount delay so the hero intro choreography plays
+  first, home corner bottom-LEFT (copilot owns bottom-right).
+- **Page diffs (attributes + render only):** `page.tsx` (import, hero wrapper,
+  section attrs ×5, `cta-pricing`/`cta-final` anchors, `<LandingPet/>`),
+  `HeroSection.tsx` (+1 `cta-hero` anchor on the CTA row — on top of the
+  parallel session's committed scroll fix, no overlap).
+- **18th test failure is NOT ours:** full suite = **18 failed | 207 passed**;
+  the delta vs the 17-baseline is a 4th `reveal/route.test.ts` failure in
+  credit/claim logic — that file+route were rewritten by backend's `21bf37d`
+  after our last green run; our diff touches zero backend/shared files.
+  (A chained `stash push`/`vitest`/`pop` probe misfired mid-way — vitest's
+  nonzero exit skipped the pop; recovered immediately with an explicit pop.
+  Lesson: never chain pop after a command that can exit nonzero.)
+- **Ship state:** branch `landing-pet-preview` (from main incl. parallel
+  session's `537862d` scroll fix). **No gate flip needed:** `COMING_SOON` is
+  already `false` in the tree (flipped by user/another session), so the Vercel
+  preview of this branch serves the real landing + pet directly (the
+  `?preview=1` trick is dev-only, dead in prod builds). `main` untouched until
+  QA passes.
+

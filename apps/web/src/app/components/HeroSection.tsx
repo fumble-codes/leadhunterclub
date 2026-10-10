@@ -2342,6 +2342,7 @@ export default function HeroSection() {
           {/* CTA Row */}
           <motion.div
             {...reveal(0.6, 12)}
+            data-guide-anchor="cta-hero"
             style={{ pointerEvents: revealed ? 'auto' : 'none' }}
             className="flex flex-wrap items-center justify-center gap-3.5"
           >
