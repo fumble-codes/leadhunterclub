@@ -982,3 +982,38 @@ in playful pet voice ("ooh, that link looks off…").
   glide-to-focus, bubble side flips at edges, mobile park, mute/unmute, reduced
   motion, 0 console errors on a real onboarding run.
 
+### Preview push for pup QA (2026-10-09) — branch `onboarding-pet-preview`
+User couldn't get Firebase verification mail on localhost, asked for a Vercel
+preview link to test the pup. Committed ONLY the 6 pup files (WolfOrb edit,
+onboarding page/guideCopy/guideCopy.test/OnboardingPet, PROGRESS.md) —
+everything else (demo-leads, tutorial-preview-qa, moodboard, etc.) untouched.
+- Rebased onto backend's 7 new commits (`origin/main` → `0de8576`, admin
+  targets/leads/tokens/apify work) before pushing; `0 0` vs upstream branch.
+  Preview build = pup + backend's latest. `main` branch untouched (no prod effect).
+- **Rebase collision (not ours, flagged):** backend committed
+  `components/support/VideoHelpModal.tsx`, which existed locally as another
+  session's untracked WIP with REAL content differences (87 lines ignoring
+  whitespace — not just line endings). Local copy parked at
+  `C:\Users\HP\AppData\Local\Temp\opencode\support-backup\VideoHelpModal.tsx`.
+  Do NOT copy it back blindly — reconcile with that session first. Tree now
+  carries upstream's committed version.
+- **Before testing auth on preview:** add the preview deployment domain to
+  Firebase Console → Authentication → Settings → Authorized domains, or sign-in
+  redirects/links break. If verification mail still never arrives on preview
+  either, it's Firebase-side (templates/quota/spam — backend guy), not env.
+- Preview URL: Vercel dashboard → project `leadhunterclub` → Deployments (branch
+  `onboarding-pet-preview`), or open a PR
+  (`github.com/fumble-codes/leadhunterclub/pull/new/onboarding-pet-preview`) —
+  PR page shows the deployment link + checks. No PR opened (not requested).
+
+### Pup copy fix + LIVE merge (2026-10-09)
+User corrections: no OTP anywhere (we don't have it), no podcast example (we
+don't have one). Fixed: pet phone hint "your OTP lands here" → "so we can
+reach you"; pet Other-box hint "a reel? a podcast? name it" → "a reel? a
+friend? name it"; onboarding Other input placeholder "…a podcast…" →
+"…YouTube…". Left alone on purpose: the page's disabled OTP *functions*
+(lines ~335-476, explicitly commented "temporarily disabled… kept for future
+re-enablement") — dead code, not user-facing; resurrecting/removing is a
+separate call. Verified again: lint clean, 10/10 hint tests, tsc 0 in touched
+files. Merged `onboarding-pet-preview` → `main`, pushed (see deploy §4).
+

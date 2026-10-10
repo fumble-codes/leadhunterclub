@@ -56,7 +56,7 @@ export function pickHint(s: GuideStatus): GuideHint {
       return { title: 'linkedin goes here', sub: "it's how i know you're real", mood: 'listening' }
     }
     if (s.focused === 'phone') {
-      return { title: 'phone number here', sub: 'your OTP lands here', mood: 'listening' }
+      return { title: 'phone number here', sub: 'so we can reach you', mood: 'listening' }
     }
     if (s.focused === 'social') {
       return { title: 'ooh, bonus points', sub: 'totally optional, but shiny', mood: 'listening' }
@@ -97,7 +97,7 @@ export function pickHint(s: GuideStatus): GuideHint {
 
   // Step 3 — discovery + submit.
   if (s.focused === 'discoveryOther') {
-    return { title: 'spill it', sub: 'a reel? a podcast? name it', mood: 'listening' }
+    return { title: 'spill it', sub: 'a reel? a friend? name it', mood: 'listening' }
   }
   if (s.focused === 'discovery') {
     return { title: "where'd you find us?", sub: 'tap one', mood: 'listening' }

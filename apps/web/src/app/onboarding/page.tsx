@@ -1186,7 +1186,7 @@ export default function OnboardingPage() {
                           data-guide-anchor="discoveryOther"
                           value={discoverySourceOther}
                           onChange={(e) => setDiscoverySourceOther(e.target.value)}
-                          placeholder="e.g. Instagram reel, a podcast, newsletter..."
+                           placeholder="e.g. Instagram reel, YouTube, newsletter..."
                           maxLength={120}
                           autoFocus
                           className="w-full px-3 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.08] text-text-primary text-sm outline-none focus:border-accent-mint/40 focus:ring-1 focus:ring-accent-mint/30 transition-all placeholder:text-text-secondary/50"
