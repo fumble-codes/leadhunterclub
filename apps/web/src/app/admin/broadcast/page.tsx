@@ -159,6 +159,8 @@ export default function AdminBroadcastPage() {
   const [data, setData] = useState<BroadcastData | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'composer' | 'templates' | 'logs'>('composer')
+  // Mouse-wheel support for the nav tabs (vertical wheel → horizontal when they overflow)
+  const navTabsScrollRef = useHorizontalWheelScroll<HTMLDivElement>()
   // Mouse-wheel support for the logs table (vertical wheel → horizontal when it overflows)
   const tableScrollRef = useHorizontalWheelScroll<HTMLDivElement>()
 
@@ -1746,10 +1748,10 @@ export default function AdminBroadcastPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-white/[0.08] pb-1">
+      <div ref={navTabsScrollRef} className="flex items-center gap-2 overflow-x-auto scrollbar-hide border-b border-white/[0.08] pb-1">
         <button
           onClick={() => setActiveTab('composer')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'composer'
               ? 'bg-primary text-black shadow-md shadow-primary/20'
               : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
@@ -1768,7 +1770,7 @@ export default function AdminBroadcastPage() {
 
         <button
           onClick={() => setActiveTab('templates')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'templates'
               ? 'bg-primary text-black shadow-md shadow-primary/20'
               : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
@@ -1787,7 +1789,7 @@ export default function AdminBroadcastPage() {
 
         <button
           onClick={() => setActiveTab('logs')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0 ${
             activeTab === 'logs'
               ? 'bg-primary text-black shadow-md shadow-primary/20'
               : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
