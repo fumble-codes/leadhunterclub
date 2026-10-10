@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useHorizontalWheelScroll } from '@/hooks/useHorizontalWheelScroll'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   MegaphoneIcon,
@@ -158,6 +159,8 @@ export default function AdminBroadcastPage() {
   const [data, setData] = useState<BroadcastData | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'composer' | 'templates' | 'logs'>('composer')
+  // Mouse-wheel support for the logs table (vertical wheel → horizontal when it overflows)
+  const tableScrollRef = useHorizontalWheelScroll<HTMLDivElement>()
 
   // Composer Form
   const [audience, setAudience] = useState<'ALL' | 'PAID' | 'FREE'>('ALL')
@@ -2690,7 +2693,7 @@ export default function AdminBroadcastPage() {
           </div>
 
           <div className="overflow-hidden rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-xl">
-            <div className="overflow-x-auto">
+            <div ref={tableScrollRef} className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-surface-elevated/70 border-b border-white/[0.08] text-text-secondary uppercase tracking-wider font-semibold text-[10px]">
                   <tr>
