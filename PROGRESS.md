@@ -874,6 +874,23 @@ tables scroll horizontally first while they overflow, page scroll resumes at edg
   errors are pre-existing; tsc still 47 with 0 on touched lines.
 - Tables elsewhere (`settings`, `referrals`, `saved`, hero demo) intentionally left native.
 
+### Broadcast nav tabs had NO scroll mechanism (`a639b56` pushed, 2026-10-10)
+Follow-up on the admin report: the broadcast Composer/Templates/Logs tab strip
+(`admin/broadcast:1749`) had no `overflow-x-auto` at all — on narrow screens tabs
+clipped with no way to reach them. Added `overflow-x-auto scrollbar-hide` + the wheel
+hook + `whitespace-nowrap shrink-0` on the 3 buttons. Lint: only pre-existing quote
+errors; tsc 47 unchanged, 0 on touched lines.
+- **Not behavior-verified locally:** `/admin/broadcast` sticks on its LOADING gate in
+  dev (backend data never arrives — same 503-class backend gap as `/leads`), so the tabs
+  never mount here; prod (real data) mounts them and the callback-ref hook covers it
+  (same proven pattern as community tabs). User: confirm on live after deploy (~6 min).
+- **Community re-check:** `/community` tabs fix IS live in prod (hook found in the live
+  page chunk). If tabs still don't wheel-scroll there, hard-refresh (Ctrl+Shift+R) — SPA
+  keeps the old chunk otherwise. Lightbox/modal audited OK (`overflow-auto` present).
+- **Repo quirk discovered:** the shared dev server stops recompiling on file edits after
+  a while (touch produced no recompile; only a restart fixed it). If localhost ever
+  ignores your edits, restart `npm run dev` (I restarted it this session ~18:35).
+
 ---
 
 ## 3. Blocked — waiting on user input
