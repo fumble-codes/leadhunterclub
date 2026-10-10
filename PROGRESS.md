@@ -831,6 +831,37 @@ you") instead of the actual lead feed.
   `/login`; no stored test credentials (same standing gap as §6.2). Standing rule: no new
   accounts.
 
+### Niche pills / tab strips: mouse-wheel horizontal scroll (2026-10-10, committed locally, NOT pushed)
+User report: lead-feed niche pills scroll only via trackpad gesture, not mouse wheel.
+Root cause is platform behavior, not a bug in our code: vertical wheel input bubbles past
+`overflow-x-auto` strips to the page — only real horizontal deltas (trackpad) reach them.
+- **New `src/hooks/useHorizontalWheelScroll.ts`** (callback-ref pattern): native
+  non-passive `wheel` listener translates vertical `deltaY` (px/line/page normalized) into
+  `scrollLeft`; consumes (`preventDefault` + `stopPropagation`, Lenis-safe) ONLY while the
+  strip can move in that direction — at edges / for horizontal intent the event flows
+  through so page scroll keeps working. React `onWheel` can't do this (attached passive).
+- **Wired (3-line change each):** `leads/page.tsx` niche pills (the reported one),
+  `HeroSection.tsx` demo pills (`LeadsContent`) + demo tabs (`CommunityContent`),
+  `community/page.tsx` category tabs, `WhoItsForGrid.tsx` niche pills.
+- **Gotcha found by testing (recorded so nobody re-learns it):** first version used a
+  mount-time `useEffect` + ref object — worked on landing, silently dead on `/community`
+  because `if (loading) return <CustomLoader/>` means the strip mounts AFTER the effect
+  ran (`ref.current === null`, no retry; console proved it). Callback ref fixes this class.
+- **Verified (dev server, synthetic wheel dispatch):** landing pills consume + translate
+  (incl. edge-release + horizontal-passthrough); community tabs consume post-rewrite.
+  `/leads` pills couldn't overflow in this session (API 503 → only the 'All' pill renders;
+  see below) but wiring is identical + lint/tsc clean. **Not pushed per user's hold.**
+- **Scroll audit (19 `overflow-x-auto` site-wide):** same mouse-wheel issue class also in
+  `support:334` segmented tabs, `HeroSection:1438` segmented tabs, `admin/rewards:339`
+  status tabs (4 short tabs, rarely overflows), `WhoItsForGrid:759` decorative chips,
+  `Testimonials:284` mobile snap carousel (touch-first; desktop = grid) — all minor/fit
+  content, left alone. Tables (`settings`, `referrals`, admin pages, `saved:702`,
+  hero demo `874`) + referral-link boxes are CORRECT as-is (vertical wheel should scroll
+  the page over them). Re-run the audit if new strips appear.
+- **Intel for backend guy:** `GET /api/leads` → **503 `SERVICE_UNAVAILABLE` "Lead database
+  is temporarily unreachable"** in dev (seen ~11× incl. the new 6s `refresh=true` poll),
+  so `/leads` renders its error state locally. Not frontend — passing through.
+
 ---
 
 ## 3. Blocked — waiting on user input
