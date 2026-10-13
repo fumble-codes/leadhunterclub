@@ -355,6 +355,84 @@ export default function SavedLeadsPage() {
     }
   }
 
+  // --- Follow-up counter actions ---
+  const handleLogFollowUp = async (leadId: string) => {
+    const lead = savedLeads.find((l) => l.id === leadId)
+    if (!lead) return
+    const currentCount = lead.followUpCount ?? 0
+    const newCount = currentCount + 1
+    const wasSaved = lead.status === 'saved' || lead.status === 'new'
+    const newStatus = wasSaved ? 'follow-up' : lead.status
+    const prevLeads = savedLeads
+
+    // Optimistic UI
+    setSavedLeads((prev) =>
+      prev.map((l) =>
+        l.id === leadId
+          ? { ...l, followUpCount: newCount, lastFollowUpAt: new Date().toISOString(), status: newStatus }
+          : l,
+      ),
+    )
+    addToast({ type: 'success', message: `✓ Follow-up ${newCount} logged` })
+
+    // Background sync
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ logFollowUp: true }),
+      })
+      if (!res.ok) {
+        setSavedLeads(prevLeads)
+        addToast({ type: 'error', message: 'Failed to log follow-up on server' })
+      }
+    } catch {
+      setSavedLeads(prevLeads)
+      addToast({ type: 'error', message: 'Failed to log follow-up' })
+    }
+  }
+
+  const handleSetFollowUpCount = async (leadId: string, count: number) => {
+    if (count < 0) return
+    const lead = savedLeads.find((l) => l.id === leadId)
+    if (!lead) return
+    const prevLeads = savedLeads
+
+    // Optimistic UI
+    setSavedLeads((prev) =>
+      prev.map((l) =>
+        l.id === leadId
+          ? { ...l, followUpCount: count, lastFollowUpAt: new Date().toISOString() }
+          : l,
+      ),
+    )
+    addToast({ type: 'success', message: `✓ Follow-up count set to ${count}` })
+
+    // Background sync
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ followUpCount: count }),
+      })
+      if (!res.ok) {
+        setSavedLeads(prevLeads)
+        addToast({ type: 'error', message: 'Failed to set follow-up count on server' })
+      }
+    } catch {
+      setSavedLeads(prevLeads)
+      addToast({ type: 'error', message: 'Failed to set follow-up count' })
+    }
+  }
+
   const getRows = () => {
     if (filteredLeads.length === 0) {
       addToast({ type: 'error', message: 'No leads to export' })
@@ -816,7 +894,7 @@ export default function SavedLeadsPage() {
                         </div>
 
                         <div className="col-span-2">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Badge
                               size="sm"
                               color={
@@ -827,6 +905,11 @@ export default function SavedLeadsPage() {
                             >
                               {lead.urgency}
                             </Badge>
+                            {(lead.followUpCount ?? 0) > 0 && (
+                              <Badge size="sm" color="purple">
+                                FU {lead.followUpCount}
+                              </Badge>
+                            )}
                             {lead.replyProbability > 0 && (
                               <span className="text-xxs text-text-secondary">
                                 {lead.replyProbability}%
@@ -952,26 +1035,57 @@ export default function SavedLeadsPage() {
                                   )}
                                 </button>
 
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    handleMarkStatus(lead.id, 'follow-up', 'Follow-up')
-                                    setOpenActionDropdownId(null)
-                                  }}
-                                  className={`w-full flex items-center justify-between px-3 py-2.5 text-xs transition-colors hover:bg-white/5 ${
-                                    lead.status === 'follow-up'
-                                      ? 'text-primary font-semibold bg-primary/10'
-                                      : 'text-text-primary'
-                                  }`}
-                                >
-                                  <span className="flex items-center gap-2">
-                                    <ArrowPathIcon className={`w-3.5 h-3.5 shrink-0 ${lead.status === 'follow-up' ? 'text-primary' : 'text-text-secondary'}`} />
-                                    Mark as Follow-up
-                                  </span>
-                                  {lead.status === 'follow-up' && (
-                                    <CheckIcon className="w-3.5 h-3.5 text-primary" />
-                                  )}
-                                </button>
+                                {(() => {
+                                  const currentCount = lead.followUpCount ?? 0
+                                  return (
+                                    <>
+                                      <div className="px-3 pb-1 pt-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary/70">
+                                        Follow-ups
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          handleLogFollowUp(lead.id)
+                                          setOpenActionDropdownId(null)
+                                        }}
+                                        className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-text-primary hover:bg-white/5 transition-colors"
+                                      >
+                                        <span className="flex items-center gap-2">
+                                          <ArrowPathIcon className="w-3.5 h-3.5 shrink-0 text-primary" />
+                                          <span>Log follow-up</span>
+                                          {currentCount > 0 && (
+                                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-primary/10 text-primary">
+                                              {currentCount}
+                                            </span>
+                                          )}
+                                        </span>
+                                        <span className="text-[10px] text-text-secondary/50">+1</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const current = lead.followUpCount ?? 0
+                                          const input = prompt(`Set follow-up count (current: ${current}):`, String(current))
+                                          if (input !== null) {
+                                            const n = parseInt(input, 10)
+                                            if (!isNaN(n) && n >= 0) {
+                                              handleSetFollowUpCount(lead.id, n)
+                                            }
+                                          }
+                                          setOpenActionDropdownId(null)
+                                        }}
+                                        className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-text-secondary hover:bg-white/5 transition-colors"
+                                      >
+                                        <span className="flex items-center gap-2">
+                                          <ArrowPathIcon className="w-3.5 h-3.5 shrink-0 text-text-secondary" />
+                                          Set count
+                                        </span>
+                                        <span className="text-[10px] text-text-secondary/50">Custom</span>
+                                      </button>
+                                      <div className="h-px bg-white/[0.08] my-1" />
+                                    </>
+                                  )
+                                })()}
 
                                 <button
                                   type="button"
