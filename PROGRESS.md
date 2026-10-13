@@ -479,6 +479,14 @@ domain `https://leadhunterclub.com`; "Trusted by 3500+" confirmed real (left alo
 - Verified: lint clean on all touched files; tsc 44 = pre-existing baseline, 0 in touched
   files; dev server HTTP 200 on `/privacy` `/terms` `/cookies` `/register` with legal strings
   present; checkbox state + guard code-reviewed (live submit test needs a fresh email).
+- **Pushed as `9beba57`** (pull --rebase was a no-op, sync `0 0`).
+- **⚠️ Stash note for the parallel session (saved/page.tsx):** to pull --rebase with a clean
+  tree I stashed that file's WIP as `temp-saved-page-parallel-wip` (`stash@{0}` — the older
+  `stash@{1..3}` entries are untouched). The pop was **refused and kept** because the other
+  session re-edited the file meanwhile: live tree now has the 1-line `<div
+  data-action-dropdown>` wrapper (`saved/page.tsx:1041`), while the stash holds the matching
+  scroll→click-outside handler half (~line 94). **Do not drop the stash** — reconcile both
+  halves in the owning session first, then `git stash drop "stash@{0}"`.
 
 ### #13 Landing copy → docs/landingpagecontent.md (done)
 Content-only rewrite of 6 sections across 3 files (layouts/components untouched):
