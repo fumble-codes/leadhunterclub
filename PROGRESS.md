@@ -968,11 +968,14 @@ Implemented per the locked counter plan:
 - **API:** `PATCH /api/leads/:id` accepts `logFollowUp: true` (increments, sets `lastFollowUpAt`, auto-moves `saved`/`new` → `follow-up`) and `followUpCount: N` (sets count + timestamp).
 - **Validator:** `updateLeadSchema` extended with `followUpCount` + `logFollowUp`.
 - **UI (`saved/page.tsx`):** action menu now has a "Follow-ups" section with:
-  - **"Log follow-up"** — increments counter, shows toast "✓ Follow-up N logged", auto-moves `Saved` → `Follow-up`.
+  - **"Log follow-up"** — increments counter, shows toast "✓ Follow-up N logged (moved to Follow-up)", auto-moves `Saved` → `Follow-up`.
   - **"Set count…"** — prompt for any number ≥0, retroactive entry (e.g. off-app calls).
   - Badge in table row: "FU N" (purple) when count > 0.
-- **Verified:** lint clean, tsc 0 new errors (all 51 are pre-existing baseline). Local test blocked by `/api/leads?saved=true` → 500 (backend gap) — cannot click through multi-page. Ready for prod verification after deploy (~6 min).
+- **Verified:** lint clean, tsc 0 new errors (all 51 are pre-existing baseline). Local test blocked by `/api/leads?saved=true` → 500 (backend gap). Ready for prod verification after deploy (~6 min).
 - **Prisma note:** client needs `npx prisma generate` on next build (Windows file lock blocked local regen).
+
+### Follow-up toast debugging (`bc637a3`, 2026-10-13)
+User reported intermittent wrong toast messages ("Marked as Drafting" instead of "Follow-up N logged") when logging follow-ups. Added console logging to all three follow-up handlers (`handleLogFollowUp`, `handleMarkStatus`, `handleSetFollowUpCount`) with distinct toast messages to trace which handler fires. Deploy and check browser console on next user test.
 
 ---
 
