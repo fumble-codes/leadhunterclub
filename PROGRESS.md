@@ -930,6 +930,18 @@ DB `status` is a plain String (no enum migration needed for either option).
 - Rejected: 8 status strings (touches every grouping/validator, unwieldy menu, breaks
   at 9); free-text labels (unfilterable, breaks badges/exports).
 
+### Follow-up counter — BUILT (`e1cc559`, 2026-10-13)
+Implemented per the locked counter plan:
+- **Schema:** `followUpCount Int @default(0)` + `lastFollowUpAt DateTime?` on `UserLeadState`.
+- **API:** `PATCH /api/leads/:id` accepts `logFollowUp: true` (increments, sets `lastFollowUpAt`, auto-moves `saved`/`new` → `follow-up`) and `followUpCount: N` (sets count + timestamp).
+- **Validator:** `updateLeadSchema` extended with `followUpCount` + `logFollowUp`.
+- **UI (`saved/page.tsx`):** action menu now has a "Follow-ups" section with:
+  - **"Log follow-up"** — increments counter, shows toast "✓ Follow-up N logged", auto-moves `Saved` → `Follow-up`.
+  - **"Set count…"** — prompt for any number ≥0, retroactive entry (e.g. off-app calls).
+  - Badge in table row: "FU N" (purple) when count > 0.
+- **Verified:** lint clean, tsc 0 new errors (all 51 are pre-existing baseline). Local test blocked by `/api/leads?saved=true` → 500 (backend gap) — cannot click through multi-page. Ready for prod verification after deploy (~6 min).
+- **Prisma note:** client needs `npx prisma generate` on next build (Windows file lock blocked local regen).
+
 ---
 
 ## 3. Blocked — waiting on user input
