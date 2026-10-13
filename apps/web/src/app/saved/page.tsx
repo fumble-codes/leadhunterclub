@@ -38,9 +38,14 @@ const LeadDrawer = dynamic(() => import('../leads/components/LeadDrawer'), {
   ssr: false,
 })
 
+// One page of the saved-leads table. Export always uses the full filtered
+// list — this only controls how many rows render at once.
+const SAVED_PAGE_SIZE = 10
+
 export default function SavedLeadsPage() {
   const [activeTab, setActiveTab] = useState('All Leads')
   const [searchTerm, setSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
   const [savedLeads, setSavedLeads] = useState<AppLead[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
@@ -54,6 +59,7 @@ export default function SavedLeadsPage() {
   )
   const actionBtnRefs = useRef(new Map<string, HTMLButtonElement>())
   const mainRef = useRef<HTMLElement | null>(null)
+  const tableCardRef = useRef<HTMLDivElement | null>(null)
   const { addToast } = useToast()
 
   const toggleActionMenu = (leadId: string) => {
@@ -523,6 +529,34 @@ export default function SavedLeadsPage() {
     return true
   })
 
+  // --- Pagination: 10 rows per page. Export/drawer/hover keep using the full
+  // filtered list — only the rendered rows are sliced.
+  const totalPages = Math.max(1, Math.ceil(filteredLeads.length / SAVED_PAGE_SIZE))
+  const pagedLeads = filteredLeads.slice((page - 1) * SAVED_PAGE_SIZE, page * SAVED_PAGE_SIZE)
+  const pageStart = filteredLeads.length === 0 ? 0 : (page - 1) * SAVED_PAGE_SIZE + 1
+  const pageEnd = Math.min(page * SAVED_PAGE_SIZE, filteredLeads.length)
+  const pageNumbers = (() => {
+    const maxButtons = 5
+    const end = Math.min(totalPages, Math.max(page + Math.floor(maxButtons / 2), maxButtons))
+    const start = Math.max(1, end - maxButtons + 1)
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+  })()
+
+  const goToPage = (p: number) => {
+    setPage(Math.min(Math.max(1, p), totalPages))
+    tableCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  // Back to first page whenever the view changes
+  useEffect(() => {
+    setPage(1)
+  }, [activeTab, searchTerm])
+
+  // Clamp when the list shrinks (e.g. removing the last row of the last page)
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages)
+  }, [page, totalPages])
+
   const statusBadgeColor: Record<string, 'mint' | 'purple'> = {
     new: 'mint',
     saved: 'mint',
@@ -676,7 +710,7 @@ export default function SavedLeadsPage() {
         </div>
 
         {/* Pipeline Table */}
-        <div className="metallic-card min-h-[420px] pb-16">
+        <div ref={tableCardRef} className="metallic-card min-h-[420px] pb-16">
           {filteredLeads.length === 0 && !loading && (
             <div className="p-12 text-center">
               <p className="text-text-secondary text-sm">No leads match this view.</p>
@@ -710,7 +744,7 @@ export default function SavedLeadsPage() {
                 </div>
 
                 <div className="divide-y divide-white/[0.03]">
-                  {filteredLeads.map((lead) => {
+                  {pagedLeads.map((lead) => {
                     const isDropdownOpen = openActionDropdownId === lead.id
 
                     return (
@@ -1020,6 +1054,50 @@ export default function SavedLeadsPage() {
               </div>
             </div>
           )}
+          {filteredLeads.length > 0 && totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 sm:px-8 py-5 border-t border-white/[0.05]">
+                <p className="text-xs text-text-secondary">
+                  Showing <span className="font-bold text-text-primary">{pageStart}–{pageEnd}</span>{' '}
+                  of <span className="font-bold text-text-primary">{filteredLeads.length}</span> leads
+                </p>
+                <div className="flex items-center gap-1.5" role="navigation" aria-label="Saved leads pages">
+                  <button
+                    type="button"
+                    onClick={() => goToPage(page - 1)}
+                    disabled={page === 1}
+                    aria-label="Previous page"
+                    className="min-h-[44px] px-4 rounded-xl text-xs font-bold border transition-all bg-white/5 border-white/10 text-text-secondary hover:text-text-primary hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-text-secondary"
+                  >
+                    Prev
+                  </button>
+                  {pageNumbers.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => goToPage(n)}
+                      aria-label={`Page ${n}`}
+                      aria-current={n === page ? 'page' : undefined}
+                      className={`min-h-[44px] min-w-[44px] px-3 rounded-xl text-xs font-bold border transition-all ${
+                        n === page
+                          ? 'bg-accent-purple text-text-on-accent border-transparent shadow-lg'
+                          : 'bg-white/5 border-white/10 text-text-secondary hover:text-text-primary hover:bg-white/10'
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => goToPage(page + 1)}
+                    disabled={page === totalPages}
+                    aria-label="Next page"
+                    className="min-h-[44px] px-4 rounded-xl text-xs font-bold border transition-all bg-white/5 border-white/10 text-text-secondary hover:text-text-primary hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/5 disabled:hover:text-text-secondary"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
 
           {loading && <CustomLoader page="saved" />}
           {!loading && savedLeads.length === 0 && (
