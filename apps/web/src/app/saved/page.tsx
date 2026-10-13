@@ -94,11 +94,18 @@ export default function SavedLeadsPage() {
       setOpenActionDropdownId(null)
       setMenuPos(null)
     }
-    window.addEventListener('scroll', close, true)
     window.addEventListener('resize', close)
+    // Use click-outside instead of scroll to avoid closing when scrolling inside dropdown
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('[data-action-dropdown]')) {
+        close()
+      }
+    }
+    setTimeout(() => window.addEventListener('click', handleClickOutside), 0)
     return () => {
-      window.removeEventListener('scroll', close, true)
       window.removeEventListener('resize', close)
+      window.removeEventListener('click', handleClickOutside)
     }
   }, [openActionDropdownId])
 
