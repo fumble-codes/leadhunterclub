@@ -891,6 +891,28 @@ errors; tsc 47 unchanged, 0 on touched lines.
   a while (touch produced no recompile; only a restart fixed it). If localhost ever
   ignores your edits, restart `npm run dev` (I restarted it this session ~18:35).
 
+### Saved leads pagination — 10 rows per page (`568069a` pushed, 2026-10-13)
+User ask: paginate the saved-leads table, 10 per page, break nothing.
+- **Change (`saved/page.tsx`, +80/−2):** `SAVED_PAGE_SIZE = 10`; `page` state; `totalPages`
+  + `pagedLeads = slice(...)` derived from `filteredLeads`; row map renders `pagedLeads`;
+  Prev/numbered/Next bar with "Showing X–Y of Z" under the table (hidden unless >1 page);
+  page resets on tab/search change, clamps when rows are removed, scrolls card into view
+  on change. **Untouched by design:** export (still full filtered list), drawer/hover/
+  dropdown lookups (id-keyed on `savedLeads`), filter logic, summary cards, scroll hint.
+- **War story (don't repeat):** first placement of the bar *inside* the table conditional
+  broke parsing with errors pointing at the new lines while every hunk looked right —
+  isolated-block parse passed, braces balanced. Fixed by moving the bar *after* the
+  conditional close (`{filteredLeads.length > 0 && totalPages > 1 && ...}`). Lesson: when
+  TSX errors defy inspection, relocate the block instead of re-reading it.
+- **Verified:** lint clean · tsc 47 = baseline, 0 in file · browser: page loads, bar
+  correctly hidden on empty (account has 0 saved; `/api/leads?saved=true` → 500 in dev —
+  backend gap). Multi-page click-through NOT possible locally (no data); logic hand-checked.
+- **Git incident (recovered, rule added):** the parallel session had `pup-expressions`
+  checked out in this shared tree — my commit landed on THEIR branch and my pull
+  rebased it. Recovered via reflog: cherry-picked the commit to main (`568069a`, pushed,
+  sync 0 0), then `reset --hard` their branch to its exact prior tip (`16f37b2`).
+  **New rule: run `git branch --show-current` before every commit** — never assume main.
+
 ---
 
 ## 3. Blocked — waiting on user input
