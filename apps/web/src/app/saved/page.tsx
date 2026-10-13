@@ -962,18 +962,18 @@ export default function SavedLeadsPage() {
                             })()}
 
                             {isDropdownOpen && menuPos && createPortal(
-                              <div>
-                                <div
-                                  className="fixed inset-0 z-50 cursor-default"
-                                  onClick={() => {
-                                    setOpenActionDropdownId(null)
-                                    setMenuPos(null)
-                                  }}
-                                />
+                              <div
+                                className="fixed inset-0 z-50 cursor-default"
+                                onClick={() => {
+                                  setOpenActionDropdownId(null)
+                                  setMenuPos(null)
+                                }}
+                              >
                                 <div
                                   role="menu"
                                   style={{ top: menuPos.top, left: menuPos.left }}
                                   className="fixed w-52 max-h-[380px] overflow-y-auto scrollbar-hide rounded-2xl bg-surface-elevated/95 border border-white/10 shadow-2xl shadow-black/80 py-2 z-50 text-left backdrop-blur-xl"
+                                  onClick={(e) => e.stopPropagation()}
                                 >
                                 <div className="px-3 pb-1 pt-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary/70">
                                   Stage / Status
