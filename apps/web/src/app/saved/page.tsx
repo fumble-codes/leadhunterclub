@@ -334,6 +334,7 @@ export default function SavedLeadsPage() {
   ]
 
   const handleMarkStatus = async (leadId: string, status: string, label: string) => {
+    console.log('[handleMarkStatus]', { leadId, status, label })
     // 1. Optimistic UI update (instant response)
     const prevLeads = savedLeads
     setSavedLeads((prev) =>
@@ -380,7 +381,9 @@ export default function SavedLeadsPage() {
           : l,
       ),
     )
-    addToast({ type: 'success', message: `✓ Follow-up ${newCount} logged` })
+    const msg = `✓ Follow-up ${newCount} logged${wasSaved ? ' (moved to Follow-up)' : ''}`
+    console.log('[handleLogFollowUp]', { leadId, currentCount, newCount, wasSaved, newStatus, msg })
+    addToast({ type: 'success', message: msg })
 
     // Background sync
     try {
@@ -404,6 +407,7 @@ export default function SavedLeadsPage() {
   }
 
   const handleSetFollowUpCount = async (leadId: string, count: number) => {
+    console.log('[handleSetFollowUpCount]', { leadId, count })
     if (count < 0) return
     const lead = savedLeads.find((l) => l.id === leadId)
     if (!lead) return
