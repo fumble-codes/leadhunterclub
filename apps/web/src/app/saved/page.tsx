@@ -955,7 +955,7 @@ export default function SavedLeadsPage() {
                             })()}
 
                             {isDropdownOpen && menuPos && createPortal(
-                              <>
+                              <div>
                                 <div
                                   className="fixed inset-0 z-50 cursor-default"
                                   onClick={() => {
@@ -966,7 +966,7 @@ export default function SavedLeadsPage() {
                                 <div
                                   role="menu"
                                   style={{ top: menuPos.top, left: menuPos.left }}
-                                  className="fixed w-52 max-h-[380px] overflow-y-auto rounded-2xl bg-surface-elevated/95 border border-white/10 shadow-2xl shadow-black/80 py-2 z-50 text-left backdrop-blur-xl"
+                                  className="fixed w-52 max-h-[380px] overflow-y-auto scrollbar-hide rounded-2xl bg-surface-elevated/95 border border-white/10 shadow-2xl shadow-black/80 py-2 z-50 text-left backdrop-blur-xl"
                                 >
                                 <div className="px-3 pb-1 pt-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary/70">
                                   Stage / Status
@@ -1038,7 +1038,7 @@ export default function SavedLeadsPage() {
                                 {(() => {
                                   const currentCount = lead.followUpCount ?? 0
                                   return (
-                                    <>
+                                    <div data-action-dropdown className="scrollbar-hide max-h-[380px] overflow-y-auto">
                                       <div className="px-3 pb-1 pt-0.5 text-[10px] font-bold uppercase tracking-wider text-text-secondary/70">
                                         Follow-ups
                                       </div>
@@ -1082,10 +1082,10 @@ export default function SavedLeadsPage() {
                                         </span>
                                         <span className="text-[10px] text-text-secondary/50">Custom</span>
                                       </button>
-                                      <div className="h-px bg-white/[0.08] my-1" />
-                                    </>
+<div className="h-px bg-white/[0.08] my-1" />
+                                    </div>
                                   )
-                                })()}
+                                  })()}
 
                                 <button
                                   type="button"
@@ -1156,7 +1156,7 @@ export default function SavedLeadsPage() {
                                   Remove from Saved
                                 </button>
                                 </div>
-                              </>,
+                              </div>,
                               document.body,
                             )}
                           </div>
