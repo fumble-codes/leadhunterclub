@@ -36,7 +36,7 @@ User asked for local dummy lead data to test the lead drawer without the live DB
 | 4 | Capabilities card 4 — interactive credit-ledger UI (superseded the original "replace with video" ask) | ✅ done + browser-verified (16/16 checks desktop+mobile) |
 | 5 | Rollover copy → 15 days everywhere | ✅ done + visually verified |
 | 6 | Pricing → 2 plans only: Free (no card) + ₹999 — landing + `/pricing` | ✅ done + browser-verified |
-| 7 | Footer — rework nav columns + real social links | 🟡 nav columns ✅ done + browser-verified; social/legal URLs pending from user |
+| 7 | Footer — rework nav columns + real social links | 🟡 nav columns ✅ done + browser-verified; social URLs still pending from user; **legal links ✅ done 2026-10-13** (`/privacy` `/terms` `/cookies` live, wired in landing footer + ComingSoon footer + login) |
 | 8 | Onboarding — real-time email/number validation; experience → Beginner 6–12mo / Intermediate 1–3yr / Expert 3–6yr | ✅ done |
 | 9 | Admin UI — audit every section's dropdowns (z-index/overflow clipping) & fix | ✅ code + harness-verified (sweep of the 2 real admin pages needs admin login) |
 | 10 | Saved leads — wire `LeadDrawer` popup on lead name click (like lead feed) | ✅ code + compile-verified (click-through needs login) |
@@ -439,8 +439,7 @@ confirmed; lint clean; **vitest 18 failed/167 passed = identical to pre-edit bas
 - If an admin later saves plans from the admin UI, `plans_config` row is created from the
   now-2-plan payload (row still doesn't exist).
 
-### #7 Footer rework (nav columns done; social/legal pending)
-Changed in `apps/web/src/app/page.tsx` footer (~line 735+):
+### #7 Footer rework (nav columns done; social/legal pending)Changed in `apps/web/src/app/page.tsx` footer (~line 735+):
 - **Product column** → real in-page anchors: How It Works `#funnel`, Features `#features`,
   Pricing `#pricing`, Token System `#tokens`, FAQ `#faq` (fixes 2 previously broken ids
   `#how-it-works`, `#token-system` — those sections don't exist; real ids confirmed).
@@ -453,8 +452,33 @@ Changed in `apps/web/src/app/page.tsx` footer (~line 735+):
 - Verified: lint clean; automated link audit on live page = 11 footer links → 5 anchors
   resolve to real section ids, 3 routes 200; fresh-tab screenshot matches DOM
   (no Support, no rendered social icons, legal row intact).
-- **Still needs from user:** real social profile URLs; Privacy/Terms/Cookie decision
-  (currently `href="#"`).
+- **Still needs from user:** real social profile URLs (legal links done 2026-10-13 — see
+  "Legal paperwork" entry below).
+
+### Legal paperwork — Privacy/Terms/Cookies + register consent (done 2026-10-13)
+User-confirmed values: operator **Aman Agarwal**, Viman Nagar, Pune, Maharashtra, India;
+courts at Pune (grievance: Aman Agarwal); contacts `privacy@`/`support@theleadhunterclub.com`;
+domain `https://leadhunterclub.com`; "Trusted by 3500+" confirmed real (left alone).
+- **New routes** `apps/web/src/app/privacy|terms|cookies/page.tsx` — server components,
+  pricing-page layout (centered, no Navbar), TOC + numbered sections, `Last updated: 13
+  October 2026`. Copy grounded in code truth: reveal costs email 10 / phone 12 / both 15 /
+  profile 5 (`coins.ts`), Free 50cr + Freelancer ₹999/1000cr + top-ups 125/199·275/399·450/599
+  (`pricing/page.tsx`), 15-day rollover (Terms defer to in-app rules on drift), `__session`
+  30-day (session-length if stay-logged-in off, `useAuth.ts`), Resend transactional + Brevo
+  newsletter (`env.ts`), Razorpay (no card data stored), subprocessors table incl.
+  Vercel + Supabase (verified), lead-sourcing disclosure (Apify + Hunter/Apollo/ContactOut/
+  ContactCompass) with privacy@ opt-out → delete, DPDP rights + short GDPR note, 18+,
+  no-refunds-once-consumed, liability cap = 3 months' fees, India law / Pune courts.
+- **Register consent:** checkbox above Create Account ("I am 18 or older, and I agree to the
+  Terms of Service and Privacy Policy", links open in new tab) + `handleSubmit` guard
+  blocking with `Please agree to the Terms of Service and Privacy Policy`. Login's existing
+  "By continuing…" fine print kept (links now resolve instead of 404).
+- **Footer wiring:** `page.tsx:916` `href="#"` map → `/privacy` `/terms` `/cookies`;
+  `ComingSoon.tsx` footer (the currently-visible one) gained Privacy · Terms · Cookies links.
+- Middleware needed no change (matcher doesn't cover the new public routes).
+- Verified: lint clean on all touched files; tsc 44 = pre-existing baseline, 0 in touched
+  files; dev server HTTP 200 on `/privacy` `/terms` `/cookies` `/register` with legal strings
+  present; checkbox state + guard code-reviewed (live submit test needs a fresh email).
 
 ### #13 Landing copy → docs/landingpagecontent.md (done)
 Content-only rewrite of 6 sections across 3 files (layouts/components untouched):
