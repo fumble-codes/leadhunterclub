@@ -913,6 +913,23 @@ User ask: paginate the saved-leads table, 10 per page, break nothing.
   sync 0 0), then `reset --hard` their branch to its exact prior tip (`16f37b2`).
   **New rule: run `git branch --show-current` before every commit** — never assume main.
 
+### Follow-up stages plan — LOCKED: counter design (2026-10-13, no code written)
+User ask: "Mark as Follow-up" should become Follow-up 1…8 or custom counts. Investigation:
+`LeadStatus` union (`types/lead.ts` + `lib/types/lead.ts`), `z.enum` validator, dashboard
+groupings, "In Progress" tab, sheets allowlist all key on the single `'follow-up'` value;
+DB `status` is a plain String (no enum migration needed for either option).
+- **Decision: counter, not 8 statuses.** Keep `status='follow-up'` + new `followUpCount
+  Int @default(0)` (and `lastFollowUpAt?` for cadence later). Menu gets a follow-up
+  section: "Log follow-up" (+1, optimistic, toast with N) + "Set count…" (retroactive
+  entry, e.g. 2 calls made off-app). Badge → "Follow-up · N"; export gains a column.
+  Nothing else changes (all groupings keep matching the status string). No ceiling —
+  8 today, 30 tomorrow, no code edits.
+- **Backend-guy tasks when we build it:** additive migration (2 cols), accept/validate
+  `followUpCount` in PATCH + zod, include in payloads/mappers. Open product call:
+  logging a follow-up auto-moves `Saved` → `follow-up`? Per-note activity log = v2.
+- Rejected: 8 status strings (touches every grouping/validator, unwieldy menu, breaks
+  at 9); free-text labels (unfilterable, breaks badges/exports).
+
 ---
 
 ## 3. Blocked — waiting on user input
