@@ -977,7 +977,7 @@ Implemented per the locked counter plan:
 ### Follow-up toast debugging (`bc637a3`, 2026-10-13)
 User reported intermittent wrong toast messages ("Marked as Drafting" instead of "Follow-up N logged") when logging follow-ups. Added console logging to all three follow-up handlers (`handleLogFollowUp`, `handleMarkStatus`, `handleSetFollowUpCount`) with distinct toast messages to trace which handler fires. Deploy and check browser console on next user test.
 
-### Admin page wheel-scroll (Lenis hijack) — FIXED (`d5387c9`, 2026-10-15, committed, NOT pushed)
+### Admin page wheel-scroll (Lenis hijack) — FIXED (`d5387c9` + `3628c47`, 2026-10-15, pushed)
 User report: WhatsApp group panel in `/admin/broadcast` won't scroll with a mouse (works
 partly on trackpad). **Root cause = Lenis smooth-scroll was mounted on every `/admin/*`
 page.** `ClientLayout` gated it on `const isLanding = !isAppRoute`, but `appRoutes` =
@@ -1007,7 +1007,9 @@ time, while trackpad/momentum streams aren't always → native scroll slipped th
   coins, credits mocks, verify-session, coins fixtures); `next lint --file` on both files →
   only pre-existing broadcast:1474 unescaped-quote errors + ClientLayout:150/262
   exhaustive-deps warnings. Only the 2 intended files staged and committed.
-- **Open (needs user):** (a) **not pushed**; (b) **no browser verification** — `/admin` has
+- **Pushed:** `d5387c9` + this log entry `3628c47` are on `origin/main` (verified via
+  `git ls-remote` SHA match + `merge-base --is-ancestor`, sync `0 0`).
+- **Open (needs user):** (b) **no browser verification** — `/admin` has
   no test credentials in this session, so the fix is source+tooling-verified only. Confirm on
   live/after deploy with a real mouse; (c) **design fork left open** — `data-lenis-prevent`
   already exists on dashboard/leads/saved/analytics, where Lenis *never* mounts, which hints
