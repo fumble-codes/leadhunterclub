@@ -1095,7 +1095,7 @@ export default function SettingsPage() {
             )}
           </motion.div>
 
-          {/* Phone Verification */}
+          {/* Phone Number */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1108,8 +1108,8 @@ export default function SettingsPage() {
                   <PhoneIcon className="w-6 h-6 text-text-secondary" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-text-primary">Phone Verification</h2>
-                  <p className="text-sm text-text-secondary">Secure your account with SMS</p>
+                  <h2 className="text-lg font-bold text-text-primary">Phone Number</h2>
+                  <p className="text-sm text-text-secondary">How we reach you about your account and leads</p>
                 </div>
               </div>
               <span
@@ -1119,7 +1119,7 @@ export default function SettingsPage() {
                     : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
                 }`}
               >
-                {user?.phone ? 'Verified' : 'Not Verified'}
+                  {user?.phone ? 'Saved' : 'Required'}
               </span>
             </div>
 
@@ -1127,7 +1127,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between gap-4">
                 <p className="text-sm text-text-secondary">Phone: {user.phone}</p>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-accent-mint/10 text-accent-mint border border-accent-mint/20">
-                  Verified
+                  Saved
                 </span>
               </div>
             ) : (
