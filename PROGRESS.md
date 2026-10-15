@@ -977,6 +977,46 @@ Implemented per the locked counter plan:
 ### Follow-up toast debugging (`bc637a3`, 2026-10-13)
 User reported intermittent wrong toast messages ("Marked as Drafting" instead of "Follow-up N logged") when logging follow-ups. Added console logging to all three follow-up handlers (`handleLogFollowUp`, `handleMarkStatus`, `handleSetFollowUpCount`) with distinct toast messages to trace which handler fires. Deploy and check browser console on next user test.
 
+### Admin page wheel-scroll (Lenis hijack) — FIXED (`d5387c9`, 2026-10-15, committed, NOT pushed)
+User report: WhatsApp group panel in `/admin/broadcast` won't scroll with a mouse (works
+partly on trackpad). **Root cause = Lenis smooth-scroll was mounted on every `/admin/*`
+page.** `ClientLayout` gated it on `const isLanding = !isAppRoute`, but `appRoutes` =
+dashboard/leads/saved/analytics/settings/support/referrals/rewards/community — **no
+`/admin`**, so the gate evaluated true there. Lenis v1.3.23 attaches a **non-passive
+`wheel` listener on `window`** and, walking `composedPath()` target→body, only skips
+`preventDefault()` when it finds `data-lenis-prevent` / a `prevent` callback /
+`allowNestedScroll` (defaults **false**, never passed). The group list
+(`max-h-48 overflow-y-auto scrollbar-hide`) had no opt-out → wheel input consumed to
+smooth-scroll `window`. **Mouse vs trackpad asymmetry:** Lenis gates on
+`if (event.cancelable)`; discrete mouse notches are always cancelable → swallowed every
+time, while trackpad/momentum streams aren't always → native scroll slipped through.
+- **Why tabs/tables on the same page were fine:** `useHorizontalWheelScroll` attaches its
+  own non-passive listener and calls `stopPropagation()`, so Lenis never sees those events
+  (the "Lenis-safe" note at line 872 is exactly this). The group list is *vertical* and so
+  never got the hook — correct, once Lenis stops intercepting.
+- **Fix 1 (root cause, `ClientLayout.tsx`):** `const isLanding = !isAppRoute && !isAdminRoute`
+  + dep array now `[isAppRoute, isAdminRoute]`. Native wheel scroll restored for all admin
+  routes (panel, sidebar nav, filter pills, dropdowns).
+- **Fix 2 (defense in depth, `admin/broadcast/page.tsx`):** `data-lenis-prevent` +
+  `overscroll-contain` on the group list so it survives if smooth-scroll is ever re-enabled
+  for admin, and end-of-list doesn't chain into the page. (First attempt used a JSX
+  `{/* */}` comment in ternary expression position → TS1005 parse errors; must be a JS
+  `/* */` comment there. Reverted to that.)
+- **Verified (stash-compare, not eyeballed):** tsc **55 with / 55 without** my diff (0 added);
+  vitest **4 failed files / 15 failed / 210 passed both ways** (all pre-existing: reveal
+  coins, credits mocks, verify-session, coins fixtures); `next lint --file` on both files →
+  only pre-existing broadcast:1474 unescaped-quote errors + ClientLayout:150/262
+  exhaustive-deps warnings. Only the 2 intended files staged and committed.
+- **Open (needs user):** (a) **not pushed**; (b) **no browser verification** — `/admin` has
+  no test credentials in this session, so the fix is source+tooling-verified only. Confirm on
+  live/after deploy with a real mouse; (c) **design fork left open** — `data-lenis-prevent`
+  already exists on dashboard/leads/saved/analytics, where Lenis *never* mounts, which hints
+  smooth-scroll was intended site-wide. If you want Lenis on admin instead, revert fix 1 and
+  put `data-lenis-prevent` on the admin `<main>`/`<aside>` scroll containers (say the word).
+- **Pre-existing noise seen this session (NOT ours):** `settings/page.tsx` briefly carried 12
+  tsc JSX parse errors from another session's WIP; that file is back to clean in the tree now.
+  Repo-wide tsc baseline is **55 errors**, not the 47 recorded earlier.
+
 ---
 
 ## 3. Blocked — waiting on user input
