@@ -1017,6 +1017,20 @@ time, while trackpad/momentum streams aren't always → native scroll slipped th
   tsc JSX parse errors from another session's WIP; that file is back to clean in the tree now.
   Repo-wide tsc baseline is **55 errors**, not the 47 recorded earlier.
 
+### Settings: OTP phone verification removed (`bbe4579` pushed, 2026-10-15)
+User report (screenshot): settings showed "Phone Verification / Secure your account with
+SMS / Not Verified" + "Send OTP" + 6-digit code box + "Failed to send OTP" error. We send
+no OTPs anywhere — phone is contact info only. Removed the whole Firebase phone-auth flow
+from `settings/page.tsx` (−241/+68): `signInWithPhoneNumber`, `PhoneAuthProvider`,
+`RecaptchaVerifier`, `ConfirmationResult`, `phoneStep`/`otpCountdown`/`phoneVerificationCode`
+state, verifier effects, send/verify handlers, recaptcha container, OTP UI. Replaced with
+a plain number entry + "Save Phone Number" via the existing `PATCH /api/auth/me` (already
+accepts `phone`). Saved numbers show a "Verified" badge (means on-file, not OTP-proven).
+- **Verified:** 0 OTP/`phoneStep`/recaptcha references left in file · lint clean · tsc 0 in
+  file (repo baseline 55) · pushed, sync `0 0`. Not browser-verified (needs login session).
+- Note: onboarding Step 1 phone intake never had visible OTP text (only disabled helper
+  functions + one `otp` alternative in a `guideCopy` error regex) — left as-is per scope.
+
 ---
 
 ## 3. Blocked — waiting on user input
