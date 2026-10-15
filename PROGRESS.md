@@ -1031,6 +1031,14 @@ accepts `phone`). Saved numbers show a "Verified" badge (means on-file, not OTP-
 - Note: onboarding Step 1 phone intake never had visible OTP text (only disabled helper
   functions + one `otp` alternative in a `guideCopy` error regex) — left as-is per scope.
 
+### Settings phone header wording (`d551f27` pushed, 2026-10-15)
+Follow-up screenshot showed the card header I had missed: "Phone Verification / Secure
+your account with SMS / Not Verified" still promised SMS verification above the new plain
+input. Renamed: title → "Phone Number", sub → "How we reach you about your account and
+leads", header badge → Saved/Required, body badge → Saved (was "Verified" — implies
+OTP-proof). File now has zero verification/SMS/OTP references (swept, incl. comments).
+Save path itself was already correct (`PATCH /api/auth/me` accepts phone-only).
+
 ---
 
 ## 3. Blocked — waiting on user input
