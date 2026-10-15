@@ -1041,6 +1041,19 @@ leads", header badge → Saved/Required, body badge → Saved (was "Verified" �
 OTP-proof). File now has zero verification/SMS/OTP references (swept, incl. comments).
 Save path itself was already correct (`PATCH /api/auth/me` accepts phone-only).
 
+### Admin support: reporter links to user details (`a810502` pushed, 2026-10-15)
+User ask: on the admin support ticket page, clicking the reporter name/icon should open
+that user's page in admin/users. Done frontend-only, no API change: both ticket payloads
+already ship the `userId` scalar (`findUnique`/`findMany` without `select`), so only the
+interfaces gained `userId: string` and the names became Links to `/admin/users/[id]`:
+queue reporter cell + thread header reporter (with hover underline + title). Message-level
+author labels left plain (same destination, would be visual noise).
+- **Verified live (shared admin session):** queue link renders ("dualsparkstudio" →
+  `/admin/users/42sb3…`), thread header link renders, and the user detail page loads for
+  that id (no bounce) · lint clean both files · tsc 55 = baseline, 0 in touched files.
+- Also deleted my leftover temp scripts (`add_followup_counter.sql`, `fix-settings*.cjs`,
+  `run-migration.mjs`) from `apps/web/`.
+
 ---
 
 ## 3. Blocked — waiting on user input
