@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   ArrowLeftIcon,
@@ -31,6 +32,7 @@ interface AdminTicketDetail {
   createdAt: string
   resolvedAt: string | null
   messages: Message[]
+  userId: string
   user: { name: string; email: string }
 }
 
@@ -152,7 +154,15 @@ export default function AdminSupportThreadPage() {
                   {ticket.status.replace('_', ' ')}
                 </Badge>
                 <span className="text-xxs text-text-secondary">
-                  · {ticket.user.name} ({ticket.user.email})
+                  ·{' '}
+                  <Link
+                    href={`/admin/users/${ticket.userId}`}
+                    title="Open user details"
+                    className="hover:text-accent-mint hover:underline transition-colors"
+                  >
+                    {ticket.user.name}
+                  </Link>{' '}
+                  ({ticket.user.email})
                 </span>
               </div>
             </div>
