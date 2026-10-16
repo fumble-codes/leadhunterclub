@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import {
   ArrowLeftIcon,
   PaperAirplaneIcon,
   LockClosedIcon,
+  ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/solid'
 import { Badge, Button, Select, CustomLoader } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
@@ -151,9 +153,15 @@ export default function AdminSupportThreadPage() {
                 <Badge size="sm" color={statusColor[ticket.status] || 'purple'}>
                   {ticket.status.replace('_', ' ')}
                 </Badge>
-                <span className="text-xxs text-text-secondary">
-                  · {ticket.user.name} ({ticket.user.email})
-                </span>
+                <span className="text-xxs text-text-secondary">·</span>
+                <Link
+                  href={`/admin/users?search=${encodeURIComponent(ticket.user.email)}`}
+                  className="text-xxs text-accent-mint hover:underline font-medium inline-flex items-center gap-1 transition-colors"
+                  title={`View ${ticket.user.name}'s profile in Admin`}
+                >
+                  {ticket.user.name} ({ticket.user.email})
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                </Link>
               </div>
             </div>
             <div className="flex items-center gap-2">

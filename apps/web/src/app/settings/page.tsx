@@ -336,14 +336,20 @@ export default function SettingsPage() {
 
       const token = await auth.currentUser?.getIdToken().catch(() => null)
       if (token) {
-        await fetch('/api/auth/me', {
+        const patchRes = await fetch('/api/auth/me', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ phone: normalized }),
-        }).catch(() => {})
+        })
+        const patchJson = await patchRes.json().catch(() => null)
+        if (!patchRes.ok) {
+          setPhoneError(patchJson?.message || 'Failed to update phone number.')
+          setPhoneLoading(false)
+          return
+        }
       }
 
       setPhoneStep('idle')
