@@ -617,6 +617,53 @@ export async function updateApolloApiKey(api_key: string): Promise<{ success: bo
   return res
 }
 
+export async function getScrapedogApiKey(): Promise<ApiKeySettingResponse['data']> {
+  const res = await fetchApi<ApiKeySettingResponse>(`/settings/scrapedog-api-key`)
+  return res.data
+}
+
+export async function updateScrapedogApiKey(api_key: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/scrapedog-api-key`, {
+    method: 'POST',
+    body: JSON.stringify({ api_key }),
+  })
+  return res
+}
+
+export async function getCrawlbaseToken(): Promise<TokenSettingResponse['data']> {
+  const res = await fetchApi<TokenSettingResponse>(`/settings/crawlbase-token`)
+  return res.data
+}
+
+export async function updateCrawlbaseToken(token: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/crawlbase-token`, {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  })
+  return res
+}
+
+export interface ScraperEngineSettings {
+  primary_engine: string
+  fallback_engines: string[]
+}
+
+export async function getScraperEngines(): Promise<ScraperEngineSettings> {
+  const res = await fetchApi<{ success: boolean; data: ScraperEngineSettings }>(`/settings/scraper-engines`)
+  return res.data
+}
+
+export async function updateScraperEngines(settings: {
+  primary_engine?: string
+  fallback_engines?: string[]
+}): Promise<{ success: boolean; message: string }> {
+  const res = await fetchApi<{ success: boolean; message: string }>(`/settings/scraper-engines`, {
+    method: 'POST',
+    body: JSON.stringify(settings),
+  })
+  return res
+}
+
 // --- Watchlist targets (backend proxy) ---
 
 export interface ExternalTarget {
@@ -818,5 +865,98 @@ export async function triggerAllScrapers(): Promise<{
     method: 'POST',
     body: JSON.stringify({}),
   })
+}
+
+// --- Scraper Engine Keys (Scrapingdog & Crawlbase multi-key pool) ---
+
+export interface ExternalScraperKey {
+  id: string
+  key: string
+  label: string | null
+  is_active: boolean
+  is_exhausted: boolean
+  error_message?: string | null
+  created_at: string
+}
+
+export async function getScraperKeys(engine: string): Promise<{ success: boolean; data: ExternalScraperKey[] }> {
+  return fetchApi<{ success: boolean; data: ExternalScraperKey[] }>(`/scraper-keys/${engine}`)
+}
+
+export async function createScraperKey(
+  engine: string,
+  input: { key: string; label?: string | null }
+): Promise<{ success: boolean; data: ExternalScraperKey }> {
+  return fetchApi<{ success: boolean; data: ExternalScraperKey }>(`/scraper-keys/${engine}`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  })
+}
+
+export async function bulkCreateScraperKeys(
+  engine: string,
+  items: Array<{ key: string; label?: string | null }>
+): Promise<{ success: boolean; addedCount: number; updatedCount: number; data: ExternalScraperKey[] }> {
+  return fetchApi<{ success: boolean; addedCount: number; updatedCount: number; data: ExternalScraperKey[] }>(
+    `/scraper-keys/${engine}/bulk`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ items }),
+    }
+  )
+}
+
+export async function deleteScraperKey(engine: string, id: string): Promise<{ success: boolean }> {
+  return fetchApi<{ success: boolean }>(`/scraper-keys/${engine}/${id}`, {
+    method: 'DELETE',
+  })
+}
+
+export async function bulkDeleteScraperKeys(
+  engine: string,
+  options: { ids?: string[]; all?: boolean }
+): Promise<{ success: boolean; deletedCount: number }> {
+  return fetchApi<{ success: boolean; deletedCount: number }>(`/scraper-keys/${engine}/bulk`, {
+    method: 'DELETE',
+    body: JSON.stringify(options),
+  })
+}
+
+export async function testScraperKey(
+  engine: string,
+  key: string
+): Promise<{ success: boolean; valid: boolean; message: string; credits?: number }> {
+  return fetchApi<{ success: boolean; valid: boolean; message: string; credits?: number }>(
+    `/scraper-keys/${engine}/test`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ key }),
+    }
+  )
+}
+
+export async function getScraperEngines(): Promise<{
+  primaryEngine: string
+  fallbackEngines: string[]
+  supportedEngines: string[]
+}> {
+  const res = await fetchApi<{
+    success: boolean
+    data: { primaryEngine: string; fallbackEngines: string[]; supportedEngines: string[] }
+  }>(`/settings/scraper-engines`)
+  return res.data
+}
+
+export async function updateScraperEngines(input: {
+  primaryEngine: string
+  fallbackEngines: string[]
+}): Promise<{ success: boolean; data: { primaryEngine: string; fallbackEngines: string[] } }> {
+  return fetchApi<{ success: boolean; data: { primaryEngine: string; fallbackEngines: string[] } }>(
+    `/settings/scraper-engines`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    }
+  )
 }
 

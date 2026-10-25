@@ -29,6 +29,7 @@ const GETTERS = {
   contactout: getContactOutToken,
   apollo: getApolloApiKey,
   automation: getAutomationSettings,
+  'scraper-engines': getScraperEngines,
 } as const
 
 const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknown>> = {
@@ -37,6 +38,10 @@ const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknow
   hunter: (body) => updateHunterApiKey(String(body?.api_key ?? '').trim()),
   contactout: (body) => updateContactOutToken(String(body?.token ?? '').trim()),
   apollo: (body) => updateApolloApiKey(String(body?.api_key ?? '').trim()),
+  'scraper-engines': (body) => updateScraperEngines({
+    primaryEngine: String(body?.primaryEngine ?? 'apify').trim(),
+    fallbackEngines: Array.isArray(body?.fallbackEngines) ? body.fallbackEngines.map(String) : ['scrapedog', 'crawlbase'],
+  }),
   automation: (body) => {
     const b = body as {
       auto_scrape_enabled?: boolean

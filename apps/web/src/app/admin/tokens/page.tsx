@@ -10,6 +10,7 @@ import {
 import { CustomLoader } from '@/components/ui/CustomLoader'
 import { useToast } from '@/components/ui/Toast'
 import { parseApifyTokens } from '@/lib/apify-token-parser'
+import { ScraperKeyPoolManager, ScraperPoolKey } from '@/components/admin/ScraperKeyPoolManager'
 
 interface ApifyKey {
   _id: string
@@ -50,6 +51,9 @@ interface AutomationSettings {
 }
 
 export default function AdminTokensPage() {
+  type EngineTab = 'apify' | 'scrapedog' | 'crawlbase' | 'routing'
+  const [activeEngineTab, setActiveEngineTab] = useState<EngineTab>('apify')
+
   const [tokens, setTokens] = useState<ApifyKey[]>([])
   const [loading, setLoading] = useState(true)
   const [newKey, setNewKey] = useState('')
@@ -62,6 +66,15 @@ export default function AdminTokensPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isBulkDeleting, setIsBulkDeleting] = useState(false)
   const { addToast } = useToast()
+
+  const [scrapedogKeys, setScrapedogKeys] = useState<ScraperPoolKey[]>([])
+  const [crawlbaseKeys, setCrawlbaseKeys] = useState<ScraperPoolKey[]>([])
+  const [scrapedogLoading, setScrapedogLoading] = useState(false)
+  const [crawlbaseLoading, setCrawlbaseLoading] = useState(false)
+
+  const [primaryEngine, setPrimaryEngine] = useState<string>('apify')
+  const [fallbackEngines, setFallbackEngines] = useState<string[]>(['scrapedog', 'crawlbase'])
+  const [isSavingRouting, setIsSavingRouting] = useState(false)
 
   const parsedPreview = useMemo(() => {
     return parseApifyTokens(bulkText)
@@ -100,6 +113,57 @@ export default function AdminTokensPage() {
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }, [])
+
+  const fetchScrapedogKeys = useCallback(async () => {
+    setScrapedogLoading(true)
+    try {
+      const res = await apiCall('/api/admin/scraper-keys/scrapedog')
+      setScrapedogKeys(res.data || [])
+    } catch (e) {
+      console.error('Failed to load Scrapingdog keys:', e)
+    } finally {
+      setScrapedogLoading(false)
+    }
+  }, [apiCall])
+
+  const fetchCrawlbaseKeys = useCallback(async () => {
+    setCrawlbaseLoading(true)
+    try {
+      const res = await apiCall('/api/admin/scraper-keys/crawlbase')
+      setCrawlbaseKeys(res.data || [])
+    } catch (e) {
+      console.error('Failed to load Crawlbase keys:', e)
+    } finally {
+      setCrawlbaseLoading(false)
+    }
+  }, [apiCall])
+
+  const fetchScraperEngines = useCallback(async () => {
+    try {
+      const res = await apiCall('/api/admin/settings?service=scraper-engines')
+      if (res?.data) {
+        setPrimaryEngine(res.data.primaryEngine || 'apify')
+        setFallbackEngines(res.data.fallbackEngines || ['scrapedog', 'crawlbase'])
+      }
+    } catch (e) {
+      console.error('Failed to load scraper engines:', e)
+    }
+  }, [apiCall])
+
+  const handleSaveRouting = async () => {
+    setIsSavingRouting(true)
+    try {
+      await apiCall('/api/admin/settings?service=scraper-engines', {
+        method: 'POST',
+        body: JSON.stringify({ primaryEngine, fallbackEngines }),
+      })
+      addToast({ type: 'success', message: 'Scraper engine routing saved successfully' })
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Failed to save routing settings' })
+    } finally {
+      setIsSavingRouting(false)
+    }
+  }
 
   const fetchEnrichmentKeys = useCallback(async () => {
     try {
@@ -153,9 +217,12 @@ export default function AdminTokensPage() {
 
   useEffect(() => {
     fetchTokens()
+    fetchScrapedogKeys()
+    fetchCrawlbaseKeys()
+    fetchScraperEngines()
     fetchEnrichmentKeys()
     fetchAutomationSettings()
-  }, [fetchTokens, fetchEnrichmentKeys, fetchAutomationSettings])
+  }, [fetchTokens, fetchScrapedogKeys, fetchCrawlbaseKeys, fetchScraperEngines, fetchEnrichmentKeys, fetchAutomationSettings])
 
   const addKey = async () => {
     const keyTrimmed = newKey.trim()
@@ -445,6 +512,69 @@ export default function AdminTokensPage() {
       ) : (
         <div className="space-y-6">
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+            {/* Scraper Engine Selection Tabs */}
+            <div className="flex items-center gap-2 border-b border-white/[0.08] pb-4 mb-6 overflow-x-auto">
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('apify')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'apify'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>Apify</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'apify' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                  {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('scrapedog')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'scrapedog'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>🐶 Scrapingdog</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'scrapedog' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                  {scrapedogKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('crawlbase')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'crawlbase'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>🕷️ Crawlbase</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'crawlbase' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                  {crawlbaseKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('routing')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ml-auto whitespace-nowrap ${
+                  activeEngineTab === 'routing'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <Cog6ToothIcon className="w-3.5 h-3.5" />
+                <span>Failover Routing</span>
+              </button>
+            </div>
+
+            {activeEngineTab === 'apify' && (
+              <>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
@@ -839,6 +969,162 @@ export default function AdminTokensPage() {
                 )
               })}
             </div>
+              </>
+            )}
+
+            {activeEngineTab === 'scrapedog' && (
+              <ScraperKeyPoolManager
+                engine="scrapedog"
+                title="Scrapingdog API Keys"
+                subtitle="Residential proxy crawl for Reddit posts and Google SERP scraping for LinkedIn, Twitter, and Threads"
+                iconEmoji="🐶"
+                placeholder="66085a... (Scrapingdog API Key)"
+                keys={scrapedogKeys}
+                loading={scrapedogLoading}
+                onRefresh={fetchScrapedogKeys}
+                apiCall={apiCall}
+                addToast={addToast}
+              />
+            )}
+
+            {activeEngineTab === 'crawlbase' && (
+              <ScraperKeyPoolManager
+                engine="crawlbase"
+                title="Crawlbase Tokens"
+                subtitle="Rotating smart proxies and JavaScript rendering for anti-bot bypass on public social platforms"
+                iconEmoji="🕷️"
+                placeholder="crawlbase_token_... (Crawlbase Token)"
+                keys={crawlbaseKeys}
+                loading={crawlbaseLoading}
+                onRefresh={fetchCrawlbaseKeys}
+                apiCall={apiCall}
+                addToast={addToast}
+              />
+            )}
+
+            {activeEngineTab === 'routing' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                    <Cog6ToothIcon className="w-4 h-4 text-accent-mint" />
+                    Scraper Failover & Engine Hierarchy
+                  </h3>
+                  <p className="text-xs text-text-secondary mt-1">
+                    Configure the primary scraping engine used for keyword jobs, and the automatic failover sequence when rate limits or quotas are hit.
+                  </p>
+                </div>
+
+                <div className="bg-surface-elevated/40 border border-white/[0.06] rounded-xl p-4 space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-text-primary block mb-2">
+                      Primary Scraper Engine
+                    </label>
+                    <p className="text-[11px] text-text-secondary mb-3">
+                      This engine will always be attempted first for all keyword and watchlist monitoring jobs.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'apify', name: 'Apify', desc: 'Actor searches (LinkedIn, X, Reddit, Threads)' },
+                        { id: 'scrapedog', name: 'Scrapingdog', desc: 'Reddit proxy & Google SERP scraper' },
+                        { id: 'crawlbase', name: 'Crawlbase', desc: 'Crawling API & Smart Proxies' },
+                      ].map((engine) => (
+                        <label
+                          key={engine.id}
+                          onClick={() => setPrimaryEngine(engine.id)}
+                          className={`flex flex-col p-3.5 rounded-xl border cursor-pointer transition-all ${
+                            primaryEngine === engine.id
+                              ? 'bg-accent-mint/10 border-accent-mint text-white'
+                              : 'bg-surface-elevated/60 border-white/5 hover:border-white/10 text-text-secondary'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-bold text-white">{engine.name}</span>
+                            <input
+                              type="radio"
+                              name="primaryEngine"
+                              checked={primaryEngine === engine.id}
+                              onChange={() => setPrimaryEngine(engine.id)}
+                              className="accent-emerald-500"
+                            />
+                          </div>
+                          <span className="text-[10px] text-text-secondary leading-tight">{engine.desc}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-white/5">
+                    <label className="text-xs font-semibold text-text-primary block mb-2">
+                      Fallback Engines (Auto-Relay)
+                    </label>
+                    <p className="text-[11px] text-text-secondary mb-3">
+                      If the primary engine returns zero leads, reaches monthly quota, or gets rate-limited, the system automatically falls back to these engines in order.
+                    </p>
+                    <div className="space-y-2">
+                      {['scrapedog', 'crawlbase', 'apify'].map((engine) => {
+                        const isPrimary = primaryEngine === engine
+                        const isChecked = fallbackEngines.includes(engine)
+                        return (
+                          <label
+                            key={engine}
+                            className={`flex items-center justify-between p-3 rounded-lg border text-xs ${
+                              isPrimary
+                                ? 'opacity-40 cursor-not-allowed border-white/5 bg-surface-elevated/20'
+                                : 'border-white/5 bg-surface-elevated/40 hover:border-white/10 cursor-pointer'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                disabled={isPrimary}
+                                checked={!isPrimary && isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFallbackEngines((prev) => [...prev.filter((x) => x !== engine), engine])
+                                  } else {
+                                    setFallbackEngines((prev) => prev.filter((x) => x !== engine))
+                                  }
+                                }}
+                                className="accent-emerald-500 rounded"
+                              />
+                              <span className="font-medium text-white capitalize">{engine}</span>
+                              {isPrimary && (
+                                <span className="text-[10px] text-accent-mint px-2 py-0.5 rounded bg-accent-mint/10">
+                                  Primary
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-text-secondary">
+                              {engine === 'scrapedog' ? 'Scrapingdog Residential & Google SERP' : engine === 'crawlbase' ? 'Crawlbase Proxy Crawler' : 'Apify Cloud Actors'}
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      onClick={handleSaveRouting}
+                      disabled={isSavingRouting}
+                      className="px-5 py-2.5 rounded-xl bg-accent-mint text-black font-bold text-xs hover:bg-accent-mint/90 transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {isSavingRouting ? (
+                        <>
+                          <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                          <span>Saving Routing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircleIcon className="w-4 h-4" />
+                          <span>Save Routing Hierarchy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">

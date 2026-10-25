@@ -51,3 +51,47 @@ export function parseApifyTokens(rawText: string): ParsedApifyToken[] {
 
   return results
 }
+
+/**
+ * Parses multi-line tokens or messages for Scrapingdog or Crawlbase.
+ * Supports:
+ * - "T1: <key>"
+ * - "Key 2 - <key>"
+ * - Raw token per line
+ */
+export function parseScraperTokens(rawText: string, defaultPrefix = 'Key'): ParsedApifyToken[] {
+  if (!rawText || !rawText.trim()) return []
+
+  const results: ParsedApifyToken[] = []
+  const seenKeys = new Set<string>()
+  const lines = rawText.replace(/[\u2028\u2029]/g, '\n').split(/\r?\n/)
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+
+    // Pattern 1: Explicit label like "T1: abc..." or "Account 1 - xyz..."
+    const labeledMatch = line.match(/^([a-zA-Z0-9_\-\s]+?)[\s:=-]+([a-zA-Z0-9_\-]{8,})/i)
+    if (labeledMatch) {
+      const label = labeledMatch[1].trim()
+      const key = labeledMatch[2].trim()
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key)
+        results.push({ key, label: label || `${defaultPrefix} ${results.length + 1}` })
+      }
+      continue
+    }
+
+    // Pattern 2: Single token on a line (at least 8 alphanumeric/dash characters)
+    const rawMatch = line.match(/^([a-zA-Z0-9_\-]{8,})$/)
+    if (rawMatch) {
+      const key = rawMatch[1].trim()
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key)
+        results.push({ key, label: `${defaultPrefix} ${results.length + 1}` })
+      }
+    }
+  }
+
+  return results
+}
