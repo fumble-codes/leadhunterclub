@@ -18,6 +18,7 @@ import {
   getScraperEngines,
   updateScraperEngines,
   toggleScraperEnginePause,
+  getLastScrapeTiming,
   getPausedEnrichmentProviders,
   toggleEnrichmentProviderPause,
 } from '@/lib/external-api/client'
@@ -35,6 +36,7 @@ const GETTERS = {
   apollo: getApolloApiKey,
   automation: getAutomationSettings,
   'scraper-engines': getScraperEngines,
+  'last-scrape': getLastScrapeTiming,
   'enrichment-paused': getPausedEnrichmentProviders,
 } as const
 

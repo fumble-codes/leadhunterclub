@@ -3,9 +3,10 @@
 import { useState, useMemo } from 'react'
 import {
   KeyIcon, PlusIcon, TrashIcon, ShieldCheckIcon,
-  ArrowPathIcon, ExclamationTriangleIcon, XCircleIcon,
+  ArrowPathIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon,
 } from '@heroicons/react/24/solid'
 import { parseScraperTokens } from '@/lib/apify-token-parser'
+import { formatScrapeTiming } from '@/lib/scraper-tool'
 
 export interface ScraperPoolKey {
   id: string
@@ -25,6 +26,7 @@ interface ScraperKeyPoolManagerProps {
   placeholder: string
   keys: ScraperPoolKey[]
   loading: boolean
+  lastScrapedAt?: string | null
   isPaused?: boolean
   onTogglePause?: (paused: boolean) => Promise<void>
   onRefresh: () => Promise<void>
@@ -40,6 +42,7 @@ export function ScraperKeyPoolManager({
   placeholder,
   keys,
   loading,
+  lastScrapedAt,
   isPaused = false,
   onTogglePause,
   onRefresh,
@@ -228,6 +231,18 @@ export function ScraperKeyPoolManager({
                 Running
               </span>
             )}
+            {lastScrapedAt && (() => {
+              const scrapeTiming = formatScrapeTiming(lastScrapedAt)
+              return (
+                <span
+                  className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-text-secondary border border-white/5 flex items-center gap-1"
+                  title={`Last scrape performed: ${scrapeTiming.formatted}`}
+                >
+                  <ClockIcon className="w-3 h-3 text-accent-mint" />
+                  <span>Last scrape: <strong className="text-white font-semibold">{scrapeTiming.relative}</strong></span>
+                </span>
+              )
+            })()}
           </div>
           <p className="text-xs text-text-secondary mt-1">{subtitle}</p>
         </div>

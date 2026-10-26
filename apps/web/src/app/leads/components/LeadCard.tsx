@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
 import { sanitizePublicText, sanitizeHeadline, stripPersonAndCompany, getStructuredLeadDetails } from '@/lib/claim-reveal'
 import { triggerUnlockConfetti } from '@/lib/confetti'
+import { getScraperToolInfo } from '@/lib/scraper-tool'
 
 const themeMap = {
   mint: {
@@ -320,6 +321,18 @@ function LeadCard({
 
         {/* Dynamic Badges Row */}
         <div className="flex items-center gap-1.5 mb-2.5 shrink-0 select-none overflow-hidden flex-wrap sm:flex-nowrap h-auto sm:h-[22px]">
+          {(() => {
+            const tool = getScraperToolInfo(lead)
+            return (
+              <span
+                className={`px-2 py-0.5 text-[10px] rounded-md border backdrop-blur-sm shrink-0 whitespace-nowrap flex items-center gap-1 font-bold ${tool.badgeClass}`}
+                title={`Discovered and scraped by ${tool.name}`}
+              >
+                <span>{tool.icon}</span>
+                <span>{tool.shortName}</span>
+              </span>
+            )
+          })()}
           {visibleTags.map((tag) => {
             const isHot = /hot lead|few seats/i.test(tag)
             const isIntl = /international/i.test(tag)

@@ -37,6 +37,7 @@ import {
 } from '@/lib/email-verification'
 import type { ExternalPost } from '@/lib/external-api/client'
 import { notifyLeadsUpdated, subscribeToLeadsUpdated } from '@/lib/sync-events'
+import { getScraperToolInfo } from '@/lib/scraper-tool'
 
 interface LeadStats {
   qualified_today?: number
@@ -1219,22 +1220,30 @@ export default function AdminLeadsPage() {
                             <ExternalLink size={12} />
                           </a>
                         )}
-                        {lead.source === 'manual' && (
-                          <div className="px-1.5 py-0.5 bg-accent-mint/10 border border-accent-mint/30 text-accent-mint text-[7px] font-black uppercase tracking-widest rounded">
-                            Manual
-                          </div>
-                        )}
+                        {(() => {
+                          const tool = getScraperToolInfo(lead)
+                          return (
+                            <div
+                              className={`px-2 py-0.5 border text-[8px] font-black uppercase tracking-wider rounded flex items-center gap-1 ${tool.badgeClass}`}
+                              title={`Scraped by ${tool.name} tool`}
+                            >
+                              <span>{tool.icon}</span>
+                              <span>{tool.name}</span>
+                            </div>
+                          )
+                        })()}
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                         {lead.created_at && (() => {
                           const { relative, full } = formatScrapedTime(lead.created_at)
+                          const tool = getScraperToolInfo(lead)
                           return (
                             <div
                               className="px-2 py-0.5 bg-accent-mint/10 border border-accent-mint/30 text-accent-mint text-[8px] font-black uppercase tracking-wider flex items-center gap-1.5 rounded"
-                              title={`Scraped at: ${full}`}
+                              title={`Scraped at ${full} using ${tool.name}`}
                             >
                               <span className="w-1.5 h-1.5 rounded-full bg-accent-mint animate-pulse" />
-                              <span>Scraped {relative}</span>
+                              <span>Scraped {relative} by {tool.shortName}</span>
                               <span className="text-accent-mint/60 font-mono text-[8px] hidden md:inline">({full})</span>
                             </div>
                           )

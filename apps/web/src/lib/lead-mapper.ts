@@ -129,6 +129,7 @@ export function externalPostToAppLead(
     timestamp: formatTimeAgo(post.reviewed_at || post.updated_at || post.created_at),
     scrapedAt: post.created_at,
     scrapedAgo: formatTimeAgo(post.created_at),
+    scraperEngine: post.scraper_engine || (post as any).contact_info?.scraper_engine || (post as any).raw_result?._scraper_engine || (post.source_type === 'watchlist' ? 'apify' : (post.source === 'manual' ? 'manual' : 'apify')),
     reviewedAt: post.reviewed_at || null,
     approvedAt: post.reviewed_at || post.updated_at || post.created_at,
     claimedCount: effectiveClaimedCount,

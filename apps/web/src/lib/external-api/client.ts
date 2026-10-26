@@ -252,6 +252,8 @@ export interface ExternalPost {
   is_claimed: boolean
   claimed_count: number
   credit_cost?: number | null
+  scraper_engine?: string
+  raw_result?: any
   created_at: string
   updated_at: string
 }
@@ -643,14 +645,41 @@ export async function updateCrawlbaseToken(token: string): Promise<{ success: bo
   return res
 }
 
+export interface EngineScrapeMetric {
+  last_scraped_at: string | null
+  last_platform?: string | null
+  last_keyword?: string | null
+  items_found?: number
+  status?: 'success' | 'idle' | 'running' | 'error'
+  error?: string | null
+}
+
+export interface LastScrapeInfo {
+  last_scraped_at: string | null
+  last_engine: string | null
+  last_platform: string | null
+  last_target_or_keyword: string | null
+  engines: {
+    apify: EngineScrapeMetric
+    scrapedog: EngineScrapeMetric
+    crawlbase: EngineScrapeMetric
+  }
+}
+
 export interface ScraperEngineSettings {
   primary_engine: string
   fallback_engines: string[]
   paused_engines?: string[]
+  last_scrape?: LastScrapeInfo
 }
 
 export async function getScraperEngines(): Promise<ScraperEngineSettings> {
   const res = await fetchApi<{ success: boolean; data: ScraperEngineSettings }>(`/settings/scraper-engines`)
+  return res.data
+}
+
+export async function getLastScrapeTiming(): Promise<LastScrapeInfo> {
+  const res = await fetchApi<{ success: boolean; data: LastScrapeInfo }>(`/settings/last-scrape`)
   return res.data
 }
 

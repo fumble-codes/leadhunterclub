@@ -5,6 +5,7 @@
  */
 import type { ExternalPost, ExternalAuthor, ExternalContactInfo } from '@/lib/external-api/client'
 import type { LeadPost } from '@prisma/client'
+import { getScraperToolInfo } from '@/lib/scraper-tool'
 
 export interface RawLeadPost {
   id: string
@@ -117,6 +118,8 @@ export function mapLeadPostToExternal(p: RawLeadPost | LeadPost): ExternalPost {
     is_claimed: p.claimed_count >= 25,
     claimed_count: p.claimed_count,
     credit_cost: (p as any).credit_cost ?? null,
+    scraper_engine: getScraperToolInfo(p).id,
+    raw_result: (p as any).raw_result || null,
     created_at: p.created_at.toISOString(),
     updated_at: p.updated_at.toISOString(),
   }

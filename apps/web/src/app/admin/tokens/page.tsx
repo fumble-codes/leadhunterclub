@@ -5,12 +5,14 @@ import { getFirebaseToken } from '@/lib/firebase'
 import {
   KeyIcon, PlusIcon, TrashIcon, ShieldCheckIcon, ShieldExclamationIcon,
   EyeIcon, EyeSlashIcon, CheckCircleIcon, ArrowPathIcon, Cog6ToothIcon,
-  ExclamationTriangleIcon, XCircleIcon,
+  ExclamationTriangleIcon, XCircleIcon, ClockIcon,
 } from '@heroicons/react/24/solid'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 import { useToast } from '@/components/ui/Toast'
 import { parseApifyTokens } from '@/lib/apify-token-parser'
 import { ScraperKeyPoolManager, ScraperPoolKey } from '@/components/admin/ScraperKeyPoolManager'
+import type { LastScrapeInfo } from '@/lib/external-api/client'
+import { formatScrapeTiming, getScraperToolInfo } from '@/lib/scraper-tool'
 
 interface ApifyKey {
   _id: string
@@ -77,6 +79,9 @@ export default function AdminTokensPage() {
   const [isSavingRouting, setIsSavingRouting] = useState(false)
   const [pausedEngines, setPausedEngines] = useState<string[]>([])
   const [isTogglingEnginePause, setIsTogglingEnginePause] = useState<Record<string, boolean>>({})
+
+  const [lastScrapeInfo, setLastScrapeInfo] = useState<LastScrapeInfo | null>(null)
+  const [isRefreshingScrape, setIsRefreshingScrape] = useState(false)
 
   const [pausedEnrichment, setPausedEnrichment] = useState<string[]>([])
   const [isTogglingEnrichmentPause, setIsTogglingEnrichmentPause] = useState<Record<string, boolean>>({})
@@ -150,9 +155,26 @@ export default function AdminTokensPage() {
         setPrimaryEngine(res.data.primaryEngine || res.data.primary_engine || 'apify')
         setFallbackEngines(res.data.fallbackEngines || res.data.fallback_engines || ['scrapedog', 'crawlbase'])
         setPausedEngines(res.data.pausedEngines || res.data.paused_engines || [])
+        if (res.data.last_scrape) {
+          setLastScrapeInfo(res.data.last_scrape)
+        }
       }
     } catch (e) {
       console.error('Failed to load scraper engines:', e)
+    }
+  }, [apiCall])
+
+  const fetchLastScrape = useCallback(async () => {
+    setIsRefreshingScrape(true)
+    try {
+      const res = await apiCall('/api/admin/settings?service=last-scrape')
+      if (res?.data) {
+        setLastScrapeInfo(res.data)
+      }
+    } catch (e) {
+      console.error('Failed to load last scrape status:', e)
+    } finally {
+      setIsRefreshingScrape(false)
     }
   }, [apiCall])
 
@@ -573,9 +595,66 @@ export default function AdminTokensPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary tracking-tight">API Keys & Tokens</h1>
-        <p className="text-sm text-text-secondary mt-1">Manage scraping and enrichment service credentials</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">API Keys & Tokens</h1>
+          <p className="text-sm text-text-secondary mt-1">Manage scraping and enrichment service credentials</p>
+        </div>
+
+        {/* Real-time Last Scrape Timing Card */}
+        {(() => {
+          const timing = formatScrapeTiming(lastScrapeInfo?.last_scraped_at)
+          const tool = getScraperToolInfo({
+            scraper_engine: lastScrapeInfo?.last_engine || 'apify',
+          })
+          return (
+            <div className="flex items-center gap-3 bg-surface/60 backdrop-blur-xl border border-white/[0.08] px-4 py-3 rounded-2xl shadow-lg shadow-black/20 self-start md:self-auto">
+              <div className="w-9 h-9 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center shrink-0">
+                <ClockIcon className="w-5 h-5 text-accent-mint" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-text-secondary">
+                    Last Scrape Performed
+                  </span>
+                  {timing.isRecent && (
+                    <span className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                  <span className="text-sm font-bold text-white tracking-tight" title={lastScrapeInfo?.last_scraped_at || ''}>
+                    {timing.relative}
+                  </span>
+                  <span className="text-xs text-text-secondary">
+                    • {timing.formatted}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${tool.badgeClass}`}>
+                    <span>{tool.icon}</span>
+                    <span>{tool.name}</span>
+                  </span>
+                  {lastScrapeInfo?.last_platform && (
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-text-secondary border border-white/5">
+                      {lastScrapeInfo.last_platform}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={fetchLastScrape}
+                disabled={isRefreshingScrape}
+                title="Refresh scrape timing"
+                className="ml-2 p-2 rounded-xl text-text-secondary hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+              >
+                <ArrowPathIcon className={`w-4 h-4 ${isRefreshingScrape ? 'animate-spin text-accent-mint' : ''}`} />
+              </button>
+            </div>
+          )
+        })()}
       </div>
 
       {loading ? (
@@ -684,6 +763,20 @@ export default function AdminTokensPage() {
                       Running
                     </span>
                   )}
+                  {/* Apify Last Scrape Badge */}
+                  {(() => {
+                    const apifyLast = lastScrapeInfo?.engines?.apify?.last_scraped_at || (lastScrapeInfo?.last_engine === 'apify' ? lastScrapeInfo.last_scraped_at : null)
+                    const timing = formatScrapeTiming(apifyLast)
+                    return (
+                      <span
+                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-text-secondary border border-white/5 flex items-center gap-1"
+                        title={apifyLast ? `Last Apify scrape: ${timing.formatted} (${timing.relative})` : 'No Apify scrapes recorded'}
+                      >
+                        <ClockIcon className="w-3 h-3 text-amber-400" />
+                        <span>Last run: <strong className="text-white font-semibold">{timing.relative}</strong></span>
+                      </span>
+                    )
+                  })()}
                 </div>
               </div>
 
@@ -1111,6 +1204,7 @@ export default function AdminTokensPage() {
                 placeholder="66085a... (Scrapingdog API Key)"
                 keys={scrapedogKeys}
                 loading={scrapedogLoading}
+                lastScrapedAt={lastScrapeInfo?.engines?.scrapedog?.last_scraped_at || (lastScrapeInfo?.last_engine === 'scrapedog' ? lastScrapeInfo.last_scraped_at : null)}
                 isPaused={pausedEngines.includes('scrapedog')}
                 onTogglePause={(paused) => handleToggleScraperPause('scrapedog', paused)}
                 onRefresh={fetchScrapedogKeys}
@@ -1128,6 +1222,7 @@ export default function AdminTokensPage() {
                 placeholder="crawlbase_token_... (Crawlbase Token)"
                 keys={crawlbaseKeys}
                 loading={crawlbaseLoading}
+                lastScrapedAt={lastScrapeInfo?.engines?.crawlbase?.last_scraped_at || (lastScrapeInfo?.last_engine === 'crawlbase' ? lastScrapeInfo.last_scraped_at : null)}
                 isPaused={pausedEngines.includes('crawlbase')}
                 onTogglePause={(paused) => handleToggleScraperPause('crawlbase', paused)}
                 onRefresh={fetchCrawlbaseKeys}
@@ -1164,6 +1259,8 @@ export default function AdminTokensPage() {
                         { id: 'crawlbase', name: 'Crawlbase', icon: '🕷️' },
                       ].map((engine) => {
                         const isPaused = pausedEngines.includes(engine.id)
+                        const engineLast = lastScrapeInfo?.engines?.[engine.id]?.last_scraped_at || (lastScrapeInfo?.last_engine === engine.id ? lastScrapeInfo.last_scraped_at : null)
+                        const timing = formatScrapeTiming(engineLast)
                         return (
                           <div
                             key={engine.id}
@@ -1177,18 +1274,23 @@ export default function AdminTokensPage() {
                               <span className="text-base">{engine.icon}</span>
                               <div>
                                 <div className="text-xs font-bold text-white">{engine.name}</div>
-                                <div className="text-[10px]">
-                                  {isPaused ? (
-                                    <span className="text-amber-300 font-semibold flex items-center gap-1">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                                      Paused
-                                    </span>
-                                  ) : (
-                                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                                      Running
-                                    </span>
-                                  )}
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <div className="text-[10px]">
+                                    {isPaused ? (
+                                      <span className="text-amber-300 font-semibold flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                                        Paused
+                                      </span>
+                                    ) : (
+                                      <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                        Running
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[10px] text-text-secondary" title={engineLast || ''}>
+                                    • {timing.relative}
+                                  </span>
                                 </div>
                               </div>
                             </div>
