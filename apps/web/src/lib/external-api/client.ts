@@ -935,28 +935,3 @@ export async function testScraperKey(
   )
 }
 
-export async function getScraperEngines(): Promise<{
-  primaryEngine: string
-  fallbackEngines: string[]
-  supportedEngines: string[]
-}> {
-  const res = await fetchApi<{
-    success: boolean
-    data: { primaryEngine: string; fallbackEngines: string[]; supportedEngines: string[] }
-  }>(`/settings/scraper-engines`)
-  return res.data
-}
-
-export async function updateScraperEngines(input: {
-  primaryEngine: string
-  fallbackEngines: string[]
-}): Promise<{ success: boolean; data: { primaryEngine: string; fallbackEngines: string[] } }> {
-  return fetchApi<{ success: boolean; data: { primaryEngine: string; fallbackEngines: string[] } }>(
-    `/settings/scraper-engines`,
-    {
-      method: 'PUT',
-      body: JSON.stringify(input),
-    }
-  )
-}
-

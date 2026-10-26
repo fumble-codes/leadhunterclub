@@ -41,8 +41,12 @@ const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknow
   contactout: (body) => updateContactOutToken(String(body?.token ?? '').trim()),
   apollo: (body) => updateApolloApiKey(String(body?.api_key ?? '').trim()),
   'scraper-engines': (body) => updateScraperEngines({
-    primaryEngine: String(body?.primaryEngine ?? 'apify').trim(),
-    fallbackEngines: Array.isArray(body?.fallbackEngines) ? body.fallbackEngines.map(String) : ['scrapedog', 'crawlbase'],
+    primary_engine: String(body?.primary_engine ?? body?.primaryEngine ?? 'apify').trim(),
+    fallback_engines: Array.isArray(body?.fallback_engines)
+      ? body.fallback_engines.map(String)
+      : Array.isArray(body?.fallbackEngines)
+        ? body.fallbackEngines.map(String)
+        : ['scrapedog', 'crawlbase'],
   }),
   automation: (body) => {
     const b = body as {
