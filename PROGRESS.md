@@ -44,6 +44,7 @@ User asked for local dummy lead data to test the lead drawer without the live DB
 | 12 | "Firebase auth panel" change | ❓ unclear — awaiting user clarification |
 | 13 | Landing copy → `docs/landingpagecontent.md` (hero/how/why/testimonials/pricing/final CTA) | ✅ done + browser-verified (desktop + mobile) |
 | 14 | Admin dashboard insights — persona/growth/revenue/activation/ops on `/admin` | ✅ shipped — API 200 + browser render verified |
+| 15 | Last scrape timing & tool badges on leads — `/admin/tokens`, `/admin/leads`, `LeadCard`, `LeadDrawer` | ✅ shipped — deployed on VM + Vercel |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 
