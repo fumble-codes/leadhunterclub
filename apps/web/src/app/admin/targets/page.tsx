@@ -218,9 +218,14 @@ export default function AdminTargetsPage() {
                     </div>
                   </div>
                   {t.notes && <p className="text-xs text-text-secondary mb-3">{t.notes}</p>}
-                  <div className="flex items-center gap-4 text-[10px] text-text-secondary mb-4">
-                    <span>{t.platform}</span>
-                    <span>Comments found: {t.monthly_comments_found ?? t.last_comments_found ?? 0}</span>
+                  <div className="flex items-center gap-4 text-[10px] text-text-secondary mb-4 flex-wrap">
+                    <span className="uppercase font-semibold tracking-wider">{t.platform}</span>
+                    <span>
+                      Comments found: <strong className="text-white font-semibold">{t.last_comments_found ?? 0}</strong>
+                      {typeof t.monthly_comments_found === 'number' && (
+                        <span className="text-zinc-500 text-[9px] ml-1.5" title="Total comments found this month">(Monthly: {t.monthly_comments_found})</span>
+                      )}
+                    </span>
                     {t.last_scraped_at && <span>Last scraped: {new Date(t.last_scraped_at).toLocaleDateString()}</span>}
                   </div>
                   <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">

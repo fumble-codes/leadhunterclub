@@ -68,6 +68,13 @@ export function mapLeadPostToExternal(p: RawLeadPost | LeadPost): ExternalPost {
       else dynamicAgoShort = `${Math.floor(hours / 24)}d`;
     }
 
+    const rawAuthorName = (author as any)?.name
+    const safeAuthorName = typeof rawAuthorName === 'string'
+      ? rawAuthorName
+      : (typeof rawAuthorName === 'object' && rawAuthorName !== null && rawAuthorName.name
+          ? String(rawAuthorName.name)
+          : (typeof author === 'string' ? author : ''))
+
     return {
     id: p.id,
     post_id: p.post_id,
@@ -75,7 +82,7 @@ export function mapLeadPostToExternal(p: RawLeadPost | LeadPost): ExternalPost {
     content: p.content,
     platform: p.platform,
     author: {
-      name: author.name || '',
+      name: safeAuthorName,
       handle: author.handle,
       url: author.url,
       info: author.info,

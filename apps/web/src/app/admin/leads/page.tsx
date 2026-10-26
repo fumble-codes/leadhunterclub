@@ -1205,7 +1205,11 @@ export default function AdminLeadsPage() {
                     <div className="flex items-center justify-between gap-4 mb-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <h3 className="text-base font-bold uppercase tracking-tight group-hover:text-accent-mint transition-colors truncate">
-                          {lead.author?.name || 'Unknown'}
+                          {typeof lead.author?.name === 'string'
+                            ? lead.author.name
+                            : (typeof lead.author?.name === 'object' && lead.author?.name?.name
+                                ? String(lead.author.name.name)
+                                : 'Unknown')}
                           {lead.is_claimed && lead.author?.handle && (
                             <span className="text-[10px] text-zinc-500 lowercase font-bold">@{lead.author.handle}</span>
                           )}
