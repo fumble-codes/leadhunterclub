@@ -19,7 +19,7 @@ export interface ScraperPoolKey {
 }
 
 interface ScraperKeyPoolManagerProps {
-  engine: 'scrapedog' | 'crawlbase'
+  engine: 'scrapedog' | 'crawlbase' | 'scrapingbee' | 'zenrows' | 'zyte'
   title: string
   subtitle: string
   iconEmoji: string
@@ -90,7 +90,16 @@ export function ScraperKeyPoolManager({
     }
   }
 
-  const defaultPrefix = engine === 'scrapedog' ? 'DogKey' : 'CrawlKey'
+  const defaultPrefix =
+    engine === 'scrapedog'
+      ? 'DogKey'
+      : engine === 'crawlbase'
+      ? 'CrawlKey'
+      : engine === 'scrapingbee'
+      ? 'BeeKey'
+      : engine === 'zenrows'
+      ? 'ZenKey'
+      : 'ZyteKey'
   const parsedPreview = useMemo(() => {
     return parseScraperTokens(bulkText, defaultPrefix)
   }, [bulkText, defaultPrefix])

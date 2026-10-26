@@ -53,7 +53,7 @@ interface AutomationSettings {
 }
 
 export default function AdminTokensPage() {
-  type EngineTab = 'apify' | 'scrapedog' | 'crawlbase' | 'routing'
+  type EngineTab = 'apify' | 'scrapedog' | 'crawlbase' | 'scrapingbee' | 'zenrows' | 'zyte' | 'routing'
   const [activeEngineTab, setActiveEngineTab] = useState<EngineTab>('apify')
 
   const [tokens, setTokens] = useState<ApifyKey[]>([])
@@ -71,11 +71,18 @@ export default function AdminTokensPage() {
 
   const [scrapedogKeys, setScrapedogKeys] = useState<ScraperPoolKey[]>([])
   const [crawlbaseKeys, setCrawlbaseKeys] = useState<ScraperPoolKey[]>([])
+  const [scrapingbeeKeys, setScrapingbeeKeys] = useState<ScraperPoolKey[]>([])
+  const [zenrowsKeys, setZenrowsKeys] = useState<ScraperPoolKey[]>([])
+  const [zyteKeys, setZyteKeys] = useState<ScraperPoolKey[]>([])
+
   const [scrapedogLoading, setScrapedogLoading] = useState(false)
   const [crawlbaseLoading, setCrawlbaseLoading] = useState(false)
+  const [scrapingbeeLoading, setScrapingbeeLoading] = useState(false)
+  const [zenrowsLoading, setZenrowsLoading] = useState(false)
+  const [zyteLoading, setZyteLoading] = useState(false)
 
   const [primaryEngine, setPrimaryEngine] = useState<string>('apify')
-  const [fallbackEngines, setFallbackEngines] = useState<string[]>(['scrapedog', 'crawlbase'])
+  const [fallbackEngines, setFallbackEngines] = useState<string[]>(['scrapingbee', 'zenrows', 'zyte', 'scrapedog', 'crawlbase'])
   const [isSavingRouting, setIsSavingRouting] = useState(false)
   const [pausedEngines, setPausedEngines] = useState<string[]>([])
   const [isTogglingEnginePause, setIsTogglingEnginePause] = useState<Record<string, boolean>>({})
@@ -148,12 +155,48 @@ export default function AdminTokensPage() {
     }
   }, [apiCall])
 
+  const fetchScrapingbeeKeys = useCallback(async () => {
+    setScrapingbeeLoading(true)
+    try {
+      const res = await apiCall('/api/admin/scraper-keys/scrapingbee')
+      setScrapingbeeKeys(res.data || [])
+    } catch (e) {
+      console.error('Failed to load ScrapingBee keys:', e)
+    } finally {
+      setScrapingbeeLoading(false)
+    }
+  }, [apiCall])
+
+  const fetchZenrowsKeys = useCallback(async () => {
+    setZenrowsLoading(true)
+    try {
+      const res = await apiCall('/api/admin/scraper-keys/zenrows')
+      setZenrowsKeys(res.data || [])
+    } catch (e) {
+      console.error('Failed to load ZenRows keys:', e)
+    } finally {
+      setZenrowsLoading(false)
+    }
+  }, [apiCall])
+
+  const fetchZyteKeys = useCallback(async () => {
+    setZyteLoading(true)
+    try {
+      const res = await apiCall('/api/admin/scraper-keys/zyte')
+      setZyteKeys(res.data || [])
+    } catch (e) {
+      console.error('Failed to load Zyte keys:', e)
+    } finally {
+      setZyteLoading(false)
+    }
+  }, [apiCall])
+
   const fetchScraperEngines = useCallback(async () => {
     try {
       const res = await apiCall('/api/admin/settings?service=scraper-engines')
       if (res?.data) {
         setPrimaryEngine(res.data.primaryEngine || res.data.primary_engine || 'apify')
-        setFallbackEngines(res.data.fallbackEngines || res.data.fallback_engines || ['scrapedog', 'crawlbase'])
+        setFallbackEngines(res.data.fallbackEngines || res.data.fallback_engines || ['scrapingbee', 'zenrows', 'zyte', 'scrapedog', 'crawlbase'])
         setPausedEngines(res.data.pausedEngines || res.data.paused_engines || [])
         if (res.data.last_scrape) {
           setLastScrapeInfo(res.data.last_scrape)
@@ -312,10 +355,23 @@ export default function AdminTokensPage() {
     fetchTokens()
     fetchScrapedogKeys()
     fetchCrawlbaseKeys()
+    fetchScrapingbeeKeys()
+    fetchZenrowsKeys()
+    fetchZyteKeys()
     fetchScraperEngines()
     fetchEnrichmentKeys()
     fetchAutomationSettings()
-  }, [fetchTokens, fetchScrapedogKeys, fetchCrawlbaseKeys, fetchScraperEngines, fetchEnrichmentKeys, fetchAutomationSettings])
+  }, [
+    fetchTokens,
+    fetchScrapedogKeys,
+    fetchCrawlbaseKeys,
+    fetchScrapingbeeKeys,
+    fetchZenrowsKeys,
+    fetchZyteKeys,
+    fetchScraperEngines,
+    fetchEnrichmentKeys,
+    fetchAutomationSettings,
+  ])
 
   const addKey = async () => {
     const keyTrimmed = newKey.trim()
@@ -723,6 +779,69 @@ export default function AdminTokensPage() {
                 ) : (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'crawlbase' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
                     {crawlbaseKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('scrapingbee')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'scrapingbee'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>🐝 ScrapingBee</span>
+                {pausedEngines.includes('scrapingbee') ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Paused
+                  </span>
+                ) : (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'scrapingbee' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                    {scrapingbeeKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('zenrows')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'zenrows'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>🛡️ ZenRows</span>
+                {pausedEngines.includes('zenrows') ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Paused
+                  </span>
+                ) : (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'zenrows' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                    {zenrowsKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('zyte')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'zyte'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>⚡ Zyte API</span>
+                {pausedEngines.includes('zyte') ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Paused
+                  </span>
+                ) : (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'zyte' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                    {zyteKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
                   </span>
                 )}
               </button>
@@ -1231,6 +1350,60 @@ export default function AdminTokensPage() {
               />
             )}
 
+            {activeEngineTab === 'scrapingbee' && (
+              <ScraperKeyPoolManager
+                engine="scrapingbee"
+                title="ScrapingBee API Keys"
+                subtitle="Google SERP scraping & residential proxy bypass for LinkedIn, Reddit, Twitter/X, and Threads"
+                iconEmoji="🐝"
+                placeholder="Enter ScrapingBee API Key..."
+                keys={scrapingbeeKeys}
+                loading={scrapingbeeLoading}
+                lastScrapedAt={lastScrapeInfo?.engines?.scrapingbee?.last_scraped_at || (lastScrapeInfo?.last_engine === 'scrapingbee' ? lastScrapeInfo.last_scraped_at : null)}
+                isPaused={pausedEngines.includes('scrapingbee')}
+                onTogglePause={(paused) => handleToggleScraperPause('scrapingbee', paused)}
+                onRefresh={fetchScrapingbeeKeys}
+                apiCall={apiCall}
+                addToast={addToast}
+              />
+            )}
+
+            {activeEngineTab === 'zenrows' && (
+              <ScraperKeyPoolManager
+                engine="zenrows"
+                title="ZenRows API Keys"
+                subtitle="Anti-bot residential proxies and auto-bypass JavaScript rendering for social lead extraction"
+                iconEmoji="🛡️"
+                placeholder="Enter ZenRows API Key..."
+                keys={zenrowsKeys}
+                loading={zenrowsLoading}
+                lastScrapedAt={lastScrapeInfo?.engines?.zenrows?.last_scraped_at || (lastScrapeInfo?.last_engine === 'zenrows' ? lastScrapeInfo.last_scraped_at : null)}
+                isPaused={pausedEngines.includes('zenrows')}
+                onTogglePause={(paused) => handleToggleScraperPause('zenrows', paused)}
+                onRefresh={fetchZenrowsKeys}
+                apiCall={apiCall}
+                addToast={addToast}
+              />
+            )}
+
+            {activeEngineTab === 'zyte' && (
+              <ScraperKeyPoolManager
+                engine="zyte"
+                title="Zyte API Keys"
+                subtitle="Enterprise headless browser automation and anti-ban extraction for high-intent discussions"
+                iconEmoji="⚡"
+                placeholder="Enter Zyte API Key..."
+                keys={zyteKeys}
+                loading={zyteLoading}
+                lastScrapedAt={lastScrapeInfo?.engines?.zyte?.last_scraped_at || (lastScrapeInfo?.last_engine === 'zyte' ? lastScrapeInfo.last_scraped_at : null)}
+                isPaused={pausedEngines.includes('zyte')}
+                onTogglePause={(paused) => handleToggleScraperPause('zyte', paused)}
+                onRefresh={fetchZyteKeys}
+                apiCall={apiCall}
+                addToast={addToast}
+              />
+            )}
+
             {activeEngineTab === 'routing' && (
               <div className="space-y-6">
                 <div>
@@ -1252,11 +1425,14 @@ export default function AdminTokensPage() {
                     <p className="text-[11px] text-text-secondary mb-3">
                       Quickly stop or pause any scraping provider. Paused providers are automatically skipped during scraping and failover runs.
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {[
                         { id: 'apify', name: 'Apify', icon: '⚡' },
                         { id: 'scrapedog', name: 'Scrapingdog', icon: '🐶' },
                         { id: 'crawlbase', name: 'Crawlbase', icon: '🕷️' },
+                        { id: 'scrapingbee', name: 'ScrapingBee', icon: '🐝' },
+                        { id: 'zenrows', name: 'ZenRows', icon: '🛡️' },
+                        { id: 'zyte', name: 'Zyte API', icon: '⚡' },
                       ].map((engine) => {
                         const isPaused = pausedEngines.includes(engine.id)
                         const engineLast = lastScrapeInfo?.engines?.[engine.id]?.last_scraped_at || (lastScrapeInfo?.last_engine === engine.id ? lastScrapeInfo.last_scraped_at : null)
@@ -1320,11 +1496,14 @@ export default function AdminTokensPage() {
                     <p className="text-[11px] text-text-secondary mb-3">
                       This engine will always be attempted first for all keyword and watchlist monitoring jobs.
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {[
                         { id: 'apify', name: 'Apify', desc: 'Actor searches (LinkedIn, X, Reddit, Threads)' },
                         { id: 'scrapedog', name: 'Scrapingdog', desc: 'Reddit proxy & Google SERP scraper' },
                         { id: 'crawlbase', name: 'Crawlbase', desc: 'Crawling API & Smart Proxies' },
+                        { id: 'scrapingbee', name: 'ScrapingBee', desc: 'Google SERP & Residential Proxies' },
+                        { id: 'zenrows', name: 'ZenRows', desc: 'Residential Anti-Bot & JS Rendering' },
+                        { id: 'zyte', name: 'Zyte API', desc: 'Headless Browser & Automated Unblocker' },
                       ].map((engine) => (
                         <label
                           key={engine.id}
@@ -1359,7 +1538,7 @@ export default function AdminTokensPage() {
                       If the primary engine returns zero leads, reaches monthly quota, or gets rate-limited, the system automatically falls back to these engines in order.
                     </p>
                     <div className="space-y-2">
-                      {['scrapedog', 'crawlbase', 'apify'].map((engine) => {
+                      {['scrapingbee', 'zenrows', 'zyte', 'scrapedog', 'crawlbase', 'apify'].map((engine) => {
                         const isPrimary = primaryEngine === engine
                         const isChecked = fallbackEngines.includes(engine)
                         return (
@@ -1393,7 +1572,17 @@ export default function AdminTokensPage() {
                               )}
                             </div>
                             <span className="text-[10px] text-text-secondary">
-                              {engine === 'scrapedog' ? 'Scrapingdog Residential & Google SERP' : engine === 'crawlbase' ? 'Crawlbase Proxy Crawler' : 'Apify Cloud Actors'}
+                              {engine === 'scrapedog'
+                                ? 'Scrapingdog Residential & Google SERP'
+                                : engine === 'crawlbase'
+                                ? 'Crawlbase Proxy Crawler'
+                                : engine === 'scrapingbee'
+                                ? 'ScrapingBee Google SERP & Residential Proxies'
+                                : engine === 'zenrows'
+                                ? 'ZenRows Residential Anti-Bot Bypass'
+                                : engine === 'zyte'
+                                ? 'Zyte API Browser Extraction & Unblocker'
+                                : 'Apify Cloud Actors'}
                             </span>
                           </label>
                         )
@@ -1593,9 +1782,15 @@ export default function AdminTokensPage() {
                       </p>
                     )}
                     {item.key === 'auto_scrape_enabled' && automationSettings.auto_scrape_enabled && (
-                      <p className="text-[10px] text-accent-mint">
-                        Runs every {automationSettings.scrape_interval_minutes} minutes for active keywords & LinkedIn watchlist targets
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-accent-mint">
+                          Runs every {automationSettings.scrape_interval_minutes} minutes for active keywords & LinkedIn watchlist targets
+                        </p>
+                        <p className="text-[10px] text-amber-300/90 flex items-center gap-1">
+                          <span>🌙</span>
+                          <span>Quiet Hours Active: Automation automatically pauses daily from 7:00 PM to 10:00 AM IST</span>
+                        </p>
+                      </div>
                     )}
                     {item.key === 'keep_alive_enabled' && automationSettings.keep_alive_enabled && (
                       <p className="text-[10px] text-accent-mint">

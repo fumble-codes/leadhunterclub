@@ -68,6 +68,42 @@ export function getScraperToolInfo(lead: any): ScraperToolInfo {
     }
   }
 
+  if (rawEngine === 'scrapingbee') {
+    return {
+      id: 'scrapingbee',
+      name: 'ScrapingBee',
+      shortName: 'ScrapingBee',
+      icon: '🐝',
+      badgeClass: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30',
+      borderClass: 'border-yellow-500/30',
+      pillClass: 'bg-yellow-500/10 text-yellow-300',
+    }
+  }
+
+  if (rawEngine === 'zenrows') {
+    return {
+      id: 'zenrows',
+      name: 'ZenRows',
+      shortName: 'ZenRows',
+      icon: '🛡️',
+      badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      borderClass: 'border-emerald-500/30',
+      pillClass: 'bg-emerald-500/10 text-emerald-300',
+    }
+  }
+
+  if (rawEngine === 'zyte' || rawEngine === 'zyteapi') {
+    return {
+      id: 'zyte',
+      name: 'Zyte API',
+      shortName: 'Zyte',
+      icon: '⚡',
+      badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+      borderClass: 'border-cyan-500/30',
+      pillClass: 'bg-cyan-500/10 text-cyan-300',
+    }
+  }
+
   if (rawEngine === 'manual') {
     return {
       id: 'manual',

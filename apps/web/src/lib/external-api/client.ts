@@ -663,6 +663,10 @@ export interface LastScrapeInfo {
     apify: EngineScrapeMetric
     scrapedog: EngineScrapeMetric
     crawlbase: EngineScrapeMetric
+    scrapingbee?: EngineScrapeMetric
+    zenrows?: EngineScrapeMetric
+    zyte?: EngineScrapeMetric
+    [key: string]: EngineScrapeMetric | undefined
   }
 }
 

@@ -52,7 +52,7 @@ const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknow
       ? body.fallback_engines.map(String)
       : Array.isArray(body?.fallbackEngines)
         ? body.fallbackEngines.map(String)
-        : ['scrapedog', 'crawlbase'],
+        : ['scrapingbee', 'zenrows', 'zyte', 'scrapedog', 'crawlbase'],
     paused_engines: Array.isArray(body?.paused_engines)
       ? body.paused_engines.map(String)
       : Array.isArray(body?.pausedEngines)
