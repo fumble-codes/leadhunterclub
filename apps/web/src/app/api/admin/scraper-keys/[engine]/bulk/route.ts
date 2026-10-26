@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { engine: string } }
+  { params }: { params: Promise<{ engine: string }> }
 ) {
   try {
     await requireAdmin(request)
-    const { engine } = params
+    const { engine } = await params
     const body = await request.json()
     const { items } = body
 
@@ -36,11 +36,11 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { engine: string } }
+  { params }: { params: Promise<{ engine: string }> }
 ) {
   try {
     await requireAdmin(request)
-    const { engine } = params
+    const { engine } = await params
     const body = await request.json().catch(() => ({}))
     const { ids, all } = body
 

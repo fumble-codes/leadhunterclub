@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { engine: string; id: string } }
+  { params }: { params: Promise<{ engine: string; id: string }> }
 ) {
   try {
     await requireAdmin(request)
-    const { engine, id } = params
+    const { engine, id } = await params
     await deleteScraperKey(engine, id)
     return NextResponse.json({ success: true })
   } catch (error: any) {

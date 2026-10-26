@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { engine: string } }
+  { params }: { params: Promise<{ engine: string }> }
 ) {
   try {
     await requireAdmin(request)
-    const { engine } = params
+    const { engine } = await params
     const result = await getScraperKeys(engine)
     return NextResponse.json({ success: true, data: result.data || [] })
   } catch (error: any) {
@@ -29,11 +29,11 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { engine: string } }
+  { params }: { params: Promise<{ engine: string }> }
 ) {
   try {
     await requireAdmin(request)
-    const { engine } = params
+    const { engine } = await params
     const body = await request.json()
     const { key, label } = body
 

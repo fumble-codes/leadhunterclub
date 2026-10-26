@@ -15,6 +15,8 @@ import {
   updateApolloApiKey,
   getAutomationSettings,
   updateAutomationSettings,
+  getScraperEngines,
+  updateScraperEngines,
 } from '@/lib/external-api/client'
 
 export const dynamic = 'force-dynamic'
