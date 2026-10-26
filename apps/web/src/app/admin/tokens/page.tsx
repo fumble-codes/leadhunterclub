@@ -75,6 +75,11 @@ export default function AdminTokensPage() {
   const [primaryEngine, setPrimaryEngine] = useState<string>('apify')
   const [fallbackEngines, setFallbackEngines] = useState<string[]>(['scrapedog', 'crawlbase'])
   const [isSavingRouting, setIsSavingRouting] = useState(false)
+  const [pausedEngines, setPausedEngines] = useState<string[]>([])
+  const [isTogglingEnginePause, setIsTogglingEnginePause] = useState<Record<string, boolean>>({})
+
+  const [pausedEnrichment, setPausedEnrichment] = useState<string[]>([])
+  const [isTogglingEnrichmentPause, setIsTogglingEnrichmentPause] = useState<Record<string, boolean>>({})
 
   const parsedPreview = useMemo(() => {
     return parseApifyTokens(bulkText)
@@ -142,8 +147,9 @@ export default function AdminTokensPage() {
     try {
       const res = await apiCall('/api/admin/settings?service=scraper-engines')
       if (res?.data) {
-        setPrimaryEngine(res.data.primaryEngine || 'apify')
-        setFallbackEngines(res.data.fallbackEngines || ['scrapedog', 'crawlbase'])
+        setPrimaryEngine(res.data.primaryEngine || res.data.primary_engine || 'apify')
+        setFallbackEngines(res.data.fallbackEngines || res.data.fallback_engines || ['scrapedog', 'crawlbase'])
+        setPausedEngines(res.data.pausedEngines || res.data.paused_engines || [])
       }
     } catch (e) {
       console.error('Failed to load scraper engines:', e)
@@ -155,7 +161,11 @@ export default function AdminTokensPage() {
     try {
       await apiCall('/api/admin/settings?service=scraper-engines', {
         method: 'POST',
-        body: JSON.stringify({ primaryEngine, fallbackEngines }),
+        body: JSON.stringify({
+          primaryEngine,
+          fallbackEngines,
+          paused_engines: pausedEngines,
+        }),
       })
       addToast({ type: 'success', message: 'Scraper engine routing saved successfully' })
     } catch (err: any) {
@@ -165,15 +175,76 @@ export default function AdminTokensPage() {
     }
   }
 
+  const handleToggleScraperPause = async (engine: string, paused?: boolean) => {
+    setIsTogglingEnginePause(prev => ({ ...prev, [engine]: true }))
+    try {
+      const res = await apiCall('/api/admin/settings?service=toggle-scraper-pause', {
+        method: 'POST',
+        body: JSON.stringify({ engine, paused }),
+      })
+      if (res?.data?.paused_engines) {
+        setPausedEngines(res.data.paused_engines)
+      } else {
+        setPausedEngines(prev => {
+          const isPaused = prev.includes(engine)
+          return isPaused ? prev.filter(e => e !== engine) : [...prev, engine]
+        })
+      }
+      const isNowPaused = res?.data?.is_paused ?? !pausedEngines.includes(engine)
+      addToast({
+        type: isNowPaused ? 'warning' : 'success',
+        message: `${engine.toUpperCase()} scraping is now ${isNowPaused ? 'PAUSED' : 'ACTIVE'}`,
+      })
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || `Failed to update ${engine} status` })
+    } finally {
+      setIsTogglingEnginePause(prev => ({ ...prev, [engine]: false }))
+    }
+  }
+
+  const handleToggleEnrichmentPause = async (service: string) => {
+    const providerKey = service.toLowerCase().replace(/[-_]/g, '')
+    setIsTogglingEnrichmentPause(prev => ({ ...prev, [service]: true }))
+    try {
+      const res = await apiCall('/api/admin/settings?service=toggle-enrichment-pause', {
+        method: 'POST',
+        body: JSON.stringify({ provider: service }),
+      })
+      if (res?.data?.paused_providers) {
+        setPausedEnrichment(res.data.paused_providers)
+      } else {
+        setPausedEnrichment(prev => {
+          const isPaused = prev.map(p => p.toLowerCase().replace(/[-_]/g, '')).includes(providerKey)
+          return isPaused
+            ? prev.filter(p => p.toLowerCase().replace(/[-_]/g, '') !== providerKey)
+            : [...prev, service]
+        })
+      }
+      const isNowPaused = res?.data?.is_paused ?? !pausedEnrichment.map(p => p.toLowerCase().replace(/[-_]/g, '')).includes(providerKey)
+      addToast({
+        type: isNowPaused ? 'warning' : 'success',
+        message: `${service} enrichment is now ${isNowPaused ? 'PAUSED' : 'ACTIVE'}`,
+      })
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || `Failed to update ${service} status` })
+    } finally {
+      setIsTogglingEnrichmentPause(prev => ({ ...prev, [service]: false }))
+    }
+  }
+
   const fetchEnrichmentKeys = useCallback(async () => {
     try {
-      const [intel, compass, hunter, contactout, apollo] = await Promise.all([
+      const [intel, compass, hunter, contactout, apollo, paused] = await Promise.all([
         apiCall('/api/admin/settings?service=openrouter'),
         apiCall('/api/admin/settings?service=contact-compass'),
         apiCall('/api/admin/settings?service=hunter'),
         apiCall('/api/admin/settings?service=contactout'),
         apiCall('/api/admin/settings?service=apollo'),
+        apiCall('/api/admin/settings?service=enrichment-paused').catch(() => ({})),
       ])
+      if (paused?.data?.paused_providers) {
+        setPausedEnrichment(paused.data.paused_providers)
+      }
       const d = (r: { data?: Record<string, unknown> }) => r?.data || {}
       const newStates = {
         'OpenRouter API Key': {
@@ -524,9 +595,15 @@ export default function AdminTokensPage() {
                 }`}
               >
                 <span>Apify</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'apify' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
-                  {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length}
-                </span>
+                {pausedEngines.includes('apify') ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Paused
+                  </span>
+                ) : (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'apify' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                    {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length}
+                  </span>
+                )}
               </button>
 
               <button
@@ -539,9 +616,15 @@ export default function AdminTokensPage() {
                 }`}
               >
                 <span>🐶 Scrapingdog</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'scrapedog' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
-                  {scrapedogKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
-                </span>
+                {pausedEngines.includes('scrapedog') ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Paused
+                  </span>
+                ) : (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'scrapedog' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                    {scrapedogKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                  </span>
+                )}
               </button>
 
               <button
@@ -554,9 +637,15 @@ export default function AdminTokensPage() {
                 }`}
               >
                 <span>🕷️ Crawlbase</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'crawlbase' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
-                  {crawlbaseKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
-                </span>
+                {pausedEngines.includes('crawlbase') ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Paused
+                  </span>
+                ) : (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeEngineTab === 'crawlbase' ? 'bg-black/20 text-black font-bold' : 'bg-white/10 text-text-secondary'}`}>
+                    {crawlbaseKeys.filter(k => k.is_active && !k.is_exhausted && !k.error_message).length}
+                  </span>
+                )}
               </button>
 
               <button
@@ -575,37 +664,78 @@ export default function AdminTokensPage() {
 
             {activeEngineTab === 'apify' && (
               <>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-                  <KeyIcon className="w-4 h-4 text-accent-mint" />Apify API Keys
-                </h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-text-secondary border border-white/5">
-                  {tokens.length} Active
-                </span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                    <KeyIcon className="w-4 h-4 text-accent-mint" />Apify API Keys
+                  </h2>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-text-secondary border border-white/5">
+                    {tokens.length} Active
+                  </span>
+                  {pausedEngines.includes('apify') ? (
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      PAUSED
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      Running
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <button
-                onClick={() => setIsBulkMode(!isBulkMode)}
-                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm ${
-                  isBulkMode
-                    ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
-                    : 'bg-accent-mint text-black hover:bg-accent-mint/90'
-                }`}
-              >
-                {isBulkMode ? (
-                  <>
-                    <KeyIcon className="w-3.5 h-3.5" />
-                    <span>Single Key</span>
-                  </>
-                ) : (
-                  <>
-                    <span>⚡</span>
-                    <span>Bulk Add Keys</span>
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+                <button
+                  type="button"
+                  disabled={isTogglingEnginePause['apify']}
+                  onClick={() => handleToggleScraperPause('apify', !pausedEngines.includes('apify'))}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
+                    pausedEngines.includes('apify')
+                      ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
+                      : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+                  }`}
+                >
+                  <span>{pausedEngines.includes('apify') ? '▶️' : '⏸️'}</span>
+                  <span>{pausedEngines.includes('apify') ? 'Resume Apify' : 'Pause Apify'}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsBulkMode(!isBulkMode)}
+                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm ${
+                    isBulkMode
+                      ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                      : 'bg-accent-mint text-black hover:bg-accent-mint/90'
+                  }`}
+                >
+                  {isBulkMode ? (
+                    <>
+                      <KeyIcon className="w-3.5 h-3.5" />
+                      <span>Single Key</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span>
+                      <span>Bulk Add Keys</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
+
+            {pausedEngines.includes('apify') && (
+              <div className="p-3.5 mb-5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 flex items-center gap-2.5">
+                <span className="text-base">⏸️</span>
+                <div>
+                  <span className="font-bold">Apify scraper engine is currently paused.</span>
+                  <span className="text-amber-300/80 ml-1.5">
+                    Keyword scrapes and profile monitoring will bypass Apify and failover to active engines (Scrapingdog / Crawlbase) or wait until resumed.
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Mode Switcher Tabs */}
             <div className="flex items-center gap-2 mb-4 p-1 bg-surface-elevated/70 border border-white/5 rounded-xl w-fit">
@@ -981,6 +1111,8 @@ export default function AdminTokensPage() {
                 placeholder="66085a... (Scrapingdog API Key)"
                 keys={scrapedogKeys}
                 loading={scrapedogLoading}
+                isPaused={pausedEngines.includes('scrapedog')}
+                onTogglePause={(paused) => handleToggleScraperPause('scrapedog', paused)}
                 onRefresh={fetchScrapedogKeys}
                 apiCall={apiCall}
                 addToast={addToast}
@@ -996,6 +1128,8 @@ export default function AdminTokensPage() {
                 placeholder="crawlbase_token_... (Crawlbase Token)"
                 keys={crawlbaseKeys}
                 loading={crawlbaseLoading}
+                isPaused={pausedEngines.includes('crawlbase')}
+                onTogglePause={(paused) => handleToggleScraperPause('crawlbase', paused)}
                 onRefresh={fetchCrawlbaseKeys}
                 apiCall={apiCall}
                 addToast={addToast}
@@ -1015,7 +1149,69 @@ export default function AdminTokensPage() {
                 </div>
 
                 <div className="bg-surface-elevated/40 border border-white/[0.06] rounded-xl p-4 space-y-4">
+                  {/* Provider Operational Status */}
                   <div>
+                    <label className="text-xs font-semibold text-text-primary block mb-2">
+                      Provider Operational State (Pause / Stop / Resume)
+                    </label>
+                    <p className="text-[11px] text-text-secondary mb-3">
+                      Quickly stop or pause any scraping provider. Paused providers are automatically skipped during scraping and failover runs.
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { id: 'apify', name: 'Apify', icon: '⚡' },
+                        { id: 'scrapedog', name: 'Scrapingdog', icon: '🐶' },
+                        { id: 'crawlbase', name: 'Crawlbase', icon: '🕷️' },
+                      ].map((engine) => {
+                        const isPaused = pausedEngines.includes(engine.id)
+                        return (
+                          <div
+                            key={engine.id}
+                            className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
+                              isPaused
+                                ? 'bg-amber-500/10 border-amber-500/30'
+                                : 'bg-surface-elevated/60 border-white/5'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className="text-base">{engine.icon}</span>
+                              <div>
+                                <div className="text-xs font-bold text-white">{engine.name}</div>
+                                <div className="text-[10px]">
+                                  {isPaused ? (
+                                    <span className="text-amber-300 font-semibold flex items-center gap-1">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                                      Paused
+                                    </span>
+                                  ) : (
+                                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                      Running
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              disabled={isTogglingEnginePause[engine.id]}
+                              onClick={() => handleToggleScraperPause(engine.id, !isPaused)}
+                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all border ${
+                                isPaused
+                                  ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
+                                  : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+                              }`}
+                            >
+                              {isPaused ? 'Resume' : 'Pause'}
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-white/5">
                     <label className="text-xs font-semibold text-text-primary block mb-2">
                       Primary Scraper Engine
                     </label>
@@ -1138,24 +1334,61 @@ export default function AdminTokensPage() {
                 const state = enrichmentKeys[field.label]
                 const isSaving = saving === field.label
                 const show = showValues[field.label] || false
+                const isProviderPaused = pausedEnrichment
+                  .map(p => p.toLowerCase().replace(/[-_]/g, ''))
+                  .includes(field.service.toLowerCase().replace(/[-_]/g, ''))
                 return (
-                  <div key={field.label} className="bg-surface-elevated/30 border border-white/[0.03] rounded-xl p-4">
+                  <div key={field.label} className={`border rounded-xl p-4 transition-all ${
+                    isProviderPaused ? 'bg-amber-500/[0.04] border-amber-500/20' : 'bg-surface-elevated/30 border-white/[0.03]'
+                  }`}>
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-9 h-9 bg-accent-mint/10 rounded-lg flex items-center justify-center">
                         <field.icon className="w-4 h-4 text-accent-mint" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-sm font-medium text-text-primary">{field.label}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-medium text-text-primary">{field.label}</h3>
+                          {isProviderPaused && (
+                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                              PAUSED
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[10px] text-text-secondary">{field.description}</p>
                       </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-                        state?.is_configured
-                          ? 'bg-green-500/10 text-green-400 border border-green-500/20'
-                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                      }`}>
-                        {state?.is_configured ? 'Configured' : 'Not Set'}
-                      </span>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+                          state?.is_configured
+                            ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        }`}>
+                          {state?.is_configured ? 'Configured' : 'Not Set'}
+                        </span>
+
+                        {state?.is_configured && (
+                          <button
+                            type="button"
+                            disabled={isTogglingEnrichmentPause[field.service]}
+                            onClick={() => handleToggleEnrichmentPause(field.service)}
+                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all border shadow-sm ${
+                              isProviderPaused
+                                ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
+                                : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+                            }`}
+                          >
+                            <span>{isProviderPaused ? '▶️ Resume' : '⏸️ Pause'}</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
+
+                    {isProviderPaused && (
+                      <p className="text-[11px] text-amber-300/80 mb-2.5 flex items-center gap-1.5">
+                        <span>⏸️</span>
+                        <span>This provider is paused. Automatic contact discovery will skip this service until resumed.</span>
+                      </p>
+                    )}
 
                     <div className="flex items-center gap-3">
                       <div className="relative flex-1">

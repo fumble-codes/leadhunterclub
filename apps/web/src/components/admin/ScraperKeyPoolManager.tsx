@@ -25,6 +25,8 @@ interface ScraperKeyPoolManagerProps {
   placeholder: string
   keys: ScraperPoolKey[]
   loading: boolean
+  isPaused?: boolean
+  onTogglePause?: (paused: boolean) => Promise<void>
   onRefresh: () => Promise<void>
   apiCall: (path: string, init?: RequestInit) => Promise<any>
   addToast: (toast: { type: 'success' | 'error' | 'warning' | 'info'; message: string }) => void
@@ -38,6 +40,8 @@ export function ScraperKeyPoolManager({
   placeholder,
   keys,
   loading,
+  isPaused = false,
+  onTogglePause,
   onRefresh,
   apiCall,
   addToast,
@@ -52,6 +56,17 @@ export function ScraperKeyPoolManager({
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isBulkDeleting, setIsBulkDeleting] = useState(false)
   const [testingKey, setTestingKey] = useState<string | null>(null)
+  const [isTogglingPause, setIsTogglingPause] = useState(false)
+
+  const handleTogglePause = async () => {
+    if (!onTogglePause) return
+    setIsTogglingPause(true)
+    try {
+      await onTogglePause(!isPaused)
+    } finally {
+      setIsTogglingPause(false)
+    }
+  }
 
   const testKey = async (keyString: string) => {
     setTestingKey(keyString)
@@ -194,7 +209,7 @@ export function ScraperKeyPoolManager({
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h2 className="text-sm font-semibold text-text-primary flex items-center gap-2">
               <span className="text-base">{iconEmoji}</span>
               <span>{title}</span>
@@ -202,31 +217,72 @@ export function ScraperKeyPoolManager({
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-text-secondary border border-white/5">
               {activeCount} Active
             </span>
+            {isPaused ? (
+              <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                PAUSED
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Running
+              </span>
+            )}
           </div>
           <p className="text-xs text-text-secondary mt-1">{subtitle}</p>
         </div>
 
-        <button
-          onClick={() => setIsBulkMode(!isBulkMode)}
-          className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm self-start sm:self-auto ${
-            isBulkMode
-              ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
-              : 'bg-accent-mint text-black hover:bg-accent-mint/90'
-          }`}
-        >
-          {isBulkMode ? (
-            <>
-              <KeyIcon className="w-3.5 h-3.5" />
-              <span>Single Key</span>
-            </>
-          ) : (
-            <>
-              <span>⚡</span>
-              <span>Bulk Add Keys</span>
-            </>
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          {onTogglePause && (
+            <button
+              type="button"
+              disabled={isTogglingPause}
+              onClick={handleTogglePause}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
+                isPaused
+                  ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
+                  : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
+              }`}
+            >
+              <span>{isPaused ? '▶️' : '⏸️'}</span>
+              <span>{isPaused ? `Resume ${title}` : `Pause ${title}`}</span>
+            </button>
           )}
-        </button>
+
+          <button
+            onClick={() => setIsBulkMode(!isBulkMode)}
+            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm ${
+              isBulkMode
+                ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                : 'bg-accent-mint text-black hover:bg-accent-mint/90'
+            }`}
+          >
+            {isBulkMode ? (
+              <>
+                <KeyIcon className="w-3.5 h-3.5" />
+                <span>Single Key</span>
+              </>
+            ) : (
+              <>
+                <span>⚡</span>
+                <span>Bulk Add Keys</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {isPaused && (
+        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 flex items-center gap-2.5">
+          <span className="text-base">⏸️</span>
+          <div>
+            <span className="font-bold">{title} is currently paused.</span>
+            <span className="text-amber-300/80 ml-1.5">
+              Scraping jobs will bypass this provider and route to active fallback engines until resumed.
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Mode Switcher Tabs */}
       <div className="flex items-center gap-2 p-1 bg-surface-elevated/70 border border-white/5 rounded-xl w-fit">

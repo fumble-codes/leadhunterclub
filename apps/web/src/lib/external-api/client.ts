@@ -646,6 +646,7 @@ export async function updateCrawlbaseToken(token: string): Promise<{ success: bo
 export interface ScraperEngineSettings {
   primary_engine: string
   fallback_engines: string[]
+  paused_engines?: string[]
 }
 
 export async function getScraperEngines(): Promise<ScraperEngineSettings> {
@@ -656,12 +657,38 @@ export async function getScraperEngines(): Promise<ScraperEngineSettings> {
 export async function updateScraperEngines(settings: {
   primary_engine?: string
   fallback_engines?: string[]
+  paused_engines?: string[]
 }): Promise<{ success: boolean; message: string }> {
   const res = await fetchApi<{ success: boolean; message: string }>(`/settings/scraper-engines`, {
     method: 'POST',
     body: JSON.stringify(settings),
   })
   return res
+}
+
+export async function toggleScraperEnginePause(
+  engine: string,
+  paused?: boolean
+): Promise<{ success: boolean; data: { engine: string; is_paused: boolean; paused_engines: string[] } }> {
+  return fetchApi(`/settings/scraper-engines/toggle-pause`, {
+    method: 'POST',
+    body: JSON.stringify({ engine, paused }),
+  })
+}
+
+export async function getPausedEnrichmentProviders(): Promise<{ paused_providers: string[] }> {
+  const res = await fetchApi<{ success: boolean; data: { paused_providers: string[] } }>(`/settings/enrichment-providers/paused`)
+  return res.data
+}
+
+export async function toggleEnrichmentProviderPause(
+  provider: string,
+  paused?: boolean
+): Promise<{ success: boolean; data: { provider: string; is_paused: boolean; paused_providers: string[] } }> {
+  return fetchApi(`/settings/enrichment-providers/toggle-pause`, {
+    method: 'POST',
+    body: JSON.stringify({ provider, paused }),
+  })
 }
 
 // --- Watchlist targets (backend proxy) ---

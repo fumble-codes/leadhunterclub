@@ -17,6 +17,9 @@ import {
   updateAutomationSettings,
   getScraperEngines,
   updateScraperEngines,
+  toggleScraperEnginePause,
+  getPausedEnrichmentProviders,
+  toggleEnrichmentProviderPause,
 } from '@/lib/external-api/client'
 
 export const dynamic = 'force-dynamic'
@@ -32,6 +35,7 @@ const GETTERS = {
   apollo: getApolloApiKey,
   automation: getAutomationSettings,
   'scraper-engines': getScraperEngines,
+  'enrichment-paused': getPausedEnrichmentProviders,
 } as const
 
 const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknown>> = {
@@ -47,7 +51,20 @@ const UPDATERS: Record<string, (body: Record<string, unknown>) => Promise<unknow
       : Array.isArray(body?.fallbackEngines)
         ? body.fallbackEngines.map(String)
         : ['scrapedog', 'crawlbase'],
+    paused_engines: Array.isArray(body?.paused_engines)
+      ? body.paused_engines.map(String)
+      : Array.isArray(body?.pausedEngines)
+        ? body.pausedEngines.map(String)
+        : undefined,
   }),
+  'toggle-scraper-pause': (body) => toggleScraperEnginePause(
+    String(body?.engine ?? ''),
+    typeof body?.paused === 'boolean' ? body.paused : undefined
+  ),
+  'toggle-enrichment-pause': (body) => toggleEnrichmentProviderPause(
+    String(body?.provider ?? ''),
+    typeof body?.paused === 'boolean' ? body.paused : undefined
+  ),
   automation: (body) => {
     const b = body as {
       auto_scrape_enabled?: boolean
