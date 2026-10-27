@@ -22,6 +22,7 @@ import {
 } from '@heroicons/react/24/solid'
 import type { AppLead } from '@/types/lead'
 import { Select, CreditExhaustedModal } from '@/components/ui'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -673,6 +674,8 @@ export default function LeadsPage() {
           </div>
 
           <div className="relative shrink-0 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto justify-end">
+            <NotificationBell leads={leadsList} />
+
             <Select
               options={[
                 { label: 'Recently Approved', value: 'newest' },

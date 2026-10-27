@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import {
   SparklesIcon,
@@ -11,7 +11,8 @@ import {
   ArrowRightIcon,
   CalendarDaysIcon,
   ChatBubbleLeftRightIcon,
-} from '@heroicons/react/24/solid'
+  CheckIcon,
+} from '@heroicons/react/24/outline'
 
 export interface CommunityPopupPost {
   id: string
@@ -33,26 +34,29 @@ interface CommunityWinPopupProps {
   onViewWin: (postId: string) => void
 }
 
+// Single mint accent for this success moment — never paired with amber here
+const WIN_PILL = 'border-accent-mint/25 bg-accent-mint/[0.12] text-accent-mint'
+
 const CATEGORY_LABELS: Record<string, { label: string; icon: any; color: string }> = {
   DEAL_CLOSED: {
     label: 'Client Deal Closed',
     icon: TrophyIcon,
-    color: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    color: WIN_PILL,
   },
   MEETING_SCHEDULED: {
     label: 'Meeting Booked',
     icon: CalendarDaysIcon,
-    color: 'bg-accent-mint/15 text-accent-mint border-accent-mint/30',
+    color: WIN_PILL,
   },
   POSITIVE_REPLY: {
     label: 'Positive Reply',
     icon: ChatBubbleLeftRightIcon,
-    color: 'bg-primary/15 text-primary border-primary/30',
+    color: WIN_PILL,
   },
   SPOTLIGHT: {
     label: 'Member Spotlight',
     icon: SparklesIcon,
-    color: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+    color: WIN_PILL,
   },
 }
 
@@ -62,6 +66,8 @@ export function CommunityWinPopup({
   onClose,
   onViewWin,
 }: CommunityWinPopupProps) {
+  const reduceMotion = useReducedMotion()
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -80,17 +86,16 @@ export function CommunityWinPopup({
     }
   }, [open, handleKeyDown])
 
-  if (!open || !post) return null
-
   const catConfig =
-    CATEGORY_LABELS[post.category] || {
+    (post && CATEGORY_LABELS[post.category]) || {
       label: 'Verified Member Win',
       icon: SparklesIcon,
-      color: 'bg-accent-mint/15 text-accent-mint border-accent-mint/30',
+      color: WIN_PILL,
     }
   const CategoryIcon = catConfig.icon
 
   const handleCelebrateClick = () => {
+    if (!post) return
     try {
       confetti({
         particleCount: 80,
@@ -106,124 +111,146 @@ export function CommunityWinPopup({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0 bg-black/75 backdrop-blur-md"
-          onClick={onClose}
-        />
+      {open && post && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop (Modal treatment) */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            aria-hidden
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
 
-        {/* Modal Dialog */}
-        <motion.div
-          initial={{ opacity: 0, y: 25, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 25, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-          className="relative w-full max-w-lg bg-surface-elevated/95 border border-accent-mint/30 rounded-3xl shadow-2xl overflow-hidden p-6 md:p-7 space-y-5 ring-1 ring-accent-mint/20"
-        >
-          {/* Subtle Ambient Top Glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-20 bg-accent-mint/10 blur-3xl pointer-events-none rounded-full" />
+          {/* Liquid-glass dialog */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Community win"
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.97 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.985 }}
+            transition={{ type: 'spring', stiffness: 520, damping: 38, mass: 0.7 }}
+            className="relative w-full max-w-lg overflow-hidden rounded-[24px] border border-white/[0.11] bg-[#0b0b0e]/[0.97] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_32px_80px_-20px_rgba(0,0,0,0.95),0_2px_12px_rgba(0,0,0,0.5)] backdrop-blur-2xl backdrop-saturate-150"
+          >
+            {/* ambient depth: top sheen + soft mint glow */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/[0.05] via-white/[0.012] to-transparent"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-accent-mint/[0.06] blur-3xl"
+            />
 
-          {/* Header */}
-          <div className="flex items-start justify-between gap-3 relative">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-accent-mint/20 to-primary/20 border border-accent-mint/30 flex items-center justify-center text-accent-mint shadow-lg shadow-accent-mint/10 shrink-0">
-                <SparklesIcon className="w-6 h-6 animate-pulse" />
-              </div>
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-accent-mint">
-                  <ShieldCheckIcon className="w-3.5 h-3.5" />
-                  <span>New Addition in Community Hub</span>
+            <div className="relative space-y-5 p-6 md:p-7">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] border border-accent-mint/20 bg-accent-mint/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_6px_18px_-8px_rgba(0,0,0,0.7)]">
+                    <SparklesIcon className="h-5 w-5 text-accent-mint" strokeWidth={1.6} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-accent-mint">
+                      <ShieldCheckIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.6} />
+                      <span>New Addition in Community Hub</span>
+                    </div>
+                    <h3 className="mt-1 text-lg font-semibold leading-snug tracking-tight text-text-primary">
+                      Fresh Member Win Just Verified!
+                    </h3>
+                  </div>
                 </div>
-                <h3 className="text-lg font-extrabold text-white tracking-tight">
-                  Fresh Member Win Just Verified!
-                </h3>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  title="Close popup"
+                  aria-label="Close dialog"
+                  className="-mr-2 -mt-1 flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-xl p-2 text-text-muted transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-mint/50"
+                >
+                  <XMarkIcon className="h-5 w-5" strokeWidth={1.6} />
+                </button>
               </div>
-            </div>
 
-            <button
-              onClick={onClose}
-              title="Close popup"
-              className="p-1.5 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
-            >
-              <XMarkIcon className="w-5 h-5" />
-            </button>
-          </div>
+              {/* Post Preview Card */}
+              <div className="relative overflow-hidden rounded-[13px] border border-white/[0.07] bg-white/[0.035] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] md:p-5">
+                {/* Badges Row */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-[10px] border px-2.5 py-1 text-[11px] font-semibold ${catConfig.color}`}
+                  >
+                    <CategoryIcon className="h-3.5 w-3.5" strokeWidth={1.6} />
+                    <span>{catConfig.label}</span>
+                  </span>
 
-          {/* Post Preview Card */}
-          <div className="p-4 md:p-5 rounded-2xl bg-surface-container-lowest/80 border border-white/[0.08] space-y-3 relative overflow-hidden">
-            {/* Badges Row */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${catConfig.color}`}
-              >
-                <CategoryIcon className="w-3.5 h-3.5" />
-                <span>{catConfig.label}</span>
-              </span>
+                  {post.dealSize && (
+                    <span className="inline-flex items-center gap-1.5 rounded-[10px] border border-accent-mint/20 bg-accent-mint/[0.1] px-2.5 py-1 font-mono text-[11px] font-semibold tabular-nums text-accent-mint">
+                      {post.dealSize}
+                    </span>
+                  )}
 
-              {post.dealSize && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-extrabold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  {post.dealSize}
-                </span>
-              )}
-
-              {post.clientNiche && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20">
-                  {post.clientNiche}
-                </span>
-              )}
-            </div>
-
-            {/* Title */}
-            <h4 className="text-base font-bold text-white tracking-tight leading-snug line-clamp-2">
-              {post.title}
-            </h4>
-
-            {/* Story Snippet */}
-            <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed">
-              {post.content}
-            </p>
-
-            {/* Author Footer in Card */}
-            <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs text-zinc-400">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center text-[10px] font-bold text-accent-mint uppercase">
-                  {post.authorName.slice(0, 2)}
+                  {post.clientNiche && (
+                    <span className="inline-flex items-center rounded-[10px] border border-white/[0.08] bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-text-secondary">
+                      {post.clientNiche}
+                    </span>
+                  )}
                 </div>
-                <span className="font-semibold text-white">{post.authorName}</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/[0.06] text-zinc-400 border border-white/[0.08]">
-                  {post.authorPlan || 'PRO MEMBER'}
-                </span>
+
+                {/* Title */}
+                <h4 className="mt-3 line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-text-primary">
+                  {post.title}
+                </h4>
+
+                {/* Story Snippet */}
+                <p className="mt-1.5 line-clamp-3 text-[13px] leading-relaxed text-text-secondary">
+                  {post.content}
+                </p>
+
+                {/* Author Footer in Card */}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-[11px] text-text-secondary">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent-mint/20 bg-accent-mint/10 text-[10px] font-bold uppercase text-accent-mint">
+                      {post.authorName.slice(0, 2)}
+                    </span>
+                    <span className="truncate font-semibold text-text-primary">
+                      {post.authorName}
+                    </span>
+                    <span className="rounded-[10px] border border-white/[0.08] bg-white/[0.05] px-1.5 py-0.5 text-[10px] text-text-secondary">
+                      {post.authorPlan || 'PRO MEMBER'}
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-accent-mint/90">
+                    <CheckIcon className="h-3 w-3" strokeWidth={1.8} />
+                    Verified Win
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] text-accent-mint/90 font-medium">✓ Verified Win</span>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="min-h-[44px] rounded-xl border border-white/[0.12] px-4 text-[13px] font-medium text-text-secondary transition-colors hover:bg-white/5 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-mint/50"
+                >
+                  Maybe Later
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCelebrateClick}
+                  className="flex min-h-[44px] items-center gap-2 rounded-xl bg-accent-mint px-5 text-[13px] font-semibold text-black shadow-[0_10px_28px_-12px_rgba(67,237,158,0.45)] transition-all hover:bg-accent-mint/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-mint/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0b0e]"
+                >
+                  <span>View in Community Hub</span>
+                  <ArrowRightIcon className="h-3.5 w-3.5" strokeWidth={1.8} />
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
-            >
-              Maybe Later
-            </button>
-
-            <button
-              type="button"
-              onClick={handleCelebrateClick}
-              className="px-5 py-2.5 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-black font-extrabold text-xs transition-all flex items-center gap-2 shadow-lg shadow-accent-mint/25 active:scale-95"
-            >
-              <span>View in Community Hub</span>
-              <ArrowRightIcon className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
+      )}
     </AnimatePresence>
   )
 }
