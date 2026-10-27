@@ -280,21 +280,31 @@ export async function GET(request: NextRequest) {
             }
           : { userId, status: { in: ['drafting', 'sent', 'replied', 'follow-up'] } },
         orderBy: [{ lastActionDate: 'desc' }, { revealedAt: 'desc' }],
-        include: { lead: { select: LEAD_POST_SELECT } },
       })
 
-      // Ensure claimed/saved leads remain permanently accessible even if purged from oracle.lead_posts
-      const missingLeadIds = userStates.filter((s) => !s.lead).map((s) => s.leadId)
-      const fallbackLeads =
-        missingLeadIds.length > 0
-          ? await db.lead.findMany({ where: { id: { in: missingLeadIds } } })
-          : []
+      const stateLeadIds = userStates.map((s) => s.leadId)
+      const [leadPosts, fallbackLeads] = await Promise.all([
+        stateLeadIds.length > 0
+          ? oracleDb.leadPost.findMany({
+              where: { id: { in: stateLeadIds } },
+              select: LEAD_POST_SELECT,
+            })
+          : [],
+        stateLeadIds.length > 0
+          ? db.lead.findMany({
+              where: { id: { in: stateLeadIds } },
+            })
+          : [],
+      ])
+
+      const leadPostMap = new Map(leadPosts.map((lp) => [lp.id, lp]))
       const fallbackMap = new Map(fallbackLeads.map((l) => [l.id, l]))
 
       data = userStates
         .map((s) => {
-          if (s.lead) {
-            return externalPostToAppLead(mapLeadPostToExternal(s.lead as any), s, false)
+          const leadPost = leadPostMap.get(s.leadId)
+          if (leadPost) {
+            return externalPostToAppLead(mapLeadPostToExternal(leadPost as any), s, false)
           }
           const fallback = fallbackMap.get(s.leadId)
           if (fallback) {

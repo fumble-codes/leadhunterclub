@@ -175,7 +175,7 @@ model UserLeadState {
   lastActionDate  DateTime? @updatedAt
 
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lead           LeadPost  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  lead           LeadPost? @relation(fields: [leadId], references: [id], onDelete: Cascade)
   emails         EmailMessage[]
 
   @@unique([userId, leadId])
