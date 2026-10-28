@@ -770,7 +770,7 @@ export default function AdminLeadsPage() {
 
   const canEnrichLead = (lead: ExternalPost) =>
     lead.status === 'relevant' &&
-    ['linkedin', 'threads', 'twitter', 'reddit'].includes(lead.platform)
+    ['linkedin', 'threads', 'twitter', 'reddit', 'manual'].includes(lead.platform)
 
   const getEnrichButtonLabel = (lead: ExternalPost) => {
     if (!lead.enrichment_status || lead.enrichment_status === 'pending') return 'Find Contacts'
@@ -1460,7 +1460,6 @@ export default function AdminLeadsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            {(lead.enrichment_status === 'found' || lead.enrichment_status === 'partial' || leadHasContactDetails(lead)) && (
                               <button
                                 onClick={() => handleRegenerateIntel(lead.id)}
                                 disabled={intelActionIds.includes(lead.id)}
@@ -1473,7 +1472,6 @@ export default function AdminLeadsPage() {
                                 )}
                                 {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
                               </button>
-                            )}
                             <button
                               onClick={() => handleReEnrichLead(lead.id)}
                               disabled={enrichingIds.includes(lead.id)}
