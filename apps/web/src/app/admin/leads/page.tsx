@@ -1460,18 +1460,20 @@ export default function AdminLeadsPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleRegenerateIntel(lead.id)}
-                              disabled={intelActionIds.includes(lead.id)}
-                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
-                            >
-                              {intelActionIds.includes(lead.id) ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <BrainCircuit size={12} />
-                              )}
-                              {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
-                            </button>
+                            {(lead.enrichment_status === 'found' || lead.enrichment_status === 'partial' || leadHasContactDetails(lead)) && (
+                              <button
+                                onClick={() => handleRegenerateIntel(lead.id)}
+                                disabled={intelActionIds.includes(lead.id)}
+                                className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+                              >
+                                {intelActionIds.includes(lead.id) ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <BrainCircuit size={12} />
+                                )}
+                                {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
+                              </button>
+                            )}
                             <button
                               onClick={() => handleReEnrichLead(lead.id)}
                               disabled={enrichingIds.includes(lead.id)}

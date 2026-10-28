@@ -30,7 +30,6 @@ import {
 } from '@/lib/claim-reveal'
 import { triggerUnlockConfetti } from '@/lib/confetti'
 import { NicheBadge } from '@/components/ui/NicheBadge'
-import { getScraperToolInfo } from '@/lib/scraper-tool'
 
 export default function LeadDrawer({
   lead,
@@ -413,18 +412,6 @@ export default function LeadDrawer({
                 Posted {lead.timestamp}
               </span>
             )}
-            {(() => {
-              const tool = getScraperToolInfo(lead)
-              return (
-                <span
-                  className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-bold text-[11px] ${tool.badgeClass}`}
-                  title={`Discovered and scraped by ${tool.name}`}
-                >
-                  <span>{tool.icon}</span>
-                  <span>{tool.name}</span>
-                </span>
-              )
-            })()}
             {lead.replyProbability > 0 && (
               <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 font-medium tabular-nums text-text-secondary">
                 {lead.replyProbability}% reply odds
