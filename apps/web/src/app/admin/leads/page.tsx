@@ -1837,6 +1837,20 @@ export default function AdminLeadsPage() {
                             </button>
                           )
                         })()}
+                        <button
+                          type="button"
+                          onClick={() => handleRegenerateIntel(lead.id)}
+                          disabled={intelActionIds.includes(lead.id)}
+                          title="Generate or refresh AI intelligence report"
+                          className="h-7 px-3 text-[8px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+                        >
+                          {intelActionIds.includes(lead.id) ? (
+                            <Loader2 size={11} className="animate-spin" />
+                          ) : (
+                            <BrainCircuit size={11} />
+                          )}
+                          <span>{intelActionIds.includes(lead.id) ? 'Generating...' : lead.intelligence ? 'Regen Intel' : 'Generate Intel'}</span>
+                        </button>
                       </div>
 
                       <div className="flex items-center gap-3 flex-wrap justify-end">
