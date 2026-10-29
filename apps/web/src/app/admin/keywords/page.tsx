@@ -37,6 +37,7 @@ export default function AdminKeywordsPage() {
   const [isScrapingAll, setIsScrapingAll] = useState(false)
   const [autoScrapeEnabled, setAutoScrapeEnabled] = useState<boolean | null>(null)
   const [togglingAuto, setTogglingAuto] = useState(false)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const { addToast } = useToast()
 
   const fetchKeywords = useCallback(async () => {
@@ -247,6 +248,33 @@ export default function AdminKeywordsPage() {
     fetchKeywords()
   }
 
+  const toggleKeywordActive = async (k: Keyword) => {
+    const id = k._id || k.id
+    const nextActive = !k.is_active
+    setTogglingId(id)
+    const token = await getFirebaseToken()
+    try {
+      const res = await fetch(`/api/admin/keywords/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: nextActive }),
+      })
+      if (res.ok) {
+        setKeywords(prev => prev.map(item => (item._id || item.id) === id ? { ...item, is_active: nextActive } : item))
+        addToast({
+          type: 'success',
+          message: nextActive ? `Automation activated for "${k.text}"` : `Automation stopped for "${k.text}"`,
+        })
+      } else {
+        throw new Error('Failed to update keyword status')
+      }
+    } catch (e) {
+      addToast({ type: 'error', message: e instanceof Error ? e.message : 'Error updating keyword status' })
+    } finally {
+      setTogglingId(null)
+    }
+  }
+
   const deleteKeyword = async (id: string) => {
     const token = await getFirebaseToken()
     await fetch(`/api/admin/keywords/${id}`, {
@@ -422,9 +450,19 @@ export default function AdminKeywordsPage() {
                     )}
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                      k.is_active ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'
-                    }`}>{k.is_active ? 'Active' : 'Inactive'}</span>
+                    <button
+                      onClick={() => toggleKeywordActive(k)}
+                      disabled={togglingId === (k._id || k.id)}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
+                        k.is_active
+                          ? 'bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20'
+                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20'
+                      } disabled:opacity-50`}
+                      title={k.is_active ? 'Click to pause automation for this keyword' : 'Click to enable automation for this keyword'}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${k.is_active ? 'bg-green-400 animate-pulse' : 'bg-amber-400'}`} />
+                      <span>{k.is_active ? 'Auto: ON' : 'Auto: PAUSED'}</span>
+                    </button>
                   </td>
                   <td className="px-4 py-4 text-right">
                     <div className="flex items-center justify-end gap-1.5">
