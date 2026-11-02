@@ -56,10 +56,10 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   Values kept within the original set (backend is `z.string().min(1)` — no enum, verified).
   Restore-from-localStorage now resets stale values (`none`/`advanced`) to `''`.
 - **New helper** `isValidPhoneNumber` in `src/lib/phone.ts` (7–15 digits, formatting-agnostic).
-- **Onboarding step 1**: live phone hint (green ✓ / red) under `PhoneInputWithCountry`, live
+- **Onboarding step 1**: live phone hint (green ✅ / red) under `PhoneInputWithCountry`, live
   red border via `error` prop, Continue + submit guards added.
 - **Register page** (where the email input actually lives — onboarding itself has no email
-  field): controlled email input with live green ✓ / red ✗ hints + border states, submit guard
+  field): controlled email input with live green ✅ / red ❌ hints + border states, submit guard
   (`Please enter a valid email address`); phone input gets the same treatment and "Send OTP"
   stays disabled until the number is valid.
 - Verified: lint clean; validators+auth tests 50/50; temp unit test for `isValidPhoneNumber`
@@ -90,8 +90,8 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   legacy-map shim (`display-costs.ts`, built while the server still sent 5/8/10/2) was
   **deleted** the same day; all call sites now read `LEAD_REVEAL_COSTS`/`revealCost` raw.
   (If that backend commit is ever reverted, the shim pattern + mock-id bypass must return —
-  see git history for `display-costs.ts`.) Copilot prompts already say 10/12/15 ✓; HunterCopilot
-  hint "10-15 per lead" ✓. Verified: lint clean, 0 tsc errors in touched files, vitest 18/185 =
+  see git history for `display-costs.ts`.) Copilot prompts already say 10/12/15 ✅; HunterCopilot
+  hint "10-15 per lead" ✅. Verified: lint clean, 0 tsc errors in touched files, vitest 18/185 =
   baseline, browser   30/32 (2 = collapsed-FAQ probe artifact; expanded-FAQ probe = all true,
   who-grid pills -10/-15/-10 correct, ledger loop exact, 0 console errors).
   **Copy-sync sweep (same day):** Hunter Copilot FAQ (`api/copilot/route.ts`) was the
@@ -121,7 +121,7 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   + all 5 copilot spots (code's 99/399/699 was stale; user is source of truth).
   Verified: lint 0 errors, 0 tsc, vitest 18 failed = baseline (suite grew 185→189,
   +4 upstream passing), browser: /pricing?tab=refills shows 125/275/450 at ₹199/399/599,
-  FAQ answers ₹199 + numbered list ✓. NOTE: FAQ answers + refills grid don't exist in
+  FAQ answers ₹199 + numbered list ✅. NOTE: FAQ answers + refills grid don't exist in
   SSR HTML (AnimatePresence closed / default tab=plans) — verify via browser, not fetch.
 
 - **Mass user wipe (2026-10-05, user-requested):** user asked to remove every account's
@@ -170,13 +170,13 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
 - **#4 Credit-ledger widget** (`FeaturesSection.tsx`): replaced stale tier selector
   (250/750/2000 credits, "3/reveal" — all wrong vs product) with a live ledger demo:
   8 demo leads, real costs from `coins.ts` (email 5 / phone 8 / both 10 / profile 2),
-  start 50 (Free plan), reveal → balance animates + ledger row slides in (`−N … BAL N`),
+  start 50 (Free plan), reveal → balance animates + ledger row slides in (`-N … BAL N`),
   low-balance → disabled "Need N" + pulsing top-up, `+50 top-up` mint row, Reset.
   Fits the 260px card slot exactly (258/258 desktop, 238/238 mobile). Copy uses **"credits"**
   (product term; user said "tokens" but site never says tokens — flagged to user).
   Verified: lint/tsc clean, 16/16 browser checks, 0 console errors.
 - **Flowchart lead card** (`LeadOutreachFlowchart.tsx`, Why-section): desktop Stage 03 +
-  mobile Step 3 mock were bright-green `#B8F36B` cards with "✓ Claimed" footer — restyled
+  mobile Step 3 mock were bright-green `#B8F36B` cards with "✅ Claimed" footer — restyled
   1:1 with feed `LeadCard.tsx`: `bg-surface-container-low rounded-[22px] border
   border-border-subtle shadow-elevation-3`, category dot + `3/25` badge + timestamp,
   real type scale (headline 10.5px/0.12em, quote 13.5px clamp-2 / 15px clamp-3 mobile),
@@ -228,22 +228,22 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   with a light local radial scrim (`rgba(11,13,19,0.45)` center) to keep headline contrast.
   Old `/images/hero image 2.png` reference removed (file kept on disk).
 - **Verified:** lint clean; `tsc` 0 errors in HeroSection; browser screenshots desktop +
-  mobile — art behind hero text ✓, glowing eyes visible in the gap above the demo ✓, demo
-  bottom → next-section transition clean ✓, console clean (1 pre-existing Lenis warn).
+  mobile — art behind hero text ✅, glowing eyes visible in the gap above the demo ✅, demo
+  bottom → next-section transition clean ✅, console clean (1 pre-existing Lenis warn).
 - **Pre-existing quirk — "Trusted by 3500+" strip (FIXED 2026-10-05):** the strip was
   invisible on **every** viewport since the full-bleed restructure — two stacked causes:
   (a) demo window's `lg:mt-[-48px]` pulled it over the strip (only `mb-8` clearance) on lg+;
   (b) the section-level bg layer is `absolute … z-0` (positioned → paints ABOVE static
   in-flow content), so the plain static strip div rendered *underneath* the video/scrims at
   all sizes (hero copy survived because it lives in transformed `motion.div`s = positioned
-  layer; demo has `z-10`). Fix: strip wrapper got `relative z-10` + `lg:mb-16` (64 − 48 =
+  layer; demo has `z-10`). Fix: strip wrapper got `relative z-10` + `lg:mb-16` (64 - 48 =
   16px gap above the demo; mobile keeps `mb-8`/`mt-[-24px]` = 8px gap). Verified headless
   (gate flipped false): full-viewport screenshot shows the tan mono strip between the credits
   line and the demo, hit-test returns the span itself, 0 console errors, lint clean; gate
   restored to `true` after (ComingSoon markers re-verified on `/`).
 - **Full-bleed fix (user follow-up):** the gutters came from `page.tsx:58`'s
   `<main className="... max-w-[1280px] mx-auto px-4 sm:px-6">` (screenshot math: ~1580px
-  viewport → 1280 centered → content starts at x=174 ✓). Restructured so only the hero
+  viewport → 1280 centered → content starts at x=174 ✅). Restructured so only the hero
   artwork breaks out, zero change to the rest of the layout:
   1. `page.tsx` main keeps `min-h-screen bg-bg-main ... overflow-x-hidden` but LOST
      `max-w-[1280px] mx-auto px-4 sm:px-6`; a new wrapper `<div className="mx-auto
@@ -274,7 +274,7 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   - **Verified:** lint + tsc clean; `/videos/hero-bg.mp4` 200 (3155627 B) + poster 200;
     Playwright with gate flipped false: `paused:false, readyState:4, error:null, 1920×1080,
     muted:true, loop:true`, playhead advanced 3.04→4.57 s, screenshot = wolf video behind the
-    frameless hero copy ✓. Flag then **restored to `true`** and re-verified `/` serves
+    frameless hero copy ✅. Flag then **restored to `true`** and re-verified `/` serves
     ComingSoon (`1003.mp4` ×1, hero headline absent, HTTP 200).
   - **Two copies of the same footage now exist:** hero uses `/videos/hero-bg.mp4` (3.16 MB
     lossless remux), the coming-soon page uses `/videos/1003.mp4` (436 KB re-encode — kept
@@ -304,7 +304,7 @@ Note: user's original list had duplicate "5" (rollover + pricing); renumbered as
   (content was 158px in a 140px box → 3px overlap of "Step 02" label on hover).
 - Step 02 (`font-mono text-text-secondary`) + Step 03 (`font-mono text-accent-purple`) labels
   unified to match 01/04: `text-sm font-semibold text-accent-orange block mb-2`.
-- Verified in-browser: gap −28px at rest **and** on hover (was +3px overlap); all 4 labels
+- Verified in-browser: gap -28px at rest **and** on hover (was +3px overlap); all 4 labels
   identical (`600 · rgb(255,184,0) · 14px`); lint clean.
 
 ### #5 Rollover copy → 15 days (done — fully verified in browser)
@@ -333,11 +333,11 @@ Changed (13 edits across 6 files):
   created from whatever the admin UI sends.
 
 Verified in browser (screenshots in `%TEMP%\opencode\v5_*.png`):
-- Landing hero demo → Settings mock: "Renews monthly · Unused credits roll over for 15 days" ✓
+- Landing hero demo → Settings mock: "Renews monthly · Unused credits roll over for 15 days" ✅
 - Capabilities card 04 (hover): badge "15-Day Rollover" + "FULL LEFTOVER CARRIES OVER"
-  (old "NO EXPIRATION DATE" gone) ✓
+  (old "NO EXPIRATION DATE" gone) ✅
 - `/pricing` plans tab: Freelancer "Unused credits roll over for 15 days" + Agency "15-day
-  rollover on unused credits" ✓; top-ups tab banner re-titled "Purchased Credits Never Expire" ✓
+  rollover on unused credits" ✅; top-ups tab banner re-titled "Purchased Credits Never Expire" ✅
 - `/api/plans` returns new copy, `grep` sweep clean, lint clean.
 - email-templates tests: 2 pass / 2 fail — failures are pre-existing `renderEmailVerification`
   timeouts (untouched functions).
@@ -388,8 +388,8 @@ Shipped in a parallel session; verified here:
   merge; Esc + backdrop click close; body **and** `<main>` scroll-lock while open; reveal
   callback mirrors server state (`isReveal`, `status: 'saved'`, `isSaved`, `phone`) into both
   the table rows and the drawer detail; framer-motion enter/exit.
-- Signature check: `LeadDrawer` default export ✓, `onReveal(name, email, phone?, fullLead?)`
-  matches the call site ✓ (type-checked).
+- Signature check: `LeadDrawer` default export ✅, `onReveal(name, email, phone?, fullLead?)`
+  matches the call site ✅ (type-checked).
 - Verified: lint clean · `tsc` 0 errors in `saved/page.tsx` · page compiles HTTP 200 with
   0 console errors (incl. `?lead=dummy123` deep-link) · auth-gated → `/login` unauthenticated.
 - **Live click-through** (needs a logged-in account with ≥1 saved lead).
@@ -430,7 +430,7 @@ credit card required"; "Recommended" badge on Freelancer; no fake current-plan b
 `/api/plans` → `ids:[FREE,FREELANCER] prices:[0,999] credits:[50,1000]`; trust note + FAQ text
 confirmed; lint clean; **vitest 18 failed/167 passed = identical to pre-edit baseline**.
 
-**⚠️ Backend/dispatch notes:**
+**⚠ï¸ Backend/dispatch notes:**
 - `api/dashboard/route.ts:82` says `FREELANCER ? 500 : …` — inconsistent with config 1000
   (sidebar/mobile-nav/copilot all say 1000). Backend guy.
 - Copilot prompt copies (`api/copilot/route.ts`, `HunterCopilot.tsx:36`) still say coin costs
@@ -481,7 +481,7 @@ domain `https://leadhunterclub.com`; "Trusted by 3500+" confirmed real (left alo
   files; dev server HTTP 200 on `/privacy` `/terms` `/cookies` `/register` with legal strings
   present; checkbox state + guard code-reviewed (live submit test needs a fresh email).
 - **Pushed as `9beba57`** (pull --rebase was a no-op, sync `0 0`).
-- **⚠️ Stash note for the parallel session (saved/page.tsx):** to pull --rebase with a clean
+- **⚠ï¸ Stash note for the parallel session (saved/page.tsx):** to pull --rebase with a clean
   tree I stashed that file's WIP as `temp-saved-page-parallel-wip` (`stash@{0}` — the older
   `stash@{1..3}` entries are untouched). The pop was **refused and kept** because the other
   session re-edited the file meanwhile: live tree now has the 1-line `<div
@@ -518,10 +518,10 @@ Content-only rewrite of 6 sections across 3 files (layouts/components untouched)
   spec line; button → "Start Hunting Free"; NEW "50 free credits · No credit card required"
   under the button; dot chips + supporting row kept.
 - **Verified:** lint clean (3 files), tsc 0 new errors, old-string grep sweep = 0 hits, browser
-  22/22 DOM checks + "See How It Works" anchor click scroll ✓, desktop 1440 + mobile screenshots
+  22/22 DOM checks + "See How It Works" anchor click scroll ✅, desktop 1440 + mobile screenshots
   clean (no overflow: bodyScrollW == clientWidth, 0 text overflow), console = 1 pre-existing
   Lenis warn only. `/pricing` page + API defaults intentionally untouched (landing-only ask).
-- **⚠️ Launch gate discovered:** `src/lib/launch.ts` `COMING_SOON = true` (untracked user WIP)
+- **⚠ï¸ Launch gate discovered:** `src/lib/launch.ts` `COMING_SOON = true` (untracked user WIP)
   makes `/` render `ComingSoon.tsx` instead of the landing page — the new copy was verified with
   the gate temporarily flipped to `false`, then **restored to `true`**. Flip it to ship the page.
   ComingSoon already carries the new hero lines.
@@ -531,7 +531,7 @@ Content-only rewrite of 6 sections across 3 files (layouts/components untouched)
 (`plans` 2, `payment` 4, `credits` 9, `reveal route` 3 — the known stale-expectation set;
 was 19 before, one flaky email-templates timeout now passes). **No regressions.**
 
-### ⚠️ For the backend guy — dead endpoint discovered
+### ⚠ï¸ For the backend guy — dead endpoint discovered
 `src/app/api/auth/check-phone/route.ts` imports `arePhonesMatching` + `getPhoneDigits` from
 `@/lib/phone`, which **never existed** (committed file only exports `normalizePhone`) → the
 route throws into its own catch and always answers `isAvailable: true`. It also has **zero
@@ -547,7 +547,7 @@ must be implemented first. `tsc` flags these as 2 of the ~49 pre-existing errors
 - **`DELETE /api/auth/me`:** rate-limit 5/60s, 403 if `emailVerified` (DB row or JWT claim),
   admin-SDK `deleteUser(uid)` **first** (no recent-login wall; `FIREBASE_SERVICE_ACCOUNT_PATH`
   set in dev, fallback = client `user.delete()` try/catch), then hard DB delete (all FKs
-  cascade), returns `referralCode` → client re-saves `lh_ref_code`. ⚠️ Backend guy: referrer
+  cascade), returns `referralCode` → client re-saves `lh_ref_code`. ⚠ï¸ Backend guy: referrer
   may double-dip the +10 on re-signup (5 re-applies to user, referrer bonus not reversed).
 - **816c7da regression fixed:** "Sign in with a different account" restored on
   `/verify-email`. Both exits use `window.location.assign` (hard nav) — `router.replace`
@@ -582,7 +582,7 @@ User ask: let users edit the profile/social data collected at onboarding, mobile
   disabled while prefilling/saving), toasts for API `message`s, GET prefill on mount.
 - **Verified:** lint clean · tsc 41 errors = pre-existing baseline, **0 in touched files** ·
   vitest **18 failed | 183 passed (201)** = baseline + the 12 new · dev server serves
-  `/settings` HTTP 200 (route compiles). **⚠️ NOT browser-screenshot-verified:** auth-gated
+  `/settings` HTTP 200 (route compiles). **⚠ï¸ NOT browser-screenshot-verified:** auth-gated
   (ClientLayout) + standing no-new-accounts rule → needs a working login (same ask as §6.2).
 - **Session infra note:** all sub-agent models were dead this session
   (`mimo-v2.5-free`/`deepseek-v4-flash-free`/`muse-spark-1.3-free` → not found; config edits
@@ -605,7 +605,7 @@ User report: every login bounced straight to `/onboarding` (esp. yashnandan, dua
 - **Fix 2 (data):** dualsparkstudio DB role `user` → `admin` (user: "these people are admin")
   so it rides the same bypass. All 4 login-able rows now `admin`: admin@leadhunter,
   dualspark, yashkaranjule230, yashnandanshrivastava (system@internal never logs in).
-- **⚠️ Side-effect:** dualspark now sees the admin panel (role change). Revert =
+- **⚠ï¸ Side-effect:** dualspark now sees the admin panel (role change). Revert =
   `UPDATE users SET role='user' WHERE email='dualsparkstudio@gmail.com'` → then it must have
   its LinkedIn URL filled (its only missing gate field) or it bounces again.
 - **Unaffected:** PENDING new signups still hit the strict AND-gate → onboarding funnel
@@ -621,7 +621,7 @@ the API returns.
   — while the UI's Deep Intel (`buildLeadIntelText`/`parseIntelSections`) shows the full parsed
   sections from `buyerType`. Same intel, different (lossy) code path.
 - **Fix:** rewrote `leadsToRows` in `src/lib/csv.ts` — Lead Intelligence cell = every parsed
-  Deep Intel section (`Verdict: … • Context: … • Requirements: …`, same parser as the drawer),
+  Deep Intel section (`Verdict: … € Context: … € Requirements: …`, same parser as the drawer),
   fallback to the classic labelled pieces then the raw blob; added columns Title, One-Liner,
   Category, Source, Status, Urgency, Reply Probability, Summary (detailsSummary→summary→taskScope),
   Signal Context, Tags. Contact columns stay reveal-gated (blank until unlocked); intel passes
@@ -653,7 +653,7 @@ refreshed).
 - **Verified:** re-grep for `never expire|no expiry|Never Expires|forever|yours to keep|
   never lose|while your membership|as long as your` = 0 hits in `apps/web/src` · lint clean
   (all 6 files) · vitest **17 failed | 192 passed (209)** = baseline.
-- **⚠️ Bare `npx tsc --noEmit` now reports 44 pre-existing errors** (broadcast routes use
+- **⚠ï¸ Bare `npx tsc --noEmit` now reports 44 pre-existing errors** (broadcast routes use
   `admin.id` on `AuthUser` which has no `id`; sheets/export select fields; cron/newsletter/
   razorpay typings; Prisma mock args in credits/verify-session/coins tests; 1 `ButtonColor`
   in leads page + 2 support-page types). **Zero are from this sweep** — the 2 in the
@@ -694,7 +694,7 @@ dashboard. **All 5 blocks live on the main page** (user's placement choice).
   broadcast-page unescaped quotes) · vitest **17 failed | 192 passed (209)** = baseline ·
   dev server: `/admin` 200, `/api/admin/insights` 401 unauth, `/api/admin` 401 unauth,
   compiled clean in log.
-- **⚠️ Not browser-verified:** needs an admin login session to eyeball the 5 blocks
+- **⚠ï¸ Not browser-verified:** needs an admin login session to eyeball the 5 blocks
   (same standing gap as #9 sweep).
 
 ### Reviews gallery swap — new testimony images (2026-10-07)
@@ -711,7 +711,7 @@ Closures + Positive replies**. Design/animations untouched — only image source
 - **Verified:** lint clean (only pre-existing `<img>` warning) · SSR HTML: landing = exactly
   6 imgs `/review/positive/p01–p06`; `/reviews` = 79 imgs (first `c01`, last `p68`); 0 old
   WhatsApp refs anywhere · sampled URLs 200 with correct content-types (incl. `p51.png`).
-- ⚠️ Not eyeballed in a browser: chrome-devtools profile locked by the parallel session.
+- ⚠ï¸ Not eyeballed in a browser: chrome-devtools profile locked by the parallel session.
 
 ### Onboarding: free-text capture for the "Other" discovery source (2026-10-07)
 User ask: on the "how did you find us?" onboarding question, the **Other** option must
@@ -745,8 +745,8 @@ outside the floating collapsed navbar.
   overlay `md:hidden` → `lg:hidden` (tablet band now uses the hamburger — navigation stays
   reachable; brand text + CTA + hamburger fit with room to spare). Hover state (1100) and
   mobile layout untouched.
-- **Verified (browser, dev server):** overflow = −21px slack at 1440 (scrolled),
-  −20/−21 at 1024 (unscrolled incl. "Log in" + scrolled), −21 at 900 and −20 at 768
+- **Verified (browser, dev server):** overflow = -21px slack at 1440 (scrolled),
+  -20/-21 at 1024 (unscrolled incl. "Log in" + scrolled), -21 at 900 and -20 at 768
   (links hidden, hamburger visible), ~500 mobile unchanged (brand + hamburger, no
   horizontal doc scroll) · `next lint --file` clean.
 
@@ -926,7 +926,7 @@ errors; tsc 47 unchanged, 0 on touched lines.
 
 ### Saved leads pagination — 10 rows per page (`568069a` pushed, 2026-10-13)
 User ask: paginate the saved-leads table, 10 per page, break nothing.
-- **Change (`saved/page.tsx`, +80/−2):** `SAVED_PAGE_SIZE = 10`; `page` state; `totalPages`
+- **Change (`saved/page.tsx`, +80/-2):** `SAVED_PAGE_SIZE = 10`; `page` state; `totalPages`
   + `pagedLeads = slice(...)` derived from `filteredLeads`; row map renders `pagedLeads`;
   Prev/numbered/Next bar with "Showing X–Y of Z" under the table (hidden unless >1 page);
   page resets on tab/search change, clamps when rows are removed, scrolls card into view
@@ -969,7 +969,7 @@ Implemented per the locked counter plan:
 - **API:** `PATCH /api/leads/:id` accepts `logFollowUp: true` (increments, sets `lastFollowUpAt`, auto-moves `saved`/`new` → `follow-up`) and `followUpCount: N` (sets count + timestamp).
 - **Validator:** `updateLeadSchema` extended with `followUpCount` + `logFollowUp`.
 - **UI (`saved/page.tsx`):** action menu now has a "Follow-ups" section with:
-  - **"Log follow-up"** — increments counter, shows toast "✓ Follow-up N logged (moved to Follow-up)", auto-moves `Saved` → `Follow-up`.
+  - **"Log follow-up"** — increments counter, shows toast "✅ Follow-up N logged (moved to Follow-up)", auto-moves `Saved` → `Follow-up`.
   - **"Set count…"** — prompt for any number ≥0, retroactive entry (e.g. off-app calls).
   - Badge in table row: "FU N" (purple) when count > 0.
 - **Verified:** lint clean, tsc 0 new errors (all 51 are pre-existing baseline). Local test blocked by `/api/leads?saved=true` → 500 (backend gap). Ready for prod verification after deploy (~6 min).
@@ -1024,7 +1024,7 @@ time, while trackpad/momentum streams aren't always → native scroll slipped th
 User report (screenshot): settings showed "Phone Verification / Secure your account with
 SMS / Not Verified" + "Send OTP" + 6-digit code box + "Failed to send OTP" error. We send
 no OTPs anywhere — phone is contact info only. Removed the whole Firebase phone-auth flow
-from `settings/page.tsx` (−241/+68): `signInWithPhoneNumber`, `PhoneAuthProvider`,
+from `settings/page.tsx` (-241/+68): `signInWithPhoneNumber`, `PhoneAuthProvider`,
 `RecaptchaVerifier`, `ConfirmationResult`, `phoneStep`/`otpCountdown`/`phoneVerificationCode`
 state, verifier effects, send/verify handlers, recaptcha container, OTP UI. Replaced with
 a plain number entry + "Save Phone Number" via the existing `PATCH /api/auth/me` (already
@@ -1092,15 +1092,15 @@ author labels left plain (same destination, would be visual noise).
   the repo in the Vercel dashboard (or correct its Root Directory — app lives in
   `apps/web`). To read its logs: `npx vercel login` then
   `npx vercel inspect dpl_AYiyp7sA8r72GXSFGWQJ4duq9Hjq --logs`.
-- 🚨 **LAUNCH BLOCKER: `leadhunterclub.com` does not resolve in DNS at all** (apex, www
+- ðŸš¨ **LAUNCH BLOCKER: `leadhunterclub.com` does not resolve in DNS at all** (apex, www
   and NS lookups all NXDOMAIN — not a propagation delay). Site can't be reached on the
   domain until DNS is pointed at Vercel: add the domain in Vercel → project
   `leadhunterclub` → Settings → Domains, then follow the registrar instructions.
   Ask user: where is the domain registered / has it been added to Vercel yet?
-- `next build` ✔ · `next lint` ✔ (warnings only, pre-existing) · tests: **18 pre-existing failures**
+- `next build` ❌ · `next lint` ❌ (warnings only, pre-existing) · tests: **18 pre-existing failures**
   (stale expectations, e.g. `plans.test.ts` wants FREELANCER=500 but config=1000). Proven
   pre-existing via `git stash` / `git stash pop`.
-- ⚠️ **Hardcoded Razorpay TEST keys** in `apps/web/src/lib/razorpay.ts` with silent fallback if
+- ⚠ï¸ **Hardcoded Razorpay TEST keys** in `apps/web/src/lib/razorpay.ts` with silent fallback if
   env vars missing → **must set real env vars in Vercel and rotate the secret after launch.**
   (Values intentionally not recorded here.)
 - `vercel.json` regions `bom1`. `.env.example` = env checklist for Vercel.
@@ -1212,7 +1212,7 @@ in playful pet voice ("ooh, that link looks off…").
   noise, **0 in touched files** · vitest **17 failed | 204 passed (221)** = same
   17 pre-existing failures (payment 4, credits 9, auth 1, reveal 3) + 10 new
   passing. No dev server running (`:3000` closed) so no compile probe.
-- **⚠️ NOT browser-verified (needs login, standing gap §6.2):** gaze-follows-cursor,
+- **⚠ï¸ NOT browser-verified (needs login, standing gap §6.2):** gaze-follows-cursor,
   glide-to-focus, bubble side flips at edges, mobile park, mute/unmute, reduced
   motion, 0 console errors on a real onboarding run.
 
@@ -1295,9 +1295,345 @@ who "which one are you?…", faq "questions? good.…"); hero/funnel/pricing/fin
 get second-sighting comebacks ("still thinking?", "told you. live demand.",
 "do the maths", "ok, final push"); third sightings go quiet. CTA hover
 alternates two nudges via a new `ctaHits` counter in `LandingPet`
-("go on, click it" ↔ "no, really"). All copy kept consistent with site truth
+("go on, click it" → "no, really"). All copy kept consistent with site truth
 (50 free/no card, ₹999 ≈ 100+, 5–15 coins). Tests 4 → still 4 its but covering
 the whole matrix (14/14 pup tests green with onboarding's 10). Verified: lint
 clean, tsc 0 in touched files, full suite 18f/207p = same pre-existing set.
 Merged to `main`, pushed live.
+
+---
+
+### Cold email outreach machine (2026-10-23) — separate repo, free tools only
+
+**Architecture (locked):**
+- LeadHunterClub = **lead source only** (buyer-intent leads from `/saved` CSV export)
+- Sender = **yashnandanshrivastava@gmail.com** via Gmail API
+- Engine = **`E:\programming and stuff\lead-gen-emailer`** — own git repo, sibling folder
+- **Never commit outreach tool code/secrets into `leadhunterclubfull`** — this is a live webapp.
+- Stack 100% free: Groq free LLM (llama-3.3-70b) · Gmail API · Google Sheets · Windows Task Scheduler
+- Harvey = dead for us (requires Claude Pro subscription — user uses free tools only). **Its prompt system is now ported** as editable text in the engine.
+
+**Engine features (built + committed in lead-gen-emailer):**
+- 15-email sequences personalized from LeadIntel · threaded follow-ups · reply detection (auto-pause)
+- Daily send cap `MAX_DAILY_SENDS=50` (warmup: 25-30/day week 1 → 50 week 2) · `python main.py daily` · `setup_daily_task.ps1` (9:30am)
+- `import_leadhunter.py` — LHC CSV → sheet format, `--services` keyword filter for AI/web/SaaS leads
+- Copy sells **AI automation + web dev + SaaS development** (founder-led, no fake case studies)
+- Google OAuth client present (`credentials.json`); secrets gitignored
+
+**Prompt library + quality gate (2026-10-23 upgrade, commit `0de8536`):**
+- `prompts/writer_system.md` — Harvey-style STRICT EMAIL RULES (no em dashes, banned phrases, one question max, plain text, no links in email 1). Editable at runtime.
+- `prompts/sequence_strategy.yaml` — 15-step phases (Open → Nurture → Convert → Close) with per-step angle/CTA/word_limit. Editable.
+- `prompts/avoid_list.txt` — banned phrases the LLM cannot bypass (enforced in code). Editable.
+- `gate.py` — deterministic quality filter: hard-fails em dashes, ALL CAPS, >1 question mark, URLs in email 1, banned phrases, exclamation marks, over word limit. Retries LLM up to 3x. Run `python main.py gate-test` to verify.
+- `dashboard.py` — local web UI at **localhost:8080** (`python main.py dashboard`): campaign stats, daily send history, leads table, email preview with gate pass/fail badges, prompt editor, logs, JSON API.
+
+**User action required (GOLIVE.md in lead-gen-emailer):**
+1. Groq API key → `.env`
+2. Google Sheet with LHC leads → `LEAD_SHEET_ID` in `.env`
+3. Gmail OAuth once: `python main.py setup` (sign in as yashnandanshrivastava@gmail.com)
+4. `pre-generate` → review via dashboard → first live `daily` → register scheduled task
+
+**Later:** Reddit + free GitHub lead scrapers as additional sources (after core pipeline is live).
+- Related prior projects on this machine (not touched): `email_followup`, `Lead_Hunter`, `Ladhunterclub`, `harvey` (parked).
+
+### Cold email machine: compliance + send UI (2026-10-25) — shipped, commits `2e6243c` + `21ce454`
+
+**Compliance layer (`2e6243c`):**
+- CAN-SPAM footer appended at SEND time (`compliance.py` `append_footer`, idempotent; needs
+  `SENDER_ADDRESS` in `.env` — still missing, footer shows placeholder + warning until set).
+- Reply intent classifier (`reply_handler.py`): unsubscribe > ooo > not_interested > interested >
+  other; bare "stop" keyword included. Actions: unsubscribe→`opted_out` permanent, ooo→snooze 14d,
+  not_interested→`completed`, interested→`paused` + auto booking-link reply if `BOOKING_LINK` set,
+  other→`paused` NEEDS REVIEW. 17-case test suite passed (temp test file deleted after).
+- Dashboard `/replies` page (intent badges, snippets), "Opted Out" stat card, footer shown in preview.
+
+**Send UI (`21ce454`) — user's "send button + review edit send" request:**
+- `campaign_manager.py`: `_send_cached_step()` (shared single-step sender: gate check — catastrophic
+  garbage refused, style failures warn-and-send; footer; threading; state + sheet updates) and
+  `send_next_for_lead()` (dashboard endpoint: guards opted_out/paused/completed/snoozed, reply check
+  FIRST, sequence integrity next_step=current+1, daily cap; manual send overrides 2-day wait).
+- `dashboard.py`: lazy `_get_manager()` (OAuth on first send action), POST `/edit_email`
+  (save→re-gate via `check_email`, send→`send_next_for_lead`), POST `/quick_send`; preview page now
+  has editable subject input + body textarea per email, Save + "Send Now" (only for the lead's next
+  step when status active), "Send Next" buttons in cached-sequences table with JS confirm.
+- Verified: py_compile OK; preview list 200 (8 Send Next), review page 200 (15 Save + 1 Send Now);
+  no-op save POST → "Saved step 1", gate re-ran PASS; quick_send guard path → manager auth
+  initialized, refusal works. Dashboard restarted on localhost:8080.
+
+**Cache state:** 7 leads cached (~103 emails); poisoned abhijit + rhythmagarwalla files deleted
+(will regenerate). 20 leads uncached — run `python main.py pre-generate` when LLM quotas reset (UTC).
+
+**Blocked on user:** ~~`SENDER_ADDRESS` in `.env`~~ → **now dashboard-configurable**: Settings
+page (commit `be91f3c`) — sender name/email, postal address, meeting link + website link with
+toggles, saved to gitignored `settings.json` which overrides .env at runtime. User still needs to
+enter postal address + links via the UI (name/email prefilled). Prompt rewrite inputs (what they
+sell / what they've truly built / price anchor) for proof block + offer profile + 15→7-8 email trim.
+
+**API key question (answered 2026-10-25):** more same-provider accounts = ToS violation (ban risk
+on main keys). LLM calls are one-time per lead (pre-generate caches; daily sends = 0 LLM calls), so
+extra keys only speed the bootstrap — waiting for daily resets is free and safe.
+
+**Discussed, not built:** multi-inbox rotation (round-robin, per-inbox caps, SentFrom column,
+replies route to sending inbox), sender profiles for agency launch, lead feeders, email verifier
+keys (Reoon 600/mo, ZeroBounce 100/mo free), warmup schedule automation.
+
+### Cold email machine: manual outreach + universal intake (2026-10-26) — shipped, commit `4f20470`
+
+User asked: 8 emails/lead + dashboard tweak + manual outreach when AI quota is out + paste-anywhere
+lead intake + CSV robustness + how the AI analyzes leads. All built and committed:
+
+- **Emails per lead = 8, dashboard-configurable:** `settings.json` `emails_per_lead` (validated
+  1–15) → overrides `Config.MAX_FOLLOW_UPS` at runtime. Settings page has a number field. Fixed
+  `pre_generate_all` bug: was hardcoding `len(sequence)` (15), now `min(MAX_FOLLOW_UPS, len)`.
+- **Manual outreach mode (no LLM needed):** `/add_lead` page — fill lead fields + optionally write
+  the first email (subject/body) and follow-ups separated by `---` lines. `campaign_manager.
+  add_manual_lead()`: validates email, refuses sheet duplicates (`sheet_client.email_exists`),
+  appends via `sheet_client.append_lead`, writes cache entries with `"source": "manual"`, gate runs
+  warn-only (user-authored copy is never blocked), state step=0/active. Daily run / Send Next sends
+  them automatically. AI mode = leave email boxes empty → row lands in sheet for next pre-generate.
+- **Universal paste intake:** `lead_parsing.py` `parse_pasted_leads()` — regex emails + name
+  heuristics (`Name <email>`, `Name - email`, `email (Name)`, bare email → name from local part,
+  capitalized-name guard so line prose isn't mistaken for a name). `/paste_leads` page with import
+  report (added / duplicates skipped). Works for LinkedIn, directories, WhatsApp, CSV fragments.
+- **CSV importer robustness:** `import_leadhunter.py` `--min-intel` default 20→0 (keeps
+  contact+name-only leads; AI personalizes on name/company/role) + in-file dedupe by lowercase email
+  (root cause of the `drishtirajpoot905` dupe in the sheet).
+- **Prompt rule:** `writer_system.md` — "If LeadIntel empty/thin, personalize on name/company/role
+  only, NEVER invent company details."
+- **Tests:** offline suite passed (parser 5-lead messy-text case incl. dupe skip; add_manual_lead
+  3-email manual sequence cached, dupe/bad-email refused, AI-mode add without cache). Dashboard
+  restarted: `/add_lead`, `/paste_leads`, `/settings` all 200 with new fields verified in HTML.
+  No test rows written to the real sheet.
+
+**Still blocked on user:** Settings page postal address + links; prompt rewrite inputs (offer/
+proof/price); 20 leads uncached until LLM quotas reset (pre-generate now writes 8/lead).
+**Scheduler note:** `setup_daily_task.ps1` already has `-StartWhenAvailable` (missed 9:30am run
+catches up at next boot). Task deliberately NOT registered yet — register only after Settings page
+is filled + cache is full, so the first automated send isn't a placeholder-footer email.
+
+### Cold email machine: multi-inbox rotation (2026-10-26) — shipped, commit `21345eb`
+
+User asked for multiple sending Gmails to scale volume. Built (rotation + per-inbox caps +
+thread continuity), with honest advice against same-day multi-hits on one lead:
+
+- **`inbox_auth.py` (new):** per-inbox OAuth — `authenticate_inbox()` opens Google login from the
+  dashboard, saves `tokens/{email}.json` (pickle); `list_inbox_tokens()` / `disconnect_inbox()` /
+  `refresh_inbox_token()`. Legacy `token.json` stays PRIMARY. Scopes: gmail send/compose/modify.
+- **`gmail_client.py`:** `GmailClient(service, sender_email, sender_name)` — per-inbox From header,
+  falls back to Config (backward compatible).
+- **`campaign_manager.py`:** `self.inboxes: {email: GmailClient}`; `_pick_inbox(lead, step)` —
+  step 1 = round-robin over inboxes with capacity, step >1 = pinned to `sent_from` (the thread
+  lives in that mailbox — continuity beats rotation); per-inbox daily counters
+  (`daily_sends_by_inbox` in state, 7-day retention); `MAX_DAILY_SENDS` is now PER INBOX
+  (total = 50 × n inboxes); reply detection scans ALL inboxes and pins `sent_from` to the one that
+  received the reply (booking auto-reply goes from that inbox too).
+- **`dashboard.py` Settings:** "Sending inboxes (rotation)" panel — lists primary + extras with
+  Disconnect buttons, "Connect another Gmail inbox" button (POST `/connect_gmail`, blocking OAuth,
+  opens browser), cap math shown (50/inbox × n).
+- **Tests:** offline suite passed — 3-inbox round-robin, sent_from continuity, per-inbox cap skip,
+  all-at-cap refusal, cross-inbox reply scan pinning, single-inbox backward compat. Dashboard
+  restarted, Settings page shows the inbox section. No real sends.
+- **Gotchas for user:** each new Gmail must be a test user on the OAuth consent screen (Testing
+  mode) or Google blocks with access_denied; "unverified app" warning → Advanced → Go to app is
+  normal; new inboxes need ~2 weeks warmup before full cold volume; free Gmail hard limit ~500/day
+  but 30–50/inbox/day is the deliverability-safe zone.
+- **NOT built (proposed):** staggered second-touch — full sequence from inbox A, no reply → fresh
+  sequence from inbox B weeks later with a different angle (the legit version of "hit the same
+  lead from multiple Gmails"; same-day multi-hit reads as spam and Gmail correlates accounts).
+
+### Cold email machine: inbox angles A/B test (2026-10-26) — shipped, commit `ac41378`
+
+User approved the 4-addresses × 4-angles concept. Built the full angle system (infrastructure;
+angle copy is editable prompts):
+
+- **`prompts/angles.yaml` (new):** 4 angles — `shipped_proof` (credibility via LeadHunterClub as
+  shipped proof), `stated_need` (uses LeadIntel, falls back to role_reality when thin),
+  `role_reality` (safe default for thin leads, role-level observations only), `speed_lean`
+  (weeks-not-quarters). Each has label + guidance; angle shapes EMAIL 1 hook only, follow-ups
+  stay governed by sequence_strategy.yaml. Editable on the Prompts page.
+- **`email_generator.py`:** `load_angles()` (+ cache, reloadable via `reload_prompts()`);
+  `_angle_block(angle, step)` injects an "INBOX ANGLE" section into the system prompt for step 1
+  only; `generate_email(..., angle=None)` and `generate_full_sequence(lead, angle=None)` accept it.
+- **`campaign_manager.py`:** `pre_generate_all` now assigns each lead an inbox+angle round-robin
+  over `settings.inbox_angles` (fallback: connected inboxes with no angle) and stores
+  `assigned_inbox` / `angle` in lead state; `_pick_inbox` prefers `assigned_inbox` on step 1;
+  live path picks the inbox BEFORE generation so the bound angle shapes the email; footer variant
+  from `_footer_variant(inbox_email)` (crc32 % 4) applied at all 4 send sites (live, cached,
+  booking reply ×2).
+- **`compliance.py`:** `OPT_OUT_LINES` — 4 footer phrasings (same meaning, different words, so
+  inboxes don't share an identical fingerprint); `build_footer(variant)` / `append_footer(body,
+  variant)`; idempotency checks ANY variant line so a body never gets two footers.
+- **`settings.py`:** `inbox_angles: {inbox_email: angle_id}` default + validation (keys must be
+  emails, values must be known angle ids).
+- **`dashboard.py`:** Settings — "Inbox angles (A/B test)" block with a dropdown per connected
+  inbox (POST parses `angle_<email>` fields); Overview — "Angle Performance" panel (leads/sends/
+  replies/reply-rate per angle from lead state `angle` + `replied_at`).
+- **Tests:** `_test_angles.py` (committed) — 19 checks all pass: angle loading, injection
+  (step 1 only, unknown/None safe), 4 footer variants + cross-variant idempotency, settings
+  validation, assigned-inbox preference on step 1, sent_from continuity on step 2, round-robin
+  assignment. Dashboard restarted; /settings and / return 200; angle panel renders. Settings
+  dropdowns show the "connect a Gmail inbox" fallback in this environment because
+  `_gmail_account()` returns None here (token.json exists but the profile check fails offline —
+  pre-existing, not a regression); dropdowns render correctly when an inbox resolves (verified
+  via standalone Jinja test).
+- **Next for user:** approve/edit the 4 angle drafts on the Prompts page, connect the extra
+  Gmails on Settings, bind angles per inbox, then run `python main.py pre-generate` after the
+  LLM quota reset (assignments happen at pre-generate).
+
+### Cold email machine: dashboard pre-generation + angle editor (2026-10-26) — complete, pending commit
+
+- **Dashboard pre-generation:** Overview now has a **Pre-generate sequences** button. It starts the
+  existing `CampaignManager.pre_generate_all()` in a background thread, so the page stays usable;
+  progress shows processed/cached/failed leads and the active lead/email step, refreshing every
+  three seconds. It only generates and caches drafts — it cannot send email. The CLI command stays
+  available as a fallback. Cached sequences remain untouched.
+- **Angle editing:** `prompts/angles.yaml` is now selectable and editable on the Prompts page;
+  pre-generation hot-reloads prompt files immediately before it starts, so saved angle edits apply
+  to newly generated sequences.
+- **Verification:** `py_compile` clean; offline Flask test verifies the background task lifecycle
+  and progress state plus the angle-editor route; Overview and prompt-editor requests both return
+  HTTP 200. No Gmail, Google Sheet, LLM, cache, token, or send state was changed during testing.
+
+### Cold email machine: per-inbox sender names (2026-10-26) — shipped, commit `824f8b6`
+
+User wants different sender names per inbox (same name across 3 addresses defeats the purpose of
+using multiple inboxes). Built per-inbox identity:
+
+- **`settings.py`:** `inbox_names: {inbox_email: display_name}` default + validation (keys must be
+  emails, values must be text).
+- **`compliance.py`:** `build_footer(variant, sender_name)` and `append_footer(body, variant,
+  sender_name)` — per-inbox name overrides the global `Config.SENDER_NAME` in the footer.
+- **`campaign_manager.py`:** `__init__` accepts `inbox_names` and creates each `GmailClient` with
+  its own `sender_name`; auto-loads extra inboxes from `tokens/` on startup; `_inbox_name()`
+  helper returns per-inbox name with global fallback; `add_inbox(email, sender_name)` adds a
+  newly connected inbox to the running manager without restart; all 4 `append_footer` call sites
+  (live, cached, booking reply ×2) now pass `self._inbox_name(inbox_email)`.
+- **`gmail_client.py`:** already supported per-instance `sender_name` (used in `From` header via
+  `formataddr((sender_name, sender_email))`) — no change needed.
+- **`dashboard.py`:** Settings page shows a "Sender name" input per connected inbox (next to the
+  angle dropdown); POST saves `inbox_names` dict; `connect_gmail` adds the new inbox to the
+  running manager with a default name (email local-part) so it's usable immediately.
+- **`.gitignore`:** added `tokens/` (OAuth secrets — never commit).
+
+**Current state:** 3 inboxes connected (yashnandanshrivastava@gmail.com primary,
+skribal.designs@gmail.com, webmatic.dev@gmail.com). Each needs its own sender name set on
+Settings before pre-generating.
+
+### Cold email machine: second OpenRouter key + capacity findings (2026-10-27) — shipped, commit `aadc6a5`
+
+- **OpenRouter exhaustion diagnosed:** the account-level `free-models-per-day` limit (50/day) was
+  drained by the user's OpenCode sessions running `nvidia/nemotron-*.free` through the same
+  OpenRouter account (`opencode.log`: 601 openrouter lines, 681 rate-limit lines, wall at
+  12:06 UTC). Not the emailer. Fix: run coding on OpenCode's own free provider, keep OpenRouter
+  for the emailer.
+- **`OPENROUTER_API_KEY_2` added:** new `openrouter-2` provider in `PROVIDERS` + `CALLERS`
+  (`llm_client.py`), `Config.OPENROUTER_API_KEY_2` (`config.py`), validation updated. Chain is
+  now `openrouter -> openrouter-2 -> gemini -> gemini-2 -> groq`. Verified: key 1 exhausted →
+  auto-falls through to key 2 → generation succeeds.
+- **Key status (today):** OR key1 0/50 (resets UTC), OR key2 0/50 (fresh), Gemini key1 + key2
+  both present in `.env` (key2 is a 39-char key), Groq OK.
+- **CRITICAL capacity finding:** AI quota is NOT the bottleneck — **Gmail send capacity is**.
+  At 3 inboxes × 50 sends/day = 150 sends/day, an 8-email sequence yields only ~19 new
+  leads/day steady-state. To hit 50 new leads/day at 8 emails needs ~400 sends/day = ~8 warm
+  inboxes. Alternatives: shorten sequence to ~5 emails (→ ~30 leads/day on 3 inboxes) or add
+  inboxes. AI drafting for 50 leads/day = 400 calls, which the ~650/day stack covers.
+- **Caveat:** two Gemini keys only add capacity if they belong to different Google Cloud
+  projects; keys from the same project share one quota.
+
+
+### Cold email machine: sequence math corrected + API-key UI + 2 bug fixes (2026-10-27) — shipped, commit `cf01324` / `bbeba2a`
+
+- **Sequence length was 15, not 8.** `MAX_FOLLOW_UPS=15` in `.env` AND `settings.json.emails_per_lead=8`
+  (settings.json overrides .env at import). The 7 cached sequences are 15/14 emails. Both now set to **5**
+  (`MAX_FOLLOW_UPS=5`, `emails_per_lead=5`); cached files simply send the first 5.
+- **Accumulation math (N=20/day, L=5, D=2):** per-lead emails on days 0,2,4,6,8. Daily send load ramps
+  20→20→40→40→60→60→80→80→**100** by day 8, then 100/day steady state. Ramp length = `(L-1)×D = 8` days.
+  In-flight ≈ 400 emails is normal pipeline, not backlog.
+- **Ceiling:** `N_max = (inboxes × 50) / L`. 3 inboxes, L=5 → **30 new contacts/day hard ceiling**;
+  safe operating point **20–25/day** (67–83% utilisation). At 15 emails the same 3 inboxes cap at 10/day.
+  Adding 2 inboxes (5 total) lifts the ceiling to 50/day at L=5 (40/day safe).
+- **Backlog law:** if upload rate exceeds capacity, backlog grows `(N×L) - (inboxes×50)` per day.
+  At 40/day on 3 inboxes that is -50/day → 1,500 stranded before day 30.
+- **API keys UI (`env_store.py` + Settings page):** masked per-slot status (OpenRouter 1/2, Gemini 1/2,
+  Groq), write to `.env`, push into `os.environ` + `Config`, reset the cached manager so `LLMClient`
+  rebuilds — no server restart. Blank field = keep; "clear" checkbox empties a slot.
+- **Bug fixed — `POST /settings` 500:** `'dict' object has no attribute 'email'`. `list_inbox_tokens()`
+  returns dicts; the POST handler used `.email`, so **Settings save crashed for every multi-inbox setup**.
+  Fixed to `ib["email"]`.
+- **Bug fixed — primary inbox missing from Settings:** `_gmail_account()` read `token.json` as JSON, but
+  the app stores a **pickle** (as `sheet_client`/`inbox_auth` do). Now unpickles (and re-pickles on refresh).
+  All 3 inboxes now render with angle + sender-name fields.
+- **Saved sequences note:** cached 15-email files keep working; emails 6-15 are paid-for but unused.
+- **Tracker:** `lead-gen-emailer/ISSUES.md` created — 9 open items, top = `send_from_cache` 50-cap bug
+  (loses 2/3 capacity) and missing due-date fairness.
+
+### Cold email machine: cap bug fixed + warmup control (2026-10-27) — shipped, commit `67f267d`
+
+- **Bug #1 fixed (CRITICAL):** `send_from_cache` budgeted and stopped on a single inbox's
+  `MAX_DAILY_SENDS` (50) instead of `total_daily_cap(len(inboxes))`. The dashboard/CLI cache-send path
+  was silently capped at 50/day total, not 150. Now uses the aggregate cap. All four send paths
+  (`run_once`, `send_from_cache`, `send_next_for_lead`, `run_daily`) agree.
+- **Warmup control in the UI:** new `daily_cap_per_inbox` setting (settings.json → `Config.MAX_DAILY_SENDS`).
+  Settings page shows "Daily sends per inbox (warmup)" with the live total (`cap × inboxes`).
+  Set to **10** for week 1 → 30 sends/day → **6 new contacts/day** at L=5.
+- **Warmup schedule (3 inboxes, L=5):** week 1 = 10/inbox (30/day, 6 contacts) → week 2 = 20 (60/day, 12)
+  → week 3 = 35 (105/day, 21) → week 4+ = 50 (150/day, 30).
+- **Current effective config:** `MAX_FOLLOW_UPS=5`, `MAX_DAILY_SENDS=10` (warmup), 3 inboxes → 30 sends/day.
+- **Lead supply note:** the 29 leads in the sheet are DEMO and will be deleted by the user. Upcoming leads
+  will come in mixed intel formats, split into **inbound (already asking) vs cold** — logged as planned work
+  in `ISSUES.md`; inbound must not get the 5-email cold sequence.
+- **Remaining top bugs:** #2 due-date fairness/starvation, #3 no `nurture` status, #5 no queue dashboard.
+
+### Credits-exhausted modal: palette + single paid plan + top-ups (2026-11-02)
+
+- **Rewrote** `apps/web/src/components/ui/CreditExhaustedModal.tsx` to match the "Obsidian Kinetic" system and
+  `UpgradeNudgePopup` (liquid-glass panel on `#0b0b0e/[0.97]`, `border-white/[0.11]`, `rounded-[24px]`, amber
+  `accent-purple` CTA, mint `accent-mint` credit accents, `text-text-*` tokens, framer-motion, Escape + body
+  scroll lock, 44px touch targets). Dropped the raw `#0e131f` / `purple-500` / hardcoded mint styling and the
+  old two-column plan grid.
+- **One paid plan only:** modal shows Freelancer Pro (₹999/mo, 1,000 credits); Agency card removed.
+- **Top-ups surfaced:** 125/₹199, 275/₹399 (Popular), 450/₹599; pack buttons and "View all" route to
+  `/pricing?tab=refills`, plan CTA routes to `/pricing`.
+- **Real balance in the header:** `LeadCard`, `LeadDrawer`, and `PipelineLeadCard` now dispatch
+  `{ available, required }` with `open-credit-exhausted-modal`; the modal shows actual remaining credits and
+  the reveal cost instead of always "0 Credits Remaining".
+- **Icon fix + policy:** the lightning `BoltIcon` in the modal header was replaced with `BanknotesIcon`
+  (matching `UpgradeNudgePopup`'s credits mapping). A permanent "no generic AI-slop icons" rule (no bolts,
+  sparkles, rockets, wands, brains, robots) now lives in root `AGENTS.md` § *Design & iconography rules*,
+  `docs/DESIGN.md` § *Iconography (non-negotiable)*, and is referenced from `docs/AGENTS.md`.
+- **Design doc resynced:** `docs/DESIGN.md` still documented the retired "Arc Light" palette (green
+  `#B8F36B` / lilac `#A78BFA`). Rewrote it to the shipped "Obsidian Kinetic" tokens from
+  `apps/web/src/lib/colors.ts` (amber `#ffb800` primary, mint `#43ed9e`, obsidian ladder `#0d0e0f`–`#343536`),
+  documented the `accent-purple` → amber alias trap, added a *Surface & glass treatment* recipe (the modal
+  pattern), and refreshed the `docs/AGENTS.md` index + component conventions. YAML block validated.
+- **Checks:** `tsc --noEmit` → same pre-existing repo errors, none in touched files; `next lint` → same
+  pre-existing baseline (`admin/broadcast/page.tsx` unescaped quotes + warnings). No new issues. Modal
+  re-rendered at 900px and 375px with the banknotes icon confirmed.
+
+### Community popup (admin announcements/wins): readable size, images, per-category design (2026-11-02)
+
+- **Problem:** the popup users see for admin posts (`CommunityWinPopup`, fed by `/api/community/unread-popup`)
+  was `max-w-lg` with `line-clamp-3` content, **never rendered `imageUrl` at all**, and hardcoded win copy
+  ("Fresh Member Win Just Verified!") even for `ANNOUNCEMENT` posts. Long announcements were unreadable.
+- **Rebuilt** `apps/web/src/components/ui/CommunityWinPopup.tsx`:
+  - Width 640px / 720px at `sm+` (was 512px), `max-h-[calc(100dvh-1.5rem)]`, whole panel scrolls so the
+    entire announcement body and attachment are reachable; action bar is `sticky bottom-0` so CTAs stay
+    visible while scrolling.
+  - `post.title` is now the dialog heading (was a duplicate hardcoded headline); `content` renders with
+    `whitespace-pre-line` and no clamp, so admin line breaks/lists survive.
+  - Image attachments now render full-bleed (`h-52 sm:h-72 object-cover`) with a bottom fade, `loading="lazy"`,
+    plain `<img>` + eslint note because admin URLs are arbitrary (no `remotePatterns` entry).
+  - Category-aware design mirroring the Community Hub: **amber** for `ANNOUNCEMENT`, **mint** for wins
+    (`DEAL_CLOSED` / `MEETING_SCHEDULED` / `POSITIVE_REPLY` / `SPOTLIGHT`), **cyan** for `STRATEGY`;
+    matching pill, icon tile, glow and CTA. Removed the `SparklesIcon` fallbacks (icon policy) — now
+    `Megaphone` / `Star` / `BookOpen` / `ShieldCheck`.
+  - Post meta: deal size + niche chips, author avatar/plan, formatted "Posted 2 Nov 2026" date; confetti only
+    for actual wins, in palette colors.
+  - A11y: `aria-labelledby` points at the real title, focus moves into the panel, Tab is trapped, Escape and
+    backdrop dismiss, body scroll locked, `overscroll-contain` so mobile scroll doesn't chain.
+- **Docs:** `docs/DESIGN.md` now records the category-tinted CTA exception to the "single amber CTA" rule.
+- **Verified:** temporary `/qa-popup-preview` route rendered announcement+image, member win, and no-image
+  variants at 1280×800 and 375×812; scrolled top→bottom on both, confirmed image, full text, author row and
+  pinned CTAs. Route deleted, dev server stopped.
+- **Checks:** `tsc --noEmit` and `next lint --file` both clean for the touched file; no new repo-wide errors.
 

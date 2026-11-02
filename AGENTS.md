@@ -23,6 +23,26 @@ When a user request matches a skill's trigger:
 2. Follow its instructions and conventions
 3. Do not deviate from its rules unless the user explicitly overrides
 
+## Design & iconography rules
+
+- **No generic "AI slop" icons.** Never use lightning bolts (⚡ / `BoltIcon`), sparkles, rockets, magic wands,
+  brains, or robot glyphs for product concepts — credits, upgrades, billing, AI, or "energy". They read as
+  template slop and are banned from product UI.
+- **Use literal, domain-specific icons** from the project sets (`@heroicons/react/24/outline`, `lucide-react`):
+  - credits / billing / top-ups → `BanknotesIcon` / `Wallet` / `CurrencyRupeeIcon`
+  - verified / success → `CheckBadgeIcon` / `CheckIcon`
+  - warnings → `ExclamationTriangleIcon`
+  - contact data → `EnvelopeIcon` / `PhoneIcon` / `UserIcon`
+  - exports → `TableCellsIcon` / `ArrowDownTrayIcon`
+- **Reuse existing mappings before inventing one.** `UpgradeNudgePopup` already maps low/out-of-credits to
+  `BanknotesIcon` — follow that, don't reach for a new metaphor.
+- **Render consistently:** outline style, heroicons `strokeWidth={1.6}`, 20px icon inside a 44px tile, tinted
+  with a palette token (`accent-purple`, `accent-mint`, `text-text-*`) — never raw hex or the default icon color.
+  Note the legacy alias trap: `accent-purple` renders **amber `#ffb800`**, `accent-mint` renders **green
+  `#43ed9e`**. Full palette + surface/glass recipe: `docs/DESIGN.md`.
+- **One icon per concept.** Every icon must carry meaning. Decorative icon soup (an icon next to every label)
+  is banned; if it's only decoration, remove it.
+
 ## Git workflow
 
 - **Always pull before pushing — no exceptions.** Run `git pull --rebase origin main` (fetch + rebase) *before* every `git push`, so commits pushed from other machines/sessions are integrated first and the push is never rejected.

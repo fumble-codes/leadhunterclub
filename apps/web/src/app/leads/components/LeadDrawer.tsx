@@ -305,7 +305,14 @@ export default function LeadDrawer({
         window.dispatchEvent(new Event('user-refetch'))
       } else {
         if (json.code === 'INSUFFICIENT_CREDITS' || res.status === 402) {
-          window.dispatchEvent(new CustomEvent('open-credit-exhausted-modal'))
+          window.dispatchEvent(
+            new CustomEvent('open-credit-exhausted-modal', {
+              detail: {
+                available: typeof json.available === 'number' ? json.available : undefined,
+                required: typeof json.required === 'number' ? json.required : undefined,
+              },
+            }),
+          )
         }
         setErrorMsg(json.message || 'Failed to unlock lead')
       }

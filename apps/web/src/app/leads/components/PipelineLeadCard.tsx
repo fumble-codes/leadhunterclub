@@ -219,7 +219,14 @@ function PipelineLeadCard({
       const json = await res.json()
       if (!res.ok) {
         if (json.code === 'INSUFFICIENT_CREDITS' || res.status === 402) {
-          window.dispatchEvent(new CustomEvent('open-credit-exhausted-modal'))
+          window.dispatchEvent(
+            new CustomEvent('open-credit-exhausted-modal', {
+              detail: {
+                available: typeof json.available === 'number' ? json.available : undefined,
+                required: typeof json.required === 'number' ? json.required : undefined,
+              },
+            }),
+          )
         }
         addToast({
           type: 'error',
