@@ -166,7 +166,7 @@ export function extractNiches(
     } else if (pNiche.includes('ui/ux') || pNiche.includes('design') || pNiche.includes('brand')) {
       niches.push('Design')
       if (pNiche.includes('web')) niches.push('Web Design')
-    } else if (pNiche.includes('paid ads') || pNiche.includes('marketing') || pNiche.includes('growth')) {
+    } else if (pNiche.includes('paid ads') || pNiche.includes('marketing') || (pNiche.includes('growth') && !pNiche.includes('seo'))) {
       niches.push('Paid Ads & Marketing')
       niches.push('Marketing')
     } else if (pNiche.includes('seo')) {
