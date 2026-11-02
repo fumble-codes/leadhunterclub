@@ -44,6 +44,18 @@ export function getScraperToolInfo(lead: any): ScraperToolInfo {
     .toLowerCase()
     .trim()
 
+  if (rawEngine === 'hunter_crawler' || rawEngine === 'huntercrawler' || rawEngine === 'hunter') {
+    return {
+      id: 'hunter_crawler',
+      name: 'HunterCrawler',
+      shortName: 'Hunter',
+      icon: '🎯',
+      badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      borderClass: 'border-emerald-500/30',
+      pillClass: 'bg-emerald-500/10 text-emerald-300',
+    }
+  }
+
   if (rawEngine === 'scrapedog' || rawEngine === 'scrapingdog') {
     return {
       id: 'scrapedog',
