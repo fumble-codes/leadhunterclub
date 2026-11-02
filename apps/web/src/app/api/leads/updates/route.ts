@@ -5,6 +5,8 @@ import { mapLeadPostToExternal } from '@/lib/oracle-mapper'
 import { requireFullyAuthorized, handleAuthApiError } from '@/lib/auth'
 import { LEAD_POST_SELECT, externalPostToAppLead } from '@/lib/lead-mapper'
 
+import { buildPrismaNicheFilter } from '@/lib/niche-filter'
+
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
@@ -37,7 +39,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (niche && niche !== 'All') {
-      where.niche = niche
+      const nicheFilter = buildPrismaNicheFilter(niche)
+      if (nicheFilter) {
+        where.niche = nicheFilter
+      }
     }
 
     // 1. Lightweight count check first (minimal egress)

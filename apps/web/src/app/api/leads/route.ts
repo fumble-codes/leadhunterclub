@@ -30,6 +30,8 @@ import {
   getCachedRevealCounts,
   setCachedRevealCounts,
 } from '@/lib/feed-cache'
+import { buildPrismaNicheFilter } from '@/lib/niche-filter'
+
 export const dynamic = 'force-dynamic'
 
 function formatTimeAgo(dateStr: string): string {
@@ -341,7 +343,10 @@ export async function GET(request: NextRequest) {
             ],
           }
           if (niche && niche !== 'All') {
-            where.niche = niche
+            const nicheFilter = buildPrismaNicheFilter(niche)
+            if (nicheFilter) {
+              where.niche = nicheFilter
+            }
           }
           const [fetchedLeads, fetchedTotal] = await Promise.all([
             oracleDb.leadPost.findMany({

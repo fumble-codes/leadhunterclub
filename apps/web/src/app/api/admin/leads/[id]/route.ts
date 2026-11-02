@@ -107,6 +107,7 @@ export async function POST(
           console.error('[Admin Leads] Failed to broadcast lead alert email:', emailErr)
         }
 
+        clearFeedCache()
         return NextResponse.json({ success: true, data: approved, mode: intelResult.mode, message: 'Lead approved and released to the feed with intelligence report.' })
       }
       case 'reject': {
