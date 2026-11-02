@@ -781,11 +781,14 @@ export default function AdminLeadsPage() {
     if (lead.email?.trim()) return true
     if (lead.contact_info?.emails?.some((e) => e.email?.trim())) return true
     if (lead.contact_info?.phone_numbers?.some((p) => p.number?.trim())) return true
+    if (lead.contact_info?.profile_url?.trim()) return true
+    if (lead.contact_info?.linkedin_public_id?.trim()) return true
+    if (lead.author?.url?.trim() && !lead.author.url.includes('#')) return true
     return false
   }
 
   const leadHasContactDetails = (lead: ExternalPost) =>
-    (lead.enrichment_status === 'found' || lead.enrichment_status === 'partial') &&
+    (lead.enrichment_status === 'found' || lead.enrichment_status === 'partial' || leadHasDiscoverableContact(lead)) &&
     leadHasDiscoverableContact(lead)
 
   const leadCanBulkApprove = (lead: ExternalPost) =>
