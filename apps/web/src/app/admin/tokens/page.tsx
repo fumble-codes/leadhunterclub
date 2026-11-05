@@ -53,7 +53,7 @@ interface AutomationSettings {
 }
 
 export default function AdminTokensPage() {
-  type EngineTab = 'apify' | 'scrapedog' | 'crawlbase' | 'scrapingbee' | 'zenrows' | 'zyte' | 'routing'
+  type EngineTab = 'hunter_crawler' | 'apify' | 'scrapedog' | 'crawlbase' | 'scrapingbee' | 'zenrows' | 'zyte' | 'routing'
   const [activeEngineTab, setActiveEngineTab] = useState<EngineTab>('apify')
 
   const [tokens, setTokens] = useState<ApifyKey[]>([])
@@ -235,6 +235,34 @@ export default function AdminTokensPage() {
       addToast({ type: 'success', message: 'Scraper engine routing saved successfully' })
     } catch (err: any) {
       addToast({ type: 'error', message: err?.message || 'Failed to save routing settings' })
+    } finally {
+      setIsSavingRouting(false)
+    }
+  }
+
+  const handleQuickSwitchEngine = async (targetEngine: string) => {
+    if (primaryEngine === targetEngine || isSavingRouting) return
+    setIsSavingRouting(true)
+    try {
+      await apiCall('/api/admin/settings?service=scraper-engines', {
+        method: 'POST',
+        body: JSON.stringify({
+          primaryEngine: targetEngine,
+          primary_engine: targetEngine,
+          fallbackEngines: fallbackEngines.filter((e) => e !== targetEngine),
+          paused_engines: pausedEngines,
+        }),
+      })
+      setPrimaryEngine(targetEngine)
+      const name =
+        targetEngine === 'hunter_crawler'
+          ? 'HunterCrawler'
+          : targetEngine === 'apify'
+          ? 'Apify'
+          : targetEngine.charAt(0).toUpperCase() + targetEngine.slice(1)
+      addToast({ type: 'success', message: `Primary scraper engine flipped to ${name}!` })
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Failed to switch scraper engine' })
     } finally {
       setIsSavingRouting(false)
     }
@@ -717,9 +745,135 @@ export default function AdminTokensPage() {
         <CustomLoader page="admin" />
       ) : (
         <div className="space-y-6">
+          {/* Quick Primary Engine Flip Switch */}
+          <div className="bg-surface/60 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-4 sm:p-5 shadow-xl">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-xl bg-accent-mint/10 border border-accent-mint/25 flex items-center justify-center shrink-0 text-2xl shadow-inner shadow-accent-mint/10">
+                  {primaryEngine === 'hunter_crawler' ? '🎯' : primaryEngine === 'apify' ? '⚡' : '🌐'}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-text-secondary">
+                      Active Primary Scraper Engine
+                    </span>
+                    <span className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span className="text-base font-bold text-white tracking-tight">
+                      {primaryEngine === 'hunter_crawler'
+                        ? 'HunterCrawler'
+                        : primaryEngine === 'apify'
+                        ? 'Apify Cloud Actors'
+                        : primaryEngine.charAt(0).toUpperCase() + primaryEngine.slice(1)}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-md bg-accent-mint/10 text-accent-mint border border-accent-mint/20 font-medium">
+                      {primaryEngine === 'hunter_crawler' ? 'Local / Playwright' : 'Cloud API'}
+                    </span>
+                    <span className="text-xs text-text-secondary hidden sm:inline">
+                      • {primaryEngine === 'hunter_crawler'
+                        ? 'Scrapes directly using local session and proxy (bypasses Apify tokens)'
+                        : 'Scrapes cloud-side with zero login, zero checkpoints, zero IP blocks'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Instant 1-Click Flip Toggle */}
+              <div className="flex items-center gap-2.5 self-start lg:self-auto flex-wrap">
+                <div className="flex items-center p-1 bg-surface-elevated/90 border border-white/10 rounded-xl shadow-inner">
+                  <button
+                    type="button"
+                    disabled={isSavingRouting}
+                    onClick={() => handleQuickSwitchEngine('hunter_crawler')}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      primaryEngine === 'hunter_crawler'
+                        ? 'bg-accent-mint text-black shadow-md shadow-accent-mint/25 scale-[1.02]'
+                        : 'text-text-secondary hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span>🎯</span>
+                    <span>HunterCrawler</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isSavingRouting}
+                    onClick={() => handleQuickSwitchEngine('apify')}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      primaryEngine === 'apify'
+                        ? 'bg-accent-mint text-black shadow-md shadow-accent-mint/25 scale-[1.02]'
+                        : 'text-text-secondary hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span>⚡</span>
+                    <span>Apify</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-semibold ${
+                      primaryEngine === 'apify' ? 'bg-black/20 text-black' : 'bg-white/10 text-text-secondary'
+                    }`}>
+                      {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Flip Switch Button */}
+                <button
+                  type="button"
+                  disabled={isSavingRouting}
+                  onClick={() => handleQuickSwitchEngine(primaryEngine === 'hunter_crawler' ? 'apify' : 'hunter_crawler')}
+                  title={`Flip to ${primaryEngine === 'hunter_crawler' ? 'Apify' : 'HunterCrawler'}`}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-elevated/90 border border-white/10 hover:border-accent-mint/50 text-xs font-semibold text-text-secondary hover:text-white transition-all shadow-md group"
+                >
+                  <ArrowPathIcon className={`w-3.5 h-3.5 text-accent-mint transition-transform duration-300 ${isSavingRouting ? 'animate-spin' : 'group-hover:rotate-180'}`} />
+                  <span>Flip</span>
+                </button>
+
+                {/* Provider Selector Dropdown */}
+                <select
+                  value={primaryEngine}
+                  disabled={isSavingRouting}
+                  onChange={(e) => handleQuickSwitchEngine(e.target.value)}
+                  className="bg-surface-elevated/90 border border-white/10 text-xs text-text-secondary hover:text-white rounded-xl px-3 py-2 outline-none focus:border-accent-mint transition-all cursor-pointer shadow-md"
+                >
+                  <option value="hunter_crawler">🎯 HunterCrawler (Local)</option>
+                  <option value="apify">⚡ Apify ({tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length} active)</option>
+                  <option value="scrapedog">🐶 Scrapingdog</option>
+                  <option value="crawlbase">🕷️ Crawlbase</option>
+                  <option value="scrapingbee">🐝 ScrapingBee</option>
+                  <option value="zenrows">🛡️ ZenRows</option>
+                  <option value="zyte">⚡ Zyte API</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
             {/* Scraper Engine Selection Tabs */}
             <div className="flex items-center gap-2 border-b border-white/[0.08] pb-4 mb-6 overflow-x-auto">
+              <button
+                type="button"
+                onClick={() => setActiveEngineTab('hunter_crawler')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                  activeEngineTab === 'hunter_crawler'
+                    ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
+                    : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
+                }`}
+              >
+                <span>🎯 HunterCrawler</span>
+                {primaryEngine === 'hunter_crawler' ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    Primary
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-white/10 text-text-secondary">
+                    Local
+                  </span>
+                )}
+              </button>
+
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('apify')}
@@ -859,6 +1013,96 @@ export default function AdminTokensPage() {
                 <span>Failover Routing</span>
               </button>
             </div>
+
+            {activeEngineTab === 'hunter_crawler' && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-2">
+                      <span className="text-xl">🎯</span>
+                      <span>HunterCrawler Engine</span>
+                      {primaryEngine === 'hunter_crawler' ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                          Active Primary Engine
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-text-secondary border border-white/10">
+                          Secondary / Standby
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Direct browser crawler using Playwright, local Brave/Chromium session, and residential proxy rotation.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {primaryEngine !== 'hunter_crawler' ? (
+                      <button
+                        type="button"
+                        disabled={isSavingRouting}
+                        onClick={() => handleQuickSwitchEngine('hunter_crawler')}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-accent-mint hover:bg-accent-mint/90 text-black shadow-md shadow-accent-mint/20 transition-all"
+                      >
+                        <span>🎯 Set as Primary Engine</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={isSavingRouting}
+                        onClick={() => handleQuickSwitchEngine('apify')}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all"
+                      >
+                        <span>⚡ Switch to Apify Cloud</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/5 space-y-1">
+                    <div className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Engine Mode</div>
+                    <div className="text-sm font-bold text-white flex items-center gap-2">
+                      <span>Direct Playwright Browser</span>
+                    </div>
+                    <p className="text-[11px] text-text-secondary">Scrapes full post permalinks, real SDR author data & comment timestamps.</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/5 space-y-1">
+                    <div className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Residential Proxy</div>
+                    <div className="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      <span>Webshare Rotating (p.webshare.io)</span>
+                    </div>
+                    <p className="text-[11px] text-text-secondary">Protects direct IP during high-frequency watchlist crawls.</p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/5 space-y-1">
+                    <div className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider">Watchlist Coverage</div>
+                    <div className="text-sm font-bold text-white flex items-center gap-2">
+                      <span>35 Creator & Decision-Maker Profiles</span>
+                    </div>
+                    <p className="text-[11px] text-text-secondary">Monitors public discussion & buyer request activity.</p>
+                  </div>
+                </div>
+
+                {/* Operational Commands & Triggering */}
+                <div className="p-5 rounded-2xl bg-surface-elevated/30 border border-white/[0.08] space-y-3">
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Operational Commands & Triggering</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <div className="text-xs font-mono text-accent-mint mb-1">npm run scrape:local</div>
+                      <p className="text-[11px] text-text-secondary">Runs local crawler across all 35 watchlist targets and saves fresh leads into database.</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-black/40 border border-white/5">
+                      <div className="text-xs font-mono text-accent-mint mb-1">npm run login:local</div>
+                      <p className="text-[11px] text-text-secondary">Opens persistent browser session for manual 2FA / checkpoint renewal if needed.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {activeEngineTab === 'apify' && (
               <>
@@ -1427,6 +1671,7 @@ export default function AdminTokensPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {[
+                        { id: 'hunter_crawler', name: 'HunterCrawler', icon: '🎯' },
                         { id: 'apify', name: 'Apify', icon: '⚡' },
                         { id: 'scrapedog', name: 'Scrapingdog', icon: '🐶' },
                         { id: 'crawlbase', name: 'Crawlbase', icon: '🕷️' },
@@ -1498,6 +1743,7 @@ export default function AdminTokensPage() {
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {[
+                        { id: 'hunter_crawler', name: 'HunterCrawler', desc: 'Direct Playwright browser crawler (Local session / proxy)' },
                         { id: 'apify', name: 'Apify', desc: 'Actor searches (LinkedIn, X, Reddit, Threads)' },
                         { id: 'scrapedog', name: 'Scrapingdog', desc: 'Reddit proxy & Google SERP scraper' },
                         { id: 'crawlbase', name: 'Crawlbase', desc: 'Crawling API & Smart Proxies' },
@@ -1538,7 +1784,7 @@ export default function AdminTokensPage() {
                       If the primary engine returns zero leads, reaches monthly quota, or gets rate-limited, the system automatically falls back to these engines in order.
                     </p>
                     <div className="space-y-2">
-                      {['scrapingbee', 'zenrows', 'zyte', 'scrapedog', 'crawlbase', 'apify'].map((engine) => {
+                      {['hunter_crawler', 'scrapingbee', 'zenrows', 'zyte', 'scrapedog', 'crawlbase', 'apify'].map((engine) => {
                         const isPrimary = primaryEngine === engine
                         const isChecked = fallbackEngines.includes(engine)
                         return (
@@ -1572,7 +1818,9 @@ export default function AdminTokensPage() {
                               )}
                             </div>
                             <span className="text-[10px] text-text-secondary">
-                              {engine === 'scrapedog'
+                              {engine === 'hunter_crawler'
+                                ? 'HunterCrawler Local & Playwright Scraper'
+                                : engine === 'scrapedog'
                                 ? 'Scrapingdog Residential & Google SERP'
                                 : engine === 'crawlbase'
                                 ? 'Crawlbase Proxy Crawler'
