@@ -4,23 +4,21 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ExternalLink,
-  User,
-  ImageIcon,
-  Mail,
-  Loader2,
-  BrainCircuit,
-  Zap,
-  RefreshCw,
-  CheckCircle2,
-  XCircle,
-  ClipboardCheck,
-  Trash2,
-  Plus,
-  Coins,
-  Edit3,
-  ClipboardPaste,
-} from 'lucide-react'
+  ArrowTopRightOnSquareIcon,
+  UserIcon,
+  PhotoIcon,
+  EnvelopeIcon,
+  ArrowPathIcon,
+  CpuChipIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClipboardDocumentCheckIcon,
+  TrashIcon,
+  PlusIcon,
+  BanknotesIcon,
+  PencilIcon,
+  ClipboardDocumentIcon,
+} from '@heroicons/react/24/outline'
 import ReactMarkdown from 'react-markdown'
 
 import { LinkedinLogo, XLogo, RedditLogo, ThreadsLogo } from '@/components/BrandIcons'
@@ -906,7 +904,7 @@ export default function AdminLeadsPage() {
 
           <div className="p-4 bg-surface/40 backdrop-blur-xl border border-white/[0.06] border-l-4 border-l-blue-500 rounded-2xl max-w-4xl">
             <div className="flex items-center gap-2 mb-2">
-              <ClipboardCheck size={16} className="text-blue-400" />
+              <ClipboardDocumentCheckIcon className="w-[16px] h-[16px] text-blue-400" strokeWidth={1.6} />
               <span className="text-[10px] font-black uppercase tracking-widest text-white">Stage 5 — Admin Review</span>
             </div>
             <p className="text-xs text-zinc-400 leading-relaxed">
@@ -921,10 +919,10 @@ export default function AdminLeadsPage() {
           {aiMetrics && (
             <div className="p-4 bg-surface/40 backdrop-blur-xl border border-white/[0.06] border-l-4 border-l-accent-mint rounded-2xl max-w-3xl">
               <div className="flex items-center gap-2 mb-2">
-                <BrainCircuit size={16} className="text-accent-mint" />
+                <CpuChipIcon className="w-[16px] h-[16px] text-accent-mint" strokeWidth={1.6} />
                 <span className="text-[10px] font-black uppercase tracking-widest text-white">Local AI Learning</span>
                 {aiMetrics.status === 'training' && (
-                  <Loader2 size={14} className="animate-spin text-accent-mint" />
+                  <ArrowPathIcon className="w-[14px] h-[14px] animate-spin text-accent-mint" strokeWidth={1.6} />
                 )}
               </div>
               <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest">
@@ -950,12 +948,12 @@ export default function AdminLeadsPage() {
                 >
                   {isTrainingAi ? (
                     <>
-                      <Loader2 size={12} className="animate-spin" />
+                      <ArrowPathIcon className="w-[12px] h-[12px] animate-spin" strokeWidth={1.6} />
                       Training...
                     </>
                   ) : (
                     <>
-                      <BrainCircuit size={12} />
+                      <CpuChipIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                       Train AI Now
                     </>
                   )}
@@ -1007,7 +1005,7 @@ export default function AdminLeadsPage() {
                 disabled={bulkApproving}
                 className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-black transition-all disabled:opacity-50"
               >
-                {bulkApproving ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                {bulkApproving ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <CheckCircleIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                 {bulkApproving ? 'Approving...' : 'Approve All'}
               </button>
               <button
@@ -1015,7 +1013,7 @@ export default function AdminLeadsPage() {
                 disabled={bulkRejecting}
                 className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
               >
-                {bulkRejecting ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
+                {bulkRejecting ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <XCircleIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                 {bulkRejecting ? 'Rejecting...' : 'Reject All'}
               </button>
             </>
@@ -1025,7 +1023,7 @@ export default function AdminLeadsPage() {
             disabled={bulkReanalysing}
             className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-white/5 text-zinc-300 border border-white/10 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
           >
-            {bulkReanalysing ? <Loader2 size={14} className="animate-spin" /> : <BrainCircuit size={14} />}
+            {bulkReanalysing ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <CpuChipIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
             {bulkReanalysing ? 'Queueing...' : 'Re-analyse All'}
           </button>
           <button
@@ -1033,14 +1031,14 @@ export default function AdminLeadsPage() {
             disabled={bulkReenriching}
             className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-accent-mint/10 text-accent-mint border border-accent-mint/30 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
           >
-            {bulkReenriching ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+            {bulkReenriching ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <ArrowPathIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
             {bulkReenriching ? 'Queueing...' : 'Re-enrich All'}
           </button>
           <button
             onClick={() => setIsManualModalOpen(true)}
             className="h-10 px-5 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-white text-black border border-white hover:bg-accent-mint hover:text-black transition-all"
           >
-            <Plus size={14} /> Add Lead Manually
+            <PlusIcon className="w-[14px] h-[14px]" strokeWidth={1.6} /> Add Lead Manually
           </button>
         </div>
 
@@ -1073,7 +1071,7 @@ export default function AdminLeadsPage() {
                   }
                   className="h-9 px-4 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-black transition-all disabled:opacity-50"
                 >
-                  {bulkSelectionBusy ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                  {bulkSelectionBusy ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <CheckCircleIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                   Approve Selected{selectedApprovableCount > 0 ? ` (${selectedApprovableCount})` : ''}
                 </button>
                 <button
@@ -1081,7 +1079,7 @@ export default function AdminLeadsPage() {
                   disabled={bulkSelectionBusy}
                   className="h-9 px-4 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
                 >
-                  {bulkSelectionBusy ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                  {bulkSelectionBusy ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <TrashIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                   Delete Selected ({selectedLeadIds.length})
                 </button>
                 <button
@@ -1200,7 +1198,7 @@ export default function AdminLeadsPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={lead.author.avatar.url} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <User size={20} className="text-zinc-600" />
+                      <UserIcon className="w-[20px] h-[20px] text-zinc-600" strokeWidth={1.6} />
                     )}
                   </div>
 
@@ -1224,7 +1222,7 @@ export default function AdminLeadsPage() {
 
                         {lead.url && lead.url.startsWith('http') && (
                           <a href={lead.url} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors">
-                            <ExternalLink size={12} />
+                            <ArrowTopRightOnSquareIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                           </a>
                         )}
                         {(() => {
@@ -1330,7 +1328,7 @@ export default function AdminLeadsPage() {
                           : 'bg-red-500/5 border-red-500/30 border-l-red-500'
                       }`}>
                         <div className="flex items-center gap-2 mb-1">
-                          <BrainCircuit size={12} className={lead.status === 'relevant' ? 'text-green-400' : 'text-red-400'} />
+                          <EnvelopeIcon className={`w-3 h-3 ${lead.status === 'relevant' ? 'text-green-400' : 'text-red-400'}`} strokeWidth={1.6} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-white">
                             AI Review {lead.ai_score ? `(${lead.ai_score}%)` : ''}
                           </span>
@@ -1342,7 +1340,7 @@ export default function AdminLeadsPage() {
                     {lead.status === 'relevant' && lead.review_status === 'awaiting_review' && (
                       <div className="mb-4 p-3 bg-blue-500/5 border border-blue-500/30 border-l-2 border-l-blue-500 rounded-lg flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
-                          <ClipboardCheck size={14} className="text-blue-400" />
+                          <ClipboardDocumentCheckIcon className="w-[14px] h-[14px] text-blue-400" strokeWidth={1.6} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-300">
                             {leadHasContactDetails(lead)
                               ? 'Contact found — ready to approve (verification optional)'
@@ -1355,7 +1353,7 @@ export default function AdminLeadsPage() {
                     {lead.review_status === 'approved' && (
                       <div className="mb-4 p-3 bg-green-500/5 border border-green-500/30 border-l-2 border-l-green-500 rounded-lg">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <CheckCircle2 size={12} className="text-green-400" />
+                          <CheckCircleIcon className="w-[12px] h-[12px] text-green-400" strokeWidth={1.6} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-green-400">
                             {lead.intelligence
                               ? 'Approved — visible on Lead Feed'
@@ -1365,11 +1363,11 @@ export default function AdminLeadsPage() {
                             <span className="text-[9px] font-black uppercase tracking-widest text-accent-mint flex items-center gap-1">
                               {intelActionIds.includes(lead.id) ? (
                                 <>
-                                  <Loader2 size={10} className="animate-spin" /> Generating intel...
+                                  <ArrowPathIcon className="w-[10px] h-[10px] animate-spin" strokeWidth={1.6} /> Generating intel...
                                 </>
                               ) : (
                                 <>
-                                  <Loader2 size={10} className="animate-spin" /> Intel pending — claim locked
+                                  <ArrowPathIcon className="w-[10px] h-[10px] animate-spin" strokeWidth={1.6} /> Intel pending — claim locked
                                 </>
                               )}
                             </span>
@@ -1402,9 +1400,9 @@ export default function AdminLeadsPage() {
                       }`}>
                         <div className="flex items-center gap-2">
                           {lead.qualification_reason ? (
-                            <BrainCircuit size={14} className="text-yellow-400" />
+                            <CpuChipIcon className="w-[14px] h-[14px] text-yellow-400" strokeWidth={1.6} />
                           ) : (
-                            <Loader2 size={14} className="animate-spin text-zinc-500" />
+                            <ArrowPathIcon className="w-[14px] h-[14px] animate-spin text-zinc-500" strokeWidth={1.6} />
                           )}
                           <span className={`text-[10px] font-black uppercase tracking-widest ${
                             lead.qualification_reason ? 'text-yellow-300' : 'text-zinc-500'
@@ -1425,7 +1423,7 @@ export default function AdminLeadsPage() {
 
                     {canEnrichLead(lead) && lead.enrichment_status === 'searching' && (
                       <div className="mb-4 p-3 bg-accent-mint/5 border border-accent-mint/20 rounded-lg flex items-center gap-3">
-                        <Loader2 size={14} className="animate-spin text-accent-mint" />
+                        <ArrowPathIcon className="w-[14px] h-[14px] animate-spin text-accent-mint" strokeWidth={1.6} />
                         <div>
                           <span className="text-[10px] font-black uppercase tracking-widest text-accent-mint block">
                             Enriching Contacts
@@ -1449,7 +1447,7 @@ export default function AdminLeadsPage() {
                       }`}>
                         <div className="flex items-center justify-between gap-3 mb-1 flex-wrap">
                           <div className="flex items-center gap-2">
-                            <Mail size={12} className={
+                            <EnvelopeIcon className={`w-3 h-3 ${
                               lead.enrichment_status === 'found'
                                 ? 'text-green-400'
                                 : lead.enrichment_status === 'partial'
@@ -1457,7 +1455,7 @@ export default function AdminLeadsPage() {
                                   : lead.enrichment_status === 'not_found'
                                     ? 'text-red-400'
                                     : 'text-zinc-500'
-                            } />
+                            }`} />
                             <span className="text-[10px] font-black uppercase tracking-widest text-white">
                               Contact Enrichment{lead.enrichment_status ? `: ${getEnrichmentStatusLabel(lead.enrichment_status)}` : ''}
                             </span>
@@ -1469,9 +1467,9 @@ export default function AdminLeadsPage() {
                                 className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
                               >
                                 {intelActionIds.includes(lead.id) ? (
-                                  <Loader2 size={12} className="animate-spin" />
+                                  <ArrowPathIcon className="w-[12px] h-[12px] animate-spin" strokeWidth={1.6} />
                                 ) : (
-                                  <BrainCircuit size={12} />
+                                  <CpuChipIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                                 )}
                                 {intelActionIds.includes(lead.id) ? 'Generating...' : 'Generate Intel'}
                               </button>
@@ -1481,9 +1479,9 @@ export default function AdminLeadsPage() {
                               className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-accent-mint/10 text-accent-mint border border-accent-mint/30 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
                             >
                               {enrichingIds.includes(lead.id) ? (
-                                <Loader2 size={12} className="animate-spin" />
+                                <ArrowPathIcon className="w-[12px] h-[12px] animate-spin" strokeWidth={1.6} />
                               ) : (
-                                <RefreshCw size={12} />
+                                <ArrowPathIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                               )}
                               {enrichingIds.includes(lead.id) ? 'Queueing...' : getEnrichButtonLabel(lead)}
                             </button>
@@ -1496,7 +1494,7 @@ export default function AdminLeadsPage() {
                               className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                               title="Paste contact details manually"
                             >
-                              <ClipboardPaste size={12} />
+                              <ClipboardDocumentIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                               Paste Contact
                             </button>
                           </div>
@@ -1523,7 +1521,7 @@ export default function AdminLeadsPage() {
                               : 'bg-surface/50 border-white/[0.06] border-l-zinc-600'
                       }`}>
                         <div className="flex items-center gap-2 mb-1">
-                          <Mail size={12} className={
+                          <EnvelopeIcon className={`w-3 h-3 ${
                             lead.enrichment_status === 'found'
                               ? 'text-green-400'
                               : lead.enrichment_status === 'partial'
@@ -1531,7 +1529,7 @@ export default function AdminLeadsPage() {
                                 : lead.enrichment_status === 'not_found'
                                   ? 'text-red-400'
                                   : 'text-zinc-500'
-                          } />
+                          }`} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-white">
                             Contact Enrichment: {getEnrichmentStatusLabel(lead.enrichment_status)}
                           </span>
@@ -1548,7 +1546,7 @@ export default function AdminLeadsPage() {
                         className="mb-4 p-3 bg-surface/50 border border-white/[0.06] border-l-accent-mint border-l-2 rounded-lg"
                       >
                         <div className="flex items-center gap-2 mb-2">
-                          <Zap size={12} className="text-accent-mint" />
+                          <CpuChipIcon className="w-[12px] h-[12px] text-accent-mint" strokeWidth={1.6} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-white">Lead Intelligence</span>
                         </div>
                         <div className="text-xs text-zinc-400 leading-relaxed italic max-w-none">
@@ -1567,7 +1565,7 @@ export default function AdminLeadsPage() {
                         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 bg-accent-mint/10 flex items-center justify-center rounded border border-accent-mint/30">
-                              <Mail size={12} className="text-accent-mint" />
+                              <EnvelopeIcon className="w-[12px] h-[12px] text-accent-mint" strokeWidth={1.6} />
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-accent-mint">
                               {getLeadEmailEntries(lead).length > 1 ? 'Contact Emails' : 'Contact Email'}
@@ -1587,7 +1585,7 @@ export default function AdminLeadsPage() {
                             className="h-7 text-[9px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                             title="Edit or add contact details manually"
                           >
-                            <ClipboardPaste size={12} />
+                            <ClipboardDocumentIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                             Paste Contact
                           </button>
                         </div>
@@ -1660,7 +1658,7 @@ export default function AdminLeadsPage() {
                               className="h-7 text-[9px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                               title="Paste contact details manually"
                             >
-                              <ClipboardPaste size={12} />
+                              <ClipboardDocumentIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                               Paste Contact
                             </button>
                           </div>
@@ -1695,7 +1693,7 @@ export default function AdminLeadsPage() {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-[9px] text-accent-mint font-black uppercase hover:underline"
                             >
-                              View LinkedIn Profile <ExternalLink size={10} />
+                              View LinkedIn Profile <ArrowTopRightOnSquareIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                             </a>
                           )}
                         </div>
@@ -1712,7 +1710,7 @@ export default function AdminLeadsPage() {
                             window.open(`${baseUrl}${cleanUrl}`, '_blank')
                           }}
                         >
-                          <ImageIcon size={14} className="text-zinc-500 group-hover/img:text-accent-mint" />
+                          <PhotoIcon className="w-[14px] h-[14px] text-zinc-500 group-hover/img:text-accent-mint" strokeWidth={1.6} />
                           <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500">View Source Image</span>
                         </div>
                       )}
@@ -1770,9 +1768,9 @@ export default function AdminLeadsPage() {
                               }`}
                             >
                               {reviewActionIds.includes(lead.id) ? (
-                                <Loader2 size={12} className="animate-spin inline" />
+                                <ArrowPathIcon className="w-[12px] h-[12px] animate-spin inline" strokeWidth={1.6} />
                               ) : (
-                                <CheckCircle2 size={12} className="inline mr-1" />
+                                <CheckCircleIcon className="w-[12px] h-[12px] inline mr-1" strokeWidth={1.6} />
                               )}
                               Approve
                             </button>
@@ -1786,7 +1784,7 @@ export default function AdminLeadsPage() {
                                 className="h-7 text-[8px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                                 title="Paste contact details manually to enable approval"
                               >
-                                <ClipboardPaste size={11} />
+                                <ClipboardDocumentIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
                                 Paste Contact
                               </button>
                             )}
@@ -1830,13 +1828,13 @@ export default function AdminLeadsPage() {
                                   : 'bg-surface-elevated text-zinc-300 border-white/10 hover:border-accent-mint/50 hover:text-white'
                               }`}
                             >
-                              <Coins size={12} className={hasCustomCost ? 'text-amber-400' : 'text-zinc-400'} />
+                              <BanknotesIcon className={`w-3 h-3 ${hasCustomCost ? 'text-amber-400' : 'text-zinc-400'}`} strokeWidth={1.6} />
                               <span>
                                 {hasCustomCost
                                   ? `⚡ Custom: ${effectiveCustomCost} Cr`
                                   : `Cost: ${getLeadRevealCost(lead) ?? '—'} Cr`}
                               </span>
-                              <Edit3 size={10} className="opacity-60 hover:opacity-100" />
+                              <PencilIcon className="w-[10px] h-[10px] opacity-60 hover:opacity-100" strokeWidth={1.6} />
                             </button>
                           )
                         })()}
@@ -1848,9 +1846,9 @@ export default function AdminLeadsPage() {
                           className="h-7 px-3 text-[8px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
                         >
                           {intelActionIds.includes(lead.id) ? (
-                            <Loader2 size={11} className="animate-spin" />
+                            <ArrowPathIcon className="w-[11px] h-[11px] animate-spin" strokeWidth={1.6} />
                           ) : (
-                            <BrainCircuit size={11} />
+                            <CpuChipIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
                           )}
                           <span>{intelActionIds.includes(lead.id) ? 'Generating...' : lead.intelligence ? 'Regen Intel' : 'Generate Intel'}</span>
                         </button>
@@ -1883,11 +1881,11 @@ export default function AdminLeadsPage() {
                               }}
                               className="h-7 text-[8px] uppercase font-black px-4 rounded-lg bg-surface-elevated text-white border border-white/10 hover:border-accent-mint flex items-center gap-2 transition-all"
                             >
-                              <BrainCircuit size={12} /> View Intel
+                              <CpuChipIcon className="w-[12px] h-[12px]" strokeWidth={1.6} /> View Intel
                             </button>
                             <Link href={`/leads`}>
                               <button className="h-7 text-[8px] uppercase font-black px-4 rounded-lg bg-accent-mint text-black border border-black flex items-center gap-2 transition-all">
-                                <ExternalLink size={12} /> Hunter Preview
+                                <ArrowTopRightOnSquareIcon className="w-[12px] h-[12px]" strokeWidth={1.6} /> Hunter Preview
                               </button>
                             </Link>
                           </>
@@ -1903,7 +1901,7 @@ export default function AdminLeadsPage() {
                             disabled={claimingIds.includes(lead.id) || lead.is_claimed || !lead.intelligence}
                           >
                             {claimingIds.includes(lead.id) ? (
-                              <Loader2 size={12} className="animate-spin inline" />
+                              <ArrowPathIcon className="w-[12px] h-[12px] animate-spin inline" strokeWidth={1.6} />
                             ) : lead.is_claimed ? (
                               `Claimed (${lead.claimed_count || 0}/25)`
                             ) : !lead.intelligence ? (
@@ -1920,10 +1918,10 @@ export default function AdminLeadsPage() {
                           title="Delete lead"
                         >
                           {deletingIds.includes(lead.id) ? (
-                            <Loader2 size={12} className="animate-spin inline" />
+                            <ArrowPathIcon className="w-[12px] h-[12px] animate-spin inline" strokeWidth={1.6} />
                           ) : (
                             <>
-                              <Trash2 size={12} className="inline mr-1" />
+                              <TrashIcon className="w-[12px] h-[12px] inline mr-1" strokeWidth={1.6} />
                               Delete
                             </>
                           )}
@@ -2026,7 +2024,7 @@ export default function AdminLeadsPage() {
               <div className="p-5 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
-                    <Coins size={16} className="text-amber-400" />
+                    <BanknotesIcon className="w-[16px] h-[16px] text-amber-400" strokeWidth={1.6} />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white tracking-tight">Set Lead Credit Cost</h3>
@@ -2039,7 +2037,7 @@ export default function AdminLeadsPage() {
                   onClick={() => setCreditModalLead(null)}
                   className="text-zinc-500 hover:text-white transition-colors p-1"
                 >
-                  <XCircle size={18} />
+                  <XCircleIcon className="w-[18px] h-[18px]" strokeWidth={1.6} />
                 </button>
               </div>
 
@@ -2099,7 +2097,7 @@ export default function AdminLeadsPage() {
                   disabled={savingCreditCost}
                   className="flex-1 h-10 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 text-black hover:bg-amber-400 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {savingCreditCost ? <Loader2 size={14} className="animate-spin" /> : <Coins size={14} />}
+                  {savingCreditCost ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <BanknotesIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                   {savingCreditCost ? 'Saving...' : 'Save Credit Cost'}
                 </button>
               </div>

@@ -9,7 +9,6 @@ import {
   ChartBarSquareIcon,
   BookmarkIcon,
   LockClosedIcon,
-  SparklesIcon,
 } from '@heroicons/react/24/solid'
 import { Card, Badge } from '@/components/ui'
 import LeadCard from '@/app/leads/components/LeadCard'

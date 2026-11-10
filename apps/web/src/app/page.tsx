@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDownIcon,
   GlobeAltIcon,
-  SparklesIcon,
+  BanknotesIcon,
   ArrowRightIcon,
 } from '@heroicons/react/24/solid'
 import Link from 'next/link'
@@ -579,7 +579,7 @@ export default function LandingPage() {
                   <div
                     className={`w-8 h-8 rounded-md ${p.featured ? 'bg-accent-purple/10 border border-accent-purple/20 text-accent-purple' : 'bg-white/5 border border-white/5 text-text-secondary/60'} flex items-center justify-center mb-4`}
                   >
-                    <SparklesIcon className="w-[18px] h-[18px]" />
+                    <BanknotesIcon className="w-[18px] h-[18px]" />
                   </div>
                   <h3 className="font-display text-xl font-bold tracking-tight mb-1.5">{p.name}</h3>
                   <p className="text-xs text-text-secondary font-light leading-relaxed">{p.desc}</p>

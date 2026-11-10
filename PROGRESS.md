@@ -45,6 +45,8 @@ User asked for local dummy lead data to test the lead drawer without the live DB
 | 13 | Landing copy → `docs/landingpagecontent.md` (hero/how/why/testimonials/pricing/final CTA) | ✅ done + browser-verified (desktop + mobile) |
 | 14 | Admin dashboard insights — persona/growth/revenue/activation/ops on `/admin` | ✅ shipped — API 200 + browser render verified |
 | 15 | Last scrape timing & tool badges on leads — `/admin/tokens`, `/admin/leads`, `LeadCard`, `LeadDrawer` | ✅ shipped — deployed on VM + Vercel |
+| 16 | Generic-design audit (2026-11-09) — 100 tsx files scanned per docs/GENERIC-DESIGN-RESEARCH.md + live screenshots | ✅ audit done (docs/DESIGN-AUDIT.md) + fixed: dashboard locale bug, /pricing banned icons + generic headline, NicheBadge emoji→heroicons. Next batch (label diet / em-dash diet / empty states) awaits user decision |
+| 17 | lucide-react removed (2026-11-10) — 7 files (LeadCard, PipelineLeadCard, LeadOutreachFlowchart, HunterCopilot, PupCompanion, admin/leads page + ManualContactModal) migrated to heroicons outline, strokeWidth 1.6; dependency uninstalled; DESIGN.md + AGENTS.md icon rules updated to Heroicons-only | ✅ done — ESLint clean, tsc clean in touched files (only pre-existing baseline errors remain) |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 

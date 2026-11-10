@@ -24,7 +24,7 @@ import {
   BookOpenIcon,
   BanknotesIcon,
   XMarkIcon,
-  SparklesIcon,
+  CheckBadgeIcon,
   StarIcon,
   CheckIcon,
   ShareIcon,
@@ -694,7 +694,7 @@ function SavedContent() {
   const summaryCards = [
     { label: 'Reply Received', sub: 'Awaiting negotiation', count: `${replyCount} Leads`, accent: 'purple', icon: ChatBubbleLeftRightIcon },
     { label: 'Active Conversations', sub: 'Currently being contacted', count: `${activeCount} Leads`, accent: 'purple', icon: ArrowPathIcon },
-    { label: 'Ready to Contact', sub: 'Unlocked & waiting', count: `${readyCount} Leads`, accent: 'mint', icon: BoltIcon },
+    { label: 'Ready to Contact', sub: 'Unlocked & waiting', count: `${readyCount} Leads`, accent: 'mint', icon: CheckBadgeIcon },
     { label: 'High Priority Targets', sub: 'Critical & High Urgency', count: `${priorityCount} Leads`, accent: 'purple', icon: ExclamationTriangleIcon },
   ]
 
@@ -1815,7 +1815,7 @@ function CommunityContent({ onNavigate }: SectionProps) {
   ]
 
   const tabs = [
-    { id: 'all', label: 'All Wins', icon: SparklesIcon },
+    { id: 'all', label: 'All Wins', icon: TrophyIcon },
     { id: 'deals', label: 'Deals Closed', icon: TrophyIcon },
     { id: 'meetings', label: 'Meetings', icon: ChatBubbleLeftRightIcon },
     { id: 'replies', label: 'Replies', icon: ArrowPathIcon },

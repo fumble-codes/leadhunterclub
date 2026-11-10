@@ -6,9 +6,8 @@ import { openRazorpayCheckout } from '@/lib/razorpay-client'
 import {
   ArrowLeftIcon,
   CheckIcon,
-  SparklesIcon,
   StarIcon,
-  BoltIcon,
+  WalletIcon,
   BanknotesIcon,
   ShieldCheckIcon,
   ClockIcon,
@@ -332,11 +331,11 @@ function PricingContent() {
         {/* Page Hero */}
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-bold uppercase tracking-wider text-primary">
-            <SparklesIcon className="w-4 h-4" />
+            <BanknotesIcon className="w-4 h-4" />
             Transparent Pricing
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
-            Choose the Perfect Plan for Your Growth
+            Start hunting for free. Pay when you want to hunt harder.
           </h1>
           <p className="text-sm text-text-secondary leading-relaxed">
             Every plan includes verified contact data, direct email reveals, and deep AI strategic intelligence reports to help you close more high-ticket clients.
@@ -354,7 +353,7 @@ function PricingContent() {
                     : 'text-text-secondary hover:text-white'
                 }`}
               >
-                <SparklesIcon className="w-3.5 h-3.5" />
+                <BanknotesIcon className="w-3.5 h-3.5" />
                 Monthly Plans
               </button>
               <button
@@ -366,7 +365,7 @@ function PricingContent() {
                     : 'text-text-secondary hover:text-white'
                 }`}
               >
-                <BoltIcon className="w-3.5 h-3.5" />
+                <WalletIcon className="w-3.5 h-3.5" />
                 Instant Credit Top-ups
               </button>
             </div>
@@ -509,7 +508,6 @@ function PricingContent() {
                   >
                     {isPopular && (
                       <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-accent-orange text-black font-extrabold text-[10px] tracking-wider uppercase shadow-md flex items-center gap-1">
-                        <SparklesIcon className="w-3 h-3" />
                         Most Popular
                       </div>
                     )}

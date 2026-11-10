@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
     const stats = [
       {
         label: 'Signals Intercepted',
-        value: totalLeadsCount.toLocaleString(),
+        value: totalLeadsCount.toLocaleString('en-US'),
         trend: `${savedLeadsCount} saved`,
         trendUp: savedLeadsCount > 0,
         accent: 'mint' as const,
@@ -169,8 +169,8 @@ export async function GET(request: NextRequest) {
       },
       {
         label: 'Credits Remaining',
-        value: creditsRemaining.toLocaleString(),
-        trend: `/ ${planCredits.toLocaleString()}`,
+        value: creditsRemaining.toLocaleString('en-US'),
+        trend: `/ ${planCredits.toLocaleString('en-US')}`,
         accent: 'purple' as const,
       },
     ]

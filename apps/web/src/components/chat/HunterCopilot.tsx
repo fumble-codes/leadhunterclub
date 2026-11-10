@@ -3,14 +3,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  X,
-  Minus,
-  Send,
-  RotateCcw,
-  ExternalLink,
-  ChevronUp,
-  Command,
-} from 'lucide-react'
+  XMarkIcon,
+  MinusIcon,
+  PaperAirplaneIcon,
+  ArrowPathIcon,
+  ArrowTopRightOnSquareIcon,
+  ChevronUpIcon,
+  CommandLineIcon,
+} from '@heroicons/react/24/outline'
 import ReactMarkdown from 'react-markdown'
 import { auth } from '@/lib/firebase'
 import { WolfOrb } from '@/components/chat/WolfOrb'
@@ -323,10 +323,10 @@ export function HunterCopilot() {
               <span className="ml-0.5 h-1.5 w-1.5 rounded-full bg-secondary" />
               <div className="ml-1 flex items-center gap-0.5 border-l border-white/10 pl-1.5">
                 <ControlButton onClick={() => copilotStore.expand()} title="Expand Copilot">
-                  <ChevronUp size={14} />
+                  <ChevronUpIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />
                 </ControlButton>
                 <ControlButton onClick={() => copilotStore.close()} title="Close Copilot" danger>
-                <X size={14} />
+                <XMarkIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />
               </ControlButton>
             </div>
           </div>
@@ -386,15 +386,15 @@ export function HunterCopilot() {
 
               <div className="flex shrink-0 items-center gap-0.5 rounded-xl border border-white/[0.06] bg-black/25 p-0.5">
                 <ControlButton onClick={handleResetChat} title="Reset conversation">
-                  <RotateCcw size={13} />
+                  <ArrowPathIcon className="w-[13px] h-[13px]" strokeWidth={1.6} />
                 </ControlButton>
                 <span className="hidden sm:block">
                   <ControlButton onClick={() => copilotStore.minimize()} title="Minimize">
-                    <Minus size={14} />
+                    <MinusIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />
                   </ControlButton>
                 </span>
                 <ControlButton onClick={() => copilotStore.close()} title="Close" danger>
-                  <X size={14} />
+                  <XMarkIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />
                 </ControlButton>
               </div>
             </div>
@@ -493,7 +493,7 @@ export function HunterCopilot() {
             {/* Composer */}
             <div className="relative border-t border-white/[0.08] bg-surface-container-high/45 px-3 pb-3 pt-2.5">
               <div className="flex items-center gap-2 rounded-2xl border border-white/[0.1] bg-surface-container-lowest/85 px-3 py-2 transition-all focus-within:border-primary/55 focus-within:shadow-[0_0_0_3px_rgba(255,184,0,0.12)]">
-                <Command size={12} className="shrink-0 text-text-muted" aria-hidden />
+                <CommandLineIcon className="w-3 h-3 shrink-0 text-text-muted" aria-hidden strokeWidth={1.6} />
                 <input
                   ref={inputRef}
                   type="text"
@@ -514,7 +514,7 @@ export function HunterCopilot() {
                   aria-label="Send message"
                   className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-on-primary shadow-[0_4px_14px_-4px_rgba(255,184,0,0.7)] transition-opacity disabled:opacity-25"
                 >
-                  <Send size={12} className="-translate-x-px" strokeWidth={2.5} />
+                  <PaperAirplaneIcon className="w-3 h-3 -translate-x-px" strokeWidth={2.5} />
                 </motion.button>
               </div>
 
@@ -530,9 +530,7 @@ export function HunterCopilot() {
                   className="group inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.1em] text-text-secondary transition-colors hover:text-primary"
                 >
                   Human support
-                  <ExternalLink
-                    size={9}
-                    className="transition-transform group-hover:-translate-y-px group-hover:translate-x-px"
+                  <ArrowTopRightOnSquareIcon className="w-[9px] h-[9px] transition-transform group-hover:-translate-y-px group-hover:translate-x-px" strokeWidth={1.6}
                   />
                 </a>
               </div>

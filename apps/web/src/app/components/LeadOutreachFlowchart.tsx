@@ -3,34 +3,32 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
-  CpuChipIcon,
   CheckBadgeIcon,
 } from '@heroicons/react/24/solid'
 import {
-  Mail,
-  ShieldCheck,
-  Send,
-  Paperclip,
-  Link2,
-  Smile,
-  Trash2,
-  ChevronDown,
-  Copy,
-  Check,
-  RotateCcw,
-  ThumbsUp,
-  ThumbsDown,
-  Sparkles,
-  Share2,
-  Star,
-  Reply,
-  Forward,
-  Video,
-  Phone,
-  MoreVertical,
-  Mic,
-  CheckCheck,
-} from 'lucide-react'
+  EnvelopeIcon,
+  ShieldCheckIcon,
+  PaperAirplaneIcon,
+  PaperClipIcon,
+  LinkIcon,
+  FaceSmileIcon,  TrashIcon,
+  ChevronDownIcon,
+  Square2StackIcon,
+  CheckIcon,
+  ArrowPathIcon,
+  HandThumbUpIcon,
+  HandThumbDownIcon,
+  CpuChipIcon,
+  ShareIcon,
+  StarIcon,
+  ArrowUturnLeftIcon,
+  ArrowRightIcon,
+  VideoCameraIcon,
+  PhoneIcon,
+  EllipsisVerticalIcon,
+  MicrophoneIcon,
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline'
 
 // ==========================================
 // OFFICIAL BRAND SVG LOGOS (MINIMAL & ACCURATE)
@@ -494,7 +492,7 @@ export function LeadOutreachFlowchart() {
                     Marcus Vance
                   </div>
                   <div className="text-[9.5px] text-text-secondary truncate flex items-center gap-1 mt-0.5">
-                    <Mail size={9.5} className="shrink-0" />
+                    <EnvelopeIcon className="w-[9.5px] h-[9.5px] shrink-0" strokeWidth={1.6} />
                     <span className="truncate">marcus@vesperjewelry.co</span>
                   </div>
                 </div>
@@ -555,7 +553,7 @@ export function LeadOutreachFlowchart() {
                   <div className="flex items-center gap-1.5">
                     <AnthropicOfficialLogo className="w-3.5 h-3.5" />
                     <span className="text-[11px] font-semibold text-[#f0eee6]">Claude 3.5 Sonnet</span>
-                    <ChevronDown size={11} className="text-zinc-500" />
+                    <ChevronDownIcon className="w-[11px] h-[11px] text-zinc-500" strokeWidth={1.6} />
                   </div>
                   <div className="flex items-center gap-2 text-zinc-500 text-[9.5px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -592,12 +590,12 @@ export function LeadOutreachFlowchart() {
                         onClick={handleCopy}
                         className="flex items-center gap-1 hover:text-white transition-colors"
                       >
-                        {copied ? <Check size={11} className="text-[#B8F36B]" /> : <Copy size={11} />}
+                        {copied ? <CheckIcon className="w-[11px] h-[11px] text-[#B8F36B]" strokeWidth={1.6} /> : <Square2StackIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />}
                         <span>{copied ? 'Copied' : 'Copy'}</span>
                       </button>
                       <span className="text-white/10">|</span>
-                      <ThumbsUp size={11} className="hover:text-white cursor-pointer" />
-                      <ThumbsDown size={11} className="hover:text-white cursor-pointer" />
+                      <HandThumbUpIcon className="w-[11px] h-[11px] hover:text-white cursor-pointer" strokeWidth={1.6} />
+                      <HandThumbDownIcon className="w-[11px] h-[11px] hover:text-white cursor-pointer" strokeWidth={1.6} />
                     </div>
                     <button
                       type="button"
@@ -605,7 +603,7 @@ export function LeadOutreachFlowchart() {
                       className="flex items-center gap-1 hover:text-white transition-colors"
                       title="Regenerate with different angle"
                     >
-                      <RotateCcw size={11} />
+                      <ArrowPathIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
                       <span className="font-mono text-[9px]">Retry</span>
                     </button>
                   </div>
@@ -620,7 +618,7 @@ export function LeadOutreachFlowchart() {
                 <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/[0.06]">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[11px] font-semibold text-white">ChatGPT 4o</span>
-                    <ChevronDown size={11} className="text-zinc-400" />
+                    <ChevronDownIcon className="w-[11px] h-[11px] text-zinc-400" strokeWidth={1.6} />
                   </div>
                   <div className="flex items-center gap-1 text-zinc-500 text-[9.5px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#10A37F]" />
@@ -657,12 +655,12 @@ export function LeadOutreachFlowchart() {
                         onClick={handleCopy}
                         className="flex items-center gap-1 hover:text-white transition-colors"
                       >
-                        {copied ? <Check size={11} className="text-[#10A37F]" /> : <Copy size={11} />}
+                        {copied ? <CheckIcon className="w-[11px] h-[11px] text-[#10A37F]" strokeWidth={1.6} /> : <Square2StackIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />}
                         <span>{copied ? 'Copied' : 'Copy'}</span>
                       </button>
                       <span className="text-white/10">|</span>
-                      <ThumbsUp size={11} className="hover:text-white cursor-pointer" />
-                      <ThumbsDown size={11} className="hover:text-white cursor-pointer" />
+                      <HandThumbUpIcon className="w-[11px] h-[11px] hover:text-white cursor-pointer" strokeWidth={1.6} />
+                      <HandThumbDownIcon className="w-[11px] h-[11px] hover:text-white cursor-pointer" strokeWidth={1.6} />
                     </div>
                     <button
                       type="button"
@@ -670,7 +668,7 @@ export function LeadOutreachFlowchart() {
                       className="flex items-center gap-1 hover:text-white transition-colors"
                       title="Regenerate"
                     >
-                      <RotateCcw size={11} />
+                      <ArrowPathIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
                       <span className="font-mono text-[9px]">Regenerate</span>
                     </button>
                   </div>
@@ -686,7 +684,7 @@ export function LeadOutreachFlowchart() {
                   <div className="flex items-center gap-1.5">
                     <GeminiOfficialLogo className="w-3.5 h-3.5" />
                     <span className="text-[11px] font-semibold text-white">Gemini Advanced 1.5 Pro</span>
-                    <ChevronDown size={11} className="text-zinc-400" />
+                    <ChevronDownIcon className="w-[11px] h-[11px] text-zinc-400" strokeWidth={1.6} />
                   </div>
                   <div className="flex items-center gap-1 text-zinc-500 text-[9.5px]">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#8AB4F8]" />
@@ -702,7 +700,7 @@ export function LeadOutreachFlowchart() {
                 {/* Gemini Assistant Response Block */}
                 <div className="bg-[#191a1b] border border-[#8AB4F8]/20 rounded-xl p-3 text-[11px] text-white">
                   <div className="flex items-center gap-1.5 mb-1.5">
-                    <Sparkles size={13} className="text-[#8AB4F8]" />
+                    <CpuChipIcon className="w-[13px] h-[13px] text-[#8AB4F8]" strokeWidth={1.6} />
                     <span className="text-[10px] font-semibold text-[#8AB4F8]">Gemini</span>
                   </div>
 
@@ -721,12 +719,12 @@ export function LeadOutreachFlowchart() {
                         onClick={handleCopy}
                         className="flex items-center gap-1 hover:text-white transition-colors"
                       >
-                        {copied ? <Check size={11} className="text-[#8AB4F8]" /> : <Copy size={11} />}
+                        {copied ? <CheckIcon className="w-[11px] h-[11px] text-[#8AB4F8]" strokeWidth={1.6} /> : <Square2StackIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />}
                         <span>{copied ? 'Copied' : 'Copy'}</span>
                       </button>
                       <span className="text-white/10">|</span>
-                      <ThumbsUp size={11} className="hover:text-white cursor-pointer" />
-                      <ThumbsDown size={11} className="hover:text-white cursor-pointer" />
+                      <HandThumbUpIcon className="w-[11px] h-[11px] hover:text-white cursor-pointer" strokeWidth={1.6} />
+                      <HandThumbDownIcon className="w-[11px] h-[11px] hover:text-white cursor-pointer" strokeWidth={1.6} />
                     </div>
                     <button
                       type="button"
@@ -734,7 +732,7 @@ export function LeadOutreachFlowchart() {
                       className="flex items-center gap-1 hover:text-white transition-colors"
                       title="Modify"
                     >
-                      <RotateCcw size={11} />
+                      <ArrowPathIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
                       <span className="font-mono text-[9px]">Modify</span>
                     </button>
                   </div>
@@ -765,7 +763,7 @@ export function LeadOutreachFlowchart() {
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
-                <Mail size={10} />
+                <EnvelopeIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                 <span>Email</span>
               </button>
               <button
@@ -834,18 +832,18 @@ export function LeadOutreachFlowchart() {
                     type="button"
                     className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium text-[10.5px] px-3 py-1 rounded-md flex items-center gap-1.5 shadow-sm transition-colors"
                   >
-                    <Send size={10} className="fill-current" />
+                    <PaperAirplaneIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                     <span>Send</span>
                     <span className="border-l border-white/20 pl-1 ml-0.5 text-[8.5px]">▾</span>
                   </button>
 
                   {/* Formatting & Attachment Icons */}
                   <div className="flex items-center gap-2 text-zinc-400">
-                    <Paperclip size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
-                    <Link2 size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
-                    <Smile size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                    <PaperClipIcon className="w-[11px] h-[11px] hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
+                    <LinkIcon className="w-[11px] h-[11px] hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
+                    <FaceSmileIcon className="w-[11px] h-[11px] hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
                     <span className="text-white/10">|</span>
-                    <Trash2 size={11} className="text-zinc-500 hover:text-red-400 cursor-pointer transition-colors" />
+                    <TrashIcon className="w-[11px] h-[11px] text-zinc-500 hover:text-red-400 cursor-pointer transition-colors" strokeWidth={1.6} />
                   </div>
                 </div>
               </div>
@@ -866,7 +864,7 @@ export function LeadOutreachFlowchart() {
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 text-zinc-400">
                     <span className="text-[9px] font-mono">18m ago</span>
-                    <Star size={10} className="text-amber-400 fill-amber-400/20" />
+                    <StarIcon className="w-[10px] h-[10px] text-amber-400 fill-amber-400/20" strokeWidth={1.6} />
                   </div>
                 </div>
 
@@ -880,14 +878,14 @@ export function LeadOutreachFlowchart() {
                     type="button"
                     className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] hover:bg-[#3d4047] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06] transition-colors"
                   >
-                    <Reply size={10} />
+                    <ArrowUturnLeftIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                     <span>Reply</span>
                   </button>
                   <button
                     type="button"
                     className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] hover:bg-[#3d4047] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06] transition-colors"
                   >
-                    <Forward size={10} />
+                    <ArrowRightIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                     <span>Forward</span>
                   </button>
                 </div>
@@ -915,9 +913,9 @@ export function LeadOutreachFlowchart() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-zinc-400">
-                  <Video size={12} className="hover:text-zinc-200 cursor-pointer transition-colors" />
-                  <Phone size={11} className="hover:text-zinc-200 cursor-pointer transition-colors" />
-                  <MoreVertical size={12} className="hover:text-zinc-200 cursor-pointer transition-colors" />
+                  <VideoCameraIcon className="w-[12px] h-[12px] hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
+                  <PhoneIcon className="w-[11px] h-[11px] hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
+                  <EllipsisVerticalIcon className="w-[12px] h-[12px] hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
                 </div>
               </div>
 
@@ -935,7 +933,7 @@ export function LeadOutreachFlowchart() {
                   <p className="leading-snug">{currentAngle.body}</p>
                   <div className="flex items-center justify-end gap-1 mt-1 text-[8.5px] text-emerald-200/70 font-mono">
                     <span>10:24 AM</span>
-                    <CheckCheck size={11} className="text-[#53bdeb]" />
+                    <CheckCircleIcon className="w-[11px] h-[11px] text-[#53bdeb]" strokeWidth={1.6} />
                   </div>
                 </div>
 
@@ -950,12 +948,12 @@ export function LeadOutreachFlowchart() {
 
               {/* WhatsApp Input Bar */}
               <div className="bg-[#202c33] px-2.5 py-2 border-t border-white/[0.06] flex items-center gap-2">
-                <Smile size={13} className="text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" />
-                <Paperclip size={13} className="text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" />
+                <FaceSmileIcon className="w-[13px] h-[13px] text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
+                <PaperClipIcon className="w-[13px] h-[13px] text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
                 <div className="flex-1 bg-[#2a3942] rounded-lg px-2.5 py-1 text-[10px] text-zinc-400 font-sans">
                   Type a message
                 </div>
-                <Mic size={13} className="text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" />
+                <MicrophoneIcon className="w-[13px] h-[13px] text-zinc-400 hover:text-zinc-200 cursor-pointer transition-colors" strokeWidth={1.6} />
               </div>
             </div>
           )}
@@ -1117,7 +1115,7 @@ export function LeadOutreachFlowchart() {
                     Marcus Vance
                   </div>
                   <div className="text-[9.5px] text-text-secondary truncate flex items-center gap-1 mt-0.5">
-                    <Mail size={9.5} className="shrink-0" />
+                    <EnvelopeIcon className="w-[9.5px] h-[9.5px] shrink-0" strokeWidth={1.6} />
                     <span className="truncate">marcus@vesperjewelry.co</span>
                   </div>
                 </div>
@@ -1198,7 +1196,7 @@ export function LeadOutreachFlowchart() {
                     : 'text-zinc-400 border border-transparent'
                 }`}
               >
-                <Mail size={12} />
+                <EnvelopeIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                 <span>Email</span>
               </button>
               <button
@@ -1222,7 +1220,7 @@ export function LeadOutreachFlowchart() {
                 <span className="font-sans text-zinc-300 font-medium">Inbox Conversation</span>
                 <div className="flex items-center gap-1.5 text-zinc-400 text-[9px] font-mono">
                   <span>18m ago</span>
-                  <Star size={10} className="text-amber-400 fill-amber-400/20" />
+                  <StarIcon className="w-[10px] h-[10px] text-amber-400 fill-amber-400/20" strokeWidth={1.6} />
                 </div>
               </div>
               <div className="p-3 bg-[#18191c]/80 border-b border-white/[0.04]">
@@ -1242,14 +1240,14 @@ export function LeadOutreachFlowchart() {
                   type="button"
                   className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06]"
                 >
-                  <Reply size={10} />
+                  <ArrowUturnLeftIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                   <span>Reply</span>
                 </button>
                 <button
                   type="button"
                   className="flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#32343a] text-zinc-300 text-[9.5px] font-medium border border-white/[0.06]"
                 >
-                  <Forward size={10} />
+                  <ArrowRightIcon className="w-[10px] h-[10px]" strokeWidth={1.6} />
                   <span>Forward</span>
                 </button>
               </div>
@@ -1272,9 +1270,9 @@ export function LeadOutreachFlowchart() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 text-zinc-400">
-                  <Video size={12} />
-                  <Phone size={11} />
-                  <MoreVertical size={12} />
+                  <VideoCameraIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
+                  <PhoneIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
+                  <EllipsisVerticalIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
                 </div>
               </div>
               <div className="p-3 bg-[#0b141a] space-y-2">
@@ -1282,7 +1280,7 @@ export function LeadOutreachFlowchart() {
                   <p>{currentAngle.body}</p>
                   <div className="flex items-center justify-end gap-1 mt-1 text-[8.5px] text-emerald-200/70 font-mono">
                     <span>10:24 AM</span>
-                    <CheckCheck size={11} className="text-[#53bdeb]" />
+                    <CheckCircleIcon className="w-[11px] h-[11px] text-[#53bdeb]" strokeWidth={1.6} />
                   </div>
                 </div>
                 <div className="mr-auto max-w-[88%] bg-[#202c33] text-[#e9edef] rounded-lg rounded-tl-none px-2.5 py-1.5 text-[11px] font-sans">

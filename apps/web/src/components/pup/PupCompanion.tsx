@@ -19,10 +19,12 @@ import {
   motion,
   useAnimation,
   useMotionValue,
-  useReducedMotion,
   useSpring,
+  useReducedMotion,
 } from 'framer-motion'
-import { X } from 'lucide-react'
+import {
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 import { WolfOrb, type WolfOrbState } from '@/components/chat/WolfOrb'
 
 export interface PupHint {
@@ -344,7 +346,7 @@ export default function PupCompanion({
                 aria-label="Hide guide pup"
                 className="pointer-events-auto absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full border border-white/15 bg-surface-container text-text-secondary transition-colors hover:text-white"
               >
-                <X size={11} />
+                <XMarkIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
               </button>
             </div>
           </div>

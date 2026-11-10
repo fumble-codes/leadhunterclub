@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   UserIcon,
   CheckCircleIcon,
-  SparklesIcon,
+  PaintBrushIcon,
   ChartBarSquareIcon,
   ChartBarIcon,
   ArrowRightIcon,
@@ -139,7 +139,7 @@ const PERSONAS: PersonaData[] = [
     title: 'Web Designers',
     copyTitle: 'Web Designers',
     description: 'Find businesses already asking for design help.',
-    icon: SparklesIcon,
+    icon: PaintBrushIcon,
     accentColor: 'text-text-secondary hover:text-text-primary transition-colors',
     accentBg: 'bg-surface-secondary',
     accentBorder: 'border-border-subtle',
@@ -761,11 +761,9 @@ export default function WhoItsForGrid() {
                         {/* AI strategy bar */}
                         <div className="flex items-center gap-2 mb-3 select-none overflow-x-auto pb-1">
                           <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-secondary border border-border-subtle text-text-secondary hover:text-text-primary transition-colors text-[8px] font-bold uppercase tracking-wider">
-                            <SparklesIcon className="w-2 h-2" />
                             <span>Buyer Context:</span>
                           </div>
                           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-secondary border border-border-subtle text-[8px] font-bold text-text-secondary hover:text-text-primary transition-colors">
-                            <BoltIcon className="w-2 h-2" />
                             <span>{activePersona.lead.title}</span>
                           </div>
                         </div>

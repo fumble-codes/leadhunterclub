@@ -2,7 +2,13 @@
 
 import { useState, useEffect, memo } from 'react'
 import { motion } from 'framer-motion'
-import { Lock, Coins, Mail, Phone, Loader2 } from 'lucide-react'
+import {
+  LockClosedIcon,
+  BanknotesIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline'
 import { AppLead } from '@/types/lead'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
@@ -370,13 +376,13 @@ function PipelineLeadCard({
             )}
             {lead.email && (
               <span className={`text-[11.5px] truncate flex items-center gap-1.5 ${theme.textMuted}`}>
-                <Mail size={11} className="shrink-0" />
+                <EnvelopeIcon className="w-[11px] h-[11px] shrink-0" />
                 <span className="truncate">{lead.email}</span>
               </span>
             )}
             {lead.phone && (
               <span className={`text-[11.5px] truncate flex items-center gap-1.5 ${theme.textMuted}`}>
-                <Phone size={11} className="shrink-0" />
+                <PhoneIcon className="w-[11px] h-[11px] shrink-0" />
                 <span className="truncate">{lead.phone}</span>
               </span>
             )}
@@ -384,7 +390,7 @@ function PipelineLeadCard({
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 text-center h-full">
             <div className={`w-9 h-9 rounded-full flex items-center justify-center ${theme.blurBg}`}>
-              <Lock size={14} className={theme.textMuted} />
+              <LockClosedIcon className={`w-[14px] h-[14px] ${theme.textMuted}`} />
             </div>
             <span className={`text-[11px] font-black uppercase tracking-widest ${theme.text}`}>
               Contact locked
@@ -405,7 +411,7 @@ function PipelineLeadCard({
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center overflow-hidden shrink-0 ${theme.blurBg}`}
               >
-                <Lock size={12} className={theme.textMuted} />
+                <LockClosedIcon className={`w-3 h-3 ${theme.textMuted}`} />
               </div>
               <div className="flex flex-col select-none shrink-0 leading-tight">
                 <span className="text-[10.5px] font-semibold tracking-tight text-text-secondary">
@@ -420,7 +426,7 @@ function PipelineLeadCard({
             {/* Claimed by Member Badge OR Reveal Action Button */}
             {lead.isClaimedByOther ? (
               <div className="h-[30px] px-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10.5px] font-bold flex items-center gap-1.5 select-none shadow-sm shrink-0 whitespace-nowrap">
-                <Lock size={12} className="shrink-0" />
+                <LockClosedIcon className="w-3 h-3 shrink-0" />
                 <span>Claimed (25/25)</span>
               </div>
             ) : (
@@ -435,14 +441,14 @@ function PipelineLeadCard({
               >
                 {isRevealing ? (
                   <span className="flex items-center gap-1.5 whitespace-nowrap">
-                    <Loader2 size={12} className="animate-spin shrink-0" />
+                    <ArrowPathIcon className="w-3 h-3 animate-spin shrink-0" />
                     <span className="text-[10px] font-semibold tracking-tight whitespace-nowrap">Unlocking...</span>
                   </span>
                 ) : (
                   <span className="flex items-center gap-1.5 whitespace-nowrap">
                     <span className="whitespace-nowrap">Unlock & Save</span>
                     <span className="flex items-center gap-0.5 opacity-90 text-[10px] font-semibold tabular-nums shrink-0 whitespace-nowrap">
-                      <Coins size={11} className="shrink-0" />
+                      <BanknotesIcon className="w-[11px] h-[11px] shrink-0" />
                       <span>-{lead.revealCost ?? 10}</span>
                     </span>
                   </span>
@@ -472,7 +478,7 @@ function PipelineLeadCard({
                     className={`text-[9.5px] truncate select-all flex items-center gap-1 mt-0.5 ${theme.textMuted}`}
                     title={lead.email}
                   >
-                    <Mail size={9.5} className="shrink-0" />
+                    <EnvelopeIcon className="w-[9.5px] h-[9.5px] shrink-0" />
                     <span className="truncate">{lead.email}</span>
                   </div>
                 ) : lead.phone ? (
@@ -480,7 +486,7 @@ function PipelineLeadCard({
                     className={`text-[9.5px] truncate select-all flex items-center gap-1 mt-0.5 ${theme.textMuted}`}
                     title={lead.phone}
                   >
-                    <Phone size={9.5} className="shrink-0" />
+                    <PhoneIcon className="w-[9.5px] h-[9.5px] shrink-0" />
                     <span className="truncate">{lead.phone}</span>
                   </div>
                 ) : null}

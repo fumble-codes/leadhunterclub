@@ -8,8 +8,9 @@ import {
   PhoneIcon,
   LinkIcon,
   DocumentTextIcon,
+  ArrowPathIcon,
+  ClipboardDocumentIcon,
 } from '@heroicons/react/24/solid'
-import { Loader2, ClipboardPaste } from 'lucide-react'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useToast } from '@/components/ui/Toast'
 import type { ExternalPost } from '@/lib/external-api/client'
@@ -117,7 +118,7 @@ export default function ManualContactModal({
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <ClipboardPaste size={16} className="text-accent-mint" />
+                <ClipboardDocumentIcon className="w-[16px] h-[16px] text-accent-mint" strokeWidth={1.6} />
                 <span className="text-[10px] font-black uppercase tracking-widest text-accent-mint">
                   Manual Contact
                 </span>
@@ -233,7 +234,7 @@ export default function ManualContactModal({
               >
                 {isSaving ? (
                   <>
-                    <Loader2 size={14} className="animate-spin mr-2" />
+                    <ArrowPathIcon className="w-[14px] h-[14px] animate-spin mr-2" strokeWidth={1.6} />
                     <span>Saving...</span>
                   </>
                 ) : (

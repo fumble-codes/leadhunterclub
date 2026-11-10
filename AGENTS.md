@@ -28,8 +28,9 @@ When a user request matches a skill's trigger:
 - **No generic "AI slop" icons.** Never use lightning bolts (⚡ / `BoltIcon`), sparkles, rockets, magic wands,
   brains, or robot glyphs for product concepts — credits, upgrades, billing, AI, or "energy". They read as
   template slop and are banned from product UI.
-- **Use literal, domain-specific icons** from the project sets (`@heroicons/react/24/outline`, `lucide-react`):
-  - credits / billing / top-ups → `BanknotesIcon` / `Wallet` / `CurrencyRupeeIcon`
+- **Use literal, domain-specific icons from `@heroicons/react/24/outline` (lucide-react has been
+  removed — Heroicons only):**
+  - credits / billing / top-ups → `BanknotesIcon` / `WalletIcon`
   - verified / success → `CheckBadgeIcon` / `CheckIcon`
   - warnings → `ExclamationTriangleIcon`
   - contact data → `EnvelopeIcon` / `PhoneIcon` / `UserIcon`
