@@ -106,16 +106,10 @@ function externalPostToAppLead(
   const intel = post.intelligence || ''
   const primaryNiche = post.niche || null
 
-  const approvedOrLiveDate = post.reviewed_at || (post as any).approved_at || post.updated_at || post.created_at
-  const isExpired24h = approvedOrLiveDate
-    ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 24 * 60 * 60 * 1000
-    : false
-  const isAutoClaimedAfter24h = isExpired24h && !isRevealed
-  const effectiveClaimedCount = isAutoClaimedAfter24h ? 25 : (post.claimed_count || 0)
+  const effectiveClaimedCount = post.claimed_count || 0
   const effectiveClaimedByOther =
     isClaimedByOther ||
-    isAutoClaimedAfter24h ||
-    (!isRevealed && (effectiveClaimedCount >= 25 || post.is_claimed))
+    (!isRevealed && (effectiveClaimedCount >= 25 || Boolean(post.is_claimed)))
 
   const niches = extractNiches(post.keyword, post.content || '', post.intelligence, primaryNiche)
   const cleanTags = extractLeadBadges({ ...post, claimed_count: effectiveClaimedCount }, niches)
@@ -418,7 +412,7 @@ export async function GET(request: NextRequest) {
               isLimitReached,
             )
           })
-          .filter((l) => l.status === 'new')
+          .filter((l) => (searchParams.get('status') ? l.status === searchParams.get('status') : true))
           .sort((a, b) => {
             // 1. Unclaimed leads always come before claimed leads
             const aClaimed = a.isClaimedByOther ? 1 : 0
