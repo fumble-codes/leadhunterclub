@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { DEFAULT_PLANS, DEFAULT_REFILL_PACKS } from '@/app/api/admin/plans/route'
+import { normalizeRolloverCopy } from '@/lib/plan-copy'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,9 +35,10 @@ export async function GET() {
     const rawPlans = (plansSetting?.value as any) || DEFAULT_PLANS
     const rawRefillPacks = (refillSetting?.value as any) || DEFAULT_REFILL_PACKS
 
-    // Filter to active items only
-    const plans = rawPlans.filter((p: any) => p.isActive !== false)
-    const refillPacks = rawRefillPacks.filter((p: any) => p.isActive !== false)
+    // Admin-editable config can contain stale rollover periods; enforce the
+    // canonical 15-day wording on everything served to users.
+    const plans = normalizeRolloverCopy(rawPlans).filter((p: any) => p.isActive !== false)
+    const refillPacks = normalizeRolloverCopy(rawRefillPacks).filter((p: any) => p.isActive !== false)
 
     cachedPlansData = {
       success: true,

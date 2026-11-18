@@ -47,6 +47,7 @@ User asked for local dummy lead data to test the lead drawer without the live DB
 | 15 | Last scrape timing & tool badges on leads — `/admin/tokens`, `/admin/leads`, `LeadCard`, `LeadDrawer` | ✅ shipped — deployed on VM + Vercel |
 | 16 | Generic-design audit (2026-11-09) — 100 tsx files scanned per docs/GENERIC-DESIGN-RESEARCH.md + live screenshots | ✅ audit done (docs/DESIGN-AUDIT.md) + fixed: dashboard locale bug, /pricing banned icons + generic headline, NicheBadge emoji→heroicons. Next batch (label diet / em-dash diet / empty states) awaits user decision |
 | 17 | lucide-react removed (2026-11-10) — 7 files (LeadCard, PipelineLeadCard, LeadOutreachFlowchart, HunterCopilot, PupCompanion, admin/leads page + ManualContactModal) migrated to heroicons outline, strokeWidth 1.6; dependency uninstalled; DESIGN.md + AGENTS.md icon rules updated to Heroicons-only | ✅ done — ESLint clean, tsc clean in touched files (only pre-existing baseline errors remain) |
+| 18 | Site-wide rollover consistency (2026-11-18) — all copy must say 15-day rollover, never more/less | ✅ done: source copy already consistent; live DB `plans_config` row fixed ("up to 30 days" + "4 credits renewed monthly" → 15 days / 1000 credits); defensive normalizer in `lib/plan-copy.ts` applied to public `/api/plans`; 3 vitest cases pass; live /pricing verified |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 
@@ -1639,3 +1640,70 @@ Settings before pre-generating.
   pinned CTAs. Route deleted, dev server stopped.
 - **Checks:** `tsc --noEmit` and `next lint --file` both clean for the touched file; no new repo-wide errors.
 
+
+---
+
+## Blog feature (2026-11-12) — in-house CMS, admin authoring
+
+**Goal:** public `/blog` + authoring from the existing `/admin` panel (no third-party CMS), Markdown bodies,
+pasted-URL cover images, admin-only access, newsletter email optional (default OFF).
+
+### Files created
+- `apps/web/prisma/blog-tables.sql` — idempotent `CREATE TABLE IF NOT EXISTS "blog_posts"` + indexes
+  (camelCase columns matching Prisma's default mapping; `tags text[]`).
+- `apps/web/src/lib/validators/blog.ts` — `BLOG_STATUSES`, `BLOG_CATEGORIES`, `BLOG_CATEGORY_LABELS`,
+  `blogSlugSchema`, `createBlogPostSchema`, `updateBlogPostSchema` (partial + `status: DRAFT|ARCHIVED`),
+  `publishBlogPostSchema`, `slugifyTitle`, `estimateReadingMinutes` (200 wpm).
+- `apps/web/src/lib/blog.ts` — server-only public helpers: `SITE_URL`, `blogPostUrl`, `categoryLabel`,
+  `formatBlogDate`, `listPublishedPosts`, `countPublishedPosts`, `getPublishedPostBySlug`,
+  `listPublishedTags`, `listPublishedCategoryCounts`, `incrementPostViews`.
+- `apps/web/src/lib/blog-admin.ts` — `uniqueBlogSlug` (-2/-3 suffixing), `blankToNull`.
+- API: `api/admin/blog/route.ts` (GET list + POST create draft), `api/admin/blog/[id]/route.ts`
+  (GET/PATCH/DELETE), `api/admin/blog/[id]/publish/route.ts` (publish now / schedule / optional newsletter).
+- Admin UI: `app/admin/blog/page.tsx` (status tabs + counts, search, publish/unpublish/delete),
+  `app/admin/blog/[id]/page.tsx` (editor: title, auto-slug, excerpt, Markdown write/preview, cover URL +
+  preview, category, tags, author, SEO fields, feature toggle, publish dialog with datetime + newsletter opt-in).
+- Public: `app/blog/page.tsx` (featured hero + grid + category chips + tag shelf),
+  `app/blog/[slug]/page.tsx` (article, JSON-LD BlogPosting, CTA card, related posts),
+  `app/blog/category/[category]/page.tsx`, `app/blog/tag/[tag]/page.tsx`.
+- Shared UI: `components/blog/MarkdownContent.tsx`, `components/blog/BlogCard.tsx`,
+  `components/blog/BlogArchiveLayout.tsx`.
+- SEO: `app/sitemap.ts`, `app/robots.ts`, `app/blog/rss.xml/route.ts` (first sitemap/robots in the repo).
+
+### Files edited
+- `prisma/schema.prisma` — `BlogPost` model (`@@map("blog_posts")`, indexes on status+publishedAt,
+  category+status+publishedAt, isFeatured).
+- `app/admin/layout.tsx` — `adminNav` entry `{ name: 'Blog', href: '/admin/blog', icon: DocumentTextIcon }`.
+- `app/ClientLayout.tsx` — `/blog` + `/blog/*` added to `isPublicRoute` (so the marketing Navbar renders).
+- `components/layout/Navbar.tsx` — `Blog → /blog` nav link.
+- `app/page.tsx` — landing footer Resources column leads with `Blog → /blog`.
+- `next.config.js` — CSP `img-src` now allows `https:` (admin-pasted cover URLs are arbitrary hosts).
+
+### Behaviour notes
+- Visibility rule: `status IN ('PUBLISHED','SCHEDULED')` AND `publishedAt <= now`. Scheduled posts go live on
+  their own with zero cron; the admin list lazily promotes due `SCHEDULED` rows to `PUBLISHED` on load.
+- Unpublishing (PATCH `status: DRAFT|ARCHIVED`) clears `publishedAt` so nothing can leak through a stale date.
+- Publish requires 3+ char title, 20+ char excerpt, body, author. Newsletter send is best-effort: a failure
+  returns `newsletterError` but never rolls the publish back. AuditLog write is best-effort too.
+- Public pages use `revalidate = 60` with **no** `generateStaticParams` (avoids DB access at build time).
+- Covers render as plain `<img>` (arbitrary hosts) — no `next/image` remotePatterns needed.
+
+### Verified
+- `prisma validate` + `prisma generate` clean. Note: **do not run `prisma format`** — it re-aligns every
+  model in `schema.prisma` (≈130 lines of churn) because the repo's hand-alignment differs from Prisma's
+  canonical style. The `BlogPost` block was appended by hand in the repo's own alignment style.
+- `db.blogPost` create → findMany → delete round-trips against the configured DB, with defaults applied
+  (`tags: []`, `status: DRAFT`, `readingMinutes: 1`, `isFeatured: false`, `publishedAt: null`).
+- tsc: only pre-existing repo errors remain (blog/sitemap/robots/markdown files clean).
+- Dev-server smoke test (seeded one post, then removed it): `/blog` 200, `/blog/smoke-test-post` 200 with
+  Markdown body rendered, `/blog/category/leads` 200, `/blog/tag/buyer%20intent` 200, `/blog/rss.xml` 200,
+  `/sitemap.xml` 200, `/robots.txt` 200, `/admin/blog` + `/admin/blog/new` compile and redirect to `/login`.
+
+### ⚠️ Env quirk + deploy note
+- **`apps/web/.env` is malformed** — it contains `DATABASE_URL=" postgresql://…` (leading space, no closing
+  quote, trailing `\`) and a similarly mangled `DIRECT_URL`. Prisma CLI reads `.env` first and fails with
+  **P1013**. Next.js works because `.env.local` wins at runtime. Fix or delete `apps/web/.env`.
+- `.env.local` DATABASE_URL points at the **Supabase production pooler**, not a local dev DB.
+  `prisma db execute --file prisma/blog-tables.sql` was therefore run against that database — it created an
+  empty `blog_posts` table (idempotent DDL, 0 rows, no other tables touched; smoke-test row was deleted).
+  To roll back: `DROP TABLE IF EXISTS "blog_posts";` on that database.
