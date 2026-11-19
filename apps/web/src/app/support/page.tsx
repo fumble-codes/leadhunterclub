@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import type { ChangeEvent } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -16,6 +17,8 @@ import {
   BanknotesIcon,
   ChatBubbleLeftRightIcon,
   FunnelIcon,
+  ExclamationTriangleIcon,
+  PaperClipIcon,
 } from '@heroicons/react/24/solid'
 import { Badge, Button, Input, Select, Modal, CustomLoader } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
@@ -73,6 +76,18 @@ export default function SupportPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [showTutorial, setShowTutorial] = useState(false)
+  // Bug report modal state (uses the existing support-ticket pipeline with
+  // category "bug" + screenshots attached to the first message).
+  const [bugOpen, setBugOpen] = useState(false)
+  const [bugSubmitting, setBugSubmitting] = useState(false)
+  const [bugWhat, setBugWhat] = useState('')
+  const [bugSteps, setBugSteps] = useState('')
+  const [bugExpected, setBugExpected] = useState('')
+  const [bugActual, setBugActual] = useState('')
+  const [bugPage, setBugPage] = useState('')
+  const [bugSeverity, setBugSeverity] = useState('major')
+  const [bugFiles, setBugFiles] = useState<File[]>([])
+  const [bugPreviews, setBugPreviews] = useState<string[]>([])
   // Video help modal: content is kept after close so the exit animation never
   // shows an empty title/src; `videoHelpOpen` alone drives mount/unmount.
   const [videoHelp, setVideoHelp] = useState<VideoGuide | null>(null)
@@ -139,6 +154,99 @@ export default function SupportPage() {
       addToast({ type: 'error', message: 'Network error' })
     } finally {
       setCreating(false)
+    }
+  }
+
+  const resetBugForm = () => {
+    bugPreviews.forEach((url) => URL.revokeObjectURL(url))
+    setBugWhat('')
+    setBugSteps('')
+    setBugExpected('')
+    setBugActual('')
+    setBugPage('')
+    setBugSeverity('major')
+    setBugFiles([])
+    setBugPreviews([])
+  }
+
+  const openBugModal = () => {
+    setBugPage(typeof window !== 'undefined' ? window.location.pathname : '')
+    setBugOpen(true)
+  }
+
+  const closeBugModal = () => {
+    setBugOpen(false)
+    resetBugForm()
+  }
+
+  const pickBugFiles = (event: ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(event.target.files || [])
+    const allowed = ['image/png', 'image/jpeg', 'image/webp']
+    const valid = picked.filter((f) => allowed.includes(f.type) && f.size <= 3 * 1024 * 1024)
+    if (valid.length !== picked.length) {
+      addToast({
+        type: 'error',
+        message: 'Screenshots must be PNG/JPEG/WebP and under 3MB each',
+      })
+    }
+    const files = valid.slice(0, 2)
+    bugPreviews.forEach((url) => URL.revokeObjectURL(url))
+    setBugFiles(files)
+    setBugPreviews(files.map((f) => URL.createObjectURL(f)))
+    event.target.value = ''
+  }
+
+  const handleBugSubmit = async () => {
+    if (!bugWhat.trim() || !bugSteps.trim()) {
+      addToast({ type: 'error', message: 'Describe the bug and the steps to reproduce it' })
+      return
+    }
+    setBugSubmitting(true)
+    try {
+      const priority =
+        bugSeverity === 'blocker' ? 'urgent' : bugSeverity === 'minor' ? 'normal' : 'high'
+      const firstMessage = [
+        'BUG REPORT',
+        `Page / feature: ${bugPage.trim() || 'Not specified'}`,
+        `Severity: ${bugSeverity}`,
+        '',
+        'What happened:',
+        bugWhat.trim(),
+        '',
+        'Steps to reproduce:',
+        bugSteps.trim(),
+        '',
+        `Expected: ${bugExpected.trim() || 'Not specified'}`,
+        `Actual: ${bugActual.trim() || 'Not specified'}`,
+        '',
+        `Screenshots attached: ${bugFiles.length}`,
+      ].join('\n')
+
+      const token = await getFirebaseToken()
+      const formData = new FormData()
+      formData.append('subject', `[Bug] ${bugWhat.trim().slice(0, 70)}`)
+      formData.append('category', 'bug')
+      formData.append('priority', priority)
+      formData.append('firstMessage', firstMessage)
+      bugFiles.forEach((file) => formData.append('screenshots', file))
+
+      const res = await fetch('/api/support/tickets', {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      })
+      const json = await res.json()
+      if (res.ok) {
+        addToast({ type: 'success', message: '✓ Bug report sent to the app team' })
+        closeBugModal()
+        await loadTickets()
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to send bug report' })
+      }
+    } catch {
+      addToast({ type: 'error', message: 'Network error' })
+    } finally {
+      setBugSubmitting(false)
     }
   }
 
@@ -241,6 +349,16 @@ export default function SupportPage() {
             <Button variant="primary" color="primary" size="sm" className="min-h-[44px]" onClick={() => setCreateOpen(true)}>
               <PlusIcon className="w-3.5 h-3.5" />
               <span>New Ticket</span>
+            </Button>
+            <Button
+              variant="ghost"
+              color="mint"
+              size="sm"
+              className="min-h-[44px] border border-accent-orange/30 text-accent-orange hover:bg-accent-orange/10"
+              onClick={openBugModal}
+            >
+              <ExclamationTriangleIcon className="w-3.5 h-3.5" />
+              <span>Report a Bug</span>
             </Button>
           </div>
         </div>
@@ -516,6 +634,143 @@ export default function SupportPage() {
                 placeholder="Describe what you need help with in detail..."
                 className="w-full bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 px-4 text-xs focus:outline-none focus:border-accent-orange/40 transition-all resize-none text-text-primary"
               />
+            </div>
+          </div>
+        </Modal>
+
+        {/* Bug report modal — same ticket pipeline, category "bug" + screenshots */}
+        <Modal
+          open={bugOpen}
+          onClose={closeBugModal}
+          title="Report a Bug"
+          size="md"
+          actions={
+            <>
+              <Button variant="ghost" color="mint" onClick={closeBugModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                color="mint"
+                onClick={handleBugSubmit}
+                loading={bugSubmitting}
+              >
+                Send Bug Report
+              </Button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <p className="text-xxs text-text-secondary leading-relaxed">
+              Tell us what broke and how to reproduce it. The app team reads these directly — screenshots make it much faster to fix.
+            </p>
+            <div>
+              <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                What happened? <span className="text-accent-orange">*</span>
+              </label>
+              <Input
+                value={bugWhat}
+                onChange={(e) => setBugWhat(e.target.value)}
+                placeholder="Short description of the bug"
+              />
+            </div>
+            <div>
+              <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                Steps to reproduce <span className="text-accent-orange">*</span>
+              </label>
+              <textarea
+                value={bugSteps}
+                onChange={(e) => setBugSteps(e.target.value)}
+                rows={3}
+                placeholder="1. Open… 2. Click… 3. See error…"
+                className="w-full bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 px-4 text-xs focus:outline-none focus:border-accent-orange/40 transition-all resize-none text-text-primary"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                  Expected
+                </label>
+                <Input
+                  value={bugExpected}
+                  onChange={(e) => setBugExpected(e.target.value)}
+                  placeholder="What should have happened?"
+                />
+              </div>
+              <div>
+                <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                  Actually happened
+                </label>
+                <Input
+                  value={bugActual}
+                  onChange={(e) => setBugActual(e.target.value)}
+                  placeholder="What went wrong?"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                  Page / feature
+                </label>
+                <Input
+                  value={bugPage}
+                  onChange={(e) => setBugPage(e.target.value)}
+                  placeholder="e.g. /leads — lead drawer"
+                />
+              </div>
+              <div>
+                <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                  Severity
+                </label>
+                <Select
+                  value={bugSeverity}
+                  onChange={setBugSeverity}
+                  options={[
+                    { label: 'Blocker — can’t use the app', value: 'blocker' },
+                    { label: 'Major — feature broken', value: 'major' },
+                    { label: 'Minor — small glitch', value: 'minor' },
+                  ]}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
+                Screenshots (max 2 · PNG/JPEG/WebP · 3MB each)
+              </label>
+              <label className="inline-flex items-center gap-2 px-3.5 py-2 min-h-[44px] rounded-xl border border-white/10 bg-white/5 text-xs font-semibold text-text-primary hover:bg-white/10 cursor-pointer transition-colors">
+                <PaperClipIcon className="w-4 h-4" />
+                Choose screenshots
+                <input
+                  type="file"
+                  accept="image/png, image/jpeg, image/webp"
+                  multiple
+                  onChange={pickBugFiles}
+                  className="hidden"
+                />
+              </label>
+              {bugPreviews.length > 0 && (
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {bugPreviews.map((src, index) => (
+                    <div key={src} className="relative w-24 h-20 rounded-lg overflow-hidden border border-white/10">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        aria-label={`Remove screenshot ${index + 1}`}
+                        onClick={() => {
+                          URL.revokeObjectURL(src)
+                          setBugFiles((files) => files.filter((_, i) => i !== index))
+                          setBugPreviews((urls) => urls.filter((_, i) => i !== index))
+                        }}
+                        className="absolute top-1 right-1 p-1 rounded bg-black/70 text-white hover:bg-black"
+                      >
+                        <XMarkIcon className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </Modal>

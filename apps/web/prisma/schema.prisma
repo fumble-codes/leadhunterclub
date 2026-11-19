@@ -258,6 +258,7 @@ model SupportTicketMessage {
   authorId    String        // user UID or admin UID
   authorRole  String        // "user" | "admin"
   body        String
+  imageUrl    String?       // JSON array of screenshot data URLs (legacy: single data URL)
   isInternal  Boolean       @default(false) // admin-only internal note
   createdAt   DateTime      @default(now())
 

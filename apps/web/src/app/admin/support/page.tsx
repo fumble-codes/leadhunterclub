@@ -34,6 +34,7 @@ export default function AdminSupportPage() {
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState('')
   const [priority, setPriority] = useState('')
+  const [category, setCategory] = useState('')
   const [search, setSearch] = useState('')
   const { addToast } = useToast()
 
@@ -43,6 +44,7 @@ export default function AdminSupportPage() {
       const params = new URLSearchParams()
       if (status) params.set('status', status)
       if (priority) params.set('priority', priority)
+      if (category) params.set('category', category)
       if (search) params.set('search', search)
       const res = await fetch(`/api/admin/support/tickets?${params.toString()}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -59,7 +61,7 @@ export default function AdminSupportPage() {
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, priority])
+  }, [status, priority, category])
 
   const runSearch = () => {
     setLoading(true)
@@ -116,6 +118,22 @@ export default function AdminSupportPage() {
             ]}
           />
         </div>
+        <div className="w-40">
+          <Select
+            value={category}
+            onChange={(v) => setCategory(v)}
+            size="sm"
+            placeholder="Category"
+            options={[
+              { label: 'Bug', value: 'bug' },
+              { label: 'General', value: 'general' },
+              { label: 'Billing', value: 'billing' },
+              { label: 'Leads', value: 'leads' },
+              { label: 'Account', value: 'account' },
+              { label: 'Technical', value: 'technical' },
+            ]}
+          />
+        </div>
       </div>
 
       {/* Queue */}
@@ -154,8 +172,11 @@ export default function AdminSupportPage() {
                     className="block group-hover:text-accent-mint transition-colors"
                   >
                     <div className="text-sm font-bold text-text-primary">{ticket.subject}</div>
-                    <div className="text-xxs text-text-secondary mt-0.5 capitalize">
+                    <div className="text-xxs text-text-secondary mt-0.5 flex items-center gap-2 capitalize">
                       {ticket.category}
+                      {ticket.category === 'bug' && (
+                        <Badge size="sm" color="purple">BUG</Badge>
+                      )}
                     </div>
                   </Link>
                 </div>

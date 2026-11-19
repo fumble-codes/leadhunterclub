@@ -9,6 +9,7 @@ import {
   PaperAirplaneIcon,
   LockClosedIcon,
   ArrowTopRightOnSquareIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/solid'
 import { Badge, Button, Select, CustomLoader } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
@@ -19,6 +20,7 @@ interface Message {
   authorId: string
   authorRole: string
   body: string
+  imageUrl?: string | null
   isInternal: boolean
   createdAt: string
 }
@@ -54,6 +56,19 @@ export default function AdminSupportThreadPage() {
   const [reply, setReply] = useState('')
   const [isInternal, setIsInternal] = useState(false)
   const [sending, setSending] = useState(false)
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+
+  /** Screenshots are stored as a JSON array of data URLs on the first message. */
+  const messageScreenshots = (msg: Message): string[] => {
+    if (!msg.imageUrl) return []
+    try {
+      const parsed = JSON.parse(msg.imageUrl)
+      if (Array.isArray(parsed)) return parsed.filter((v): v is string => typeof v === 'string')
+    } catch {
+      // Legacy single data URL
+    }
+    return [msg.imageUrl]
+  }
 
   const load = async () => {
     try {
@@ -225,6 +240,22 @@ export default function AdminSupportThreadPage() {
                   <p className="text-sm text-text-primary/90 leading-relaxed whitespace-pre-wrap">
                     {msg.body}
                   </p>
+                  {messageScreenshots(msg).length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {messageScreenshots(msg).map((src, index) => (
+                        <button
+                          key={`${msg.id}-${index}`}
+                          type="button"
+                          onClick={() => setLightboxSrc(src)}
+                          className="rounded-lg overflow-hidden border border-white/10 hover:border-accent-mint/50 transition-colors"
+                          title="Open screenshot full size"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={src} alt={`Bug screenshot ${index + 1}`} className="h-24 w-36 object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )
             })}
@@ -271,6 +302,26 @@ export default function AdminSupportThreadPage() {
               </Button>
             </div>
           </div>
+
+          {lightboxSrc && (
+            <div
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 cursor-zoom-out"
+              onClick={() => setLightboxSrc(null)}
+              role="dialog"
+              aria-label="Bug screenshot viewer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={lightboxSrc} alt="Bug screenshot full size" className="max-h-full max-w-full object-contain rounded-lg" />
+              <button
+                type="button"
+                className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
+                aria-label="Close screenshot viewer"
+                onClick={() => setLightboxSrc(null)}
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

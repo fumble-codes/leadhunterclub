@@ -11,11 +11,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const priority = searchParams.get('priority')
+    const category = searchParams.get('category')
     const search = searchParams.get('search')
 
     const where: Record<string, unknown> = {}
     if (status) where.status = status
     if (priority) where.priority = priority
+    if (category) where.category = category
     if (search) {
       where.OR = [
         { subject: { contains: search, mode: 'insensitive' } },
