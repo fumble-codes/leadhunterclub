@@ -496,9 +496,17 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Reached only by the saved/outreach views (the discovery feed returns earlier).
+    // These views aren't paginated at the API level: the saved page paginates the
+    // full list client-side and exports every row. Slicing to the default pageSize
+    // (100) here silently truncated exports - a user with 140 saved leads only got
+    // 100 back, so only 100 could ever be exported. When the caller asks for no
+    // pagination (as /saved does), return the complete list. Explicit page/pageSize
+    // requests (e.g. leadsService.getSavedLeads) still get their requested page.
     const total = data.length
-    const totalPages = Math.ceil(total / pageSize)
-    const paginatedData = data.slice((page - 1) * pageSize, page * pageSize)
+    const isPaginated = searchParams.has('page') || searchParams.has('pageSize')
+    const totalPages = isPaginated ? Math.ceil(total / pageSize) : 1
+    const paginatedData = isPaginated ? data.slice((page - 1) * pageSize, page * pageSize) : data
 
     return NextResponse.json(
       {
@@ -508,8 +516,8 @@ export async function GET(request: NextRequest) {
           pageSize,
           total,
           totalPages,
-          hasNext: page < totalPages,
-          hasPrev: page > 1,
+          hasNext: isPaginated && page < totalPages,
+          hasPrev: isPaginated && page > 1,
         },
       },
       { headers: { 'Cache-Control': 'private, no-cache, stale-while-revalidate=15' } },
