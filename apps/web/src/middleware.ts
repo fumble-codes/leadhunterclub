@@ -55,10 +55,11 @@ export default async function middleware(request: NextRequest) {
 
   if (isProtected) {
     const sessionCookie = request.cookies.get('__session')
+    const redirectTarget = pathname + (request.nextUrl.search || '')
 
     if (!sessionCookie) {
       const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
+      loginUrl.searchParams.set('redirect', redirectTarget)
       const response = NextResponse.redirect(loginUrl)
       addSecurityHeaders(response)
       return response
@@ -67,7 +68,7 @@ export default async function middleware(request: NextRequest) {
     const session = await verifySession(sessionCookie.value, { allowGracePeriod: true })
     if (!session) {
       const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirect', pathname)
+      loginUrl.searchParams.set('redirect', redirectTarget)
       const response = NextResponse.redirect(loginUrl)
       response.cookies.set('__session', '', { maxAge: 0, path: '/' })
       addSecurityHeaders(response)
@@ -77,7 +78,7 @@ export default async function middleware(request: NextRequest) {
     // Email verification gate (JWT-level, no DB hit)
     if (session.email_verified === false) {
       const verifyUrl = new URL('/verify-email', request.url)
-      verifyUrl.searchParams.set('redirect', pathname)
+      verifyUrl.searchParams.set('redirect', redirectTarget)
       const response = NextResponse.redirect(verifyUrl)
       addSecurityHeaders(response)
       return response

@@ -403,12 +403,18 @@ export default function LeadsPage() {
 
   // Deep-link: ?lead=<id> opens the drawer on load / share
   useEffect(() => {
-    try {
-      const id = new URLSearchParams(window.location.search).get('lead')
-      if (id) setSelectedLeadId(id)
-    } catch {
-      // ignore malformed URL
+    const parseLead = () => {
+      try {
+        if (typeof window === 'undefined') return
+        const id = new URLSearchParams(window.location.search).get('lead')
+        if (id) setSelectedLeadId(id)
+      } catch {
+        // ignore malformed URL
+      }
     }
+    parseLead()
+    window.addEventListener('popstate', parseLead)
+    return () => window.removeEventListener('popstate', parseLead)
   }, [])
 
   const openLead = (id: string) => {
@@ -442,6 +448,13 @@ export default function LeadsPage() {
       setDrawerLeadDetail(null)
       return
     }
+
+    // If lead is already loaded in leadsList, populate drawer state immediately for instant feedback
+    const localMatch = leadsList.find((l) => l.id === selectedLeadId)
+    if (localMatch) {
+      setDrawerLeadDetail((prev) => (prev?.id === selectedLeadId ? prev : localMatch))
+    }
+
     if (
       selectedLeadId.startsWith('mock') ||
       selectedLeadId.startsWith('hero') ||
@@ -484,7 +497,7 @@ export default function LeadsPage() {
     return () => {
       cancelled = true
     }
-  }, [selectedLeadId])
+  }, [selectedLeadId, user, leadsList])
 
   // Esc closes drawer + lock background scroll while open
   useEffect(() => {
@@ -879,7 +892,7 @@ export default function LeadsPage() {
       </div>
 
           <AnimatePresence>
-            {selectedLead && (
+            {(selectedLead || (selectedLeadId && !drawerLeadDetail)) && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -899,46 +912,59 @@ export default function LeadsPage() {
                   transition={{ type: 'spring', damping: 32, stiffness: 300 }}
                   role="dialog"
                   aria-modal="true"
-                  aria-label={`Lead details: ${selectedLead.title}`}
+                  aria-label={selectedLead ? `Lead details: ${selectedLead.title}` : 'Loading lead details'}
                   className="relative h-[88dvh] w-full max-h-[88dvh] overflow-hidden rounded-t-3xl sm:h-[min(86vh,820px)] sm:max-h-[min(86vh,820px)] sm:w-[min(720px,100%)] sm:max-w-[720px] sm:rounded-[22px]"
                 >
-                  <LeadDrawer
-                    lead={selectedLead}
-                    onClose={closeLead}
-                    onSaveToggle={(isSaved) => handleSaveToggle(selectedLead.id, isSaved)}
-                    onReveal={(name, email, phone, fullLead) => {
-                      setLeadsList((prev) =>
-                        prev.map((l) =>
-                          l.id === selectedLead.id
+                  {selectedLead ? (
+                    <LeadDrawer
+                      lead={selectedLead}
+                      onClose={closeLead}
+                      onSaveToggle={(isSaved) => handleSaveToggle(selectedLead.id, isSaved)}
+                      onReveal={(name, email, phone, fullLead) => {
+                        setLeadsList((prev) =>
+                          prev.map((l) =>
+                            l.id === selectedLead.id
+                              ? {
+                                  ...l,
+                                  isRevealed: true,
+                                  name,
+                                  email,
+                                  phone: phone ?? l.phone,
+                                  status: 'saved',
+                                  isSaved: true,
+                                  ...(fullLead?.creditCost !== undefined ? { creditCost: fullLead.creditCost } : {}),
+                                }
+                              : l,
+                          ),
+                        )
+                        setDrawerLeadDetail((prev) =>
+                          prev && prev.id === selectedLead.id
                             ? {
-                                ...l,
+                                ...prev,
                                 isRevealed: true,
                                 name,
                                 email,
-                                phone: phone ?? l.phone,
+                                phone: phone ?? prev.phone,
                                 status: 'saved',
                                 isSaved: true,
                                 ...(fullLead?.creditCost !== undefined ? { creditCost: fullLead.creditCost } : {}),
                               }
-                            : l,
-                        ),
-                      )
-                      setDrawerLeadDetail((prev) =>
-                        prev && prev.id === selectedLead.id
-                          ? {
-                              ...prev,
-                              isRevealed: true,
-                              name,
-                              email,
-                              phone: phone ?? prev.phone,
-                              status: 'saved',
-                              isSaved: true,
-                              ...(fullLead?.creditCost !== undefined ? { creditCost: fullLead.creditCost } : {}),
-                            }
-                          : prev,
-                      )
-                    }}
-                  />
+                            : prev,
+                        )
+                      }}
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-[#141414] p-8 border border-white/10">
+                      <div className="flex flex-col items-center gap-3">
+                        <CustomLoader />
+                        <p className="text-sm text-neutral-400 font-medium">Opening lead details...</p>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
                 </motion.div>
               </motion.div>
             )}
