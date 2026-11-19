@@ -36,13 +36,13 @@ export async function GET(request: NextRequest) {
       totalLimit += limit
       totalUsed += used
 
-      if (k.is_active && remaining > 0) {
+      if (k.is_active) {
         activeKeysCount++
       }
     }
 
     const totalRemaining = Math.max(0, totalLimit - totalUsed)
-    const isExhausted = totalKeys === 0 || activeKeysCount === 0 || totalRemaining === 0
+    const isExhausted = totalKeys === 0 || activeKeysCount === 0
 
     let reason = ''
     if (totalKeys === 0) {

@@ -47,6 +47,8 @@ model User {
   updatedAt              DateTime  @updatedAt
 
   googleSheetId          String?
+  telegram_chat_id       String?   @map("telegram_chat_id")
+  telegram_username      String?   @map("telegram_username")
   referralCode           String?   @unique
   referredById           String?
   creditAccount          CreditAccount?

@@ -246,6 +246,8 @@ export function profilePayload(user: {
   behance?: string | null
   github?: string | null
   twitter?: string | null
+  telegram_chat_id?: string | null
+  telegram_username?: string | null
   servicesOffered?: string[] | null
   preferredLeadCategories?: string[] | null
   outreachExperience?: string | null
@@ -261,6 +263,8 @@ export function profilePayload(user: {
     behance: user.behance || null,
     github: user.github || null,
     twitter: user.twitter || null,
+    telegram_chat_id: user.telegram_chat_id || null,
+    telegram_username: user.telegram_username || null,
     servicesOffered: user.servicesOffered ?? [],
     preferredLeadCategories: user.preferredLeadCategories ?? [],
     outreachExperience: user.outreachExperience || null,
