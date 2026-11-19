@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useCallback, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface ModalProps {
@@ -36,10 +37,14 @@ export function Modal({ open, onClose, title, children, actions, size = 'md' }: 
     }
   }, [open, handleKeyDown])
 
-  return (
+  // Portal to <body>: modals rendered inside a positioned main (z-10) would
+  // otherwise sit below the mobile bottom nav (z-40).
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -53,10 +58,10 @@ export function Modal({ open, onClose, title, children, actions, size = 'md' }: 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className={`relative w-full ${sizeStyles[size]} bg-surface border border-border-subtle
-              rounded-xl shadow-elevation-4 p-6`}
+            className={`relative flex w-full flex-col overflow-hidden bg-surface border border-border-subtle
+              rounded-xl shadow-elevation-4 max-h-[calc(100dvh-1.5rem)] ${sizeStyles[size]}`}
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex shrink-0 items-center justify-between border-b border-white/5 px-6 py-4">
               <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
               <button
                 onClick={onClose}
@@ -75,11 +80,18 @@ export function Modal({ open, onClose, title, children, actions, size = 'md' }: 
                 </svg>
               </button>
             </div>
-            <div className="text-text-secondary text-sm leading-relaxed">{children}</div>
-            {actions && <div className="flex flex-wrap justify-end gap-3 mt-6">{actions}</div>}
+            <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto px-6 py-4 text-sm leading-relaxed text-text-secondary">
+              {children}
+            </div>
+            {actions && (
+              <div className="flex shrink-0 flex-wrap justify-end gap-3 border-t border-white/5 bg-surface px-6 py-4">
+                {actions}
+              </div>
+            )}
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }

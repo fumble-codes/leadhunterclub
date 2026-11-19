@@ -350,16 +350,14 @@ export default function SupportPage() {
               <PlusIcon className="w-3.5 h-3.5" />
               <span>New Ticket</span>
             </Button>
-            <Button
-              variant="ghost"
-              color="mint"
-              size="sm"
-              className="min-h-[44px] border border-accent-orange/30 text-accent-orange hover:bg-accent-orange/10"
+            <button
+              type="button"
               onClick={openBugModal}
+              className="inline-flex items-center gap-2 px-3.5 py-2 min-h-[44px] rounded-xl text-xs font-bold text-black bg-accent-orange hover:brightness-110 transition-all"
             >
               <ExclamationTriangleIcon className="w-3.5 h-3.5" />
               <span>Report a Bug</span>
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -687,17 +685,17 @@ export default function SupportPage() {
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+              <div className="min-w-0">
                 <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
                   Expected
                 </label>
                 <Input
                   value={bugExpected}
                   onChange={(e) => setBugExpected(e.target.value)}
-                  placeholder="What should have happened?"
+                  placeholder="What you expected"
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
                   Actually happened
                 </label>
@@ -709,7 +707,7 @@ export default function SupportPage() {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+              <div className="min-w-0">
                 <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
                   Page / feature
                 </label>
@@ -719,13 +717,14 @@ export default function SupportPage() {
                   placeholder="e.g. /leads — lead drawer"
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="block text-xxs font-bold text-text-secondary uppercase tracking-widest mb-2">
                   Severity
                 </label>
                 <Select
                   value={bugSeverity}
                   onChange={setBugSeverity}
+                  className="w-full min-w-0"
                   options={[
                     { label: 'Blocker — can’t use the app', value: 'blocker' },
                     { label: 'Major — feature broken', value: 'major' },
