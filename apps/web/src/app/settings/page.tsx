@@ -153,37 +153,6 @@ export default function SettingsPage() {
   const [openServiceGroups, setOpenServiceGroups] = useState<string[]>(['dev'])
   const [openNicheGroups, setOpenNicheGroups] = useState<string[]>(['tech'])
 
-  // Telegram Notifications State
-  const [tgChatId, setTgChatId] = useState<string | null>(null)
-  const [tgUsername, setTgUsername] = useState<string | null>(null)
-  const [tgBotUsername, setTgBotUsername] = useState<string>('LeadHunterBot')
-  const [tgUnlinking, setTgUnlinking] = useState(false)
-
-  const handleUnlinkTelegram = async () => {
-    setTgUnlinking(true)
-    try {
-      const token = await getFirebaseToken()
-      const res = await fetch('/api/telegram/unlink', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      })
-      if (!res.ok) {
-        addToast({ type: 'error', message: 'Failed to unlink Telegram.' })
-        return
-      }
-      setTgChatId(null)
-      setTgUsername(null)
-      addToast({ type: 'success', message: 'Telegram account unlinked.' })
-    } catch {
-      addToast({ type: 'error', message: 'Error unlinking Telegram.' })
-    } finally {
-      setTgUnlinking(false)
-    }
-  }
-
   useEffect(() => {
     let active = true
     async function loadProfile() {
@@ -208,19 +177,7 @@ export default function SettingsPage() {
           setPfNiches(Array.isArray(d.preferredLeadCategories) ? d.preferredLeadCategories : [])
           setPfExperience(d.outreachExperience || '')
           setPfDiscovery(d.discoverySource || '')
-          setTgChatId(d.telegram_chat_id || null)
-          setTgUsername(d.telegram_username || null)
         }
-
-        // Fetch bot info
-        fetch('/api/telegram/bot-info')
-          .then((r) => r.json())
-          .then((info) => {
-            if (active && info?.botUsername) {
-              setTgBotUsername(info.botUsername)
-            }
-          })
-          .catch(() => {})
       } catch (err) {
         console.error('Failed to load profile & socials:', err)
       } finally {
@@ -1228,102 +1185,6 @@ export default function SettingsPage() {
                       'Save Phone Number'
                     )}
                   </button>
-                </div>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Telegram Alerts Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.06 }}
-            className="metallic-card p-6 sm:p-8"
-          >
-            <div className="flex items-center justify-between mb-6 gap-4">
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="w-14 h-14 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20 flex items-center justify-center shrink-0">
-                  <svg className="w-7 h-7 text-[#229ED9]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
-                  </svg>
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-lg font-bold text-text-primary">Telegram Alerts</h2>
-                    {tgChatId ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        Connected {tgUsername ? `@${tgUsername}` : ''}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/5 text-text-secondary border border-white/10">
-                        Not Connected
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-text-secondary">
-                    Instant alerts for approved lead drops and account notifications
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {tgChatId ? (
-              <div className="space-y-4">
-                <div className="p-4 sm:p-5 rounded-2xl bg-surface-elevated/40 border border-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-text-primary flex items-center gap-2">
-                      <span className="text-emerald-400">●</span> Real-time notifications active
-                    </p>
-                    <p className="text-xs text-text-secondary">
-                      You are receiving alerts on Telegram whenever high-intent leads matching your criteria are approved.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleUnlinkTelegram}
-                    disabled={tgUnlinking}
-                    className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all disabled:opacity-50 shrink-0"
-                  >
-                    {tgUnlinking ? 'Disconnecting...' : 'Disconnect Telegram'}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                  Never miss a high-paying client. Connect your Telegram to receive instant alerts the moment new high-intent leads are verified, plus credit and subscription updates.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-text-secondary py-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-accent-mint font-bold">✓</span> Real-time high-intent lead drops
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-accent-mint font-bold">✓</span> Direct 1-click lead details links
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-accent-mint font-bold">✓</span> Subscription & credit renewal alerts
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-accent-mint font-bold">✓</span> Free & instant 1-click setup
-                  </div>
-                </div>
-
-                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                  <a
-                    href={`https://t.me/${tgBotUsername}?start=${user?.id || ''}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3 rounded-xl bg-[#229ED9] hover:bg-[#229ED9]/90 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(34,158,217,0.25)]"
-                  >
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
-                    </svg>
-                    Connect Telegram
-                  </a>
-                  <span className="text-[11px] text-text-secondary">
-                    Opens Telegram bot. Tap <b>"Start"</b> to link automatically.
-                  </span>
                 </div>
               </div>
             )}
