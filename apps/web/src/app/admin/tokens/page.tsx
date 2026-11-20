@@ -1455,8 +1455,8 @@ export default function AdminTokensPage() {
                 const isDeleting = deletingKeyId === keyId
                 const isSelected = selectedIds.includes(keyId)
                 const isInvalid = Boolean(k.error_message) && !k.error_message?.toLowerCase().includes('spend exhausted')
-                const isExhausted = !isInvalid && (Boolean((k as any).is_exhausted) || !k.is_active || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')))
-                const isActive = !isInvalid && !isExhausted
+                const isExhausted = !isInvalid && (Boolean((k as any).is_exhausted) || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')))
+                const isActive = !isInvalid && !isExhausted && Boolean(k.is_active)
 
                 return (
                   <div key={keyId} className={`flex items-start sm:items-center justify-between rounded-xl p-3.5 sm:px-4 sm:py-3 border transition-all ${
