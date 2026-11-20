@@ -1359,12 +1359,12 @@ export default function AdminTokensPage() {
                   {/* Summary badges */}
                   <div className="flex items-center gap-1.5 text-[11px] flex-wrap">
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
-                      {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active && k.usage?.status !== 'exhausted').length} Active
+                      {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length} Active
                     </span>
-                    {tokens.some(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active || k.usage?.status === 'exhausted')) && (
+                    {tokens.some(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active)) && (
                       <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold flex items-center gap-1">
                         <ExclamationTriangleIcon className="w-3 h-3" />
-                        {tokens.filter(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active || k.usage?.status === 'exhausted')).length} Quota Exhausted ($5 limit)
+                        {tokens.filter(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active)).length} Quota Exhausted ($5 limit)
                       </span>
                     )}
                     {tokens.some(k => Boolean(k.error_message)) && (
@@ -1392,12 +1392,12 @@ export default function AdminTokensPage() {
                       Select Invalid Only ({tokens.filter(k => Boolean(k.error_message)).length})
                     </button>
                   )}
-                  {tokens.some(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active || k.comments_remaining === 0 || k.usage?.status === 'exhausted')) && selectedIds.length === 0 && (
+                  {tokens.some(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active)) && selectedIds.length === 0 && (
                     <button
                       type="button"
                       onClick={() => {
                         const exhaustedIds = tokens
-                          .filter(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active || k.comments_remaining === 0 || k.usage?.status === 'exhausted'))
+                          .filter(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active))
                           .map(k => k._id || k.id)
                           .filter(Boolean)
                         setSelectedIds(exhaustedIds)
@@ -1455,7 +1455,7 @@ export default function AdminTokensPage() {
                 const isDeleting = deletingKeyId === keyId
                 const isSelected = selectedIds.includes(keyId)
                 const isInvalid = Boolean(k.error_message) && !k.error_message?.toLowerCase().includes('spend exhausted')
-                const isExhausted = !isInvalid && (Boolean((k as any).is_exhausted) || !k.is_active || k.usage?.status === 'exhausted' || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')))
+                const isExhausted = !isInvalid && (Boolean((k as any).is_exhausted) || !k.is_active || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')))
                 const isActive = !isInvalid && !isExhausted
 
                 return (

@@ -34,8 +34,7 @@ export async function GET(request: NextRequest) {
       const isSpendExhausted = Boolean(
         dbKey.error_message?.toLowerCase().includes('spend exhausted') ||
         ext?.error_message?.toLowerCase().includes('spend exhausted') ||
-        ext?.platform_usage?.remaining === 0 ||
-        ext?.usage?.status === 'exhausted'
+        (ext?.platform_usage && ext.platform_usage.remaining === 0)
       )
 
       merged.push({
