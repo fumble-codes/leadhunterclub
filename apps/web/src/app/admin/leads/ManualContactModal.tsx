@@ -10,6 +10,7 @@ import {
   DocumentTextIcon,
   ArrowPathIcon,
   ClipboardDocumentIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/solid'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useToast } from '@/components/ui/Toast'
@@ -205,8 +206,8 @@ export default function ManualContactModal({
 
             <div>
               <label className="text-[10px] font-bold uppercase tracking-widest text-text-secondary mb-1.5 flex items-center gap-1.5">
-                <span className="text-amber-400 font-bold">⚡</span>
-                <span>Custom Credit Cost (Coins - optional)</span>
+                <BanknotesIcon className="w-3.5 h-3.5 text-accent-purple" />
+                <span>Custom Credit Cost (Credits - optional)</span>
               </label>
               <input
                 type="number"

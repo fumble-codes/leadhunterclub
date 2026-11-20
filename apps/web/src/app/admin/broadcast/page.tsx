@@ -1824,7 +1824,7 @@ export default function AdminBroadcastPage() {
                 </div>
               ) : (
                 <p className="text-[11px] text-text-secondary mt-1">
-                  👉 Click <strong className="text-emerald-400">"Set as Target"</strong> on any group from the list on the right to start receiving automated lead drop alerts.
+                  👉 Click <strong className="text-emerald-400">&quot;Set as Target&quot;</strong> on any group from the list on the right to start receiving automated lead drop alerts.
                 </p>
               )}
             </div>
