@@ -965,10 +965,6 @@ export default function LeadsPage() {
               </motion.div>
             )}
           </AnimatePresence>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
       <CreditExhaustedModal />
     </main>
   )
