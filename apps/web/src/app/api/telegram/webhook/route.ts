@@ -263,7 +263,8 @@ async function handleLatestLeadsCommand(chatId: number | string) {
 <b>${escapeTgHtml(title)}</b>
 
 ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
-⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')} | <b>Cost:</b> ${lead.credit_cost ?? 15} credits`
+⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')} | <b>Cost:</b> ${lead.credit_cost ?? 15} credits
+🆔 <b>Lead ID:</b> <code>${lead.id}</code>`
 
     await sendTelegramMessage(chatId, messageText, {
       reply_markup: {
@@ -346,7 +347,8 @@ async function handleSavedLeadsCommand(chatId: number | string) {
 
     const messageText = `🔖 <b>${escapeTgHtml(niche)}</b>
 <b>${escapeTgHtml(title)}</b>
-⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')}${contactSnippet}`
+⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')}${contactSnippet}
+🆔 <b>Lead ID:</b> <code>${lead.id}</code>`
 
     const buttons = isUnlocked
       ? [[{ text: '🌐 View Full Intel', url: leadUrl }]]
