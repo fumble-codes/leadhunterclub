@@ -49,7 +49,13 @@ async function handleTextMessage(message: any) {
     return
   }
 
-  // 3. /claim <leadId> command
+  // 3. /leads or /latest command
+  if (text === '/leads' || text === '/latest') {
+    await handleLatestLeadsCommand(chatId)
+    return
+  }
+
+  // 4. /claim <leadId> command
   if (text.startsWith('/claim')) {
     const leadId = text.split(/\s+/)[1]?.trim()
     if (!leadId) {
@@ -63,12 +69,13 @@ async function handleTextMessage(message: any) {
     return
   }
 
-  // 4. /help command
+  // 5. /help command
   if (text === '/help') {
     await sendTelegramMessage(
       chatId,
       `🎯 <b>Lead Hunter Telegram Bot Commands:</b>
 
+• <b>/leads</b> — View latest approved high-intent leads right now.
 • <b>/balance</b> — Check your current credit balance & expiry.
 • <b>/claim &lt;lead_id&gt;</b> — Unlock buyer email & phone directly in chat.
 • <b>/help</b> — Show available commands.
@@ -81,7 +88,7 @@ async function handleTextMessage(message: any) {
   // Default fallback for unhandled text
   await sendTelegramMessage(
     chatId,
-    `👋 Hello! Send <b>/balance</b> to check your credits or <b>/help</b> to see what I can do.`,
+    `👋 Hello! Send <b>/leads</b> to see available leads, <b>/balance</b> to check credits, or <b>/help</b> for commands.`,
   )
 }
 
@@ -220,6 +227,56 @@ async function handleBalanceCommand(chatId: number | string) {
 
 <a href="${APP_URL}/pricing">⚡ Top up or Upgrade Plan &rarr;</a>`,
   )
+}
+
+async function handleLatestLeadsCommand(chatId: number | string) {
+  const leads = await db.leadPost.findMany({
+    where: {
+      status: 'relevant',
+      review_status: 'approved',
+      is_deleted: false,
+    },
+    orderBy: { created_at: 'desc' },
+    take: 3,
+  })
+
+  if (!leads || leads.length === 0) {
+    await sendTelegramMessage(
+      chatId,
+      '📭 <b>No approved leads found right now.</b>\nNew verified leads will be posted here the moment they are approved by admins.',
+    )
+    return
+  }
+
+  await sendTelegramMessage(
+    chatId,
+    `🔥 <b>Latest Verified Leads (${leads.length}):</b>\nTap <b>[⚡ Claim Lead]</b> to unlock decision-maker contacts:`,
+  )
+
+  for (const lead of leads) {
+    const title = lead.title?.trim() || 'New High-Intent Client Requirement'
+    const niche = lead.niche || lead.keyword || 'General'
+    const cleanContent = lead.content ? lead.content.replace(/\s+/g, ' ').trim() : ''
+    const snippet = cleanContent ? cleanContent.slice(0, 180) + '...' : ''
+    const leadUrl = `${APP_URL}/leads?lead=${encodeURIComponent(lead.id)}`
+
+    const messageText = `🎯 <b>${escapeTgHtml(niche)}</b>
+<b>${escapeTgHtml(title)}</b>
+
+${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
+⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')} | <b>Cost:</b> ${lead.credit_cost ?? 15} credits`
+
+    await sendTelegramMessage(chatId, messageText, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${lead.id}` },
+            { text: '🌐 View Full Intel', url: leadUrl },
+          ],
+        ],
+      },
+    })
+  }
 }
 
 async function handleCallbackQuery(callbackQuery: any) {
