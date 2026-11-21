@@ -357,8 +357,7 @@ ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
       reply_markup: {
         inline_keyboard: [
           [
-            { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${lead.id}` },
-            { text: '🌐 View Full Intel', url: leadUrl },
+            { text: '🚀 View & Claim on Dashboard ↗', url: leadUrl },
           ],
         ],
       },
@@ -497,18 +496,14 @@ async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSi
 
 📊 <b>Status:</b> ${isUnlocked ? '🟢 Unlocked' : '🔖 Bookmarked'}${contactSnippet}`
 
-    const buttons = isUnlocked
-      ? [
-          [
-            { text: '🌐 View Full Intel & Outreaching', url: leadUrl },
-          ],
-        ]
-      : [
-          [
-            { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${item.leadId}` },
-            { text: '🌐 View on Platform', url: leadUrl },
-          ],
-        ]
+    const buttons = [
+      [
+        {
+          text: isUnlocked ? '🌐 View Full Intel & Outreach ↗' : '🚀 View & Claim on Dashboard ↗',
+          url: leadUrl,
+        },
+      ],
+    ]
 
     await sendTelegramMessage(chatId, messageText, {
       reply_markup: {
