@@ -13,7 +13,6 @@ const BOT_COMMANDS_FOOTER = `─────────────────
 • <b>/leads</b> — Browse latest high-intent client opportunities
 • <b>/saved</b> — View your bookmarked leads & unlocked contacts
 • <b>/balance</b> — Check your credit balance & rollover expiry
-• <b>/claim &lt;lead_id&gt;</b> — Unlock buyer email & phone directly in chat
 • <b>/help</b> — Show quick guide & all commands`
 
 export const BOT_COMMANDS_KEYBOARD = [
@@ -90,22 +89,17 @@ async function handleTextMessage(message: any) {
     return
   }
 
-  // 5. /claim <leadId> command
+  // 5. /claim command disabled for raw IDs (claim directly via button)
   if (text.startsWith('/claim')) {
-    const leadId = text.split(/\s+/)[1]?.trim()
-    if (!leadId) {
-      await sendTelegramMessage(
-        chatId,
-        withCommandsFooter('⚠️ Please provide a Lead ID to claim:\nExample: <code>/claim &lt;lead_id&gt;</code>'),
-        {
-          reply_markup: {
-            inline_keyboard: BOT_COMMANDS_KEYBOARD,
-          },
+    await sendTelegramMessage(
+      chatId,
+      withCommandsFooter('💡 <b>Direct button claim only:</b>\nTo unlock decision-maker contacts, simply tap the <b>[⚡ Claim Lead (In-Chat)]</b> button beneath any lead drop.'),
+      {
+        reply_markup: {
+          inline_keyboard: BOT_COMMANDS_KEYBOARD,
         },
-      )
-      return
-    }
-    await processLeadClaim(chatId, leadId)
+      },
+    )
     return
   }
 
@@ -357,8 +351,7 @@ async function handleLatestLeadsCommand(chatId: number | string, page = 1, pageS
 <b>${escapeTgHtml(title)}</b>
 
 ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
-⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')} | <b>Cost:</b> ${lead.credit_cost ?? 15} credits
-🆔 <b>Lead ID:</b> <code>${lead.id}</code>`
+💰 <b>Cost:</b> ${lead.credit_cost ?? 15} credits`
 
     await sendTelegramMessage(chatId, messageText, {
       reply_markup: {
@@ -502,8 +495,7 @@ async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSi
     const messageText = `🔖 <b>${escapeTgHtml(niche)}</b>
 <b>${escapeTgHtml(title)}</b>
 
-⚡ <b>Platform:</b> ${escapeTgHtml(platform)} | <b>Status:</b> ${isUnlocked ? '🟢 Unlocked' : '🔖 Bookmarked'}${contactSnippet}
-🆔 <b>Lead ID:</b> <code>${item.leadId}</code>`
+📊 <b>Status:</b> ${isUnlocked ? '🟢 Unlocked' : '🔖 Bookmarked'}${contactSnippet}`
 
     const buttons = isUnlocked
       ? [
