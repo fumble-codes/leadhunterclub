@@ -8,6 +8,18 @@ export const dynamic = 'force-dynamic'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.theleadhunterclub.com'
 
+const BOT_COMMANDS_FOOTER = `───────────────────────
+📌 <b>Bot Commands:</b>
+• <b>/leads</b> — Browse latest high-intent client opportunities
+• <b>/saved</b> — View your bookmarked leads & unlocked contacts
+• <b>/balance</b> — Check your credit balance & rollover expiry
+• <b>/claim &lt;lead_id&gt;</b> — Unlock buyer email & phone directly in chat
+• <b>/help</b> — Show quick guide & all commands`
+
+function withCommandsFooter(text: string): string {
+  return `${text}\n\n${BOT_COMMANDS_FOOTER}`
+}
+
 export async function POST(request: NextRequest) {
   try {
     const update = await request.json()
@@ -67,7 +79,7 @@ async function handleTextMessage(message: any) {
     if (!leadId) {
       await sendTelegramMessage(
         chatId,
-        '⚠️ Please provide a Lead ID to claim:\nExample: <code>/claim &lt;lead_id&gt;</code>',
+        withCommandsFooter('⚠️ Please provide a Lead ID to claim:\nExample: <code>/claim &lt;lead_id&gt;</code>'),
       )
       return
     }
@@ -79,15 +91,9 @@ async function handleTextMessage(message: any) {
   if (text === '/help') {
     await sendTelegramMessage(
       chatId,
-      `🎯 <b>Lead Hunter Telegram Bot Commands:</b>
-
-• <b>/leads</b> — View latest approved high-intent leads right now.
-• <b>/saved</b> — View your bookmarked leads & unlocked contacts.
-• <b>/balance</b> — Check your current credit balance & expiry.
-• <b>/claim &lt;lead_id&gt;</b> — Unlock buyer email & phone directly in chat.
-• <b>/help</b> — Show available commands.
-
-💡 <i>Tap any [⚡ Claim Lead] button on alert drops to unlock instantly.</i>`,
+      withCommandsFooter(
+        `🎯 <b>Lead Hunter Telegram Bot</b>\n\nInstant high-intent buyer alerts and in-chat contact unlocks.\n💡 <i>Tap any [⚡ Claim Lead] button on alert drops to unlock instantly.</i>`,
+      ),
     )
     return
   }
@@ -95,7 +101,7 @@ async function handleTextMessage(message: any) {
   // Default fallback for unhandled text
   await sendTelegramMessage(
     chatId,
-    `👋 Hello! Send <b>/leads</b> to see new leads, <b>/saved</b> for your bookmarks, <b>/balance</b> for credits, or <b>/help</b> for commands.`,
+    withCommandsFooter(`👋 Hello! How can I help you hunt leads today?`),
   )
 }
 
@@ -112,19 +118,16 @@ async function handleStartCommand(chatId: number | string, tgUsername: string | 
     if (existingUser) {
       await sendTelegramMessage(
         chatId,
-        `⚠️ Your Telegram account is already linked to <b>${escapeTgHtml(existingUser.email)}</b>.`,
+        withCommandsFooter(`⚠️ Your Telegram account is already linked to <b>${escapeTgHtml(existingUser.email)}</b>.`),
       )
       return
     }
 
     await sendTelegramMessage(
       chatId,
-      `🎉 Welcome to <b>Lead Hunter Club</b>!
-You joined through an invite link!
-
-To claim your <b>+10 bonus credits</b>:
-1. Register on the website: <a href="${APP_URL}/register?ref=${encodeURIComponent(refCode)}">${APP_URL}/register</a>
-2. Go to <b>Settings</b> and tap <b>Connect Telegram</b> to link this chat.`,
+      withCommandsFooter(
+        `🎉 Welcome to <b>Lead Hunter Club</b>!\nYou joined through an invite link!\n\nTo claim your <b>+10 bonus credits</b>:\n1. Register on the website: <a href="${APP_URL}/register?ref=${encodeURIComponent(refCode)}">${APP_URL}/register</a>\n2. Go to <b>Settings</b> and tap <b>Connect Telegram</b> to link this chat.`,
+      ),
     )
     return
   }
@@ -138,7 +141,7 @@ To claim your <b>+10 bonus credits</b>:
     if (!targetUser) {
       await sendTelegramMessage(
         chatId,
-        `❌ Invalid link code. Please open <a href="${APP_URL}/settings">${APP_URL}/settings</a> and click <b>Connect Telegram</b> again.`,
+        withCommandsFooter(`❌ Invalid link code. Please open <a href="${APP_URL}/settings">${APP_URL}/settings</a> and click <b>Connect Telegram</b> again.`),
       )
       return
     }
@@ -156,13 +159,9 @@ To claim your <b>+10 bonus credits</b>:
 
     await sendTelegramMessage(
       chatId,
-      `✅ <b>Account Successfully Linked!</b>
-
-Welcome, <b>${escapeTgHtml(targetUser.name || 'Hunter')}</b>!
-• <b>Account:</b> ${escapeTgHtml(targetUser.email)}
-• <b>Active Credits:</b> ${balances.total}
-
-You will now receive <b>instant Telegram alerts</b> the moment verified client opportunities matching your niches are approved.`,
+      withCommandsFooter(
+        `✅ <b>Account Successfully Linked!</b>\n\nWelcome, <b>${escapeTgHtml(targetUser.name || 'Hunter')}</b>!\n• <b>Account:</b> ${escapeTgHtml(targetUser.email)}\n• <b>Active Credits:</b> ${balances.total}\n\nYou will now receive <b>instant Telegram alerts</b> the moment verified client opportunities matching your niches are approved.`,
+      ),
       {
         reply_markup: {
           inline_keyboard: [
@@ -183,13 +182,9 @@ You will now receive <b>instant Telegram alerts</b> the moment verified client o
     const balances = await creditService.getBalances(existing.id)
     await sendTelegramMessage(
       chatId,
-      `👋 Welcome back, <b>${escapeTgHtml(existing.name || 'Hunter')}</b>!
-
-• <b>Account:</b> ${escapeTgHtml(existing.email)}
-• <b>Credits:</b> ${balances.total}
-• Status: 🟢 <b>Alerts Active</b>
-
-Send <b>/balance</b> to check details or visit <a href="${APP_URL}/leads">Lead Hunter Feed</a>.`,
+      withCommandsFooter(
+        `👋 Welcome back, <b>${escapeTgHtml(existing.name || 'Hunter')}</b>!\n\n• <b>Account:</b> ${escapeTgHtml(existing.email)}\n• <b>Credits:</b> ${balances.total}\n• Status: 🟢 <b>Alerts Active</b>\n\nVisit <a href="${APP_URL}/leads">Lead Hunter Feed</a> to explore all opportunities.`,
+      ),
     )
     return
   }
@@ -197,11 +192,9 @@ Send <b>/balance</b> to check details or visit <a href="${APP_URL}/leads">Lead H
   // Unlinked user
   await sendTelegramMessage(
     chatId,
-    `👋 Welcome to <b>Lead Hunter Club Bot</b>!
-
-To link your account and receive instant alerts:
-1. Log into your dashboard: <a href="${APP_URL}/settings">${APP_URL}/settings</a>
-2. Under <b>Telegram Alerts</b>, click <b>Connect Telegram</b>.`,
+    withCommandsFooter(
+      `👋 Welcome to <b>Lead Hunter Club Bot</b>!\n\nTo link your account and receive instant alerts:\n1. Log into your dashboard: <a href="${APP_URL}/settings">${APP_URL}/settings</a>\n2. Under <b>Telegram Alerts</b>, click <b>Connect Telegram</b>.`,
+    ),
   )
 }
 
@@ -213,7 +206,9 @@ async function handleBalanceCommand(chatId: number | string) {
   if (!user) {
     await sendTelegramMessage(
       chatId,
-      `⚠️ Your Telegram account is not linked to Lead Hunter yet.\nLink it at <a href="${APP_URL}/settings">${APP_URL}/settings</a>.`,
+      withCommandsFooter(
+        `⚠️ Your Telegram account is not linked to Lead Hunter yet.\nLink it at <a href="${APP_URL}/settings">${APP_URL}/settings</a>.`,
+      ),
     )
     return
   }
@@ -225,14 +220,9 @@ async function handleBalanceCommand(chatId: number | string) {
 
   await sendTelegramMessage(
     chatId,
-    `💰 <b>Your Lead Hunter Credit Balance:</b>
-
-• <b>Total Available:</b> <b>${balances.total} Credits</b>
-• <b>Monthly Plan:</b> ${balances.subscriptionBalance} credits
-• <b>Rollover (15 Days):</b> ${balances.rolloverBalance} credits (Expires: ${rolloverExp})
-• <b>Purchased / Bonus:</b> ${balances.bonusBalance} credits (Never expires)
-
-<a href="${APP_URL}/pricing">⚡ Top up or Upgrade Plan &rarr;</a>`,
+    withCommandsFooter(
+      `💰 <b>Your Lead Hunter Credit Balance:</b>\n\n• <b>Total Available:</b> <b>${balances.total} Credits</b>\n• <b>Monthly Plan:</b> ${balances.subscriptionBalance} credits\n• <b>Rollover (15 Days):</b> ${balances.rolloverBalance} credits (Expires: ${rolloverExp})\n• <b>Purchased / Bonus:</b> ${balances.bonusBalance} credits (Never expires)\n\n<a href="${APP_URL}/pricing">⚡ Top up or Upgrade Plan &rarr;</a>`,
+    ),
   )
 }
 
@@ -250,7 +240,9 @@ async function handleLatestLeadsCommand(chatId: number | string) {
   if (!leads || leads.length === 0) {
     await sendTelegramMessage(
       chatId,
-      '📭 <b>No approved leads found right now.</b>\nNew verified leads will be posted here the moment they are approved by admins.',
+      withCommandsFooter(
+        '📭 <b>No approved leads found right now.</b>\nNew verified leads will be posted here the moment they are approved by admins.',
+      ),
     )
     return
   }
@@ -284,6 +276,12 @@ ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
       },
     })
   }
+
+  // Footer summary after batch
+  await sendTelegramMessage(
+    chatId,
+    withCommandsFooter('💡 <i>Tap any [⚡ Claim Lead] button above to unlock decision-maker contacts instantly.</i>'),
+  )
 }
 
 async function handleSavedLeadsCommand(chatId: number | string) {
@@ -294,7 +292,9 @@ async function handleSavedLeadsCommand(chatId: number | string) {
   if (!user) {
     await sendTelegramMessage(
       chatId,
-      `⚠️ Your Telegram account is not linked to Lead Hunter yet.\nLink it at <a href="${APP_URL}/settings">${APP_URL}/settings</a> to view your saved leads.`,
+      withCommandsFooter(
+        `⚠️ Your Telegram account is not linked to Lead Hunter yet.\nLink it at <a href="${APP_URL}/settings">${APP_URL}/settings</a> to view your saved leads.`,
+      ),
     )
     return
   }
@@ -315,7 +315,9 @@ async function handleSavedLeadsCommand(chatId: number | string) {
   if (!savedStates || savedStates.length === 0) {
     await sendTelegramMessage(
       chatId,
-      `📌 <b>No Saved Leads Yet</b>\n\nYou haven't bookmarked any leads. Click the bookmark icon on any lead on the <a href="${APP_URL}/leads">Lead Feed</a> to save it here for quick access.`,
+      withCommandsFooter(
+        `📌 <b>No Saved Leads Yet</b>\n\nYou haven't bookmarked any leads. Click the bookmark icon on any lead on the <a href="${APP_URL}/leads">Lead Feed</a> to save it here for quick access.`,
+      ),
     )
     return
   }
@@ -361,6 +363,12 @@ async function handleSavedLeadsCommand(chatId: number | string) {
       },
     })
   }
+
+  // Footer summary after batch
+  await sendTelegramMessage(
+    chatId,
+    withCommandsFooter(`💡 <i>Saved leads are synced live. Open <a href="${APP_URL}/leads?tab=saved">Saved Leads in Web App</a> to manage them.</i>`),
+  )
 }
 
 async function handleCallbackQuery(callbackQuery: any) {
@@ -391,7 +399,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
   if (!user) {
     await sendTelegramMessage(
       chatId,
-      `⚠️ You must link your Lead Hunter account first.\nConnect at <a href="${APP_URL}/settings">${APP_URL}/settings</a>.`,
+      withCommandsFooter(
+        `⚠️ You must link your Lead Hunter account first.\nConnect at <a href="${APP_URL}/settings">${APP_URL}/settings</a>.`,
+      ),
     )
     return
   }
@@ -399,7 +409,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
   if (user.status !== 'ACTIVE' && user.status !== 'active') {
     await sendTelegramMessage(
       chatId,
-      `🚫 Your account is currently <b>${escapeTgHtml(user.status)}</b> and cannot claim leads.`,
+      withCommandsFooter(
+        `🚫 Your account is currently <b>${escapeTgHtml(user.status)}</b> and cannot claim leads.`,
+      ),
     )
     return
   }
@@ -410,7 +422,10 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
   })
 
   if (!lead) {
-    await sendTelegramMessage(chatId, `❌ Lead not found with ID <code>${escapeTgHtml(leadId)}</code>.`)
+    await sendTelegramMessage(
+      chatId,
+      withCommandsFooter(`❌ Lead not found with ID <code>${escapeTgHtml(leadId)}</code>.`),
+    )
     return
   }
 
@@ -432,14 +447,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
   if (existingState?.isRevealed) {
     await sendTelegramMessage(
       chatId,
-      `✅ <b>You have already unlocked this lead:</b>
-
-<b>${escapeTgHtml(lead.title || 'Client Requirement')}</b>
-• <b>Email:</b> ${escapeTgHtml(emails.join(', ') || 'None')}
-• <b>Phone:</b> ${escapeTgHtml(phones.join(', ') || 'None')}
-• <b>Profile / Post:</b> <a href="${profileUrl}">View Post</a>
-
-<a href="${APP_URL}/leads?lead=${encodeURIComponent(leadId)}">View Full Lead Intelligence &rarr;</a>`,
+      withCommandsFooter(
+        `✅ <b>You have already unlocked this lead:</b>\n\n<b>${escapeTgHtml(lead.title || 'Client Requirement')}</b>\n• <b>Email:</b> ${escapeTgHtml(emails.join(', ') || 'None')}\n• <b>Phone:</b> ${escapeTgHtml(phones.join(', ') || 'None')}\n• <b>Profile / Post:</b> <a href="${profileUrl}">View Post</a>\n\n<a href="${APP_URL}/leads?lead=${encodeURIComponent(leadId)}">View Full Lead Intelligence &rarr;</a>`,
+      ),
     )
     return
   }
@@ -448,7 +458,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
   if (lead.claimed_count >= 25) {
     await sendTelegramMessage(
       chatId,
-      `⚠️ <b>Claim Limit Reached:</b> This lead has already been claimed by the maximum allowed 25 hunters.`,
+      withCommandsFooter(
+        `⚠️ <b>Claim Limit Reached:</b> This lead has already been claimed by the maximum allowed 25 hunters.`,
+      ),
     )
     return
   }
@@ -463,9 +475,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
   if (balances.total < creditCost) {
     await sendTelegramMessage(
       chatId,
-      `❌ <b>Insufficient Credits:</b> This lead requires <b>${creditCost} credits</b>, but your balance is <b>${balances.total} credits</b>.
-
-<a href="${APP_URL}/pricing">⚡ Top Up Credits Now &rarr;</a>`,
+      withCommandsFooter(
+        `❌ <b>Insufficient Credits:</b> This lead requires <b>${creditCost} credits</b>, but your balance is <b>${balances.total} credits</b>.\n\n<a href="${APP_URL}/pricing">⚡ Top Up Credits Now &rarr;</a>`,
+      ),
     )
     return
   }
@@ -507,17 +519,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
 
     await sendTelegramMessage(
       chatId,
-      `🎉 <b>Lead Successfully Claimed!</b> (-${creditCost} credits)
-
-<b>${escapeTgHtml(lead.title || 'Client Requirement')}</b>
-📁 <b>Niche:</b> ${escapeTgHtml(lead.niche || 'High-Intent')}
-
-<b>Verified Decision Maker Contact:</b>
-• <b>Email:</b> <code>${escapeTgHtml(emails.join(', ') || 'N/A')}</code>
-• <b>Phone:</b> <code>${escapeTgHtml(phones.join(', ') || 'N/A')}</code>
-• <b>Source Link:</b> <a href="${profileUrl}">${profileUrl ? 'Open Client Post' : 'N/A'}</a>
-
-💰 <b>Remaining Balance:</b> ${newBalances.total} Credits`,
+      withCommandsFooter(
+        `🎉 <b>Lead Successfully Claimed!</b> (-${creditCost} credits)\n\n<b>${escapeTgHtml(lead.title || 'Client Requirement')}</b>\n📁 <b>Niche:</b> ${escapeTgHtml(lead.niche || 'High-Intent')}\n\n<b>Verified Decision Maker Contact:</b>\n• <b>Email:</b> <code>${escapeTgHtml(emails.join(', ') || 'N/A')}</code>\n• <b>Phone:</b> <code>${escapeTgHtml(phones.join(', ') || 'N/A')}</code>\n• <b>Source Link:</b> <a href="${profileUrl}">${profileUrl ? 'Open Client Post' : 'N/A'}</a>\n\n💰 <b>Remaining Balance:</b> ${newBalances.total} Credits`,
+      ),
       {
         reply_markup: {
           inline_keyboard: [
@@ -528,6 +532,9 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
     )
   } catch (err: any) {
     console.error('[Telegram Claim Error]:', err.message)
-    await sendTelegramMessage(chatId, `❌ Failed to claim lead: ${escapeTgHtml(err.message)}`)
+    await sendTelegramMessage(
+      chatId,
+      withCommandsFooter(`❌ Failed to claim lead: ${escapeTgHtml(err.message)}`),
+    )
   }
 }
