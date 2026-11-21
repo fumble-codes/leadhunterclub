@@ -72,15 +72,21 @@ async function handleTextMessage(message: any) {
     return
   }
 
-  // 3. /leads or /latest command
-  if (text === '/leads' || text === '/latest') {
-    await handleLatestLeadsCommand(chatId)
+  // 3. /leads or /latest command (with optional page number)
+  if (text === '/leads' || text.startsWith('/leads ') || text === '/latest' || text.startsWith('/latest ')) {
+    const parts = text.split(/\s+/)
+    const pageNum = parseInt(parts[1], 10)
+    const page = !isNaN(pageNum) && pageNum > 0 ? pageNum : 1
+    await handleLatestLeadsCommand(chatId, page)
     return
   }
 
-  // 4. /saved command (Bookmarked leads from web app)
-  if (text === '/saved') {
-    await handleSavedLeadsCommand(chatId)
+  // 4. /saved command (with optional page number)
+  if (text === '/saved' || text.startsWith('/saved ')) {
+    const parts = text.split(/\s+/)
+    const pageNum = parseInt(parts[1], 10)
+    const page = !isNaN(pageNum) && pageNum > 0 ? pageNum : 1
+    await handleSavedLeadsCommand(chatId, page)
     return
   }
 
@@ -292,22 +298,35 @@ async function handleBalanceCommand(chatId: number | string) {
   )
 }
 
-async function handleLatestLeadsCommand(chatId: number | string) {
-  const leads = await db.leadPost.findMany({
-    where: {
-      status: 'relevant',
-      review_status: 'approved',
-      is_deleted: false,
-    },
-    orderBy: { created_at: 'desc' },
-    take: 3,
-  })
+async function handleLatestLeadsCommand(chatId: number | string, page = 1, pageSize = 5) {
+  const currentPage = Math.max(1, page)
+  const [totalLeads, leads] = await Promise.all([
+    db.leadPost.count({
+      where: {
+        status: 'relevant',
+        review_status: 'approved',
+        is_deleted: false,
+      },
+    }),
+    db.leadPost.findMany({
+      where: {
+        status: 'relevant',
+        review_status: 'approved',
+        is_deleted: false,
+      },
+      orderBy: { created_at: 'desc' },
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ])
 
   if (!leads || leads.length === 0) {
     await sendTelegramMessage(
       chatId,
       withCommandsFooter(
-        '📭 <b>No approved leads found right now.</b>\nNew verified leads will be posted here the moment they are approved by admins.',
+        currentPage > 1
+          ? `📭 <b>You've reached the end of verified leads.</b>\nTap <b>[🎯 Latest Leads]</b> to return to Page 1.`
+          : '📭 <b>No approved leads found right now.</b>\nNew verified leads will be posted here the moment they are approved by admins.',
       ),
       {
         reply_markup: {
@@ -318,9 +337,11 @@ async function handleLatestLeadsCommand(chatId: number | string) {
     return
   }
 
+  const totalPages = Math.max(1, Math.ceil(totalLeads / pageSize))
+
   await sendTelegramMessage(
     chatId,
-    `🔥 <b>Latest Verified Leads (${leads.length}):</b>\nTap <b>[⚡ Claim Lead]</b> to unlock decision-maker contacts:`,
+    `🔥 <b>Latest Verified Leads (Page ${currentPage} of ${totalPages} • Total: ${totalLeads}):</b>\nTap <b>[⚡ Claim Lead]</b> to unlock decision-maker contacts:`,
   )
 
   for (const lead of leads) {
@@ -349,19 +370,32 @@ ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
     })
   }
 
+  // Navigation pagination buttons
+  const navRow: any[] = []
+  if (currentPage > 1) {
+    navRow.push({ text: `⬅️ Prev (Page ${currentPage - 1})`, callback_data: `cmd:leads:page:${currentPage - 1}` })
+  }
+  if (currentPage < totalPages) {
+    navRow.push({ text: `➡️ Next (Page ${currentPage + 1})`, callback_data: `cmd:leads:page:${currentPage + 1}` })
+  }
+
+  const replyKeyboard = navRow.length > 0
+    ? [navRow, ...BOT_COMMANDS_KEYBOARD]
+    : BOT_COMMANDS_KEYBOARD
+
   // Footer summary after batch with interactive command buttons
   await sendTelegramMessage(
     chatId,
-    withCommandsFooter('💡 <i>Tap any [⚡ Claim Lead] button above to unlock decision-maker contacts instantly.</i>'),
+    withCommandsFooter(`💡 <i>Showing page ${currentPage} of ${totalPages}. Tap any [⚡ Claim Lead] button above to unlock decision-maker contacts instantly.</i>`),
     {
       reply_markup: {
-        inline_keyboard: BOT_COMMANDS_KEYBOARD,
+        inline_keyboard: replyKeyboard,
       },
     },
   )
 }
 
-async function handleSavedLeadsCommand(chatId: number | string) {
+async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSize = 5) {
   const user = await db.user.findFirst({
     where: { telegram_chat_id: String(chatId) },
   })
@@ -381,24 +415,30 @@ async function handleSavedLeadsCommand(chatId: number | string) {
     return
   }
 
-  const savedStates = await db.userLeadState.findMany({
-    where: {
-      userId: user.id,
-      isSaved: true,
-      lead: { is_deleted: false },
-    },
-    include: {
-      lead: true,
-    },
-    orderBy: { lastActionDate: 'desc' },
-    take: 5,
-  })
+  const currentPage = Math.max(1, page)
+  const whereClause = {
+    userId: user.id,
+    status: { notIn: ['dismissed', 'archived'] },
+    OR: [{ isSaved: true }, { isRevealed: true }, { status: 'saved' }],
+  }
+
+  const [totalCount, savedStates] = await Promise.all([
+    db.userLeadState.count({ where: whereClause }),
+    db.userLeadState.findMany({
+      where: whereClause,
+      orderBy: [{ lastActionDate: 'desc' }, { revealedAt: 'desc' }],
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
+    }),
+  ])
 
   if (!savedStates || savedStates.length === 0) {
     await sendTelegramMessage(
       chatId,
       withCommandsFooter(
-        `📌 <b>No Saved Leads Yet</b>\n\nYou haven't bookmarked any leads. Click the bookmark icon on any lead on the <a href="${APP_URL}/leads">Lead Feed</a> to save it here for quick access.`,
+        currentPage > 1
+          ? `📌 <b>You've reached the end of your saved leads.</b>\nTap <b>[🔖 Saved Leads]</b> to return to Page 1.`
+          : `📌 <b>No Saved or Claimed Leads Yet</b>\n\nYou haven't bookmarked or claimed any leads yet. Click the bookmark icon on any lead on the <a href="${APP_URL}/leads">Lead Feed</a> or tap <b>[⚡ Claim Lead]</b> to unlock contacts directly here.`,
       ),
       {
         reply_markup: {
@@ -409,38 +449,63 @@ async function handleSavedLeadsCommand(chatId: number | string) {
     return
   }
 
+  const stateLeadIds = savedStates.map((s) => s.leadId)
+  const [leadPosts, fallbackLeads] = await Promise.all([
+    stateLeadIds.length > 0
+      ? db.leadPost.findMany({
+          where: { id: { in: stateLeadIds }, is_deleted: false },
+        })
+      : [],
+    stateLeadIds.length > 0
+      ? db.lead.findMany({
+          where: { id: { in: stateLeadIds } },
+        })
+      : [],
+  ])
+
+  const leadPostMap = new Map(leadPosts.map((lp) => [lp.id, lp]))
+  const fallbackMap = new Map(fallbackLeads.map((l) => [l.id, l]))
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+
   await sendTelegramMessage(
     chatId,
-    `📌 <b>Your Saved Leads (${savedStates.length}):</b>\n<a href="${APP_URL}/leads?tab=saved">Open Saved Tab in Web App &rarr;</a>`,
+    `📌 <b>Your Saved & Claimed Leads (Page ${currentPage} of ${totalPages} • Total: ${totalCount}):</b>\n<a href="${APP_URL}/leads?tab=saved">Open Saved Tab in Web App &rarr;</a>`,
   )
 
   for (const item of savedStates) {
-    const lead = item.lead
-    if (!lead) continue
+    const lead = leadPostMap.get(item.leadId)
+    const fallback = fallbackMap.get(item.leadId)
+    if (!lead && !fallback) continue
 
-    const title = lead.title?.trim() || 'Client Requirement'
-    const niche = lead.niche || lead.keyword || 'General'
+    const title = lead?.title?.trim() || fallback?.title?.trim() || 'Client Requirement'
+    const niche = lead?.niche || lead?.keyword || fallback?.category || 'General'
+    const platform = lead?.platform || fallback?.source || 'LinkedIn'
     const isUnlocked = item.isRevealed
-    const leadUrl = `${APP_URL}/leads?lead=${encodeURIComponent(lead.id)}`
+    const leadUrl = `${APP_URL}/leads?lead=${encodeURIComponent(item.leadId)}`
 
     let contactSnippet = ''
     if (isUnlocked) {
-      const contact = (lead.contact_info as any) || {}
-      const emails = contact.emails?.map((e: any) => e.email).filter(Boolean) || []
-      const phones = contact.phone_numbers?.map((p: any) => p.number).filter(Boolean) || []
-      contactSnippet = `\n✅ <b>Unlocked:</b> Email: <code>${emails.join(', ') || 'None'}</code> | Phone: <code>${phones.join(', ') || 'None'}</code>`
+      const contact = (lead?.contact_info as any) || {}
+      const emails = contact.emails?.map((e: any) => e.email).filter(Boolean) || (fallback?.email ? [fallback.email] : [])
+      const phones = contact.phone_numbers?.map((p: any) => p.number).filter(Boolean) || (fallback?.phone ? [fallback.phone] : [])
+      contactSnippet = `\n\n🔓 <b>UNLOCKED CONTACT:</b>\n• <b>Email:</b> <code>${emails.join(', ') || 'Not available'}</code>\n• <b>Phone:</b> <code>${phones.join(', ') || 'Not available'}</code>`
     }
 
     const messageText = `🔖 <b>${escapeTgHtml(niche)}</b>
 <b>${escapeTgHtml(title)}</b>
-⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')}${contactSnippet}
-🆔 <b>Lead ID:</b> <code>${lead.id}</code>`
+
+⚡ <b>Platform:</b> ${escapeTgHtml(platform)} | <b>Status:</b> ${isUnlocked ? '🟢 Unlocked' : '🔖 Bookmarked'}${contactSnippet}
+🆔 <b>Lead ID:</b> <code>${item.leadId}</code>`
 
     const buttons = isUnlocked
-      ? [[{ text: '🌐 View Full Intel', url: leadUrl }]]
+      ? [
+          [
+            { text: '🌐 View Full Intel & Outreaching', url: leadUrl },
+          ],
+        ]
       : [
           [
-            { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${lead.id}` },
+            { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${item.leadId}` },
             { text: '🌐 View on Platform', url: leadUrl },
           ],
         ]
@@ -452,13 +517,26 @@ async function handleSavedLeadsCommand(chatId: number | string) {
     })
   }
 
+  // Navigation pagination buttons
+  const navRow: any[] = []
+  if (currentPage > 1) {
+    navRow.push({ text: `⬅️ Prev (Page ${currentPage - 1})`, callback_data: `cmd:saved:page:${currentPage - 1}` })
+  }
+  if (currentPage < totalPages) {
+    navRow.push({ text: `➡️ Next (Page ${currentPage + 1})`, callback_data: `cmd:saved:page:${currentPage + 1}` })
+  }
+
+  const replyKeyboard = navRow.length > 0
+    ? [navRow, ...BOT_COMMANDS_KEYBOARD]
+    : BOT_COMMANDS_KEYBOARD
+
   // Footer summary after batch with interactive command buttons
   await sendTelegramMessage(
     chatId,
-    withCommandsFooter(`💡 <i>Saved leads are synced live. Open <a href="${APP_URL}/leads?tab=saved">Saved Leads in Web App</a> to manage them.</i>`),
+    withCommandsFooter(`💡 <i>Showing page ${currentPage} of ${totalPages}. Saved leads are synced live with your web dashboard.</i>`),
     {
       reply_markup: {
-        inline_keyboard: BOT_COMMANDS_KEYBOARD,
+        inline_keyboard: replyKeyboard,
       },
     },
   )
@@ -482,16 +560,18 @@ async function handleCallbackQuery(callbackQuery: any) {
     return
   }
 
-  // Handle command buttons
-  if (data === 'cmd:leads') {
-    await answerCallbackQuery(queryId, 'Fetching newest leads...')
-    await handleLatestLeadsCommand(chatId)
+  // Handle command buttons (with pagination support)
+  if (data === 'cmd:leads' || data.startsWith('cmd:leads:page:')) {
+    const page = data.startsWith('cmd:leads:page:') ? parseInt(data.replace('cmd:leads:page:', ''), 10) || 1 : 1
+    await answerCallbackQuery(queryId, `Fetching leads (Page ${page})...`)
+    await handleLatestLeadsCommand(chatId, page)
     return
   }
 
-  if (data === 'cmd:saved') {
-    await answerCallbackQuery(queryId, 'Fetching saved leads...')
-    await handleSavedLeadsCommand(chatId)
+  if (data === 'cmd:saved' || data.startsWith('cmd:saved:page:')) {
+    const page = data.startsWith('cmd:saved:page:') ? parseInt(data.replace('cmd:saved:page:', ''), 10) || 1 : 1
+    await answerCallbackQuery(queryId, `Fetching saved leads (Page ${page})...`)
+    await handleSavedLeadsCommand(chatId, page)
     return
   }
 
@@ -650,10 +730,14 @@ async function processLeadClaim(chatId: number | string, leadId: string) {
           leadId,
           isRevealed: true,
           revealedAt: new Date(),
+          isSaved: true,
+          status: 'saved',
         },
         update: {
           isRevealed: true,
           revealedAt: new Date(),
+          isSaved: true,
+          status: 'saved',
         },
       })
 
