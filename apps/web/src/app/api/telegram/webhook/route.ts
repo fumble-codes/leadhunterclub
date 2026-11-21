@@ -298,7 +298,7 @@ async function handleBalanceCommand(chatId: number | string) {
   )
 }
 
-async function handleLatestLeadsCommand(chatId: number | string, page = 1, pageSize = 5) {
+async function handleLatestLeadsCommand(chatId: number | string, page = 1, pageSize = 10) {
   const currentPage = Math.max(1, page)
   const [totalLeads, leads] = await Promise.all([
     db.leadPost.count({
@@ -338,10 +338,12 @@ async function handleLatestLeadsCommand(chatId: number | string, page = 1, pageS
   }
 
   const totalPages = Math.max(1, Math.ceil(totalLeads / pageSize))
+  const startNum = (currentPage - 1) * pageSize + 1
+  const endNum = Math.min(startNum + leads.length - 1, totalLeads)
 
   await sendTelegramMessage(
     chatId,
-    `🔥 <b>Latest Verified Leads (Page ${currentPage} of ${totalPages} • Total: ${totalLeads}):</b>\nTap <b>[⚡ Claim Lead]</b> to unlock decision-maker contacts:`,
+    `🔥 <b>All Available Verified Leads (${startNum}–${endNum} of ${totalLeads}):</b>\nPage ${currentPage} of ${totalPages} • Tap <b>[⚡ Claim Lead]</b> to unlock contacts:`,
   )
 
   for (const lead of leads) {
@@ -370,32 +372,36 @@ ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
     })
   }
 
-  // Navigation pagination buttons
+  // Navigation pagination & full web feed buttons
   const navRow: any[] = []
   if (currentPage > 1) {
-    navRow.push({ text: `⬅️ Prev (Page ${currentPage - 1})`, callback_data: `cmd:leads:page:${currentPage - 1}` })
+    navRow.push({ text: `⬅️ Prev (Pg ${currentPage - 1})`, callback_data: `cmd:leads:page:${currentPage - 1}` })
   }
   if (currentPage < totalPages) {
-    navRow.push({ text: `➡️ Next (Page ${currentPage + 1})`, callback_data: `cmd:leads:page:${currentPage + 1}` })
+    navRow.push({ text: `➡️ Next 10 Leads (Pg ${currentPage + 1})`, callback_data: `cmd:leads:page:${currentPage + 1}` })
   }
 
-  const replyKeyboard = navRow.length > 0
-    ? [navRow, ...BOT_COMMANDS_KEYBOARD]
-    : BOT_COMMANDS_KEYBOARD
+  const customKeyboard: any[] = [
+    [{ text: `🌐 View All ${totalLeads} Leads on Web App ↗`, url: `${APP_URL}/leads` }],
+  ]
+  if (navRow.length > 0) {
+    customKeyboard.push(navRow)
+  }
+  customKeyboard.push(...BOT_COMMANDS_KEYBOARD)
 
   // Footer summary after batch with interactive command buttons
   await sendTelegramMessage(
     chatId,
-    withCommandsFooter(`💡 <i>Showing page ${currentPage} of ${totalPages}. Tap any [⚡ Claim Lead] button above to unlock decision-maker contacts instantly.</i>`),
+    withCommandsFooter(`💡 <i>Showing ${startNum}–${endNum} of ${totalLeads} available leads. Tap [➡️ Next 10 Leads] below or view all on web.</i>`),
     {
       reply_markup: {
-        inline_keyboard: replyKeyboard,
+        inline_keyboard: customKeyboard,
       },
     },
   )
 }
 
-async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSize = 5) {
+async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSize = 10) {
   const user = await db.user.findFirst({
     where: { telegram_chat_id: String(chatId) },
   })
@@ -466,10 +472,12 @@ async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSi
   const leadPostMap = new Map(leadPosts.map((lp) => [lp.id, lp]))
   const fallbackMap = new Map(fallbackLeads.map((l) => [l.id, l]))
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  const startNum = (currentPage - 1) * pageSize + 1
+  const endNum = Math.min(startNum + savedStates.length - 1, totalCount)
 
   await sendTelegramMessage(
     chatId,
-    `📌 <b>Your Saved & Claimed Leads (Page ${currentPage} of ${totalPages} • Total: ${totalCount}):</b>\n<a href="${APP_URL}/leads?tab=saved">Open Saved Tab in Web App &rarr;</a>`,
+    `📌 <b>Your Saved & Claimed Leads (${startNum}–${endNum} of ${totalCount}):</b>\n<a href="${APP_URL}/leads?tab=saved">Open Saved Tab in Web App &rarr;</a>`,
   )
 
   for (const item of savedStates) {
@@ -520,23 +528,27 @@ async function handleSavedLeadsCommand(chatId: number | string, page = 1, pageSi
   // Navigation pagination buttons
   const navRow: any[] = []
   if (currentPage > 1) {
-    navRow.push({ text: `⬅️ Prev (Page ${currentPage - 1})`, callback_data: `cmd:saved:page:${currentPage - 1}` })
+    navRow.push({ text: `⬅️ Prev (Pg ${currentPage - 1})`, callback_data: `cmd:saved:page:${currentPage - 1}` })
   }
   if (currentPage < totalPages) {
-    navRow.push({ text: `➡️ Next (Page ${currentPage + 1})`, callback_data: `cmd:saved:page:${currentPage + 1}` })
+    navRow.push({ text: `➡️ Next 10 Leads (Pg ${currentPage + 1})`, callback_data: `cmd:saved:page:${currentPage + 1}` })
   }
 
-  const replyKeyboard = navRow.length > 0
-    ? [navRow, ...BOT_COMMANDS_KEYBOARD]
-    : BOT_COMMANDS_KEYBOARD
+  const customKeyboard: any[] = [
+    [{ text: `🌐 Open Saved Leads Tab on Web App ↗`, url: `${APP_URL}/leads?tab=saved` }],
+  ]
+  if (navRow.length > 0) {
+    customKeyboard.push(navRow)
+  }
+  customKeyboard.push(...BOT_COMMANDS_KEYBOARD)
 
   // Footer summary after batch with interactive command buttons
   await sendTelegramMessage(
     chatId,
-    withCommandsFooter(`💡 <i>Showing page ${currentPage} of ${totalPages}. Saved leads are synced live with your web dashboard.</i>`),
+    withCommandsFooter(`💡 <i>Showing ${startNum}–${endNum} of ${totalCount} saved leads. Tap [➡️ Next 10 Leads] below or view all on web.</i>`),
     {
       reply_markup: {
-        inline_keyboard: replyKeyboard,
+        inline_keyboard: customKeyboard,
       },
     },
   )
