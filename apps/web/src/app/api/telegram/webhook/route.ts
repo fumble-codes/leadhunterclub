@@ -55,7 +55,13 @@ async function handleTextMessage(message: any) {
     return
   }
 
-  // 4. /claim <leadId> command
+  // 4. /saved command (Bookmarked leads from web app)
+  if (text === '/saved') {
+    await handleSavedLeadsCommand(chatId)
+    return
+  }
+
+  // 5. /claim <leadId> command
   if (text.startsWith('/claim')) {
     const leadId = text.split(/\s+/)[1]?.trim()
     if (!leadId) {
@@ -69,13 +75,14 @@ async function handleTextMessage(message: any) {
     return
   }
 
-  // 5. /help command
+  // 6. /help command
   if (text === '/help') {
     await sendTelegramMessage(
       chatId,
       `🎯 <b>Lead Hunter Telegram Bot Commands:</b>
 
 • <b>/leads</b> — View latest approved high-intent leads right now.
+• <b>/saved</b> — View your bookmarked leads & unlocked contacts.
 • <b>/balance</b> — Check your current credit balance & expiry.
 • <b>/claim &lt;lead_id&gt;</b> — Unlock buyer email & phone directly in chat.
 • <b>/help</b> — Show available commands.
@@ -88,7 +95,7 @@ async function handleTextMessage(message: any) {
   // Default fallback for unhandled text
   await sendTelegramMessage(
     chatId,
-    `👋 Hello! Send <b>/leads</b> to see available leads, <b>/balance</b> to check credits, or <b>/help</b> for commands.`,
+    `👋 Hello! Send <b>/leads</b> to see new leads, <b>/saved</b> for your bookmarks, <b>/balance</b> for credits, or <b>/help</b> for commands.`,
   )
 }
 
@@ -274,6 +281,83 @@ ${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
             { text: '🌐 View Full Intel', url: leadUrl },
           ],
         ],
+      },
+    })
+  }
+}
+
+async function handleSavedLeadsCommand(chatId: number | string) {
+  const user = await db.user.findFirst({
+    where: { telegram_chat_id: String(chatId) },
+  })
+
+  if (!user) {
+    await sendTelegramMessage(
+      chatId,
+      `⚠️ Your Telegram account is not linked to Lead Hunter yet.\nLink it at <a href="${APP_URL}/settings">${APP_URL}/settings</a> to view your saved leads.`,
+    )
+    return
+  }
+
+  const savedStates = await db.userLeadState.findMany({
+    where: {
+      userId: user.id,
+      isSaved: true,
+      lead: { is_deleted: false },
+    },
+    include: {
+      lead: true,
+    },
+    orderBy: { lastActionDate: 'desc' },
+    take: 5,
+  })
+
+  if (!savedStates || savedStates.length === 0) {
+    await sendTelegramMessage(
+      chatId,
+      `📌 <b>No Saved Leads Yet</b>\n\nYou haven't bookmarked any leads. Click the bookmark icon on any lead on the <a href="${APP_URL}/leads">Lead Feed</a> to save it here for quick access.`,
+    )
+    return
+  }
+
+  await sendTelegramMessage(
+    chatId,
+    `📌 <b>Your Saved Leads (${savedStates.length}):</b>\n<a href="${APP_URL}/leads?tab=saved">Open Saved Tab in Web App &rarr;</a>`,
+  )
+
+  for (const item of savedStates) {
+    const lead = item.lead
+    if (!lead) continue
+
+    const title = lead.title?.trim() || 'Client Requirement'
+    const niche = lead.niche || lead.keyword || 'General'
+    const isUnlocked = item.isRevealed
+    const leadUrl = `${APP_URL}/leads?lead=${encodeURIComponent(lead.id)}`
+
+    let contactSnippet = ''
+    if (isUnlocked) {
+      const contact = (lead.contact_info as any) || {}
+      const emails = contact.emails?.map((e: any) => e.email).filter(Boolean) || []
+      const phones = contact.phone_numbers?.map((p: any) => p.number).filter(Boolean) || []
+      contactSnippet = `\n✅ <b>Unlocked:</b> Email: <code>${emails.join(', ') || 'None'}</code> | Phone: <code>${phones.join(', ') || 'None'}</code>`
+    }
+
+    const messageText = `🔖 <b>${escapeTgHtml(niche)}</b>
+<b>${escapeTgHtml(title)}</b>
+⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')}${contactSnippet}`
+
+    const buttons = isUnlocked
+      ? [[{ text: '🌐 View Full Intel', url: leadUrl }]]
+      : [
+          [
+            { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${lead.id}` },
+            { text: '🌐 View on Platform', url: leadUrl },
+          ],
+        ]
+
+    await sendTelegramMessage(chatId, messageText, {
+      reply_markup: {
+        inline_keyboard: buttons,
       },
     })
   }
