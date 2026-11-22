@@ -27,6 +27,8 @@ import {
   BoltIcon,
   ShieldExclamationIcon,
   ChatBubbleLeftRightIcon,
+  CreditCardIcon,
+  ArrowTrendingUpIcon,
   QrCodeIcon,
   ClipboardDocumentIcon,
   ClipboardDocumentCheckIcon,
@@ -335,6 +337,62 @@ function renderWhatsAppFormattedText(text: string) {
   })
 }
 
+const DEFAULT_TELEGRAM_TEMPLATE = `🚀 <b>Fresh Leads Dropped — Lead Hunter Club</b>
+
+🔥 <b>{count} new verified client opportunities</b> have just been approved and added to the platform!
+
+📌 <b>Niches:</b> {niches}
+
+👉 <b>Review & unlock them now on the Dashboard:</b>
+{link}`
+
+function renderTelegramFormattedText(text: string) {
+  if (!text) return null
+  const clean = text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+
+  const lines = clean.split('\n')
+  return lines.map((line, lIdx) => {
+    const parts = line.split(/(<b>.*?<\/b>|<i>.*?<\/i>|<code>.*?<\/code>|https?:\/\/[^\s<]+)/g)
+    return (
+      <span key={lIdx} className="block min-h-[1.15em]">
+        {parts.map((part, pIdx) => {
+          if (part.startsWith('<b>') && part.endsWith('</b>')) {
+            return (
+              <strong key={pIdx} className="font-bold text-white">
+                {part.slice(3, -4)}
+              </strong>
+            )
+          }
+          if (part.startsWith('<i>') && part.endsWith('</i>')) {
+            return (
+              <em key={pIdx} className="italic text-[#b5c7d8]">
+                {part.slice(3, -4)}
+              </em>
+            )
+          }
+          if (part.startsWith('<code>') && part.endsWith('</code>')) {
+            return (
+              <code key={pIdx} className="px-1 py-0.5 rounded bg-black/40 font-mono text-emerald-400 text-[11px]">
+                {part.slice(6, -7)}
+              </code>
+            )
+          }
+          if (part.startsWith('http://') || part.startsWith('https://')) {
+            return (
+              <span key={pIdx} className="text-[#53bdeb] underline font-medium break-all">
+                {part}
+              </span>
+            )
+          }
+          return <span key={pIdx}>{part}</span>
+        })}
+      </span>
+    )
+  })
+}
+
 export default function AdminBroadcastPage() {
   const { addToast } = useToast()
 
@@ -450,6 +508,260 @@ export default function AdminBroadcastPage() {
       .replace(/\{niches\}/gi, 'Web Dev, UI/UX, AI Agents')
       .replace(/\{link\}/gi, 'https://www.theleadhunterclub.com/leads')
   }, [waTemplate])
+
+  // Channel Tab Switcher State: WhatsApp vs Telegram
+  const [activeChannelTab, setActiveChannelTab] = useState<'whatsapp' | 'telegram'>('whatsapp')
+
+  // Telegram Automation State
+  const [tgData, setTgData] = useState<{
+    botUsername: string
+    botEnabled: boolean
+    hasBotToken: boolean
+    configuredChannelId: string
+    configuredChannelName: string | null
+    alertTemplate: string
+    dripSettings: {
+      free_drips_enabled: boolean
+      renewal_drips_enabled: boolean
+      grace_drips_enabled: boolean
+      free_drip_interval_days: number
+    }
+  } | null>(null)
+  const [tgLoading, setTgLoading] = useState(false)
+  const [tgChannelInput, setTgChannelInput] = useState('')
+  const [isSavingTgChannel, setIsSavingTgChannel] = useState(false)
+  const [tgTemplate, setTgTemplate] = useState<string>(DEFAULT_TELEGRAM_TEMPLATE)
+  const [isSavingTgTemplate, setIsSavingTgTemplate] = useState(false)
+  const [isTgTemplateDirty, setIsTgTemplateDirty] = useState(false)
+  const [hasLoadedTgTemplate, setHasLoadedTgTemplate] = useState(false)
+  const [isSendingTgTest, setIsSendingTgTest] = useState(false)
+  const [isSavingTgDrips, setIsSavingTgDrips] = useState(false)
+  const [isSendingTgDripTest, setIsSendingTgDripTest] = useState<string | null>(null)
+
+  // Interpolated preview for Telegram
+  const sampleTgPreview = useMemo(() => {
+    return tgTemplate
+      .replace(/\{count\}/gi, '3')
+      .replace(/\{count_suffix\}/gi, 'ies')
+      .replace(/\{have_has\}/gi, 'have')
+      .replace(/\{niches\}/gi, 'Web Dev, AI & Automation, UI/UX Design')
+      .replace(/\{link\}/gi, 'https://www.theleadhunterclub.com/leads')
+  }, [tgTemplate])
+
+  const fetchTelegramStatus = useCallback(async () => {
+    setTgLoading(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        setTgData(json.data)
+        if (!hasLoadedTgTemplate && json.data.alertTemplate) {
+          setTgTemplate(json.data.alertTemplate)
+          setHasLoadedTgTemplate(true)
+        }
+        if (json.data.configuredChannelId) {
+          setTgChannelInput(json.data.configuredChannelId)
+        }
+      }
+    } catch (err: any) {
+      console.warn('Error loading Telegram status:', err.message)
+    } finally {
+      setTgLoading(false)
+    }
+  }, [hasLoadedTgTemplate])
+
+  const handleSaveTgChannel = async () => {
+    if (!tgChannelInput.trim()) {
+      addToast({ type: 'error', message: 'Channel or Group ID cannot be empty' })
+      return
+    }
+    setIsSavingTgChannel(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'save_channel',
+          channelId: tgChannelInput.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: 'Target Telegram community channel saved!' })
+        fetchTelegramStatus()
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to save channel' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error saving channel' })
+    } finally {
+      setIsSavingTgChannel(false)
+    }
+  }
+
+  const handleSaveTgTemplate = async () => {
+    if (!tgTemplate.trim()) {
+      addToast({ type: 'error', message: 'Telegram template cannot be empty' })
+      return
+    }
+    setIsSavingTgTemplate(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'save_template',
+          template: tgTemplate.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: 'Telegram alert template saved!' })
+        setIsTgTemplateDirty(false)
+        fetchTelegramStatus()
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to save template' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error saving template' })
+    } finally {
+      setIsSavingTgTemplate(false)
+    }
+  }
+
+  const handleResetTgTemplate = async () => {
+    setIsSavingTgTemplate(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: 'reset_template' }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        setTgTemplate(DEFAULT_TELEGRAM_TEMPLATE)
+        setIsTgTemplateDirty(false)
+        addToast({ type: 'success', message: 'Telegram template reset to default!' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error resetting template' })
+    } finally {
+      setIsSavingTgTemplate(false)
+    }
+  }
+
+  const handleSendTgTestAlert = async () => {
+    setIsSendingTgTest(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'send_test_alert',
+          template: tgTemplate,
+          targetChannel: tgChannelInput.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: json.message || 'Test drop alert dispatched to channel!' })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to send test alert' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error sending test alert' })
+    } finally {
+      setIsSendingTgTest(false)
+    }
+  }
+
+  const handleToggleDripSetting = async (key: 'free_drips_enabled' | 'renewal_drips_enabled' | 'grace_drips_enabled') => {
+    if (!tgData?.dripSettings) return
+    const current = tgData.dripSettings
+    const updated = {
+      ...current,
+      [key]: !current[key],
+    }
+    setTgData((prev) => (prev ? { ...prev, dripSettings: updated } : null))
+    setIsSavingTgDrips(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'save_drip_settings',
+          ...updated,
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: 'Drip campaign settings updated!' })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to update drips' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error updating drips' })
+    } finally {
+      setIsSavingTgDrips(false)
+    }
+  }
+
+  const handleSendTestDrip = async (dripType: 'free_upsell' | 'pre_renewal' | 'grace_recovery') => {
+    const targetChat = prompt(
+      'Enter your personal Telegram Chat ID (or chat ID to receive test drip):',
+      '1192419044',
+    )
+    if (!targetChat) return
+    setIsSendingTgDripTest(dripType)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'send_test_drip',
+          dripType,
+          targetChatId: targetChat.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: json.message || 'Test drip sent to Telegram!' })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to send test drip' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error sending test drip' })
+    } finally {
+      setIsSendingTgDripTest(null)
+    }
+  }
 
   const handleSaveWaTemplate = async () => {
     if (!waTemplate.trim()) {
@@ -758,7 +1070,8 @@ export default function AdminBroadcastPage() {
     fetchData()
     fetchTemplates()
     fetchWhatsAppStatus()
-  }, [fetchData, fetchTemplates, fetchWhatsAppStatus])
+    fetchTelegramStatus()
+  }, [fetchData, fetchTemplates, fetchWhatsAppStatus, fetchTelegramStatus])
 
   const handlePreviewFlowInShell = async (overrideFlow?: string, overrideEmail?: string) => {
     const flow = overrideFlow || testFlowType
@@ -1685,7 +1998,52 @@ export default function AdminBroadcastPage() {
         </div>
       </div>
 
+      {/* Channel Switcher Tabs */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-1.5 bg-surface/80 border border-white/[0.08] backdrop-blur-xl rounded-2xl">
+        <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded-xl w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => setActiveChannelTab('whatsapp')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              activeChannelTab === 'whatsapp'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50'
+                : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
+            }`}
+          >
+            <ChatBubbleLeftRightIcon className="w-4 h-4 text-emerald-300" />
+            <span>WhatsApp Community</span>
+            {waData?.status === 'connected' && (
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveChannelTab('telegram')}
+            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              activeChannelTab === 'telegram'
+                ? 'bg-sky-600 text-white shadow-lg shadow-sky-950/50'
+                : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
+            }`}
+          >
+            <PaperAirplaneIcon className="w-4 h-4 text-sky-300 -rotate-45" />
+            <span>Telegram Channel & Drips</span>
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-sky-400/20 text-sky-300 border border-sky-400/30">
+              2 Features
+            </span>
+          </button>
+        </div>
+
+        <div className="text-[11px] text-text-secondary px-3 py-1 flex items-center gap-2">
+          <span>Active channel:</span>
+          <span className="font-semibold text-white">
+            {activeChannelTab === 'whatsapp' ? 'WhatsApp Community Drops' : 'Telegram Lead Drops & Marketing Drips'}
+          </span>
+        </div>
+      </div>
+
       {/* WhatsApp Community Lead Drop Automation Banner */}
+      {activeChannelTab === 'whatsapp' && (
       <div className="bg-gradient-to-br from-emerald-950/20 via-surface/60 to-surface/40 border border-emerald-500/20 backdrop-blur-xl rounded-2xl p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
@@ -1727,6 +2085,19 @@ export default function AdminBroadcastPage() {
           </div>
 
           <div className="flex items-center gap-2.5 self-end sm:self-center">
+            {/* Switch to Telegram Button */}
+            <button
+              onClick={() => setActiveChannelTab('telegram')}
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+              title="Switch to Telegram community drops & automated drip sequences"
+            >
+              <PaperAirplaneIcon className="w-3.5 h-3.5 -rotate-45" />
+              <span>Telegram Automation</span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-sky-400/20 text-sky-300 border border-sky-400/30">
+                2 Features
+              </span>
+            </button>
+
             {/* Scan QR Modal Trigger */}
             <button
               onClick={() => {
@@ -2109,6 +2480,425 @@ export default function AdminBroadcastPage() {
           </div>
         </div>
       </div>
+      )}
+
+      {/* Telegram Channel & Marketing Drips Banner */}
+      {activeChannelTab === 'telegram' && (
+      <div className="bg-gradient-to-br from-sky-950/25 via-surface/60 to-surface/40 border border-sky-500/20 backdrop-blur-xl rounded-2xl p-5 shadow-sm space-y-6">
+        {/* Telegram Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
+              <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-white">Telegram Community Drops & Automated Drips</h2>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    tgData?.hasBotToken
+                      ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  }`}
+                >
+                  {tgData?.hasBotToken ? 'Bot Connected & Ready' : 'Bot Token Required'}
+                </span>
+                {tgData?.botUsername && (
+                  <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-sky-900/30 text-sky-300 border border-sky-700/40">
+                    @{tgData.botUsername}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-text-secondary mt-0.5">
+                Feature 1: Community lead drops pointing 100% to web dashboard. Feature 2: High-intent member upsell & retention drips.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 self-end sm:self-center">
+            {/* Quick switch back to WhatsApp */}
+            <button
+              onClick={() => setActiveChannelTab('whatsapp')}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <ChatBubbleLeftRightIcon className="w-3.5 h-3.5" />
+              <span>Switch to WhatsApp</span>
+            </button>
+
+            {/* Test Send Drop Alert Button */}
+            <button
+              onClick={handleSendTgTestAlert}
+              disabled={isSendingTgTest || !tgData?.hasBotToken || !tgData?.configuredChannelId}
+              title={
+                !tgData?.hasBotToken
+                  ? 'Set TELEGRAM_BOT_TOKEN first'
+                  : !tgData?.configuredChannelId
+                  ? 'Configure Target Channel ID first'
+                  : 'Dispatch a sample lead drop announcement to Telegram channel'
+              }
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/[0.08] flex items-center gap-2 transition-all disabled:opacity-40 cursor-pointer shadow-sm"
+            >
+              <PaperAirplaneIcon className={`w-3.5 h-3.5 -rotate-45 ${isSendingTgTest ? 'animate-pulse' : ''}`} />
+              <span>{isSendingTgTest ? 'Sending Alert...' : 'Send Test Alert'}</span>
+            </button>
+
+            {/* Refresh Button */}
+            <button
+              onClick={() => fetchTelegramStatus()}
+              disabled={tgLoading}
+              title="Refresh Telegram status & channel binding"
+              className="p-2 rounded-xl text-text-secondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all cursor-pointer"
+            >
+              <ArrowPathIcon className={`w-3.5 h-3.5 ${tgLoading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* FEATURE 1: COMMUNITY LEAD DROPS SECTION */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-sky-500/20 text-sky-300 border border-sky-500/30">
+              Feature 1
+            </span>
+            <h3 className="text-xs font-bold text-white tracking-wide uppercase">
+              Community Lead Drops (Channel / Supergroup)
+            </h3>
+          </div>
+
+          {/* Channel Binding Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+                  <span>Target Telegram Community Channel</span>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded font-mono ${
+                      tgData?.configuredChannelId
+                        ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    }`}
+                  >
+                    {tgData?.configuredChannelId ? 'Target Active' : 'No Target Set'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-text-secondary leading-relaxed">
+                  Enter your public channel username (e.g. <code className="text-sky-300">@theleadhunterclub</code>) or private channel/supergroup ID (e.g. <code className="text-sky-300">-100248...</code>).
+                </p>
+                <div className="mt-2.5 flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={tgChannelInput}
+                    onChange={(e) => setTgChannelInput(e.target.value)}
+                    placeholder="@theleadhunterclub or -100..."
+                    className="flex-1 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-mono placeholder:text-zinc-500 focus:outline-none focus:border-sky-500"
+                  />
+                  <button
+                    onClick={handleSaveTgChannel}
+                    disabled={isSavingTgChannel}
+                    className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all cursor-pointer disabled:opacity-40"
+                  >
+                    {isSavingTgChannel ? 'Saving...' : 'Save Target'}
+                  </button>
+                </div>
+              </div>
+
+              {tgData?.configuredChannelName && (
+                <div className="mt-2.5 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[11px]">
+                  <span className="text-text-secondary">Detected Name:</span>
+                  <span className="font-semibold text-white">{tgData.configuredChannelName}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
+              <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+                <span>Setup & Bot Permissions</span>
+                <span className="text-[10px] text-text-secondary">Instructions</span>
+              </div>
+              <ul className="text-[11px] text-text-secondary space-y-1.5 mt-2 list-disc list-inside">
+                <li>Add <strong className="text-white">@{tgData?.botUsername || 'theleadhunter_bot'}</strong> as an Administrator in your Telegram channel or group.</li>
+                <li>Grant permission: <strong className="text-sky-400">Post Messages</strong> (and edit messages if desired).</li>
+                <li>All leads announced here contain deep-links directing hunters directly to the web dashboard for instant claiming with credits.</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Template Editor & Telegram Dark Bubble Preview */}
+          <div className="p-4 rounded-xl bg-surface-elevated/30 border border-white/[0.06] space-y-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.04]">
+              <div>
+                <div className="flex items-center gap-2">
+                  <PencilSquareIcon className="w-4 h-4 text-sky-400" />
+                  <span className="text-xs font-bold text-white">Telegram Community Drop Template</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                    HTML Mode
+                  </span>
+                </div>
+                <p className="text-[11px] text-text-secondary mt-0.5">
+                  Broadcasted immediately to your community channel whenever new high-intent leads are approved.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetTgTemplate}
+                  disabled={isSavingTgTemplate}
+                  className="px-2.5 py-1 rounded-lg text-[11px] text-text-secondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                >
+                  <ArrowPathIcon className="w-3 h-3" />
+                  <span>Reset Default</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveTgTemplate}
+                  disabled={isSavingTgTemplate || !isTgTemplateDirty}
+                  className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+                >
+                  <CheckIcon className="w-3 h-3" />
+                  <span>{isSavingTgTemplate ? 'Saving...' : 'Save Template'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Variable Inserter Pill Buttons */}
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span className="text-text-secondary font-medium">Insert Variable:</span>
+              {[
+                { tag: '{count}', label: '+ {count}' },
+                { tag: '{niches}', label: '+ {niches}' },
+                { tag: '{link}', label: '+ {link}' },
+              ].map((item) => (
+                <button
+                  key={item.tag}
+                  type="button"
+                  onClick={() => {
+                    setTgTemplate((prev) => `${prev} ${item.tag}`)
+                    setIsTgTemplateDirty(true)
+                  }}
+                  className="px-2 py-0.5 rounded font-mono text-[10px] font-semibold bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 transition-all cursor-pointer"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Split Screen: Editor & Telegram Bubble Preview */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
+              {/* Textarea */}
+              <div className="flex flex-col">
+                <textarea
+                  value={tgTemplate}
+                  onChange={(e) => {
+                    setTgTemplate(e.target.value)
+                    setIsTgTemplateDirty(true)
+                  }}
+                  rows={8}
+                  className="w-full h-full min-h-[180px] p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono leading-relaxed placeholder:text-zinc-500 focus:outline-none focus:border-sky-500 resize-none"
+                  placeholder="Enter Telegram HTML alert template..."
+                />
+                <div className="mt-1.5 flex items-center justify-between text-[10px] text-text-secondary">
+                  <span>Supported HTML: &lt;b&gt;, &lt;i&gt;, &lt;code&gt;, &lt;a href=&quot;...&quot;&gt; + Emojis</span>
+                  <span className="font-mono">{tgTemplate.length} chars</span>
+                </div>
+              </div>
+
+              {/* Telegram Dark Bubble Preview */}
+              <div className="flex flex-col justify-between p-3.5 rounded-xl bg-[#0f141c] border border-white/[0.08]">
+                <div>
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-text-secondary mb-2">
+                    <span className="flex items-center gap-1.5 text-sky-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+                      Live Telegram Dark Bubble Preview
+                    </span>
+                    <span className="text-[10px] font-mono text-zinc-500">Sample: 3 leads</span>
+                  </div>
+
+                  {/* Telegram Bubble */}
+                  <div className="p-3.5 rounded-2xl rounded-tl-sm bg-[#182533] border border-[#243447] text-white text-xs space-y-2 shadow-md relative">
+                    <div className="text-white text-xs leading-relaxed space-y-1">
+                      {renderTelegramFormattedText(sampleTgPreview)}
+                    </div>
+
+                    {/* Dashboard Claim Deep Link Button */}
+                    <div className="pt-2">
+                      <div className="w-full py-1.5 px-3 rounded-lg bg-[#2b5278]/60 border border-[#2b5278] text-[#53bdeb] font-semibold text-center text-xs flex items-center justify-center gap-1.5">
+                        <span>🚀 Review & Claim on Dashboard</span>
+                        <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-1 text-[10px] text-[#708499] pt-1">
+                      <span>Just now</span>
+                      <span className="text-sky-400">✓✓</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-2 border-t border-white/[0.04]">
+                  <button
+                    onClick={handleSendTgTestAlert}
+                    disabled={isSendingTgTest || !tgData?.hasBotToken || !tgData?.configuredChannelId}
+                    className="w-full py-1.5 rounded-lg text-[11px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-sky-300 border border-sky-500/20 hover:border-sky-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
+                  >
+                    <PaperAirplaneIcon className={`w-3 h-3 -rotate-45 ${isSendingTgTest ? 'animate-pulse' : ''}`} />
+                    <span>{isSendingTgTest ? 'Dispatching Live Test...' : 'Test Send This Template to Channel'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* FEATURE 2: AUTOMATED MARKETING & RETENTION DRIPS */}
+        <div className="pt-2 border-t border-white/[0.08] space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Feature 2
+              </span>
+              <h3 className="text-xs font-bold text-white tracking-wide uppercase">
+                Automated Marketing & Retention Drips
+              </h3>
+            </div>
+            <span className="text-[11px] text-text-secondary">
+              Direct hunter retention & upsell triggers via Telegram Bot
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+            {/* Drip 1: Free Member Upsell */}
+            <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <ArrowTrendingUpIcon className="w-4 h-4" />
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggleDripSetting(
+                        'free_drips_enabled',
+                        !tgData?.dripSettings?.free_drips_enabled
+                      )
+                    }
+                    disabled={isSavingTgDrips}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                      tgData?.dripSettings?.free_drips_enabled
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-white/5 text-text-secondary border border-white/10'
+                    }`}
+                  >
+                    {tgData?.dripSettings?.free_drips_enabled ? 'Active' : 'Disabled'}
+                  </button>
+                </div>
+                <div className="mt-2.5">
+                  <h4 className="text-xs font-bold text-white">Free Member Upsell Drip</h4>
+                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
+                    Automatically drips recent high-value lead opportunities to Free tier hunters every 2 days with an upgrade CTA to Freelancer Pro.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-white/[0.04]">
+                <button
+                  onClick={() => handleSendTestDrip('free_upsell')}
+                  disabled={isSendingTgDripTest === 'free_upsell'}
+                  className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-emerald-300 border border-emerald-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <span>{isSendingTgDripTest === 'free_upsell' ? 'Sending...' : 'Test Send Sample Upsell'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Drip 2: Paid Pre-Renewal Alert */}
+            <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    <ClockIcon className="w-4 h-4" />
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggleDripSetting(
+                        'renewal_drips_enabled',
+                        !tgData?.dripSettings?.renewal_drips_enabled
+                      )
+                    }
+                    disabled={isSavingTgDrips}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                      tgData?.dripSettings?.renewal_drips_enabled
+                        ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+                        : 'bg-white/5 text-text-secondary border border-white/10'
+                    }`}
+                  >
+                    {tgData?.dripSettings?.renewal_drips_enabled ? 'Active' : 'Disabled'}
+                  </button>
+                </div>
+                <div className="mt-2.5">
+                  <h4 className="text-xs font-bold text-white">Paid Pre-Renewal Notice</h4>
+                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
+                    Sends advance notices (7 days & 4 days prior to monthly billing) highlighting 15-day credit rollover and upcoming refresh.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-white/[0.04]">
+                <button
+                  onClick={() => handleSendTestDrip('pre_renewal')}
+                  disabled={isSendingTgDripTest === 'pre_renewal'}
+                  className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-sky-300 border border-sky-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <span>{isSendingTgDripTest === 'pre_renewal' ? 'Sending...' : 'Test Send Sample Renewal'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Drip 3: Lapsed Payment & Rollover Recovery */}
+            <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3">
+              <div>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <CreditCardIcon className="w-4 h-4" />
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggleDripSetting(
+                        'grace_drips_enabled',
+                        !tgData?.dripSettings?.grace_drips_enabled
+                      )
+                    }
+                    disabled={isSavingTgDrips}
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                      tgData?.dripSettings?.grace_drips_enabled
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                        : 'bg-white/5 text-text-secondary border border-white/10'
+                    }`}
+                  >
+                    {tgData?.dripSettings?.grace_drips_enabled ? 'Active' : 'Disabled'}
+                  </button>
+                </div>
+                <div className="mt-2.5">
+                  <h4 className="text-xs font-bold text-white">Lapsed & Rollover Recovery</h4>
+                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
+                    2–3 day grace follow-ups warning users if their subscription lapsed to preserve their 15-day rollover balance before expiry.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-white/[0.04]">
+                <button
+                  onClick={() => handleSendTestDrip('grace_recovery')}
+                  disabled={isSendingTgDripTest === 'grace_recovery'}
+                  className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-amber-300 border border-amber-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                >
+                  <span>{isSendingTgDripTest === 'grace_recovery' ? 'Sending...' : 'Test Send Sample Recovery'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      )}
 
       {/* Navigation Tabs */}
       <div ref={navTabsScrollRef} className="flex items-center gap-2 overflow-x-auto scrollbar-hide border-b border-white/[0.08] pb-1">
