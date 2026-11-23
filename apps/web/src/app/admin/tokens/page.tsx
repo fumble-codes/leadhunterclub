@@ -1535,13 +1535,30 @@ export default function AdminTokensPage() {
                             <span className="font-semibold">{k.error_message}</span>
                           </p>
                         ) : isExhausted ? (
-                          <p className="text-[11px] text-amber-300/90 font-medium flex items-center gap-1 mt-1">
-                            <span>Apify Monthly Limit ($5 USD) reached:</span>
-                            <span className="font-normal text-text-secondary">Free monthly credits are fully spent on this account.</span>
-                          </p>
+                          <div className="mt-1 space-y-0.5">
+                            <p className="text-[11px] text-amber-300/90 font-medium flex items-center gap-1">
+                              <span>Apify Monthly Limit ($5 USD) reached:</span>
+                              <span className="font-normal text-text-secondary">Free monthly credits are fully spent on this account.</span>
+                            </p>
+                            {k.platform_usage && typeof k.platform_usage.used === 'number' && (
+                              <p className="text-[11px] text-amber-300 font-mono font-medium">
+                                Used: ${k.platform_usage.used.toFixed(2)} / ${Number(k.platform_usage.limit ?? 5).toFixed(2)} | Remaining Balance: $0.00
+                              </p>
+                            )}
+                          </div>
                         ) : (
-                          <p className="text-[10px] text-text-secondary mt-0.5">
-                            Used: {k.comments_used}/{k.comments_limit} | Remaining: {k.comments_remaining}
+                          <p className="text-[11px] text-text-secondary mt-0.5">
+                            {k.platform_usage && typeof k.platform_usage.used === 'number' ? (
+                              <span className="font-mono">
+                                <span className="text-text-secondary">Used: </span>
+                                <span className="text-text-primary font-semibold">${k.platform_usage.used.toFixed(2)} / ${Number(k.platform_usage.limit ?? 5).toFixed(2)}</span>
+                                <span className="mx-1.5 text-white/20">|</span>
+                                <span className="text-emerald-400 font-semibold">Remaining Balance: </span>
+                                <span className="text-emerald-300 font-bold">${Number(k.platform_usage.remaining ?? Math.max(0, (k.platform_usage.limit ?? 5) - k.platform_usage.used)).toFixed(2)}</span>
+                              </span>
+                            ) : (
+                              <span>Used: {k.comments_used}/{k.comments_limit} | Remaining: {k.comments_remaining}</span>
+                            )}
                             {k.assigned_worker && <> | Worker: {k.assigned_worker}</>}
                           </p>
                         )}
