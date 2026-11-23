@@ -29,6 +29,8 @@ import {
   ChatBubbleLeftRightIcon,
   CreditCardIcon,
   BanknotesIcon,
+  ClipboardDocumentListIcon,
+  CubeIcon,
 } from '@heroicons/react/24/solid'
 
 const adminNav = [
@@ -50,6 +52,8 @@ const adminNav = [
   { name: 'Rewards', href: '/admin/rewards', icon: TrophyIcon },
   { name: 'Community Hub', href: '/admin/community', icon: ChatBubbleBottomCenterTextIcon },
   { name: 'Reviews', href: '/admin/reviews', icon: ChatBubbleLeftRightIcon },
+  { name: 'Tasks', href: '/admin/tasks', icon: ClipboardDocumentListIcon },
+  { name: 'Products', href: '/admin/products', icon: CubeIcon },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

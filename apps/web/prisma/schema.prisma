@@ -536,3 +536,43 @@ model Review {
   @@index([category])
   @@map("reviews")
 }
+
+// Team work management — a product/workstream owns a set of tasks.
+model WorkProduct {
+  id          String    @id @default(uuid())
+  name        String
+  description String?   @db.Text
+  status      String    @default("ACTIVE") // PLANNED | ACTIVE | PAUSED | SHIPPED
+  color       String    @default("mint")   // palette key: mint | purple | cyan | orange | pink
+  ownerId     String?   // User.id (admin) — scalar so removing a user keeps the product
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  tasks       WorkTask[]
+
+  @@index([status])
+  @@map("work_products")
+}
+
+model WorkTask {
+  id          String      @id @default(uuid())
+  productId   String?
+  title       String
+  description String?     @db.Text
+  status      String      @default("TODO")   // TODO | IN_PROGRESS | REVIEW | DONE
+  priority    String      @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
+  assigneeId  String?     // User.id (admin) — scalar so removing a user keeps the task
+  dueDate     DateTime?
+  position    Int         @default(0)
+  createdById String?
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  product WorkProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([productId, status])
+  @@index([status, position])
+  @@index([assigneeId])
+  @@map("work_tasks")
+}
