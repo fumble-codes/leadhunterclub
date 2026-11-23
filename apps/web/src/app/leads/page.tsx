@@ -25,6 +25,7 @@ import { Select, CreditExhaustedModal } from '@/components/ui'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { getFirebaseToken } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
+import { persistLeadMutation, confirmLeadMutation } from '@/lib/offline-leads-client'
 
 const CANDIDATE_NICHES = [
   'Development',
@@ -526,6 +527,18 @@ export default function LeadsPage() {
   }, [selectedLeadId])
 
   const handleSaveToggle = async (leadId: string, isSaved: boolean) => {
+    const base = leadsList.find((l) => l.id === leadId) ?? drawerLeadDetail
+    if (!base || base.id !== leadId) return
+    const next: AppLead = {
+      ...base,
+      isSaved,
+      status: isSaved ? 'saved' : 'new',
+    }
+    setLeadsList((prev) => prev.map((l) => (l.id === leadId ? next : l)))
+    setDrawerLeadDetail((prev) => (prev && prev.id === leadId ? next : prev))
+    // Mirror locally first — a failed request no longer loses the user's intent.
+    const opId = await persistLeadMutation(leadId, next, isSaved ? 'save' : 'unsave')
+
     try {
       const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
@@ -536,17 +549,29 @@ export default function LeadsPage() {
         },
         body: JSON.stringify({ isSaved, status: isSaved ? 'saved' : 'new' }),
       })
-      if (res.ok) {
-        setLeadsList((prev) =>
-          prev.map((l) => (l.id === leadId ? { ...l, status: isSaved ? 'saved' : 'new', isSaved } : l)),
-        )
-        setDrawerLeadDetail((prev) =>
-          prev && prev.id === leadId ? { ...prev, status: isSaved ? 'saved' : 'new', isSaved } : prev,
-        )
-      }
+      if (res.ok) await confirmLeadMutation(leadId, opId)
     } catch (err) {
       console.error('Failed to toggle save state:', err)
     }
+  }
+
+  // The reveal endpoint auto-saves (isSaved=true, status='saved'); mirror that
+  // in both the UI and the local copy so the unlocked contact survives.
+  const handleCardReveal = async (leadId: string, name: string, email: string, phone?: string | null) => {
+    const base = leadsList.find((l) => l.id === leadId)
+    if (!base) return
+    const next: AppLead = {
+      ...base,
+      isRevealed: true,
+      name,
+      email,
+      phone: phone ?? base.phone,
+      status: 'saved',
+      isSaved: true,
+    }
+    setLeadsList((prev) => prev.map((l) => (l.id === leadId ? next : l)))
+    await persistLeadMutation(leadId, next, 'reveal')
+    await confirmLeadMutation(leadId, null)
   }
 
   const allTags = Array.from(
@@ -881,13 +906,9 @@ export default function LeadsPage() {
                       isSelected={lead.id === selectedLeadId}
                       onClick={() => openLead(lead.id)}
                       onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
-                      onReveal={(leadId, name, email, phone) => {
-                        setLeadsList((prev) =>
-                          prev.map((l) =>
-                            l.id === leadId ? { ...l, isRevealed: true, name, email, phone } : l,
-                          ),
-                        )
-                      }}
+                      onReveal={(leadId, name, email, phone) =>
+                        handleCardReveal(leadId, name, email, phone)
+                      }
                     />
                   ) : (
                     <LeadCard
@@ -897,13 +918,9 @@ export default function LeadsPage() {
                       isSelected={lead.id === selectedLeadId}
                       onClick={() => openLead(lead.id)}
                       onSaveToggle={(isSaved) => handleSaveToggle(lead.id, isSaved)}
-                      onReveal={(leadId, name, email, phone) => {
-                        setLeadsList((prev) =>
-                          prev.map((l) =>
-                            l.id === leadId ? { ...l, isRevealed: true, name, email, phone } : l,
-                          ),
-                        )
-                      }}
+                      onReveal={(leadId, name, email, phone) =>
+                        handleCardReveal(leadId, name, email, phone)
+                      }
                     />
                   )
                 )
@@ -970,6 +987,21 @@ export default function LeadsPage() {
                                 ...(fullLead?.creditCost !== undefined ? { creditCost: fullLead.creditCost } : {}),
                               }
                             : prev,
+                        )
+                        // Persist the unlocked contact locally (reveal already
+                        // spent credits on the server - nothing to replay).
+                        const revealedLead: AppLead = {
+                          ...selectedLead,
+                          isRevealed: true,
+                          name,
+                          email,
+                          phone: phone ?? selectedLead.phone,
+                          status: 'saved',
+                          isSaved: true,
+                          ...(fullLead?.creditCost !== undefined ? { creditCost: fullLead.creditCost } : {}),
+                        }
+                        void persistLeadMutation(selectedLead.id, revealedLead, 'reveal').then(() =>
+                          confirmLeadMutation(selectedLead.id, null),
                         )
                       }}
                     />

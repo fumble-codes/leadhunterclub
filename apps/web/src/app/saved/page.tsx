@@ -31,6 +31,16 @@ import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
 import { buildLeadIntelText } from '@/lib/intel'
 import { toCsv, toTsv, downloadXlsx, leadsToRows } from '@/lib/csv'
+import {
+  loadSavedLeads,
+  persistLeadMutation,
+  confirmLeadMutation,
+  dropCachedLead,
+  flushPendingOps,
+  pendingCount,
+  currentUid,
+} from '@/lib/offline-leads-client'
+import { clearOfflineCopy, type PendingOpType } from '@/lib/saved-leads-cache'
 
 // Same drawer popup the lead feed opens — code-split the same way so the
 // saved page bundle stays lean until a lead name is clicked.
@@ -47,6 +57,9 @@ export default function SavedLeadsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [page, setPage] = useState(1)
   const [savedLeads, setSavedLeads] = useState<AppLead[]>([])
+  const [recoveredIds, setRecoveredIds] = useState<Set<string>>(new Set())
+  const [pendingOpsCount, setPendingOpsCount] = useState(0)
+  const [usingOfflineCopy, setUsingOfflineCopy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null)
   const [drawerLeadDetail, setDrawerLeadDetail] = useState<AppLead | null>(null)
@@ -61,6 +74,38 @@ export default function SavedLeadsPage() {
   const mainRef = useRef<HTMLElement | null>(null)
   const tableCardRef = useRef<HTMLDivElement | null>(null)
   const { addToast } = useToast()
+
+  // Mirror every optimistic change locally first, then replay it to the server.
+  const mirrorChange = async (leadAfter: AppLead, type: PendingOpType, payload: Record<string, unknown> = {}) => {
+    const opId = await persistLeadMutation(
+      leadAfter.id,
+      leadAfter,
+      type,
+      payload,
+      recoveredIds.has(leadAfter.id) ? 'local' : 'server',
+    )
+    if (opId) setPendingOpsCount((c) => c + 1)
+    return opId
+  }
+  const confirmChange = async (leadId: string, opId: string | null) => {
+    await confirmLeadMutation(leadId, opId, recoveredIds.has(leadId) ? 'local' : 'server')
+    setPendingOpsCount((c) => Math.max(0, c - 1))
+  }
+  const noticeOffline = () =>
+    addToast({ type: 'info', message: 'Saved on this device · will sync when online' })
+
+  const handleClearOfflineCopy = async () => {
+    const uid = currentUid()
+    if (!uid) return
+    await clearOfflineCopy(uid)
+    setRecoveredIds(new Set())
+    setPendingOpsCount(0)
+    setUsingOfflineCopy(false)
+    addToast({ type: 'success', message: 'Offline copy cleared · reloading from server' })
+    const result = await loadSavedLeads()
+    setSavedLeads(result.leads)
+    setRecoveredIds(result.recoveredIds)
+  }
 
   const toggleActionMenu = (leadId: string) => {
     if (openActionDropdownId === leadId) {
@@ -335,14 +380,13 @@ export default function SavedLeadsPage() {
 
   const handleMarkStatus = async (leadId: string, status: string, label: string) => {
     console.log('[handleMarkStatus]', { leadId, status, label })
-    // 1. Optimistic UI update (instant response)
-    const prevLeads = savedLeads
-    setSavedLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, status: status as AppLead['status'] } : l)),
-    )
+    const lead = savedLeads.find((l) => l.id === leadId)
+    if (!lead) return
+    const next = { ...lead, status: status as AppLead['status'] }
+    setSavedLeads((prev) => prev.map((l) => (l.id === leadId ? next : l)))
     addToast({ type: 'success', message: `✓ Marked as ${label}` })
+    const opId = await mirrorChange(next, 'status', { status })
 
-    // 2. Background sync
     try {
       const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
@@ -354,12 +398,12 @@ export default function SavedLeadsPage() {
         body: JSON.stringify({ status }),
       })
       if (!res.ok) {
-        setSavedLeads(prevLeads)
-        addToast({ type: 'error', message: 'Failed to update status on server' })
+        noticeOffline()
+        return
       }
+      await confirmChange(leadId, opId)
     } catch {
-      setSavedLeads(prevLeads)
-      addToast({ type: 'error', message: 'Failed to update status' })
+      noticeOffline()
     }
   }
 
@@ -371,21 +415,19 @@ export default function SavedLeadsPage() {
     const newCount = currentCount + 1
     const wasSaved = lead.status === 'saved' || lead.status === 'new'
     const newStatus = wasSaved ? 'follow-up' : lead.status
-    const prevLeads = savedLeads
+    const next = {
+      ...lead,
+      followUpCount: newCount,
+      lastFollowUpAt: new Date().toISOString(),
+      status: newStatus,
+    }
 
-    // Optimistic UI
-    setSavedLeads((prev) =>
-      prev.map((l) =>
-        l.id === leadId
-          ? { ...l, followUpCount: newCount, lastFollowUpAt: new Date().toISOString(), status: newStatus }
-          : l,
-      ),
-    )
+    setSavedLeads((prev) => prev.map((l) => (l.id === leadId ? next : l)))
     const msg = `✓ Follow-up ${newCount} logged${wasSaved ? ' (moved to Follow-up)' : ''}`
     console.log('[handleLogFollowUp]', { leadId, currentCount, newCount, wasSaved, newStatus, msg })
     addToast({ type: 'success', message: msg })
+    const opId = await mirrorChange(next, 'followUp')
 
-    // Background sync
     try {
       const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
@@ -397,12 +439,12 @@ export default function SavedLeadsPage() {
         body: JSON.stringify({ logFollowUp: true }),
       })
       if (!res.ok) {
-        setSavedLeads(prevLeads)
-        addToast({ type: 'error', message: 'Failed to log follow-up on server' })
+        noticeOffline()
+        return
       }
+      await confirmChange(leadId, opId)
     } catch {
-      setSavedLeads(prevLeads)
-      addToast({ type: 'error', message: 'Failed to log follow-up' })
+      noticeOffline()
     }
   }
 
@@ -411,19 +453,12 @@ export default function SavedLeadsPage() {
     if (count < 0) return
     const lead = savedLeads.find((l) => l.id === leadId)
     if (!lead) return
-    const prevLeads = savedLeads
+    const next = { ...lead, followUpCount: count, lastFollowUpAt: new Date().toISOString() }
 
-    // Optimistic UI
-    setSavedLeads((prev) =>
-      prev.map((l) =>
-        l.id === leadId
-          ? { ...l, followUpCount: count, lastFollowUpAt: new Date().toISOString() }
-          : l,
-      ),
-    )
+    setSavedLeads((prev) => prev.map((l) => (l.id === leadId ? next : l)))
     addToast({ type: 'success', message: `✓ Follow-up count set to ${count}` })
+    const opId = await mirrorChange(next, 'setFollowUpCount', { count })
 
-    // Background sync
     try {
       const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
@@ -435,12 +470,12 @@ export default function SavedLeadsPage() {
         body: JSON.stringify({ followUpCount: count }),
       })
       if (!res.ok) {
-        setSavedLeads(prevLeads)
-        addToast({ type: 'error', message: 'Failed to set follow-up count on server' })
+        noticeOffline()
+        return
       }
+      await confirmChange(leadId, opId)
     } catch {
-      setSavedLeads(prevLeads)
-      addToast({ type: 'error', message: 'Failed to set follow-up count' })
+      noticeOffline()
     }
   }
 
@@ -449,7 +484,10 @@ export default function SavedLeadsPage() {
       addToast({ type: 'error', message: 'No leads to export' })
       return null
     }
-    return leadsToRows(filteredLeads)
+    return leadsToRows(filteredLeads).map((row, i) => ({
+      ...row,
+      Origin: recoveredIds.has(filteredLeads[i].id) ? 'This device only' : 'Server',
+    }))
   }
 
   const handleExportSheet = async () => {
@@ -541,12 +579,23 @@ export default function SavedLeadsPage() {
   }
 
   const handleRemoveSaved = async (leadId: string) => {
-    // 1. Optimistic UI update (instant response)
-    const prevLeads = savedLeads
-    setSavedLeads((prev) => prev.filter((l) => l.id !== leadId))
-    addToast({ type: 'success', message: '✓ Removed from saved leads' })
+    const lead = savedLeads.find((l) => l.id === leadId)
+    if (!lead) return
+    const next: AppLead = {
+      ...lead,
+      isSaved: false,
+      status: 'dismissed' as unknown as AppLead['status'],
+    }
 
-    // 2. Background sync
+    setSavedLeads((prev) => prev.filter((l) => l.id !== leadId))
+    setRecoveredIds((prev) => {
+      const nextSet = new Set(prev)
+      nextSet.delete(leadId)
+      return nextSet
+    })
+    addToast({ type: 'success', message: '✓ Removed from saved leads' })
+    const opId = await mirrorChange(next, 'unsave')
+
     try {
       const token = await getFirebaseToken()
       const res = await fetch(`/api/leads/${leadId}`, {
@@ -558,12 +607,13 @@ export default function SavedLeadsPage() {
         body: JSON.stringify({ isSaved: false, status: 'dismissed' }),
       })
       if (!res.ok) {
-        setSavedLeads(prevLeads)
-        addToast({ type: 'error', message: 'Failed to remove from saved leads on server' })
+        noticeOffline()
+        return
       }
+      await confirmChange(leadId, opId)
+      await dropCachedLead(leadId)
     } catch {
-      setSavedLeads(prevLeads)
-      addToast({ type: 'error', message: 'Network error removing lead' })
+      noticeOffline()
     }
   }
 
@@ -588,21 +638,35 @@ export default function SavedLeadsPage() {
   }, [exportOpen, openActionDropdownId])
 
   useEffect(() => {
-    const fetchSavedLeads = async () => {
+    const load = async () => {
       try {
-        const token = await getFirebaseToken()
-        const res = await fetch('/api/leads?saved=true', {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        })
-        const json = await res.json()
-        if (json.data) setSavedLeads(json.data)
+        // Replay any writes that failed while offline before reading the server.
+        await flushPendingOps()
+        const result = await loadSavedLeads()
+        setSavedLeads(result.leads)
+        setRecoveredIds(result.recoveredIds)
+        setUsingOfflineCopy(!result.serverReachable && result.leads.length > 0)
+        setPendingOpsCount(await pendingCount())
       } catch {
-        console.error('Failed to fetch saved leads')
+        console.error('Failed to load saved leads')
       } finally {
         setLoading(false)
       }
     }
-    fetchSavedLeads()
+    load()
+
+    const onOnline = async () => {
+      const flushed = await flushPendingOps()
+      if (flushed > 0) {
+        const result = await loadSavedLeads()
+        setSavedLeads(result.leads)
+        setRecoveredIds(result.recoveredIds)
+        setUsingOfflineCopy(!result.serverReachable && result.leads.length > 0)
+      }
+      setPendingOpsCount(await pendingCount())
+    }
+    window.addEventListener('online', onOnline)
+    return () => window.removeEventListener('online', onOnline)
   }, [])
 
   const filteredLeads = savedLeads.filter((lead) => {
@@ -742,6 +806,25 @@ export default function SavedLeadsPage() {
                 className="bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 min-h-[44px] pl-10 pr-4 text-xs focus:outline-none focus:border-border-subtle transition-all w-48 sm:w-60 focus:w-64"
               />
             </div>
+
+            {(pendingOpsCount > 0 || usingOfflineCopy || recoveredIds.size > 0) && (
+              <div className="hidden sm:flex flex-col items-end gap-0.5 mr-1">
+                <span className="text-[10px] text-text-secondary whitespace-nowrap">
+                  {pendingOpsCount > 0
+                    ? `${pendingOpsCount} change${pendingOpsCount === 1 ? '' : 's'} pending sync`
+                    : usingOfflineCopy
+                      ? 'Offline copy in use'
+                      : `${recoveredIds.size} recovered on this device`}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearOfflineCopy}
+                  className="text-[10px] text-text-secondary hover:text-accent-purple underline underline-offset-2"
+                >
+                  Clear offline copy
+                </button>
+              </div>
+            )}
 
             <div className="relative" onClick={(e) => e.stopPropagation()}>
               <Button
@@ -889,6 +972,14 @@ export default function SavedLeadsPage() {
                               {!lead.isRevealed && (
                                 <span className="text-[9px] font-bold uppercase tracking-wider text-accent-purple bg-accent-purple/10 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                                   Locked
+                                </span>
+                              )}
+                              {recoveredIds.has(lead.id) && (
+                                <span
+                                  title="This lead is stored only in this browser — the server no longer has its record"
+                                  className="text-[9px] font-bold uppercase tracking-wider text-accent-cyan bg-accent-cyan/10 px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                                >
+                                  On this device
                                 </span>
                               )}
                             </div>
@@ -1392,6 +1483,16 @@ export default function SavedLeadsPage() {
                     prev.map((l) =>
                       l.id === selectedLead.id ? { ...l, ...revealed, phone: phone ?? l.phone } : l,
                     ),
+                  )
+                  // Reveal spends credits server-side; persist only the result
+                  // locally so the unlocked contact survives a backend hiccup.
+                  const revealedLead: AppLead = {
+                    ...selectedLead,
+                    ...revealed,
+                    phone: phone ?? selectedLead.phone,
+                  }
+                  void persistLeadMutation(selectedLead.id, revealedLead, 'reveal').then(() =>
+                    confirmLeadMutation(selectedLead.id, null),
                   )
                   setDrawerLeadDetail((prev) =>
                     prev && prev.id === selectedLead.id

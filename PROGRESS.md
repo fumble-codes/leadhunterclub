@@ -49,6 +49,8 @@ User asked for local dummy lead data to test the lead drawer without the live DB
 | 17 | lucide-react removed (2026-11-10) — 7 files (LeadCard, PipelineLeadCard, LeadOutreachFlowchart, HunterCopilot, PupCompanion, admin/leads page + ManualContactModal) migrated to heroicons outline, strokeWidth 1.6; dependency uninstalled; DESIGN.md + AGENTS.md icon rules updated to Heroicons-only | ✅ done — ESLint clean, tsc clean in touched files (only pre-existing baseline errors remain) |
 | 18 | Site-wide rollover consistency (2026-11-18) — all copy must say 15-day rollover, never more/less | ✅ done: source copy already consistent; live DB `plans_config` row fixed ("up to 30 days" + "4 credits renewed monthly" → 15 days / 1000 credits); defensive normalizer in `lib/plan-copy.ts` applied to public `/api/plans`; 3 vitest cases pass; live /pricing verified |
 | 19 | Bug reports with screenshots on /support (2026-11-19) — "Report a Bug" button + structured modal, 2 screenshots via existing base64 pattern on first message, admin BUG filter/badge + screenshot lightbox | ✅ built & verified locally (test ticket created with PNG → stored/returned via API → deleted; lint + tsc clean). Additive DB column `support_ticket_messages.imageUrl` applied live. Pushed 2026-11-19 |
+| 20 | Bug modal UI/mobile polish (2026-11-19) — shared Modal portalled to body (z above mobile bottom nav), scrollable body + sticky actions, full-width Select fix, brighter header button | ✅ done locally — verified at 390px and 1440px; existing New Ticket modal still works. Pushed 81a914b |
+| 21 | Dashboard design upgrade (2026-11-22) — user rejected first rewrite (AI-slop look); reverted to original metallic-card layout via git checkout, then added HUD dial row (3 circular SVG widgets, token roles mint/cyan/amber, mount draw + hover/click interaction) on top of the untouched original cards/chart/distribution | ✅ local only; lint + tsc clean. No pulsing, no "live" pills, no fake percentages. NOT pushed yet |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 
@@ -1069,6 +1071,71 @@ author labels left plain (same destination, would be visual noise).
 - User should spot-check badges/dots/action icons on saved page and new-tab mail open on the live site after the ~6 min deploy.
 - OPTIONAL follow-up (flagged, not done): `Badge` `mint` variant renders amber due to the colors.ts remap — gift to fix it to real mint would also change HeroSection/support/newsletter badges their team may like as-is.
 
+### Saved-leads export was capped at 100 (2026-11-19) — FIXED + PUSHED (`d031bf2`)
+User report: "a user complaining that hes only able to export around 30 leads."
+- **Root cause:** `/api/leads?saved=true` defaults `pageSize=100` (saved view) and `page=1`; the
+  saved/outreach branch fetched ALL `userLeadState` rows correctly but then fell through to the
+  shared pagination block (`route.ts:505`) `data.slice((page-1)*pageSize, page*pageSize)` → only
+  the first 100 leads ever reached the browser. Saved page (`saved/page.tsx:594`) sends no
+  page/pageSize and ignores `json.pagination`, so a user with 140 saved leads saw & exported 100.
+  Export helpers (`lib/csv.ts`) have no row cap — only the API's final slice truncated it.
+  The 10-per-page client pagination is unrelated (display only).
+- **Fix (`api/leads/route.ts`, +12/-4):** in the saved/outreach-only pagination block, when the
+  caller sends no `page`/`pageSize` params return the full `data` array (skip the slice); explicit
+  pagination requests (e.g. the unused `leadsService.getSavedLeads(page)`) still get their page.
+  `hasNext`/`hasPrev` gated on `isPaginated`. Discovery feed returns earlier — unaffected.
+  Only consumer of `saved=true` is the saved page's direct fetch (no params) → now gets all leads.
+- **Verified (live login with user-supplied creds, local dev server):** logged in as
+  yashnandanshrivastava@gmail.com; `/api/leads?saved=true` → 200, `dataLen 26`, matching the page's
+  26 rows; explicit `?pageSize=1` → 1 row + `totalPages 26` (pagination path intact). Downloaded
+  `.xlsx` via Export → **26 data rows** (header + 26 = 27), creator metadata "Count: 26" — export
+  now matches exactly what's shown. `next lint --file` clean; `tsc` 0 errors in file.
+- **Pushed:** `d031bf2` (pull --rebase was a no-op, sync `0 0`). Commit contains ONLY `route.ts` —
+  other sessions' staged WIP (`next.config.js`, route.ts 24h-claim changes, blog/, etc.) preserved.
+  Stash dance: stashed WIP → pull → push → restored; `git stash pop --index` failed (concurrent
+  session edited `admin/support/page.tsx`), so restored 11/12 files from stash tree manually and
+  repaired the concurrently-edited `admin/support/page.tsx` (its `category` state declaration +
+  query param had been dropped by the partial pop — re-added, lint clean). Stash dropped; the 4
+  pre-existing older stashes untouched.
+- **⚠ SEPARATE DATA-INTEGRITY ISSUE FOUND (not code, not fixed): orphaned saved leads.** Same account
+  has **66** `userLeadState` rows but only **26** resolve to a lead record: 40 saved leads reference
+  IDs missing from BOTH `leadPosts` and `lead` tables AND from the external scraper API (404), so
+  the API's `.filter(l => l !== null)` silently drops them. Global: 3,371 state rows → 270 unique
+  leadIds → only 99 resolve. Users with 163/132/96 saved states have only 65/82/66 resolvable.
+  This is why a user may see/export "around 30" despite having many more saved. Data is
+  unrecoverable locally (no snapshots; EmailMessage rows = 0 for those states). Backend guy: needs
+  a data recovery/backfill or a decision on surfacing orphaned states. Out of frontend scope.
+
+### Saved-leads offline mirror / local recovery copy (2026-11-23) — BUILT, browser-verified
+User asked: also save saved leads in the browser so backend data loss can't wipe the list.
+- **New `src/lib/saved-leads-cache.ts`** — IndexedDB `lhc-offline` v1, stores `leads`
+  (keyPath `['uid','leadId']`, index `by_uid`) + `meta`. Namespaced by Firebase UID. Full `AppLead`
+  incl. revealed contact info, with `savedAt/updatedAt`, `origin: server|local`, `dirty`, plus a
+  `pendingOps` queue. Every op best-effort / try-catch (private mode, quota, unsupported IDB).
+- **New `src/lib/lead-merge.ts`** (pure) — `mergeSavedLeads(cached, server, pendingOps)`:
+  server wins for leads it returns, dirty local fields survive re-fetch, cached leads the server
+  no longer returns are KEPT as "recovered" (the 40-orphan data-loss case), locally-unsaved stay
+  out until replay. 7 unit tests in `lead-merge.test.ts` — all pass.
+- **New `src/lib/offline-leads-client.ts`** — `loadSavedLeads()` (cache-first → server → merge →
+  write back; cache-only if offline), `persistLeadMutation()`, `confirmLeadMutation()`,
+  `flushPendingOps()` (replays PATCH ops on mount + `online` event; reveal is not replayed — it
+  spends credits server-side), `clearOfflineCopy()`.
+- **Wired `saved/page.tsx`:** hydrate via mirror; all 5 mutations (status, follow-up ×2, remove,
+  reveal) write locally first and keep the change on network failure (toast "Saved on this
+  device · will sync when online") instead of rolling back. Rows from the mirror get an
+  **"ON THIS DEVICE"** badge; toolbar shows pending/recovered status + **Clear offline copy**.
+  Export adds an **Origin** column (`Server` / `This device only`) — NOTE the export already had a
+  `Source` column (lead's source); first attempt overwrote it, renamed to Origin.
+- **Wired `leads/page.tsx`:** `handleSaveToggle` + card/drawer reveals mirror locally (reveal
+  auto-saves server-side: isSaved=true/status='saved', verified in reveal route).
+- **Verified (real login, local dev):** cache populated with 26 leads; injected a local-only lead +
+  reloaded → showed as row 1 with badge, export = **27 rows** (26 Server / 1 This device only);
+  injected a pending status op + reloaded → replayed, queue empty; console clean. Fake test record
+  removed afterwards. lint clean; tsc 0 new errors (3 pre-existing in leads/page.tsx); vitest
+  13/13 relevant tests pass.
+- **NOT pushed** (user asked to implement + report issues first). Backend must still fix the
+  orphan data loss — this is a mitigation, not a root-cause fix.
+
 ---
 
 ## 3. Blocked — waiting on user input
@@ -1708,3 +1775,38 @@ pasted-URL cover images, admin-only access, newsletter email optional (default O
   `prisma db execute --file prisma/blog-tables.sql` was therefore run against that database — it created an
   empty `blog_posts` table (idempotent DDL, 0 rows, no other tables touched; smoke-test row was deleted).
   To roll back: `DROP TABLE IF EXISTS "blog_posts";` on that database.
+
+---
+
+### Lead feed: card `6/25` → drawer `25/25` (2026-11-23) — DIAGNOSED, NO CODE CHANGED
+User asked for diagnosis + plan first, explicitly no edits yet. Findings:
+
+- **Symptom path:** `leads/page.tsx` `openLead()` seeds the drawer from the feed lead (`claimedCount=6`),
+  then the effect at lines 441-488 fetches `/api/leads/:id` and merges `{...prev, ...fresh}` — the fresh
+  detail value overwrites the card's count. `LeadDrawer` has zero claim logic; it only renders
+  `lead.claimedCount` (lines 385/412/634). So the mismatch is entirely server-side.
+- **Root cause:** three divergent server code paths compute `claimedCount`:
+  1. `api/leads/route.ts` (feed list) — HEAD: real count only (`post.claimed_count`), because `e3ef569`
+     (Nov 12, "remove 24h fake auto-claim") deleted the fake rule here. → shows **6/25**.
+  2. `api/leads/[id]/route.ts` (drawer detail) — **still has** the fake rule (added by `6bec236`,
+     missed by `e3ef569`): any lead older than 24h and not revealed by the current user is forced to
+     `claimedCount = 25`, `isClaimedByOther = true`, `isClaimable = false`, `revealCost = null`. → **25/25**.
+  3. `lib/lead-mapper.ts` (used by `/api/leads/updates` delta feed) — also still has the fake rule,
+     with a *third* date fallback (`updated_at` present, detail's isn't). Has a TDZ bug too:
+     `effectiveClaimedCount` used at line 86 before its `const` at line 96 → runtime ReferenceError
+     whenever the updates endpoint returns new leads (swallowed by its catch → `hasNew:false`).
+- **Not cosmetic:** the fake 25 also sets `isClaimedByOther`, so the drawer blocks reveal with
+  "maximum claim limit (25 members)" while the card still offers "Unlock & Save". Real cap is
+  `MAX_CLAIMS_PER_LEAD = 25` in `api/leads/reveal/route.ts` (incremented per reveal); post age is
+  never checked there, and there is no doc supporting a 24h rule. `e3ef569` called it "fake".
+- **⚠ staged WIP conflict:** `git diff --cached api/leads/route.ts` re-adds the exact fake 24h
+  auto-claim that `e3ef569` removed AND reverts the status filter to `l.status === 'new'`. Must be
+  resolved (likely discard) before the real fix — not ours, ask before touching.
+- **Secondary inconsistency:** list counts `rawOtherCount` *including* current user (and has a dead
+  `otherCount` var); detail counts `otherRevealedCount` *excluding* current user. Unify the basis.
+- **Plan (recommended, pending user go-ahead):** remove the 24h fake auto-claim from detail +
+  lead-mapper; extract ONE canonical claim-count helper shared by list/detail/updates (real count
+  `max(claimed_count, otherRevealCount excluding current user)`, cap only via the real 25), fix the
+  lead-mapper TDZ, align date fallbacks, add unit tests asserting card/detail parity, then lint/tsc/
+  vitest + browser check. Alternative (add the rule back everywhere via the shared helper) is NOT
+  recommended — it contradicts e3ef569 and would lie to users. No code changed this session.
