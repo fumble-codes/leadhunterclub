@@ -169,12 +169,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     const isRevealed = userState?.isRevealed || false
     const approvedOrLiveDate = (externalLead as any).reviewed_at || (externalLead as any).approved_at || externalLead.created_at
-    const isExpired24h = approvedOrLiveDate
-      ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 24 * 60 * 60 * 1000
+    const isExpired48h = approvedOrLiveDate
+      ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 48 * 60 * 60 * 1000
       : false
-    const isAutoClaimedAfter24h = isExpired24h && !isRevealed
-    const totalClaims = isAutoClaimedAfter24h ? 25 : Math.max(externalLead.claimed_count || 0, otherRevealedCount)
-    const isClaimedByOther = isAutoClaimedAfter24h || (!isRevealed && (totalClaims >= 25 || externalLead.is_claimed))
+    const isAutoClaimedAfter48h = isExpired48h && !isRevealed
+    const totalClaims = isAutoClaimedAfter48h ? 25 : Math.max(externalLead.claimed_count || 0, otherRevealedCount)
+    const isClaimedByOther = isAutoClaimedAfter48h || (!isRevealed && totalClaims >= 25)
     const phone = externalLead.contact_info?.phone_numbers?.[0]?.number || null
     const email = externalLead.email || externalLead.contact_info?.emails?.[0]?.email || ''
     const isClaimable = isClaimedByOther

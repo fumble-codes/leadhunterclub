@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     const MAX_CLAIMS_PER_LEAD = 25
 
-    // Exclusive claim enforcement: verify if 25 other users have already unlocked this lead or limit reached
+    // Exclusive claim enforcement: verify if 25 other users have already unlocked this lead or lead is 48 hours old
     const otherRevealedCount = await db.userLeadState.count({
       where: {
         leadId,
@@ -111,12 +111,18 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    if (otherRevealedCount >= MAX_CLAIMS_PER_LEAD || (externalLead.claimed_count || 0) >= MAX_CLAIMS_PER_LEAD || externalLead.is_claimed) {
+    const approvedOrLiveDate = (externalLead as any).reviewed_at || (externalLead as any).approved_at || (externalLead as any).updated_at || externalLead.created_at
+    const isExpired48h = approvedOrLiveDate
+      ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 48 * 60 * 60 * 1000
+      : false
+
+    if (otherRevealedCount >= MAX_CLAIMS_PER_LEAD || (externalLead.claimed_count || 0) >= MAX_CLAIMS_PER_LEAD || isExpired48h) {
       return NextResponse.json(
         {
           code: 'LEAD_ALREADY_CLAIMED',
-          message:
-            `This lead has reached its maximum claim limit (${MAX_CLAIMS_PER_LEAD} members).`,
+          message: isExpired48h
+            ? 'This lead has expired (older than 48 hours).'
+            : `This lead has reached its maximum claim limit (${MAX_CLAIMS_PER_LEAD} members).`,
         },
         { status: 400 },
       )

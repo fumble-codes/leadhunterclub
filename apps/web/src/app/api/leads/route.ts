@@ -101,18 +101,23 @@ function externalPostToAppLead(
   isClaimedByOther: boolean = false,
 ): AppLead {
   const isRevealed = userState?.isRevealed || false
-  const phone = post.contact_info?.phone_numbers?.[0]?.number || null
+  const phone = (post as any).phone || post.contact_info?.phone_numbers?.[0]?.number || null
   const email = post.email || post.contact_info?.emails?.[0]?.email || ''
   const intel = post.intelligence || ''
   const primaryNiche = post.niche || null
 
-  const effectiveClaimedCount = post.claimed_count || 0
+  const approvedOrLiveDate = post.reviewed_at || (post as any).approved_at || post.updated_at || post.created_at
+  const isExpired48h = approvedOrLiveDate
+    ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 48 * 60 * 60 * 1000
+    : false
+  const isAutoClaimedAfter48h = isExpired48h && !isRevealed
+  const effectiveClaimedCount = isAutoClaimedAfter48h ? 25 : post.claimed_count || 0
   const effectiveClaimedByOther =
     isClaimedByOther ||
+    isAutoClaimedAfter48h ||
     (!isRevealed && effectiveClaimedCount >= 25)
 
   const niches = extractNiches(post.keyword, post.content || '', post.intelligence, primaryNiche)
-  const phone = (post as any).phone || (post.contact_info as any)?.phone_numbers?.[0]?.number || null
   const cleanTags = extractLeadBadges({ ...post, email, phone, claimed_count: effectiveClaimedCount }, niches)
   const resolvedNiche = (niches[0] && niches[0] !== 'General') ? niches[0] : (primaryNiche || 'General')
   const cleanTitle = post.title?.trim() || sanitizeHeadline(post.author?.info || post.keyword || '', resolvedNiche)
@@ -406,9 +411,13 @@ export async function GET(request: NextRequest) {
             const userUnlocked = stateMap.get(lead.id)?.isRevealed ? 1 : 0
             const otherCount = Math.max(0, rawOtherCount - userUnlocked)
             const totalClaims = Math.max(lead.claimed_count || 0, rawOtherCount)
-            const isLimitReached = totalClaims >= 25 || lead.is_claimed
+            const approvedOrLiveDate = lead.reviewed_at || (lead as any).approved_at || lead.updated_at || lead.created_at
+            const isExpired48h = approvedOrLiveDate
+              ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 48 * 60 * 60 * 1000
+              : false
+            const isLimitReached = totalClaims >= 25 || isExpired48h
             return externalPostToAppLead(
-              { ...lead, claimed_count: totalClaims },
+              { ...lead, claimed_count: isLimitReached ? 25 : totalClaims },
               stateMap.get(lead.id),
               isLimitReached,
             )
