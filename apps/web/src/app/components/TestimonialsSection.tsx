@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRightIcon } from '@heroicons/react/24/solid'
 import { useMediaQuery } from '@/hooks'
+import type { ReviewDTO } from '@/lib/reviews'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -122,11 +123,13 @@ const FLYING_POSITIONS = [
 export function ReviewScreenshotCard({ 
   imageUrl, 
   index, 
-  isFeatured = false 
+  isFeatured = false,
+  caption,
 }: { 
   imageUrl: string
   index: number
   isFeatured?: boolean
+  caption?: { quote?: string | null; author?: string | null; role?: string | null; category?: string | null }
 }) {
   const ACCENT_COLORS = ['mint', 'purple', 'cyan', 'orange'] as const
   const accent = ACCENT_COLORS[index % ACCENT_COLORS.length]
@@ -155,6 +158,26 @@ export function ReviewScreenshotCard({
           loading="lazy"
         />
       </div>
+      {/* Optional caption — bulk screenshot uploads are caption-free, so only
+          the folder label may be present. */}
+      {caption && (caption.quote || caption.author || caption.category) && (
+        <div className="px-2.5 pb-2 pt-2.5">
+          {caption.category && (
+            <span className="mb-1.5 inline-flex rounded-full border border-accent-purple/25 bg-accent-purple/10 px-2 py-0.5 text-[10px] font-semibold text-accent-purple">
+              {caption.category}
+            </span>
+          )}
+          {caption.quote && (
+            <p className="line-clamp-3 text-[12px] leading-relaxed text-text-secondary/85">“{caption.quote}”</p>
+          )}
+          {caption.author && (
+            <p className="mt-1.5 text-[11px] font-semibold text-text-primary">
+              {caption.author}
+              {caption.role ? <span className="font-normal text-text-muted"> · {caption.role}</span> : null}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -168,10 +191,42 @@ export default function TestimonialsSection() {
   const isCoarsePointer = useMediaQuery('(pointer: coarse)')
   const disableFlyingOverlay = isCoarsePointer
 
-  // Show a clean preview of 6 reviews on the homepage
-  const homepageReviews = POSITIVE_REPLY_IMAGES.slice(0, 6)
+  // Approved member/admin reviews are fed in from the API. The static screenshot
+  // archive is the fallback until the first review is approved.
+  const [liveReviews, setLiveReviews] = React.useState<ReviewDTO[]>([])
+  React.useEffect(() => {
+    let alive = true
+    fetch('/api/reviews?limit=18', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (alive && Array.isArray(json?.reviews)) setLiveReviews(json.reviews as ReviewDTO[])
+      })
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [])
+
+  const gridItems: {
+    imageUrl: string
+    caption?: { quote?: string | null; author?: string | null; role?: string | null; category?: string | null }
+  }[] =
+    liveReviews.length > 0
+      ? [
+          ...liveReviews.slice(0, 6).map((r) => ({
+            imageUrl: r.imageUrl,
+            caption: { quote: r.quote, author: r.authorName, role: r.authorRole, category: r.category },
+          })),
+          ...POSITIVE_REPLY_IMAGES.slice(0, Math.max(0, 6 - Math.min(6, liveReviews.length))).map((imageUrl) => ({
+            imageUrl,
+          })),
+        ]
+      : POSITIVE_REPLY_IMAGES.slice(0, 6).map((imageUrl) => ({ imageUrl }))
   // Use subsequent reviews for the interactive flying cards overlay
-  const flyingReviews = POSITIVE_REPLY_IMAGES.slice(6, 18)
+  const flyingImages =
+    liveReviews.length > 6
+      ? liveReviews.slice(6, 18).map((r) => r.imageUrl)
+      : POSITIVE_REPLY_IMAGES.slice(6, 18)
 
   // Emit brand reaction particles continuously when hovered (fine pointer only)
   React.useEffect(() => {
@@ -282,11 +337,11 @@ export default function TestimonialsSection() {
       <div className="relative z-10 mb-14 md:min-h-[500px] flex items-center justify-center">
         {/* Normal Grid state */}
         <div className={`flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-stretch w-full overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:overflow-visible md:pb-0 transition-all duration-700 ${isHovered ? 'blur-[4px] scale-[0.97] opacity-15' : 'opacity-100 blur-0 scale-100'}`}>
-          {homepageReviews.map((imageUrl, index) => {
+          {gridItems.map((item, index) => {
             const isMiddleTrigger = index === 1 && !disableFlyingOverlay
             return (
               <div
-                key={imageUrl}
+                key={`${item.imageUrl}-${index}`}
                 className={`h-full relative shrink-0 w-[calc(100vw-2.5rem)] max-w-[320px] md:w-auto md:max-w-none snap-start ${isMiddleTrigger ? 'cursor-pointer' : ''}`}
                 onMouseEnter={isMiddleTrigger ? () => setIsHovered(true) : undefined}
               >
@@ -296,7 +351,7 @@ export default function TestimonialsSection() {
                     <span>Reviews (what people say)</span>
                   </div>
                 )}
-                <ReviewScreenshotCard imageUrl={imageUrl} index={index} />
+                <ReviewScreenshotCard imageUrl={item.imageUrl} index={index} caption={item.caption} />
               </div>
             )
           })}
@@ -331,7 +386,7 @@ export default function TestimonialsSection() {
               </div>
 
               {/* Flying Boomerang reviews */}
-              {flyingReviews.map((imageUrl, index) => {
+              {flyingImages.map((imageUrl, index) => {
                 const pos = FLYING_POSITIONS[index % FLYING_POSITIONS.length]
                 return (
                   <motion.div
@@ -383,7 +438,11 @@ export default function TestimonialsSection() {
                   <span>✨</span>
                   <span>Reviews (what people say)</span>
                 </div>
-                <ReviewScreenshotCard imageUrl={homepageReviews[1]} index={1} isFeatured={true} />
+                <ReviewScreenshotCard
+                  imageUrl={gridItems[1]?.imageUrl ?? POSITIVE_REPLY_IMAGES[1]}
+                  index={1}
+                  isFeatured={true}
+                />
               </motion.div>
             </div>
           )}

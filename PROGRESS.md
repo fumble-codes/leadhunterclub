@@ -51,6 +51,9 @@ User asked for local dummy lead data to test the lead drawer without the live DB
 | 19 | Bug reports with screenshots on /support (2026-11-19) — "Report a Bug" button + structured modal, 2 screenshots via existing base64 pattern on first message, admin BUG filter/badge + screenshot lightbox | ✅ built & verified locally (test ticket created with PNG → stored/returned via API → deleted; lint + tsc clean). Additive DB column `support_ticket_messages.imageUrl` applied live. Pushed 2026-11-19 |
 | 20 | Bug modal UI/mobile polish (2026-11-19) — shared Modal portalled to body (z above mobile bottom nav), scrollable body + sticky actions, full-width Select fix, brighter header button | ✅ done locally — verified at 390px and 1440px; existing New Ticket modal still works. Pushed 81a914b |
 | 21 | Dashboard design upgrade (2026-11-22) — user rejected first rewrite (AI-slop look); reverted to original metallic-card layout via git checkout, then added HUD dial row (3 circular SVG widgets, token roles mint/cyan/amber, mount draw + hover/click interaction) on top of the untouched original cards/chart/distribution | ✅ local only; lint + tsc clean. No pulsing, no "live" pills, no fake percentages. NOT pushed yet |
+| 22 | Reviews system (2026-11-23) — admin upload/moderation page (`/admin/reviews`) + logged-in member submission on `/reviews`; screenshot required, pending→approve workflow, approved reviews feed `/reviews` + landing testimonials | ✅ built + API/DB + browser-verified (read path); NOT pushed. Admin UI needs a real admin login for click-through |
+| 23 | Work management (2026-11-23) — admin Tasks board (Kanban + table toggle, DnD, assignees, due dates, filters) + Products/workstreams catalog, shared DB, admin-only APIs | ✅ built + migration applied to live DB + DB smoke test + 8 unit tests; NOT pushed. Browser click-through needs an admin login |
+| 23 | Bulk screenshot upload for reviews (2026-11-23) — `/admin/reviews/bulk`: drag/drop folder or multi-select, folder name → label, caption-free by default, dedup by sha256, chunked uploads with progress | ✅ built + bulk API end-to-end verified with real admin token + caption-free UI browser-verified; NOT pushed |
 
 Note: user's original list had duplicate "5" (rollover + pricing); renumbered as above (rollover=5, pricing=6).
 
@@ -1133,8 +1136,115 @@ User asked: also save saved leads in the browser so backend data loss can't wipe
   injected a pending status op + reloaded → replayed, queue empty; console clean. Fake test record
   removed afterwards. lint clean; tsc 0 new errors (3 pre-existing in leads/page.tsx); vitest
   13/13 relevant tests pass.
-- **NOT pushed** (user asked to implement + report issues first). Backend must still fix the
-  orphan data loss — this is a mitigation, not a root-cause fix.
+- **PUSHED as `60ab74a`** (user chose "push as-is"). Rebased over 30 upstream commits; conflict in
+  `leads/page.tsx` (upstream added a `selectedLead ? ... : loader` wrapper around LeadDrawer) was
+  merged by keeping the wrapper + our reveal-persistence block, lint/tsc re-checked, sync `0 0`.
+- **⚠ Stash note:** `stash@{0}` = "temp: pre-offline-mirror-push WIP (other sessions)" is still
+  present. Its pop conflicted in 3 files (`admin/tokens/page.tsx`, `api/admin/apify-keys/route.ts`,
+  `settings/page.tsx`) because upstream added Telegram/notification + token-state features that the
+  stashed WIP deleted. We took **upstream ("ours")** for those 3 and kept the stash intact — do NOT
+  drop it until the owning session confirms those WIP changes are superseded. All other stashed
+  files applied cleanly to the working tree.
+- Backend must still fix the orphan data loss — this is a mitigation, not a root-cause fix.
+
+### Reviews system / moderation (2026-11-23) — BUILT, read path browser-verified (not pushed)
+User ask: admin panel section to upload member reviews + a way for logged-in members to submit their own,
+which admins approve before they appear on the front end. Decisions confirmed by user: **logged-in members
+only**, **screenshot required**, **no star rating**, approved reviews on **`/reviews` + landing testimonials**.
+- **DB:** new `Review` model appended to `prisma/schema.prisma` (`reviews` table: authorName, authorRole,
+  quote, imageUrl = base64 data URL, status PENDING/APPROVED/REJECTED, userId, reviewedBy/At, adminNote,
+  isFeatured). Migration SQL = new `apps/web/prisma/reviews-tables.sql` (additive, `IF NOT EXISTS`).
+  **Applied to the live Supabase DB this session** via `prisma db execute --url=<.env.local DATABASE_URL>
+  --file prisma/reviews-tables.sql` (local `.env` Postgres is down: localhost:5432 unreachable). Prisma
+  client regenerated (`npx prisma generate` from `apps/web`). No schema change was pushed to git for the DB
+  itself — the SQL file is committed source; the live table was created manually.
+- **API:** `GET /api/reviews` (public, APPROVED only, `?limit=`/`?featured=`, 60s CDN cache),
+  `POST /api/reviews` (multipart, `requireAuth`, always PENDING, admin email notification),
+  `GET /api/reviews/mine` (member's own submissions + status), `GET/POST /api/admin/reviews`
+  (admin list w/ counts+pagination; admin upload publishes immediately by default),
+  `PATCH/DELETE /api/admin/reviews/[id]` (approve/reject/feature/edit/delete + revalidatePath).
+  Shared: `lib/validators/review.ts`, `lib/review-upload.ts` (multipart→data URL, 3MB cap),
+  `lib/reviews.ts` (DTO/serializer), `lib/review-image.ts` (client-side canvas compression).
+- **UI:** new `/admin/reviews` page (status tabs, count cards, approve/reject/feature/delete, "Add review"
+  modal, pagination, lightbox) + "Reviews" nav item in `admin/layout.tsx`; `/reviews` page gained
+  "Share your review" CTA (`ReviewSubmissionModal`, prefill name from account), "Your submissions" status
+  section, and an approved-reviews masonry section above the existing static gallery; `TestimonialsSection`
+  fetches `/api/reviews` and feeds approved reviews (with quote/author caption) into the grid/flying cards,
+  falling back to the static images when empty. New components under `components/reviews/`.
+- **Verified:** lint clean on all 14 touched files · tsc 0 errors in touched files (repo baseline now 90 —
+  all pre-existing/other-session WIP) · live API: `/api/reviews` 200, admin 401, mine 401 · `/reviews` +
+  `/wall-of-love` 200, `/admin/reviews` 307→login (unauthenticated) · **browser (real dev server):** inserted
+  a temp approved review → `/reviews` rendered its card (quote/initials/author/role) + login CTA; `/?preview=1`
+  landing testimonials section rendered the same review with caption, 0 horizontal overflow, 0 console errors;
+  temp record deleted afterward (`/api/reviews` back to `[]`).
+- **Not verified:** admin page click-through (approve/reject/add) needs a real admin login; public member
+  submit POST needs a logged-in session (no new accounts per standing rule). **Not pushed** (working tree has
+  heavy staged WIP from other sessions — commit only the review files when doing so).
+
+### Bulk screenshot upload for reviews (2026-11-23) — BUILT + verified (not pushed)
+User has a drive full of deal/closure screenshots and wants a fast upload path. Decisions: **screenshots only**
+(text optional), **folder name becomes the label**.
+- **DB:** `Review.authorName`/`quote` are now nullable, added `category String?` + `imageHash String? @unique`.
+  `prisma/reviews-tables.sql` updated for fresh installs; new `prisma/reviews-bulk-patch.sql` for existing DBs.
+  **Patch applied to live Supabase** via `prisma db execute --url=<.env.local> --file prisma/reviews-bulk-patch.sql`.
+  Prisma client regen initially hit EPERM (dev server held the query-engine DLL) → stopped the 3 dev-server
+  node PIDs, regenerated OK, relaunched `npm run dev` from repo root with NODE_OPTIONS=--max-old-space-size=3072,
+  `/api/reviews` confirmed 200 again.
+- **API:** `POST /api/admin/reviews/bulk` (multipart, max 6 files/request, per-file `categories` JSON array,
+  shared optional author/role/quote, status + feature toggles, `createMany({skipDuplicates:true})` on imageHash).
+  Single admin POST + PATCH now accept optional text/category too; public member form still requires text.
+  `lib/review-upload.ts` gained `readReviewFile()` (data URL + sha256) + `readBulkReviewFormData()`.
+- **UI:** new `/admin/reviews/bulk` — drop zone, "Choose images" and "Choose folder" (`webkitdirectory`,
+  first path segment auto-fills each label), thumbnail queue with editable per-image label + remove, shared
+  caption fields, publish/feature toggles, 5-images-per-request chunked upload with 2 parallel workers,
+  live progress (published / duplicates skipped / failed) and a completion summary. "Bulk upload" button added
+  to `/admin/reviews`. Caption-free reviews render image-only with a coloured label chip (no empty “” quotes)
+  on `/reviews` and in the landing testimonials; admin cards show "Screenshot only — no caption".
+- **Verified:** lint clean on 16 touched files · tsc 0 errors in touched files (repo baseline now 109, all
+  pre-existing/other-session) · 9/9 validator tests · **bulk endpoint E2E** with a real admin ID token minted
+  via service account + custom-token exchange: 2 identical PNGs → `created:1, skipped:1`, category + hash stored,
+  quote null, status APPROVED; test rows deleted · browser: caption-free "Closures" review rendered on `/reviews`
+  and `/?preview=1`, no empty quotes, 0 overflow, 0 console errors; test row deleted, public feed back to `[]`.
+- Temp verification script removed. **Not pushed** — commit only review files when ready.
+
+### Work management: Tasks + Products (2026-11-23) — BUILT, DB-verified (not pushed)
+User ask: admin task + product management so the 3–4 person team (frontend / backend / lead engine / marketing /
+sales) can see what's being worked on, what's done and what's next. Confirmed choices: **both Kanban and table
+views**, **assign to admin accounts**, **shared DB**. Products = workstream containers that own tasks (user
+deferred the exact semantics — fits their cross-functional team).
+- **DB:** additive `WorkProduct` + `WorkTask` models appended to `prisma/schema.prisma` (`work_products`,
+  `work_tasks`). Owner/assignee are **scalar `User.id` strings, not relations** — deleting a user keeps the work
+  item. Task has status (`TODO`/`IN_PROGRESS`/`REVIEW`/`DONE`), priority, dueDate, `position` for DnD, completedAt.
+  Migration `apps/web/prisma/work-management-tables.sql` (idempotent, guarded FK) **applied to live Supabase**
+  via `prisma db execute --url=<.env.local DATABASE_URL> --file …`. Prisma client regenerated (first try hit the
+  known Windows DLL-lock EPERM; a rename probe released it; leftover locked `.bak` in node_modules is harmless).
+- **APIs (all `requireAdmin` + Zod):** `GET/POST /api/admin/tasks` (product/assignee/status/q filters),
+  `PATCH/DELETE /api/admin/tasks/[id]`, `POST /api/admin/tasks/reorder` (transactional status+position batch),
+  `GET/POST /api/admin/products`, `PATCH/DELETE /api/admin/products/[id]`, `GET /api/admin/team` (admin accounts
+  for assignee dropdown). Owners resolved via a separate `db.user.findMany` (no Prisma relation by design).
+- **UI:** `/admin/tasks` — 4 stat tiles, search/product/assignee filters, Board|Table toggle, native HTML5 DnD
+  with insertion indicator + optimistic reorder, per-card/row status `<select>` for touch/keyboard, create/edit
+  modal, delete confirm, deep-link `?product=<id>`. `/admin/products` — card grid with progress bar, per-status
+  counts, owner, open-board link, create/edit/delete modals. Two nav items added to `admin/layout.tsx` (surgical
+  additions beside other sessions' WIP). Heroicons outline `strokeWidth 1.6`, empty/loading/error states included.
+  Pure drag logic in `src/lib/work.ts` + 8 vitest cases (`src/lib/work.test.ts`) — a test caught and fixed a
+  missing re-sort in the optimistic list.
+- **Verified:** lint clean on all 17 touched files · tsc 0 errors in my files (repo baseline 90, all
+  other-session/pre-existing) · vitest 8/8 · live routes: pages 307→login, all 3 APIs 401 unauthenticated ·
+  **DB smoke test** (temp script removed): created product + 3 tasks, read back with groupBy, transactional
+  reorder, deleted all — passed. **Authenticated API E2E** (own temp dev server on :3002, since :3000/:3001
+  were started before the Prisma regen and cache the old client): minted an admin ID token via service-account
+  custom token + identitytoolkit exchange (no password, no new account) → GET team 200 (3 admins), POST product
+  201, POST task 201, filtered GET task 200 with correct byStatus, PATCH→DONE 200 with completedAt, reorder 200,
+  products GET 200 with done count 1, invalid title 400 VALIDATION_ERROR, DELETE task+product 200 (no test data
+  left). Temp server + script removed. E2E caught two real bugs: `assignee`/`owner` are scalar User.id fields,
+  **not Prisma relations** — removed from `include` and resolved via `db.user.findMany` instead (TypeScript
+  missed this because `as const` include objects passed as variables skip excess-property checks).
+  **Important:** the two pre-existing dev servers on :3000/:3001 must be restarted before local UI testing —
+  they still hold the pre-migration Prisma client (Vercel builds are unaffected).
+- **Not verified:** browser click-through of modals/DnD needs an admin browser session. **NOT pushed** — stage only the
+  work-management files + the 2 surgical `admin/layout.tsx`/`schema.prisma` additions (heavy staged WIP by other
+  sessions is present).
 
 ---
 
@@ -1778,8 +1888,9 @@ pasted-URL cover images, admin-only access, newsletter email optional (default O
 
 ---
 
-### Lead feed: card `6/25` → drawer `25/25` (2026-11-23) — DIAGNOSED, NO CODE CHANGED
-User asked for diagnosis + plan first, explicitly no edits yet. Findings:
+### Lead feed: card `6/25` → drawer `25/25` (2026-11-23) — FIXED (not committed/pushed)
+User decision: the 24h auto-claim IS intended — 24h-old leads must show fully claimed in BOTH
+card and drawer; the goal is one consistent number. Diagnosis first, then implemented below. Findings:
 
 - **Symptom path:** `leads/page.tsx` `openLead()` seeds the drawer from the feed lead (`claimedCount=6`),
   then the effect at lines 441-488 fetches `/api/leads/:id` and merges `{...prev, ...fresh}` — the fresh
@@ -1804,9 +1915,22 @@ User asked for diagnosis + plan first, explicitly no edits yet. Findings:
   resolved (likely discard) before the real fix — not ours, ask before touching.
 - **Secondary inconsistency:** list counts `rawOtherCount` *including* current user (and has a dead
   `otherCount` var); detail counts `otherRevealedCount` *excluding* current user. Unify the basis.
-- **Plan (recommended, pending user go-ahead):** remove the 24h fake auto-claim from detail +
-  lead-mapper; extract ONE canonical claim-count helper shared by list/detail/updates (real count
-  `max(claimed_count, otherRevealCount excluding current user)`, cap only via the real 25), fix the
-  lead-mapper TDZ, align date fallbacks, add unit tests asserting card/detail parity, then lint/tsc/
-  vitest + browser check. Alternative (add the rule back everywhere via the shared helper) is NOT
-  recommended — it contradicts e3ef569 and would lie to users. No code changed this session.
+- **Fix shipped (local only, NOT committed/pushed):**
+  - **NEW `lib/lead-claim.ts`** — single source of truth: `MAX_CLAIMS_PER_LEAD = 25`,
+    `getLeadLiveDate()` (`reviewed_at || approved_at || created_at`, deliberately NO `updated_at`
+    — a claim/enrichment must not reset a lead's age), and `computeClaimState()` (24h + !isRevealed
+    → 25/25 + locked; real count `max(claimed_count, otherRevealed)` otherwise).
+  - **Wired into all 3 paths:** `api/leads/route.ts` (feed), `api/leads/[id]/route.ts` (drawer),
+    `lib/lead-mapper.ts` (used by `api/leads/updates` delta feed). Removed the 3 duplicated 24h
+    blocks + the 3rd `isClaimedByOther` override param; call sites updated. Also fixed the
+    `lead-mapper.ts` TDZ (count was used before declaration → runtime ReferenceError on the delta
+    endpoint) and made the feed count other members only (was including current user), matching detail.
+  - **NEW `lib/lead-claim.test.ts`** — 12 tests (boundary, revealed exemption, no-date, real cap,
+    legacy flag, + mapper integration even with fresh `updated_at`) — all pass.
+  - **Verified:** lint clean (6 touched files) · tsc 0 errors in changed/new files (remaining errors
+    all pre-existing at HEAD) · focused vitest 12/12 · full suite 28 failed/217 passed = the known
+    unrelated backend set (credits/payment/auth/me/reveal); none import changed files.
+  - **⚠ Before committing:** `api/leads/route.ts` already had staged WIP from another session (the
+    24h rule + a `status === 'new'` filter revert). My fix is UNSTAGED on top — stage both parts
+    together. The unrelated `status === 'new'` filter change was left untouched (flag to that session).
+  - **Not browser-verified:** no dev server / live login this session; API parity is unit-tested.

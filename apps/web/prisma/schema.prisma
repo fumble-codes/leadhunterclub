@@ -511,3 +511,28 @@ model CommunityReaction {
   @@map("community_reactions")
 }
 
+
+// Member-submitted / admin-uploaded testimonials. New submissions land as
+// PENDING and only reach the public site once an admin approves them.
+model Review {
+  id          String    @id @default(uuid())
+  authorName  String?   // optional â€” bulk screenshot uploads are caption-free
+  authorRole  String?
+  category    String?   // source folder label, e.g. "Closures" / "Deals"
+  quote       String?   @db.Text
+  imageUrl    String    @db.Text // base64 data URL of the screenshot (required)
+  imageHash   String?   @unique // sha256 of image bytes â€” dedupes repeat uploads
+  status      String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  userId      String?   // submitter Firebase UID (null for admin-created reviews)
+  reviewedBy  String?   // admin UID who approved/rejected
+  reviewedAt  DateTime?
+  adminNote   String?
+  isFeatured  Boolean   @default(false) // pinned into the homepage testimonials
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([userId])
+  @@index([category])
+  @@map("reviews")
+}
