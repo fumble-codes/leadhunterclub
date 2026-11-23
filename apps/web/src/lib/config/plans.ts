@@ -15,7 +15,13 @@ export interface PlanConfig {
 
 export const PLANS: Record<PlanId, PlanConfig> = {
   FREE: { id: 'FREE', name: 'Free', credits: 50, price: 0 },
-  FREELANCER: { id: 'FREELANCER', name: 'Freelancer', credits: 1000, price: 999 },
+  FREELANCER: {
+    id: 'FREELANCER',
+    name: 'Freelancer',
+    credits: 1000,
+    price: 999,
+    razorpayPlanId: process.env.RAZORPAY_FREELANCER_PLAN_ID || 'plan_U3bJ9xiuIhqM3w',
+  },
   AGENCY: { id: 'AGENCY', name: 'Agency', credits: 1000, price: 2499 },
 }
 

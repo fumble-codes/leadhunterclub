@@ -92,6 +92,45 @@ export async function POST(request: NextRequest) {
 
         const amountPaise = Math.round(price * 100)
 
+        // If Freelancer plan, create recurring Subscription (AutoPay)
+        const freelancerPlanId = process.env.RAZORPAY_FREELANCER_PLAN_ID || 'plan_U3bJ9xiuIhqM3w'
+        const isSubscription = resolvedPlan === 'FREELANCER' && body.mode !== 'one_time'
+
+        if (isSubscription) {
+          const subscription = await razorpay.subscriptions.create({
+            plan_id: freelancerPlanId,
+            total_count: 12,
+            quantity: 1,
+            customer_notify: 1,
+            notes: {
+              userId: authUser.uid,
+              plan: resolvedPlan,
+              credits,
+            },
+          })
+
+          return NextResponse.json({
+            success: true,
+            data: {
+              subscription_id: subscription.id,
+              key_id: keyId,
+              amount: amountPaise,
+              currency: 'INR',
+              plan: resolvedPlan,
+              name: 'Lead Hunter Club',
+              description: `${planDisplayName} (${credits} Monthly Credits — AutoPay)`,
+              prefill: {
+                name: authUser.name,
+                email: authUser.email,
+              },
+            },
+            subscription_id: subscription.id,
+            key_id: keyId,
+            amount: price,
+            currency: 'INR',
+          })
+        }
+
         const order = await razorpay.orders.create({
           amount: amountPaise,
           currency: 'INR',

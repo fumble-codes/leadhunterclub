@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     const authHeader = request.headers.get('Authorization') || ''
     const body = await request.json().catch(() => ({}))
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body || {}
+    const { razorpay_order_id, razorpay_subscription_id, razorpay_payment_id, razorpay_signature } = body || {}
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    if ((!razorpay_order_id && !razorpay_subscription_id) || !razorpay_payment_id || !razorpay_signature) {
       return NextResponse.json(
         { success: false, message: 'Missing required Razorpay payment verification fields' },
         { status: 400 }
@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
     if (keySecret) {
       try {
         const crypto = await import('crypto')
-        const signaturePayload = `${razorpay_order_id}|${razorpay_payment_id}`
+        const signaturePayload = razorpay_subscription_id
+          ? `${razorpay_payment_id}|${razorpay_subscription_id}`
+          : `${razorpay_order_id}|${razorpay_payment_id}`
         const expected = crypto.createHmac('sha256', keySecret).update(signaturePayload).digest('hex')
         if (safeCompareStrings(expected, razorpay_signature)) {
           signatureValid = true
@@ -52,7 +54,6 @@ export async function POST(request: NextRequest) {
         fetchedPayment = await razorpay.payments.fetch(razorpay_payment_id)
         if (
           fetchedPayment &&
-          fetchedPayment.order_id === razorpay_order_id &&
           (fetchedPayment.status === 'captured' || fetchedPayment.status === 'authorized')
         ) {
           signatureValid = true
@@ -192,6 +193,13 @@ export async function POST(request: NextRequest) {
       const oldPlan = userProfile?.plan || 'FREE'
       const assigned = await creditService.assignPlan(authUser.uid, appPlan)
       resultData = { plan: appPlan }
+
+      if (razorpay_subscription_id) {
+        await db.user.update({
+          where: { id: authUser.uid },
+          data: { razorpaySubscriptionId: razorpay_subscription_id },
+        })
+      }
 
       if (userProfile?.email) {
         const planWeights: Record<string, number> = {

@@ -180,10 +180,11 @@ function PricingContent() {
         return
       }
 
-      if (data.success && data.data?.order_id) {
+      if (data.success && (data.data?.order_id || data.data?.subscription_id)) {
         await openRazorpayCheckout({
           key: data.data.key_id,
           order_id: data.data.order_id,
+          subscription_id: data.data.subscription_id,
           amount: data.data.amount,
           currency: data.data.currency,
           name: data.data.name,
