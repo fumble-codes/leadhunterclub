@@ -199,6 +199,12 @@ export const paymentService = {
     await db.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT 1 FROM "credit_accounts" WHERE "userId" = ${userId} FOR UPDATE`
 
+      const currentAccount = await tx.creditAccount.findUnique({ where: { userId } })
+      // Preserve leftover credits in locked rollover for 48 hours to re-subscribe
+      const leftover = Math.max(0, (currentAccount?.subscriptionBalance ?? 0) - freeCredits)
+      const totalLockedRollover = (currentAccount?.rolloverBalance ?? 0) + leftover
+      const rolloverExpiresAt = totalLockedRollover > 0 ? new Date(Date.now() + 48 * 60 * 60 * 1000) : null
+
       await tx.user.update({
         where: { id: userId },
         data: {
@@ -212,6 +218,8 @@ export const paymentService = {
         where: { userId },
         data: {
           subscriptionBalance: freeCredits,
+          rolloverBalance: totalLockedRollover,
+          rolloverExpiresAt,
           renewalDate: null,
         },
       })

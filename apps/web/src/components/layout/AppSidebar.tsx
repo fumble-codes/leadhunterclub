@@ -229,7 +229,12 @@ export default function AppSidebar({
                 <span className={`font-bold ${user?.plan === 'FREE' ? 'text-amber-400' : 'text-accent-orange'}`}>
                   {user.creditAccount.rolloverBalance}
                   {user?.plan === 'FREE' ? (
-                    <span className="font-normal text-amber-300/80"> · Locked (Upgrade to use)</span>
+                    <span className="font-normal text-amber-300/80">
+                      {' '}· Locked ({user.creditAccount.rolloverExpiresAt ? (() => {
+                        const hrs = Math.max(0, Math.ceil((new Date(user.creditAccount.rolloverExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60)))
+                        return hrs > 0 ? `Re-subscribe in ${hrs}h` : 'Expired'
+                      })() : 'Re-subscribe in 48h'})
+                    </span>
                   ) : user.creditAccount.rolloverExpiresAt ? (
                     ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                   ) : ''}

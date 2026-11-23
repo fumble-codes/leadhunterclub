@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
 export const ROLLOVER_VALIDITY_DAYS = 15
+export const INACTIVE_RESUBSCRIBE_GRACE_HOURS = 48
 
 export interface RolloverAccountFields {
   rolloverBalance: number
@@ -10,6 +11,12 @@ export interface RolloverAccountFields {
 export function rolloverExpiryDate(from: Date): Date {
   const date = new Date(from)
   date.setDate(date.getDate() + ROLLOVER_VALIDITY_DAYS)
+  return date
+}
+
+export function inactiveResubscribeExpiryDate(from: Date): Date {
+  const date = new Date(from)
+  date.setHours(date.getHours() + INACTIVE_RESUBSCRIBE_GRACE_HOURS)
   return date
 }
 

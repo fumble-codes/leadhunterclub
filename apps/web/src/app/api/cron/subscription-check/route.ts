@@ -54,6 +54,11 @@ export async function GET(request: NextRequest) {
         const nextRenewal = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
 
         await db.$transaction(async (tx) => {
+          // 48-hour re-subscribe grace window for lapsed users to recover leftover credits
+          const leftover = Math.max(0, account.subscriptionBalance - freeLimit)
+          const totalLockedRollover = account.rolloverBalance + leftover
+          const rolloverExpiresAt = totalLockedRollover > 0 ? new Date(now.getTime() + 48 * 60 * 60 * 1000) : null
+
           await tx.user.update({
             where: { id: account.userId },
             data: { plan: 'FREE' },
@@ -64,8 +69,8 @@ export async function GET(request: NextRequest) {
             data: {
               subscriptionBalance: freeLimit,
               renewalDate: nextRenewal,
-              rolloverBalance: 0,
-              rolloverExpiresAt: null,
+              rolloverBalance: totalLockedRollover,
+              rolloverExpiresAt,
             },
           })
 
