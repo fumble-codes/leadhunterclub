@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
 import { requireAdmin, AuthRequiredError, ForbiddenError } from '@/lib/auth'
-import { adminBulkReviewSchema } from '@/lib/validators/review'
+import { adminBulkReviewSchema, reviewPlacementSchema } from '@/lib/validators/review'
 import { readBulkReviewFormData, ReviewFormError } from '@/lib/review-upload'
 
 export const dynamic = 'force-dynamic'
@@ -33,6 +33,14 @@ export async function POST(request: NextRequest) {
     const status = rawStatus === 'PENDING' ? 'PENDING' : 'APPROVED'
     const rawFeatured = form.get('isFeatured')
     const isFeatured = rawFeatured === 'true' || rawFeatured === 'on'
+    const rawLanding = form.get('showOnLanding')
+    const rawWall = form.get('showOnWall')
+    const rawPosition = form.get('position')
+    const placement = reviewPlacementSchema.parse({
+      showOnLanding: rawLanding === null ? undefined : rawLanding === 'true' || rawLanding === 'on',
+      showOnWall: rawWall === null ? undefined : rawWall === 'true' || rawWall === 'on',
+      position: rawPosition !== null && Number.isFinite(Number(rawPosition)) ? Number(rawPosition) : undefined,
+    })
 
     const common = adminBulkReviewSchema
       .omit({ imageUrl: true })
@@ -52,6 +60,9 @@ export async function POST(request: NextRequest) {
       imageHash: item.imageHash,
       status,
       isFeatured: isFeatured && status === 'APPROVED',
+      showOnLanding: placement.showOnLanding,
+      showOnWall: placement.showOnWall,
+      position: placement.position,
       userId: null,
       reviewedBy: admin.uid,
       reviewedAt,

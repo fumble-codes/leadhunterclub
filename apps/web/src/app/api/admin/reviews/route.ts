@@ -78,10 +78,16 @@ export async function POST(request: NextRequest) {
       imageHash = uploaded.imageHash
       const statusValue = form.get('status')
       const featureValue = form.get('isFeatured')
+      const landingValue = form.get('showOnLanding')
+      const wallValue = form.get('showOnWall')
+      const positionValue = form.get('position')
       body = {
         ...uploaded,
         ...(statusValue ? { status: String(statusValue) } : {}),
         isFeatured: featureValue === 'true' || featureValue === 'on',
+        ...(landingValue !== null ? { showOnLanding: landingValue === 'true' || landingValue === 'on' } : {}),
+        ...(wallValue !== null ? { showOnWall: wallValue === 'true' || wallValue === 'on' } : {}),
+        ...(positionValue !== null && Number.isFinite(Number(positionValue)) ? { position: Number(positionValue) } : {}),
       }
     } else {
       body = await request.json().catch(() => ({}))
@@ -107,6 +113,9 @@ export async function POST(request: NextRequest) {
         imageHash: imageHash ?? null,
         status: input.status,
         isFeatured: input.isFeatured && approved,
+        showOnLanding: input.showOnLanding,
+        showOnWall: input.showOnWall,
+        position: input.position,
         userId: null,
         reviewedBy: admin.uid,
         reviewedAt: approved ? new Date() : null,

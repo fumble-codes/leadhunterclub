@@ -12,6 +12,9 @@ export interface ReviewDTO {
   quote: string | null
   imageUrl: string
   isFeatured: boolean
+  showOnLanding: boolean
+  showOnWall: boolean
+  position: number
   status: ReviewStatus
   createdAt: string
 }
@@ -25,6 +28,9 @@ export interface ReviewRecord {
   imageUrl: string
   status: string
   isFeatured: boolean
+  showOnLanding?: boolean
+  showOnWall?: boolean
+  position?: number
   createdAt: Date
   userId?: string | null
   reviewedBy?: string | null
@@ -43,6 +49,9 @@ export function serializeReview(r: ReviewRecord): ReviewDTO {
     quote: r.quote ?? null,
     imageUrl: r.imageUrl,
     isFeatured: r.isFeatured,
+    showOnLanding: r.showOnLanding ?? true,
+    showOnWall: r.showOnWall ?? true,
+    position: r.position ?? 0,
     status: r.status as ReviewStatus,
     createdAt: r.createdAt.toISOString(),
   }

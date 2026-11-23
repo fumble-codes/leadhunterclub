@@ -44,6 +44,9 @@ export default function AdminBulkReviewsPage() {
   const [quote, setQuote] = useState('')
   const [publish, setPublish] = useState(true)
   const [feature, setFeature] = useState(false)
+  const [showLanding, setShowLanding] = useState(true)
+  const [showWall, setShowWall] = useState(true)
+  const [position, setPosition] = useState(0)
   const [progress, setProgress] = useState<Progress | null>(null)
   const [running, setRunning] = useState(false)
   const [finished, setFinished] = useState(false)
@@ -117,6 +120,9 @@ export default function AdminBulkReviewsPage() {
     form.append('quote', quote.trim())
     form.append('status', publish ? 'APPROVED' : 'PENDING')
     form.append('isFeatured', String(feature && publish))
+    form.append('showOnLanding', String(showLanding))
+    form.append('showOnWall', String(showWall))
+    form.append('position', String(position))
 
     const res = await fetch('/api/admin/reviews/bulk', {
       method: 'POST',
@@ -272,7 +278,19 @@ export default function AdminBulkReviewsPage() {
               </label>
               <label className="flex items-center gap-2.5 text-xs text-text-secondary">
                 <input type="checkbox" checked={feature} onChange={(e) => setFeature(e.target.checked)} disabled={!publish} className="h-4 w-4 accent-orange-500 disabled:opacity-40" />
-                Feature on homepage
+                Pin to front of landing
+              </label>
+              <label className="flex items-center gap-2.5 text-xs text-text-secondary">
+                <input type="checkbox" checked={showLanding} onChange={(e) => setShowLanding(e.target.checked)} className="h-4 w-4 accent-orange-500" />
+                Show on landing
+              </label>
+              <label className="flex items-center gap-2.5 text-xs text-text-secondary">
+                <input type="checkbox" checked={showWall} onChange={(e) => setShowWall(e.target.checked)} className="h-4 w-4 accent-emerald-500" />
+                Show on Wall of Love
+              </label>
+              <label className="flex items-center gap-2.5 text-xs text-text-secondary">
+                Order
+                <input type="number" value={position} onChange={(e) => setPosition(Number(e.target.value) || 0)} className="w-20 rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5 text-xs text-text-primary focus:border-accent-mint/40 focus:outline-none" />
               </label>
             </div>
           </div>

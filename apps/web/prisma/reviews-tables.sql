@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS "reviews" (
   "reviewedAt"  TIMESTAMP(3),
   "adminNote"   TEXT,
   "isFeatured"  BOOLEAN NOT NULL DEFAULT false,
+  "showOnLanding" BOOLEAN NOT NULL DEFAULT true,
+  "showOnWall"  BOOLEAN NOT NULL DEFAULT true,
+  "position"    INTEGER NOT NULL DEFAULT 0,
   "createdAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -25,3 +28,5 @@ CREATE UNIQUE INDEX IF NOT EXISTS "reviews_imageHash_key" ON "reviews" ("imageHa
 CREATE INDEX IF NOT EXISTS "reviews_status_createdAt_idx" ON "reviews" ("status", "createdAt" DESC);
 CREATE INDEX IF NOT EXISTS "reviews_userId_idx" ON "reviews" ("userId");
 CREATE INDEX IF NOT EXISTS "reviews_category_idx" ON "reviews" ("category");
+CREATE INDEX IF NOT EXISTS "reviews_landing_idx" ON "reviews" ("status", "showOnLanding", "position");
+CREATE INDEX IF NOT EXISTS "reviews_wall_idx" ON "reviews" ("status", "showOnWall", "position");

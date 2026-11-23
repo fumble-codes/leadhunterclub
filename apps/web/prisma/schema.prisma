@@ -527,7 +527,10 @@ model Review {
   reviewedBy  String?   // admin UID who approved/rejected
   reviewedAt  DateTime?
   adminNote   String?
-  isFeatured  Boolean   @default(false) // pinned into the homepage testimonials
+  isFeatured  Boolean   @default(false) // pinned first on the landing page
+  showOnLanding Boolean @default(true)  // visible in homepage testimonials
+  showOnWall    Boolean @default(true)  // visible on /reviews (Wall of Love)
+  position      Int     @default(0)     // manual ordering, lower = earlier
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

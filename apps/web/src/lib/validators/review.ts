@@ -37,9 +37,19 @@ const adminReviewBase = z.object({
   imageUrl: imageDataUrlSchema,
 })
 
+/** Where an approved review is allowed to appear + its manual sort order. */
+export const reviewPlacementSchema = z.object({
+  showOnLanding: z.boolean().default(true),
+  showOnWall: z.boolean().default(true),
+  position: z.number().int().min(-100000).max(100000).default(0),
+})
+
 export const adminCreateReviewSchema = adminReviewBase.extend({
   status: z.enum(['PENDING', 'APPROVED']).default('APPROVED'),
   isFeatured: z.boolean().default(false),
+  showOnLanding: z.boolean().default(true),
+  showOnWall: z.boolean().default(true),
+  position: z.number().int().min(-100000).max(100000).default(0),
 })
 
 /** One file in a bulk batch — all metadata optional except the image. */
@@ -53,5 +63,8 @@ export const adminUpdateReviewSchema = z.object({
   imageUrl: imageDataUrlSchema.optional(),
   status: z.enum(REVIEW_STATUSES).optional(),
   isFeatured: z.boolean().optional(),
+  showOnLanding: z.boolean().optional(),
+  showOnWall: z.boolean().optional(),
+  position: z.number().int().min(-100000).max(100000).optional(),
   adminNote: z.string().trim().max(1000).optional().nullable(),
 })

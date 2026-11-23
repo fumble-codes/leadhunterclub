@@ -1207,6 +1207,28 @@ User has a drive full of deal/closure screenshots and wants a fast upload path. 
   and `/?preview=1`, no empty quotes, 0 overflow, 0 console errors; test row deleted, public feed back to `[]`.
 - Temp verification script removed. **Not pushed** — commit only review files when ready.
 
+### Review placement controls (2026-11-23) — BUILT + E2E verified (not pushed)
+User asked for full control over what shows on the landing page vs the Wall of Love reviews page.
+Confirmed scope: **per-review placement + ordering**, controls live on **the existing `/admin/reviews` page**
+(hardcoded static archive / landing sections / copy were explicitly NOT in scope).
+- **DB:** `reviews` gained `showOnLanding Bool @default(true)`, `showOnWall Bool @default(true)`,
+  `position Int @default(0)` + two indexes. Migration `prisma/reviews-placement-patch.sql` **applied to live
+  Supabase**; `reviews-tables.sql` updated for fresh installs. Prisma client regenerated after stopping the
+  dev server (known Windows DLL lock), dev server relaunched.
+- **API:** `GET /api/reviews?surface=landing|wall` filters by the matching flag + APPROVED status; landing orders
+  pinned/featured first then position, wall orders by position first. PATCH + admin single POST + bulk POST accept
+  all three fields (`reviewPlacementSchema`). Public DTO now carries them.
+- **UI:** each admin review card has "Landing ✓/○", "Wall of Love ✓/○" toggle chips + an Order number input
+  (patch on blur), with optimistic local update + toast. Add-review modal and bulk uploader have default
+  placement toggles + order for new uploads. "Feature" relabelled "Pin to the front of the landing page".
+- **Verified:** lint clean (11 files) · tsc 0 errors in touched files (repo baseline 90) · 11/11 validator tests ·
+  **E2E with real admin token:** inserted 3 approved test rows (landing-only / wall-only / both at position -10);
+  landing feed = landing-only + both (excludes wall-only), wall feed = wall-only + both (excludes landing-only),
+  both sorted first by position; PATCH `{showOnLanding:false, position:99}` → public landing feed dropped it
+  immediately; all test rows deleted (0 `qa-*` ids left).
+- **Not pushed** — built in the main checkout alongside other sessions' WIP; needs the same temp-worktree
+  commit flow used for `ce0deb8` when pushing.
+
 ### Work management: Tasks + Products (2026-11-23) — BUILT, DB-verified (not pushed)
 User ask: admin task + product management so the 3–4 person team (frontend / backend / lead engine / marketing /
 sales) can see what's being worked on, what's done and what's next. Confirmed choices: **both Kanban and table

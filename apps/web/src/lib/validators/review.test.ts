@@ -4,6 +4,7 @@ import {
   adminCreateReviewSchema,
   adminBulkReviewSchema,
   adminUpdateReviewSchema,
+  reviewPlacementSchema,
 } from '@/lib/validators/review'
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8AAAwAB/wFjQ7LJAAAAAElFTkSuQmCC'
@@ -50,6 +51,18 @@ describe('adminBulkReviewSchema', () => {
 
   it('still requires the image', () => {
     expect(adminBulkReviewSchema.safeParse({ category: 'Deals' }).success).toBe(false)
+  })
+})
+
+describe('reviewPlacementSchema', () => {
+  it('defaults to visible on both surfaces at order 0', () => {
+    expect(reviewPlacementSchema.parse({})).toEqual({ showOnLanding: true, showOnWall: true, position: 0 })
+  })
+
+  it('accepts hiding a review from one surface', () => {
+    const parsed = reviewPlacementSchema.parse({ showOnLanding: false, showOnWall: true, position: -3 })
+    expect(parsed.showOnLanding).toBe(false)
+    expect(parsed.position).toBe(-3)
   })
 })
 

@@ -47,6 +47,9 @@ export default function AdminReviewsPage() {
   const [formPreview, setFormPreview] = useState<string | null>(null)
   const [formPublish, setFormPublish] = useState(true)
   const [formFeature, setFormFeature] = useState(false)
+  const [formLanding, setFormLanding] = useState(true)
+  const [formWall, setFormWall] = useState(true)
+  const [formPosition, setFormPosition] = useState(0)
   const [formBusy, setFormBusy] = useState(false)
   const [formError, setFormError] = useState('')
   const [lightbox, setLightbox] = useState<string | null>(null)
@@ -123,6 +126,26 @@ export default function AdminReviewsPage() {
     }
   }
 
+  const patchReview = async (id: string, patch: Record<string, unknown>, message: string) => {
+    setActionLoading(`${id}-placement`)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.message || 'Update failed')
+      setReviews((prev) => prev.map((r) => (r.id === id ? { ...r, ...json.data } : r)))
+      addToast({ type: 'success', message })
+    } catch (e) {
+      addToast({ type: 'error', message: e instanceof Error ? e.message : 'Update failed' })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   const handleAddFile = async (chosen: File | null) => {
     if (!chosen) return
     setFormError('')
@@ -142,6 +165,9 @@ export default function AdminReviewsPage() {
     setFormPreview(null)
     setFormPublish(true)
     setFormFeature(false)
+    setFormLanding(true)
+    setFormWall(true)
+    setFormPosition(0)
     setFormError('')
   }
 
@@ -162,6 +188,9 @@ export default function AdminReviewsPage() {
       form.append('screenshot', formFile)
       form.append('status', formPublish ? 'APPROVED' : 'PENDING')
       form.append('isFeatured', String(formFeature && formPublish))
+      form.append('showOnLanding', String(formLanding))
+      form.append('showOnWall', String(formWall))
+      form.append('position', String(formPosition))
       const res = await fetch('/api/admin/reviews', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
@@ -304,6 +333,47 @@ export default function AdminReviewsPage() {
                     )}
                   </div>
                 </div>
+                {/* Placement controls — decide where an approved review appears */}
+                <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.06] px-3 py-2.5">
+                  <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-text-muted">Show on</span>
+                  <button
+                    onClick={() => void patchReview(review.id, { showOnLanding: !review.showOnLanding }, review.showOnLanding ? 'Removed from landing' : 'Added to landing')}
+                    disabled={busy}
+                    className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium disabled:opacity-40 ${
+                      review.showOnLanding
+                        ? 'border-accent-orange/30 bg-accent-orange/10 text-accent-orange'
+                        : 'border-white/10 bg-white/[0.02] text-text-muted hover:text-text-secondary'
+                    }`}
+                  >
+                    Landing {review.showOnLanding ? '✓' : '○'}
+                  </button>
+                  <button
+                    onClick={() => void patchReview(review.id, { showOnWall: !review.showOnWall }, review.showOnWall ? 'Removed from Wall of Love' : 'Added to Wall of Love')}
+                    disabled={busy}
+                    className={`rounded-lg border px-2.5 py-1.5 text-[11px] font-medium disabled:opacity-40 ${
+                      review.showOnWall
+                        ? 'border-accent-mint/30 bg-accent-mint/10 text-accent-mint'
+                        : 'border-white/10 bg-white/[0.02] text-text-muted hover:text-text-secondary'
+                    }`}
+                  >
+                    Wall of Love {review.showOnWall ? '✓' : '○'}
+                  </button>
+                  <label className="ml-auto flex items-center gap-1.5 text-[11px] text-text-muted">
+                    Order
+                    <input
+                      key={review.id}
+                      type="number"
+                      defaultValue={review.position}
+                      onBlur={(e) => {
+                        const value = Number(e.target.value)
+                        if (Number.isFinite(value) && value !== review.position) {
+                          void patchReview(review.id, { position: value }, 'Order updated')
+                        }
+                      }}
+                      className="w-16 rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5 text-center text-[11px] text-text-primary focus:border-accent-mint/40 focus:outline-none"
+                    />
+                  </label>
+                </div>
                 <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.06] bg-white/[0.02] p-3">
                   {review.status !== 'APPROVED' && (
                     <button
@@ -434,7 +504,19 @@ export default function AdminReviewsPage() {
             </label>
             <label className="flex items-center gap-2.5 text-xs text-text-secondary">
               <input type="checkbox" checked={formFeature} onChange={(e) => setFormFeature(e.target.checked)} disabled={!formPublish} className="h-4 w-4 accent-orange-500 disabled:opacity-40" />
-              Feature on the homepage testimonials
+              Pin to the front of the landing page
+            </label>
+            <label className="flex items-center gap-2.5 text-xs text-text-secondary">
+              <input type="checkbox" checked={formLanding} onChange={(e) => setFormLanding(e.target.checked)} className="h-4 w-4 accent-orange-500" />
+              Show on landing page
+            </label>
+            <label className="flex items-center gap-2.5 text-xs text-text-secondary">
+              <input type="checkbox" checked={formWall} onChange={(e) => setFormWall(e.target.checked)} className="h-4 w-4 accent-emerald-500" />
+              Show on Wall of Love
+            </label>
+            <label className="flex items-center gap-2.5 text-xs text-text-secondary">
+              Order (lower shows first)
+              <input type="number" value={formPosition} onChange={(e) => setFormPosition(Number(e.target.value) || 0)} className="w-20 rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5 text-xs text-text-primary focus:border-accent-mint/40 focus:outline-none" />
             </label>
           </div>
           {formError && <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{formError}</p>}

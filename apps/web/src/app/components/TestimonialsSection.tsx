@@ -196,7 +196,7 @@ export default function TestimonialsSection() {
   const [liveReviews, setLiveReviews] = React.useState<ReviewDTO[]>([])
   React.useEffect(() => {
     let alive = true
-    fetch('/api/reviews?limit=18', { cache: 'no-store' })
+    fetch('/api/reviews?surface=landing&limit=18', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (alive && Array.isArray(json?.reviews)) setLiveReviews(json.reviews as ReviewDTO[])

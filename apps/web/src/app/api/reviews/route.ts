@@ -13,14 +13,23 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const featuredOnly = searchParams.get('featured') === 'true'
+    const surface = searchParams.get('surface') // 'landing' | 'wall'
     const rawLimit = Number(searchParams.get('limit') || '50')
     const limit = Number.isFinite(rawLimit) ? Math.min(100, Math.max(1, rawLimit)) : 50
 
-    const reviews = await db.review.findMany({
-      where: { status: 'APPROVED', ...(featuredOnly ? { isFeatured: true } : {}) },
-      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-      take: limit,
-    })
+    const where: Record<string, unknown> = { status: 'APPROVED' }
+    if (surface === 'landing') where.showOnLanding = true
+    if (surface === 'wall') where.showOnWall = true
+    if (featuredOnly) where.isFeatured = true
+
+    // Landing pins featured reviews to the front; Wall of Love follows the
+    // admin-defined order, then falls back to newest.
+    const orderBy: { isFeatured?: 'asc' | 'desc'; position?: 'asc' | 'desc'; createdAt?: 'asc' | 'desc' }[] =
+      surface === 'landing'
+        ? [{ isFeatured: 'desc' }, { position: 'asc' }, { createdAt: 'desc' }]
+        : [{ position: 'asc' }, { isFeatured: 'desc' }, { createdAt: 'desc' }]
+
+    const reviews = await db.review.findMany({ where, orderBy, take: limit })
 
     return NextResponse.json(
       { success: true, reviews: reviews.map(serializeReview) },

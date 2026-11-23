@@ -26,7 +26,7 @@ export default function ReviewsPage() {
 
   const loadReviews = useCallback(async () => {
     try {
-      const res = await fetch('/api/reviews', { cache: 'no-store' })
+      const res = await fetch('/api/reviews?surface=wall&limit=100', { cache: 'no-store' })
       const json = await res.json().catch(() => ({}))
       if (res.ok && Array.isArray(json.reviews)) setApproved(json.reviews)
     } catch {
