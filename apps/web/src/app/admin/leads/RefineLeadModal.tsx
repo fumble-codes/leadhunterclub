@@ -191,11 +191,10 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
                   <button
                     type="button"
                     onClick={() => setIsInternational(!isInternational)}
-                    className={`w-full py-2.5 px-4 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
-                      isInternational
+                    className={`w-full py-2.5 px-4 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${isInternational
                         ? 'bg-sky-500/20 text-sky-400 border-sky-500/40 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
                         : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10'
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-2">
                       <span className="text-sm">🌍</span>
