@@ -460,11 +460,19 @@ export function extractLeadBadges(
     }
   }
 
-  // 4. International Badge
-  if (/\b(?:international|worldwide|global|us\s+client|uk\s+client|eu\s+markets|foreign|foreign\s+client)\b/i.test(textCorpus)) {
-    if (!matchedTags.includes('International')) {
-      matchedTags.push('International')
-    }
+  // 4. International Badge (USA, UK, Dubai, Europe, or foreign context)
+  const isIntlLocation =
+    matchedTags.includes('USA') ||
+    matchedTags.includes('UK') ||
+    matchedTags.includes('Dubai') ||
+    matchedTags.includes('Europe')
+
+  const hasIntlSignals =
+    /\b(?:international|worldwide|global|us\s+client|uk\s+client|eu\s+markets|foreign|foreign\s+client|united\s+states|united\s+kingdom|dubai|uae|london|canada|australia|germany|singapore)\b/i.test(textCorpus) ||
+    /\b(?:usd|\$|eur|€|gbp|£|aed)\b/i.test(textCorpus)
+
+  if ((isIntlLocation || hasIntlSignals) && !matchedTags.includes('International')) {
+    matchedTags.push('International')
   }
 
   // 5. Explicit Badges from AI report if present

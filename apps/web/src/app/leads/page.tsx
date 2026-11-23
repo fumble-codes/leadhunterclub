@@ -268,6 +268,17 @@ function matchNicheFilter(lead: AppLead, activeNiche: string): boolean {
         )
       )
 
+    case 'international':
+      return (
+        leadNiche.includes('international') ||
+        allNiches.some((n) => n.includes('international')) ||
+        tags.some((t) =>
+          ['international', 'usa', 'uk', 'dubai', 'europe', 'global', 'worldwide'].includes(t),
+        ) ||
+        /\b(?:international|worldwide|global|us\s+client|uk\s+client|eu\s+markets|foreign|foreign\s+client|united\s+states|united\s+kingdom|dubai|uae|london|canada|australia|germany|singapore)\b/i.test(lead.signalContext || '') ||
+        /\b(?:usd|\$|eur|€|gbp|£|aed)\b/i.test(lead.signalContext || '')
+      )
+
     default:
       return (
         leadNiche === target ||
@@ -588,7 +599,16 @@ export default function LeadsPage() {
         if (!matchesSearch) return false
       }
       if (selectedTags.length > 0) {
-        const hasMatchingTag = selectedTags.some((tag) => lead.nicheTags.includes(tag))
+        const hasMatchingTag = selectedTags.some((tag) => {
+          if (tag.toLowerCase() === 'international') {
+            return (
+              lead.nicheTags.some((t) => ['international', 'usa', 'uk', 'dubai', 'europe', 'global', 'worldwide'].includes(t.toLowerCase())) ||
+              /\b(?:international|worldwide|global|us\s+client|uk\s+client|eu\s+markets|foreign|foreign\s+client|united\s+states|united\s+kingdom|dubai|uae|london|canada|australia|germany|singapore)\b/i.test(lead.signalContext || '') ||
+              /\b(?:usd|\$|eur|€|gbp|£|aed)\b/i.test(lead.signalContext || '')
+            )
+          }
+          return lead.nicheTags.includes(tag)
+        })
         if (!hasMatchingTag) return false
       }
       return true

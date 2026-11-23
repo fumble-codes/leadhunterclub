@@ -3462,7 +3462,14 @@ export default function AdminBroadcastPage() {
                     <div className="text-[11px] text-text-secondary/60 text-center space-y-1 pt-2 border-t border-white/5">
                       <p>Lead Hunter Club &bull; High-intent client discovery &amp; closing engine</p>
                       <p className="text-[10px]">
-                        You are receiving this notification because you are a registered member.
+                        Don&apos;t want these emails?{' '}
+                        <a href="/alerts/unsubscribe" target="_blank" rel="noreferrer" className="underline text-text-secondary hover:text-white">
+                          Unsubscribe from lead alerts
+                        </a>{' '}
+                        &bull;{' '}
+                        <a href="/settings" target="_blank" rel="noreferrer" className="underline text-text-secondary hover:text-white">
+                          Manage preferences
+                        </a>
                       </p>
                     </div>
                   </div>
