@@ -112,7 +112,8 @@ function externalPostToAppLead(
     (!isRevealed && (effectiveClaimedCount >= 25 || Boolean(post.is_claimed)))
 
   const niches = extractNiches(post.keyword, post.content || '', post.intelligence, primaryNiche)
-  const cleanTags = extractLeadBadges({ ...post, claimed_count: effectiveClaimedCount }, niches)
+  const phone = (post as any).phone || (post.contact_info as any)?.phone_numbers?.[0]?.number || null
+  const cleanTags = extractLeadBadges({ ...post, email, phone, claimed_count: effectiveClaimedCount }, niches)
   const resolvedNiche = (niches[0] && niches[0] !== 'General') ? niches[0] : (primaryNiche || 'General')
   const cleanTitle = post.title?.trim() || sanitizeHeadline(post.author?.info || post.keyword || '', resolvedNiche)
   const { summary, detailsSummary } = extractLeadSummaries(post)

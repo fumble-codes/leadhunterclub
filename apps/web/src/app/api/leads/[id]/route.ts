@@ -192,7 +192,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       externalLead.intelligence,
       primaryNiche,
     )
-    const cleanTags = extractLeadBadges({ ...externalLead, claimed_count: externalLead.claimed_count }, niches)
+    const phone = (externalLead as any).phone || (externalLead.contact_info as any)?.phone_numbers?.[0]?.number || null
+    const cleanTags = extractLeadBadges({ ...externalLead, email: (externalLead as any).email, phone, claimed_count: externalLead.claimed_count }, niches)
     const resolvedNiche = (niches[0] && niches[0] !== 'General') ? niches[0] : (primaryNiche || 'General')
     const cleanTitle =
       externalLead.title?.trim() ||

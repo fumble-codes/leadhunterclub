@@ -412,15 +412,166 @@ export const KNOWN_LOCATIONS: Array<{ regex: RegExp; label: string }> = [
   { regex: /\bremote\b/i, label: 'Remote' },
 ]
 
+export interface LocationResolution {
+  source: 'contact' | 'author' | 'content'
+  isInternational: boolean
+  label?: string
+}
+
+/**
+ * Resolves location with strict priority:
+ * 1. Contact Details (Phone country code, email domain TLD) — HIGHEST PRIORITY / SOURCE OF TRUTH.
+ * 2. Author Profile Location (Author bio/location metadata).
+ * If both point to different locations, Contact Details takes precedence.
+ */
+export function resolveLeadLocationHierarchy(post: {
+  keyword?: string | null
+  content?: string | null
+  intelligence?: string | null
+  author?: { name?: string; info?: string; location?: string; [key: string]: any } | null
+  email?: string | null
+  phone?: string | null
+  contact_info?: any
+  [key: string]: any
+}): LocationResolution | null {
+  // ── 1. Contact Details (Source of Truth) ──
+  const phones: string[] = []
+  if (post.phone) phones.push(String(post.phone))
+  if (post.contact_info?.phone) phones.push(String(post.contact_info.phone))
+  if (Array.isArray(post.contact_info?.phone_numbers)) {
+    for (const p of post.contact_info.phone_numbers) {
+      if (typeof p === 'string' && p.trim()) phones.push(p.trim())
+      else if (p?.number && typeof p.number === 'string') phones.push(p.number.trim())
+    }
+  }
+
+  const emails: string[] = []
+  if (post.email) emails.push(String(post.email))
+  if (post.contact_info?.email) emails.push(String(post.contact_info.email))
+  if (Array.isArray(post.contact_info?.emails)) {
+    for (const e of post.contact_info.emails) {
+      if (typeof e === 'string' && e.trim()) emails.push(e.trim())
+      else if (e?.email && typeof e.email === 'string') emails.push(e.email.trim())
+    }
+  }
+
+  for (const rawPhone of phones) {
+    const p = rawPhone.replace(/[\s\-\(\)\.]/g, '')
+    if (!p) continue
+
+    // India (+91, 091, 91 with 12 digits, or standard 10-digit Indian mobile 6-9)
+    if (/^(?:\+91|091|91\d{10}$)/.test(p) || (/^\d{10}$/.test(p) && /^[6-9]/.test(p))) {
+      return { source: 'contact', isInternational: false, label: undefined }
+    }
+
+    // USA / Canada (+1)
+    if (/^\+1|^(?:001|1\d{10}$)/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'USA' }
+    }
+    // UK (+44)
+    if (/^\+44|^(?:0044)/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'UK' }
+    }
+    // UAE / Dubai (+971)
+    if (/^\+971|^(?:00971)/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'Dubai' }
+    }
+    // Australia (+61)
+    if (/^\+61|^(?:0061)/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'International' }
+    }
+    // Singapore (+65)
+    if (/^\+65|^(?:0065)/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'International' }
+    }
+    // Europe (+49, +33, +31, +34, +39, +41, +353, +46, etc.)
+    if (/^\+(?:49|33|31|34|39|41|353|46|47|48|351|43|32|45|358|30|420)/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'Europe' }
+    }
+    // Any other explicit plus country code outside India
+    if (/^\+\d{1,4}/.test(p) && !/^\+91/.test(p)) {
+      return { source: 'contact', isInternational: true, label: 'International' }
+    }
+  }
+
+  // Check email domain TLDs
+  for (const rawEmail of emails) {
+    const em = rawEmail.toLowerCase().trim()
+    if (!em.includes('@')) continue
+    const domain = em.split('@')[1] || ''
+
+    if (/\.(?:in|co\.in)$/.test(domain)) {
+      return { source: 'contact', isInternational: false, label: undefined }
+    }
+    if (/\.(?:co\.uk|uk)$/.test(domain)) {
+      return { source: 'contact', isInternational: true, label: 'UK' }
+    }
+    if (/\.(?:ae)$/.test(domain)) {
+      return { source: 'contact', isInternational: true, label: 'Dubai' }
+    }
+    if (/\.(?:ca)$/.test(domain)) {
+      return { source: 'contact', isInternational: true, label: 'USA' }
+    }
+    if (/\.(?:au)$/.test(domain)) {
+      return { source: 'contact', isInternational: true, label: 'International' }
+    }
+    if (/\.(?:de|fr|nl|es|eu|ch|it|se)$/.test(domain)) {
+      return { source: 'contact', isInternational: true, label: 'Europe' }
+    }
+  }
+
+  // ── 2. Author Profile Location (Secondary Priority) ──
+  const authorText = [
+    post.author?.location,
+    post.author?.info,
+    (post.author as any)?.headline,
+  ].filter(Boolean).join(' ').toLowerCase()
+
+  if (authorText) {
+    // Check Indian cities in author profile
+    for (const loc of KNOWN_LOCATIONS) {
+      if (!['Dubai', 'USA', 'UK', 'Europe', 'Remote'].includes(loc.label) && loc.regex.test(authorText)) {
+        return { source: 'author', isInternational: false, label: loc.label }
+      }
+    }
+    if (/\bindia\b/i.test(authorText)) {
+      return { source: 'author', isInternational: false, label: undefined }
+    }
+
+    // Check International locations in author profile
+    if (/\b(?:united\s+states|usa|us\s+client|san\s+francisco|new\s+york|california|los\s+angeles|chicago|austin|texas|florida|seattle|toronto|canada|vancouver)\b/i.test(authorText)) {
+      return { source: 'author', isInternational: true, label: 'USA' }
+    }
+    if (/\b(?:united\s+kingdom|uk|london|manchester)\b/i.test(authorText)) {
+      return { source: 'author', isInternational: true, label: 'UK' }
+    }
+    if (/\b(?:dubai|uae|abu\s+dhabi)\b/i.test(authorText)) {
+      return { source: 'author', isInternational: true, label: 'Dubai' }
+    }
+    if (/\b(?:europe|germany|berlin|france|paris|netherlands|amsterdam|spain|barcelona|madrid|ireland|dublin|sweden|switzerland)\b/i.test(authorText)) {
+      return { source: 'author', isInternational: true, label: 'Europe' }
+    }
+    if (/\b(?:international|worldwide|global|overseas|foreign|australia|sydney|melbourne|singapore)\b/i.test(authorText)) {
+      return { source: 'author', isInternational: true, label: 'International' }
+    }
+  }
+
+  return null
+}
+
 export function extractLeadBadges(
   post: {
     keyword?: string | null
     content?: string | null
     intelligence?: string | null
-    author?: { name?: string; info?: string } | null
+    author?: { name?: string; info?: string; location?: string; [key: string]: any } | null
     platform?: string | null
     claimed_count?: number | null
     title?: string | null
+    email?: string | null
+    phone?: string | null
+    contact_info?: any
+    [key: string]: any
   },
   leadNiches?: string[]
 ): string[] {
@@ -452,27 +603,45 @@ export function extractLeadBadges(
     matchedTags.push('Hot Lead')
   }
 
-  // 3. Location / Area-Specific Badge
-  for (const loc of KNOWN_LOCATIONS) {
-    if (loc.regex.test(textCorpus)) {
-      matchedTags.push(loc.label)
-      break
+  // 3 & 4. Location & International Badging (Contact Details > Author Location > Content)
+  const locHierarchy = resolveLeadLocationHierarchy(post)
+
+  if (locHierarchy) {
+    if (locHierarchy.isInternational) {
+      if (locHierarchy.label && !matchedTags.includes(locHierarchy.label)) {
+        matchedTags.push(locHierarchy.label)
+      }
+      if (!matchedTags.includes('International')) {
+        matchedTags.push('International')
+      }
+    } else {
+      // Confirmed domestic (India) by contact or author profile — contact takes precedence
+      if (locHierarchy.label && !matchedTags.includes(locHierarchy.label)) {
+        matchedTags.push(locHierarchy.label)
+      }
     }
-  }
+  } else {
+    // Neither contact nor author gave conclusive location, fall back to post content scanning
+    for (const loc of KNOWN_LOCATIONS) {
+      if (loc.regex.test(textCorpus)) {
+        matchedTags.push(loc.label)
+        break
+      }
+    }
 
-  // 4. International Badge (USA, UK, Dubai, Europe, or foreign context)
-  const isIntlLocation =
-    matchedTags.includes('USA') ||
-    matchedTags.includes('UK') ||
-    matchedTags.includes('Dubai') ||
-    matchedTags.includes('Europe')
+    const isIntlLocation =
+      matchedTags.includes('USA') ||
+      matchedTags.includes('UK') ||
+      matchedTags.includes('Dubai') ||
+      matchedTags.includes('Europe')
 
-  const hasIntlSignals =
-    /\b(?:international|worldwide|global|us\s+client|uk\s+client|eu\s+markets|foreign|foreign\s+client|united\s+states|united\s+kingdom|dubai|uae|london|canada|australia|germany|singapore)\b/i.test(textCorpus) ||
-    /\b(?:usd|\$|eur|€|gbp|£|aed)\b/i.test(textCorpus)
+    const hasIntlSignals =
+      /\b(?:international|worldwide|global|us\s+client|uk\s+client|eu\s+markets|foreign|foreign\s+client|united\s+states|united\s+kingdom|dubai|uae|london|canada|australia|germany|singapore)\b/i.test(textCorpus) ||
+      /\b(?:usd|\$|eur|€|gbp|£|aed)\b/i.test(textCorpus)
 
-  if ((isIntlLocation || hasIntlSignals) && !matchedTags.includes('International')) {
-    matchedTags.push('International')
+    if ((isIntlLocation || hasIntlSignals) && !matchedTags.includes('International')) {
+      matchedTags.push('International')
+    }
   }
 
   // 5. Explicit Badges from AI report if present
