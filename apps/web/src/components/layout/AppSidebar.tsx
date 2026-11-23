@@ -222,12 +222,17 @@ export default function AppSidebar({
 
             {user?.creditAccount?.rolloverBalance ? (
               <div className="flex items-center justify-between text-xxs">
-                <span className="text-text-secondary">Rollover</span>
-                <span className="font-bold text-accent-orange">
+                <span className="text-text-secondary flex items-center gap-1">
+                  {user?.plan === 'FREE' && <span className="text-[10px]">🔒</span>}
+                  Rollover
+                </span>
+                <span className={`font-bold ${user?.plan === 'FREE' ? 'text-amber-400' : 'text-accent-orange'}`}>
                   {user.creditAccount.rolloverBalance}
-                  {user.creditAccount.rolloverExpiresAt
-                    ? ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-                    : ''}
+                  {user?.plan === 'FREE' ? (
+                    <span className="font-normal text-amber-300/80"> · Locked (Upgrade to use)</span>
+                  ) : user.creditAccount.rolloverExpiresAt ? (
+                    ` · expires ${new Date(user.creditAccount.rolloverExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                  ) : ''}
                 </span>
               </div>
             ) : null}

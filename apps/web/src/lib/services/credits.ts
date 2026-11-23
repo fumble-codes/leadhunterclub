@@ -170,15 +170,20 @@ async function deductInTx(
 
   const account = await tx.creditAccount.findUnique({
     where: { userId },
+    include: { user: { select: { plan: true } } },
   })
 
   if (!account) throw new Error('CreditAccount not found')
 
-  const totalAvailable = account.bonusBalance + account.subscriptionBalance + account.rolloverBalance
+  // Rollover credits are only spendable on active paid plans (Freelancer/Agency)
+  const isPaid = Boolean(account.user?.plan && account.user.plan !== 'FREE')
+  const usableRollover = isPaid ? account.rolloverBalance : 0
+
+  const totalAvailable = account.bonusBalance + account.subscriptionBalance + usableRollover
   if (totalAvailable < amount) throw new InsufficientCreditsError(amount, totalAvailable)
 
   let remaining = amount
-  const rolloverDeduction = Math.min(account.rolloverBalance, remaining)
+  const rolloverDeduction = Math.min(usableRollover, remaining)
   remaining -= rolloverDeduction
   const subscriptionDeduction = Math.min(account.subscriptionBalance, remaining)
   remaining -= subscriptionDeduction
@@ -312,26 +317,38 @@ export const creditService = {
   async getBalances(userId: string) {
     await db.$transaction((tx) => checkAndRenewInTx(tx, userId))
 
-    const account = await db.creditAccount.findUnique({
-      where: { userId },
-      select: {
-        subscriptionBalance: true,
-        bonusBalance: true,
-        rolloverBalance: true,
-        rolloverExpiresAt: true,
-        renewalDate: true,
-      },
-    })
+    const [account, user] = await Promise.all([
+      db.creditAccount.findUnique({
+        where: { userId },
+        select: {
+          subscriptionBalance: true,
+          bonusBalance: true,
+          rolloverBalance: true,
+          rolloverExpiresAt: true,
+          renewalDate: true,
+        },
+      }),
+      db.user.findUnique({
+        where: { id: userId },
+        select: { plan: true },
+      }),
+    ])
+
+    const isPaid = Boolean(user?.plan && user.plan !== 'FREE')
+    const rolloverBalance = account?.rolloverBalance ?? 0
+    const usableRollover = isPaid ? rolloverBalance : 0
 
     return {
       subscriptionBalance: account?.subscriptionBalance ?? 0,
       bonusBalance: account?.bonusBalance ?? 0,
-      rolloverBalance: account?.rolloverBalance ?? 0,
+      rolloverBalance,
+      usableRollover,
+      isRolloverLocked: !isPaid && rolloverBalance > 0,
       rolloverExpiresAt: account?.rolloverExpiresAt ?? null,
       total:
         (account?.subscriptionBalance ?? 0) +
         (account?.bonusBalance ?? 0) +
-        (account?.rolloverBalance ?? 0),
+        usableRollover,
       renewalDate: account?.renewalDate ?? null,
     }
   },

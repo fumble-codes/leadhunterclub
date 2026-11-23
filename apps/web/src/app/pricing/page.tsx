@@ -58,7 +58,7 @@ const DEFAULT_PLANS: PlanConfig[] = [
     description: 'Consistent lead pipeline for active independent contractors',
     features: [
       '1000 credits renewed monthly',
-      'Unused credits roll over for 15 days',
+      '15-day credit rollover on active plan renewal',
       'Priority lead delivery & email reveals',
       'Deep AI strategic intelligence report',
       'Google Sheets export integration',
