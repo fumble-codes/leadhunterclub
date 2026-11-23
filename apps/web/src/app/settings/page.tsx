@@ -159,6 +159,42 @@ export default function SettingsPage() {
   const [tgBotUsername, setTgBotUsername] = useState<string>('leadhunterclubbot')
   const [tgUnlinking, setTgUnlinking] = useState(false)
 
+  // Email Notifications State
+  const [emailAlertsEnabled, setEmailAlertsEnabled] = useState(true)
+  const [savingEmailAlerts, setSavingEmailAlerts] = useState(false)
+
+  const handleToggleEmailAlerts = async () => {
+    const nextVal = !emailAlertsEnabled
+    setSavingEmailAlerts(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/user/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ emailAlertsEnabled: nextVal }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        setEmailAlertsEnabled(nextVal)
+        addToast({
+          type: 'success',
+          message: nextVal
+            ? 'Lead drop email alerts turned ON'
+            : 'Lead drop email alerts turned OFF',
+        })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to update alert preference' })
+      }
+    } catch {
+      addToast({ type: 'error', message: 'Network error updating alert preference' })
+    } finally {
+      setSavingEmailAlerts(false)
+    }
+  }
+
   const handleUnlinkTelegram = async () => {
     setTgUnlinking(true)
     try {
@@ -218,6 +254,18 @@ export default function SettingsPage() {
           .then((info) => {
             if (active && info?.botUsername) {
               setTgBotUsername(info.botUsername)
+            }
+          })
+          .catch(() => {})
+
+        // Fetch notification settings
+        fetch('/api/user/notifications', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (active && data?.success && typeof data.emailAlertsEnabled === 'boolean') {
+              setEmailAlertsEnabled(data.emailAlertsEnabled)
             }
           })
           .catch(() => {})
@@ -1231,6 +1279,71 @@ export default function SettingsPage() {
                 </div>
               </div>
             )}
+          </motion.div>
+
+          {/* Email Lead Drop Alerts Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="metallic-card p-6 sm:p-8"
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-14 h-14 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                  <EnvelopeIcon className="w-7 h-7 text-amber-400" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg font-bold text-text-primary">Email Notifications</h2>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        emailAlertsEnabled
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-white/5 text-text-secondary border border-white/10'
+                      }`}
+                    >
+                      {emailAlertsEnabled ? (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Active
+                        </>
+                      ) : (
+                        'Muted'
+                      )}
+                    </span>
+                  </div>
+                  <p className="text-sm text-text-secondary mt-0.5">
+                    Receive automated email alerts when verified 3-lead batches are approved on the platform
+                  </p>
+                </div>
+              </div>
+
+              {/* Lead Drop Alerts: [ ON / OFF ] Button */}
+              <div className="flex items-center gap-3 self-end sm:self-center shrink-0 bg-surface-elevated/40 border border-white/[0.06] p-2.5 rounded-xl">
+                <div className="text-right">
+                  <span className="text-xs font-semibold text-text-primary block">Lead Drop Alerts</span>
+                  <span className="text-[11px] text-text-secondary font-mono block">
+                    {emailAlertsEnabled ? 'Receiving emails' : 'Emails paused'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleEmailAlerts}
+                  disabled={savingEmailAlerts}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 ${
+                    emailAlertsEnabled
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
+                      : 'bg-white/5 text-text-secondary border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  {savingEmailAlerts ? (
+                    <span className="inline-block w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : null}
+                  <span>{emailAlertsEnabled ? 'ON' : 'OFF'}</span>
+                </button>
+              </div>
+            </div>
           </motion.div>
 
           {/* Telegram Alerts Section */}
