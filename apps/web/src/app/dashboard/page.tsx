@@ -11,6 +11,9 @@ import { TutorialPopup } from '@/components/onboarding/TutorialPopup'
 import {
   ArrowTopRightOnSquareIcon,
   ArrowPathIcon,
+  ArrowTrendingUpIcon,
+  ChartBarIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/solid'
 
 export default function DashboardPage() {
@@ -25,6 +28,8 @@ export default function DashboardPage() {
   const [selectedBar, setSelectedBar] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [hudMounted, setHudMounted] = useState(false)
+  const [activeDial, setActiveDial] = useState<string | null>(null)
 
   const load = useCallback(async (userInitiated = false) => {
     try {
@@ -80,6 +85,44 @@ export default function DashboardPage() {
     }
   }, [authLoading, load])
 
+  // Draw the HUD arcs once after mount; no looping animation.
+  useEffect(() => {
+    setHudMounted(true)
+  }, [])
+
+  const hudDials = [
+    {
+      id: 'signals',
+      label: 'Signals',
+      value: stats.find((s) => s.label === 'Signals Intercepted')?.value || '—',
+      detail: stats.find((s) => s.label === 'Signals Intercepted')?.trend || 'Captured from public sources',
+      icon: ArrowTrendingUpIcon,
+      color: 'text-secondary',
+      track: 'text-secondary/15',
+      ring: 'border-secondary/40',
+    },
+    {
+      id: 'response',
+      label: 'Response',
+      value: stats.find((s) => s.label === 'Response Rate')?.value || '—',
+      detail: stats.find((s) => s.label === 'Response Rate')?.trend || 'No contacts yet',
+      icon: ChartBarIcon,
+      color: 'text-tertiary',
+      track: 'text-tertiary/15',
+      ring: 'border-tertiary/40',
+    },
+    {
+      id: 'credits',
+      label: 'Credits',
+      value: stats.find((s) => s.label === 'Credits Remaining')?.value || '—',
+      detail: stats.find((s) => s.label === 'Credits Remaining')?.trend || 'Available balance',
+      icon: BanknotesIcon,
+      color: 'text-primary',
+      track: 'text-primary/15',
+      ring: 'border-primary/40',
+    },
+  ]
+
   if (loading) {
     return (
       <main className="flex-1 flex items-center justify-center">
@@ -119,6 +162,63 @@ export default function DashboardPage() {
           <p className="text-text-secondary mt-2">
             Welcome back. Here is your pipeline at a glance.
           </p>
+        </div>
+
+        {/* HUD dials — circular widgets drawn from the same token roles */}
+        <div className="metallic-card overflow-hidden mb-6 md:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/[0.06]">
+            {hudDials.map((dial) => {
+              const Icon = dial.icon
+              const isActive = activeDial === dial.id
+              const circumference = 2 * Math.PI * 42
+              const sweep = circumference * 0.75
+              return (
+                <button
+                  key={dial.id}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => setActiveDial(isActive ? null : dial.id)}
+                  className={`group flex items-center gap-5 p-5 sm:p-6 text-left border border-transparent transition-colors ${
+                    isActive ? dial.ring : ''
+                  }`}
+                >
+                  <div className="relative w-20 h-20 shrink-0">
+                    <svg viewBox="0 0 100 100" className={`-rotate-[135deg] w-full h-full ${dial.color}`}>
+                      <circle
+                        cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="6"
+                        strokeLinecap="round" strokeDasharray={`${sweep} ${circumference}`} strokeOpacity="0.15"
+                      />
+                      <circle
+                        cx="50" cy="50" r="42" fill="none" stroke="currentColor" strokeWidth="6"
+                        strokeLinecap="round" strokeDasharray={`${sweep} ${circumference}`}
+                        strokeDashoffset={hudMounted ? 0 : sweep}
+                        className="opacity-80 group-hover:opacity-100 transition-opacity"
+                        style={{ transition: 'stroke-dashoffset 900ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+                      />
+                    </svg>
+                    <div className={`absolute inset-0 flex items-center justify-center ${dial.color}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] font-semibold uppercase tracking-widest text-text-secondary">
+                      {dial.label}
+                    </div>
+                    <div className="mt-1 text-2xl font-extrabold tabular-nums text-text-primary">
+                      {dial.value}
+                    </div>
+                    <div
+                      className={`mt-1 text-[11px] text-text-secondary transition-all duration-200 ${
+                        isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1 group-hover:opacity-100'
+                      }`}
+                    >
+                      {dial.detail}
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         <div className="metallic-card overflow-hidden mb-8 md:mb-12">

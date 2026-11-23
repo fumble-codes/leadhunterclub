@@ -17,7 +17,7 @@ import {
   LifebuoyIcon,
   GiftIcon,
   TrophyIcon,
-  SparklesIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/solid'
 
 const navItems = [
@@ -26,7 +26,7 @@ const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
   { name: 'Refer & Earn', href: '/referrals', icon: GiftIcon },
   { name: 'Milestone Rewards', href: '/rewards', icon: TrophyIcon },
-  { name: 'Community Wins', href: '/community', icon: SparklesIcon },
+  { name: 'Community Wins', href: '/community', icon: UserGroupIcon },
   { name: 'Support', href: '/support', icon: LifebuoyIcon },
 ]
 
