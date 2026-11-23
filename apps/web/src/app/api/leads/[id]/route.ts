@@ -23,6 +23,7 @@ import {
   sanitizeHeadline,
 } from '@/lib/claim-reveal'
 import { getLeadRevealCost } from '@/lib/config/coins'
+import { computeClaimState, getLeadLiveDate } from '@/lib/lead-claim'
 
 export const dynamic = 'force-dynamic'
 
@@ -168,14 +169,16 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     ])
 
     const isRevealed = userState?.isRevealed || false
-    const approvedOrLiveDate = (externalLead as any).reviewed_at || (externalLead as any).approved_at || externalLead.created_at
-    const isExpired48h = approvedOrLiveDate
-      ? Date.now() - new Date(approvedOrLiveDate).getTime() >= 48 * 60 * 60 * 1000
-      : false
-    const isAutoClaimedAfter48h = isExpired48h && !isRevealed
-    const totalClaims = isAutoClaimedAfter48h ? 25 : Math.max(externalLead.claimed_count || 0, otherRevealedCount)
-    const isClaimedByOther = isAutoClaimedAfter48h || (!isRevealed && totalClaims >= 25)
-    const phone = externalLead.contact_info?.phone_numbers?.[0]?.number || null
+    // Same shared claim computation as the feed list — the drawer must show
+    // exactly the count the card showed before it was opened.
+    const claim = computeClaimState({
+      claimedCount: Math.max(externalLead.claimed_count || 0, otherRevealedCount),
+      isRevealed,
+      liveDate: getLeadLiveDate(externalLead),
+      isClaimed: externalLead.is_claimed,
+    })
+    const totalClaims = claim.claimedCount
+    const isClaimedByOther = claim.isClaimedByOther
     const email = externalLead.email || externalLead.contact_info?.emails?.[0]?.email || ''
     const isClaimable = isClaimedByOther
       ? false
