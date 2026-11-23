@@ -21,6 +21,7 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
   const [keyword, setKeyword] = useState('')
   const [authorName, setAuthorName] = useState('')
   const [creditCost, setCreditCost] = useState<string>('')
+  const [isInternational, setIsInternational] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { addToast } = useToast()
@@ -31,6 +32,7 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
       setKeyword(lead.keyword || '')
       setAuthorName(lead.author?.name || '')
       setCreditCost(lead.credit_cost !== null && lead.credit_cost !== undefined ? String(lead.credit_cost) : '')
+      setIsInternational(Boolean(lead.author?.is_international || (lead as any).is_international))
     }
   }, [lead])
 
@@ -54,7 +56,8 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
         body: JSON.stringify({
           content: content.trim(),
           keyword: keyword.trim(),
-          author: { ...lead.author, name: authorName.trim() },
+          author: { ...lead.author, name: authorName.trim(), is_international: isInternational },
+          is_international: isInternational,
           status: 'pending',
           credit_cost: isNaN(parsedCost as number) ? null : parsedCost,
         }),
@@ -182,6 +185,26 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
                     onChange={e => setCreditCost(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3.5 py-2.5 text-sm"
                   />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsInternational(!isInternational)}
+                    className={`w-full py-2.5 px-4 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
+                      isInternational
+                        ? 'bg-sky-500/20 text-sky-400 border-sky-500/40 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
+                        : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="text-sm">🌍</span>
+                      <span>Mark as International Lead</span>
+                    </span>
+                    <span className={`text-[10px] uppercase px-2 py-0.5 rounded font-black ${isInternational ? 'bg-sky-500 text-black' : 'bg-white/10 text-zinc-400'}`}>
+                      {isInternational ? 'YES (Active)' : 'NO (Domestic)'}
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>

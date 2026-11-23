@@ -43,6 +43,7 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
   const [contactEmail, setContactEmail] = useState('')
   const [contactPhone, setContactPhone] = useState('')
   const [profileUrl, setProfileUrl] = useState('')
+  const [isInternational, setIsInternational] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<UploadResult[] | null>(null)
@@ -138,6 +139,7 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
             contactEmail: contactEmail.trim() || undefined,
             contactPhone: contactPhone.trim() || undefined,
             creditCost: parsedCost,
+            isInternational,
           }),
         })
 
@@ -199,6 +201,7 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
     setContactEmail('')
     setContactPhone('')
     setProfileUrl('')
+    setIsInternational(false)
     setError(null)
     setResults(null)
     onClose()
@@ -437,6 +440,27 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
                       onChange={e => setCreditCost(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-amber-500/50 transition-all px-3.5 py-2 text-sm"
                     />
+                  </div>
+
+                  {/* International Lead Tag */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setIsInternational(!isInternational)}
+                      className={`w-full py-2.5 px-4 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
+                        isInternational
+                          ? 'bg-sky-500/20 text-sky-400 border-sky-500/40 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
+                          : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="text-sm">🌍</span>
+                        <span>Mark as International Lead</span>
+                      </span>
+                      <span className={`text-[10px] uppercase px-2 py-0.5 rounded font-black ${isInternational ? 'bg-sky-500 text-black' : 'bg-white/10 text-zinc-400'}`}>
+                        {isInternational ? 'YES (Active)' : 'NO (Domestic)'}
+                      </span>
+                    </button>
                   </div>
 
                   <div className="space-y-3">

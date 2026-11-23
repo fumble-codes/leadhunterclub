@@ -434,6 +434,14 @@ export function resolveLeadLocationHierarchy(post: {
   contact_info?: any
   [key: string]: any
 }): LocationResolution | null {
+  // ── 0. Explicit Admin Manual Tag Override (Highest priority) ──
+  if (post.author?.is_international === true || (post as any).is_international === true || post.author?.location?.toLowerCase() === 'international') {
+    return { source: 'contact', isInternational: true, label: 'International' }
+  }
+  if (post.author?.is_international === false || (post as any).is_international === false) {
+    return { source: 'contact', isInternational: false, label: undefined }
+  }
+
   // ── 1. Contact Details (Source of Truth) ──
   const phones: string[] = []
   if (post.phone) phones.push(String(post.phone))

@@ -153,6 +153,11 @@ export async function PUT(
       if (body.content !== undefined) updateData.content = body.content
       if (body.keyword !== undefined) updateData.keyword = body.keyword
       if (body.author !== undefined) updateData.author = body.author
+      if (body.is_international !== undefined || body.isInternational !== undefined) {
+        const isIntlVal = Boolean(body.is_international ?? body.isInternational)
+        const curAuthor = (updateData.author || (await oracleDb.leadPost.findUnique({ where: { id }, select: { author: true } }))?.author || {}) as Record<string, any>
+        updateData.author = { ...curAuthor, is_international: isIntlVal }
+      }
       if (body.status !== undefined) updateData.status = body.status
       if (body.title !== undefined) updateData.title = body.title
       if (body.niche !== undefined) updateData.niche = body.niche

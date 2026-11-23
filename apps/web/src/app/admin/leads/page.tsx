@@ -376,6 +376,43 @@ export default function AdminLeadsPage() {
     }
   }
 
+  const toggleInternational = async (lead: ExternalPost) => {
+    const isCurrentIntl = Boolean(lead.author?.is_international || (lead as any).is_international)
+    const nextVal = !isCurrentIntl
+    const updatedAuthor = { ...(lead.author || {}), is_international: nextVal }
+
+    setLeads(prev =>
+      prev.map(l =>
+        l.id === lead.id
+          ? { ...l, author: updatedAuthor, is_international: nextVal }
+          : l,
+      ),
+    )
+
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch(`/api/admin/leads/${lead.id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          author: updatedAuthor,
+          is_international: nextVal,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.success) {
+        throw new Error(json?.message || 'Failed to update international tag')
+      }
+      addToast({
+        type: 'success',
+        message: nextVal ? '✓ Marked as International lead' : '✓ Unmarked International (Domestic)',
+      })
+    } catch (err: any) {
+      addToast({ type: 'error', message: err.message || 'Failed to update tag' })
+      fetchLeads()
+    }
+  }
+
   const openCreditModal = (lead: ExternalPost) => {
     setCreditModalLead(lead)
     const cost = lead.credit_cost ?? (lead as any).creditCost
@@ -1237,6 +1274,22 @@ export default function AdminLeadsPage() {
                             </div>
                           )
                         })()}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleInternational(lead)
+                          }}
+                          className={`px-2 py-0.5 border text-[8px] font-black uppercase tracking-wider rounded flex items-center gap-1 transition-all ${
+                            lead.author?.is_international || (lead as any).is_international
+                              ? 'bg-sky-500/20 text-sky-400 border-sky-500/40 hover:bg-sky-500/30 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                              : 'bg-white/5 text-zinc-500 border-white/10 hover:text-zinc-300 hover:bg-white/10'
+                          }`}
+                          title="Click to toggle International tag on this lead"
+                        >
+                          <span>🌍</span>
+                          <span>{lead.author?.is_international || (lead as any).is_international ? 'International' : 'Domestic'}</span>
+                        </button>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                         {lead.created_at && (() => {
@@ -1737,7 +1790,20 @@ export default function AdminLeadsPage() {
                     </div>
 
                     <div className="flex items-center justify-between gap-4 flex-wrap">
-                      <div className="flex gap-1.5 flex-wrap">
+                      <div className="flex gap-1.5 flex-wrap items-center">
+                        <button
+                          type="button"
+                          onClick={() => toggleInternational(lead)}
+                          className={`h-7 px-2.5 rounded-lg text-[8px] font-black uppercase flex items-center gap-1 border transition-all ${
+                            lead.author?.is_international || (lead as any).is_international
+                              ? 'bg-sky-500/20 text-sky-400 border-sky-500/40 hover:bg-sky-500/30 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                              : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white'
+                          }`}
+                          title="Click to toggle International tag on this lead"
+                        >
+                          <span>🌍</span>
+                          <span>{lead.author?.is_international || (lead as any).is_international ? 'International' : 'Tag Intl'}</span>
+                        </button>
                         {lead.status === 'pending' && (
                           <>
                             <button

@@ -95,6 +95,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (body.isInternational) {
+      try {
+        await oracleDb.leadPost.update({
+          where: { id: postId },
+          data: {
+            author: {
+              ...(typeof post?.author === 'object' ? post.author : {}),
+              name: body.contactName?.trim() || body.authorName?.trim() || 'Manual Entry',
+              is_international: true,
+            },
+          },
+        })
+      } catch (err) {
+        console.warn('[Manual Lead] Could not set is_international:', err)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: post,
