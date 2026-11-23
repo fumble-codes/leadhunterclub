@@ -647,7 +647,7 @@ export default function LeadDrawer({
               lead.isClaimedByOther ? (
                 <div className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/15 px-3 py-2 text-xs font-bold text-amber-500 select-none">
                   <LockClosedIcon className="h-4 w-4 shrink-0" />
-                  <span>Claimed (25/25)</span>
+                  <span>Fully Claimed (25/25)</span>
                 </div>
               ) : (
                 <Button

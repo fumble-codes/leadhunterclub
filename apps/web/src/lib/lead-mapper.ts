@@ -97,7 +97,7 @@ export function externalPostToAppLead(
   const effectiveClaimedByOther =
     isClaimedByOther ||
     isAutoClaimedAfter24h ||
-    (!isRevealed && (effectiveClaimedCount >= 25 || post.is_claimed))
+    (!isRevealed && effectiveClaimedCount >= 25)
 
   return {
     id: post.id,

@@ -109,7 +109,7 @@ function externalPostToAppLead(
   const effectiveClaimedCount = post.claimed_count || 0
   const effectiveClaimedByOther =
     isClaimedByOther ||
-    (!isRevealed && (effectiveClaimedCount >= 25 || Boolean(post.is_claimed)))
+    (!isRevealed && effectiveClaimedCount >= 25)
 
   const niches = extractNiches(post.keyword, post.content || '', post.intelligence, primaryNiche)
   const phone = (post as any).phone || (post.contact_info as any)?.phone_numbers?.[0]?.number || null

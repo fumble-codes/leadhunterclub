@@ -389,7 +389,7 @@ function LeadCard({
             {lead.isClaimedByOther ? (
               <div className="h-[30px] px-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10.5px] font-bold flex items-center gap-1.5 select-none shadow-sm shrink-0 whitespace-nowrap">
                 <LockClosedIcon className="w-3 h-3 shrink-0" />
-                <span>Claimed (25/25)</span>
+                <span>Fully Claimed (25/25)</span>
               </div>
             ) : (
               <button
