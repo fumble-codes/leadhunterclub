@@ -175,6 +175,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const isAutoClaimedAfter48h = isExpired48h && !isRevealed
     const totalClaims = isAutoClaimedAfter48h ? 25 : Math.max(externalLead.claimed_count || 0, otherRevealedCount)
     const isClaimedByOther = isAutoClaimedAfter48h || (!isRevealed && totalClaims >= 25)
+    const phone = (externalLead as any).phone || externalLead.contact_info?.phone_numbers?.[0]?.number || null
     const email = externalLead.email || externalLead.contact_info?.emails?.[0]?.email || ''
     const isClaimable = isClaimedByOther
       ? false
@@ -191,7 +192,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       externalLead.intelligence,
       primaryNiche,
     )
-    const phone = (externalLead as any).phone || (externalLead.contact_info as any)?.phone_numbers?.[0]?.number || null
     const cleanTags = extractLeadBadges({ ...externalLead, email: (externalLead as any).email, phone, claimed_count: externalLead.claimed_count }, niches)
     const resolvedNiche = (niches[0] && niches[0] !== 'General') ? niches[0] : (primaryNiche || 'General')
     const cleanTitle =
