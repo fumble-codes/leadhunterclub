@@ -5,7 +5,7 @@ import { getFirebaseToken } from '@/lib/firebase'
 import {
   KeyIcon, PlusIcon, TrashIcon, ShieldCheckIcon, ShieldExclamationIcon,
   EyeIcon, EyeSlashIcon, CheckCircleIcon, ArrowPathIcon, Cog6ToothIcon,
-  ExclamationTriangleIcon, XCircleIcon, ClockIcon,
+  ExclamationTriangleIcon, XCircleIcon, ClockIcon, NoSymbolIcon,
 } from '@heroicons/react/24/solid'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 import { useToast } from '@/components/ui/Toast'
@@ -1457,6 +1457,7 @@ export default function AdminTokensPage() {
                 const isInvalid = Boolean(k.error_message) && !k.error_message?.toLowerCase().includes('spend exhausted')
                 const isExhausted = !isInvalid && (Boolean((k as any).is_exhausted) || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')))
                 const isActive = !isInvalid && !isExhausted && Boolean(k.is_active)
+                const isInactive = !isInvalid && !isExhausted && !k.is_active
 
                 return (
                   <div key={keyId} className={`flex items-start sm:items-center justify-between rounded-xl p-3.5 sm:px-4 sm:py-3 border transition-all ${
@@ -1464,6 +1465,8 @@ export default function AdminTokensPage() {
                       ? 'bg-red-950/20 border-red-500/30 shadow-sm shadow-red-950/20'
                       : isExhausted
                       ? 'bg-amber-950/15 border-amber-500/30 shadow-sm shadow-amber-950/10'
+                      : isInactive
+                      ? 'bg-white/[0.02] border-white/10 opacity-70'
                       : isSelected
                       ? 'bg-accent-mint/[0.04] border-accent-mint/30 shadow-sm'
                       : 'bg-surface-elevated/50 border-white/[0.03]'
@@ -1486,6 +1489,8 @@ export default function AdminTokensPage() {
                         <XCircleIcon className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5 sm:mt-0" />
                       ) : isExhausted ? (
                         <ExclamationTriangleIcon className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      ) : isInactive ? (
+                        <NoSymbolIcon className="w-4 h-4 text-text-secondary flex-shrink-0 mt-0.5 sm:mt-0" />
                       ) : (
                         <ShieldCheckIcon className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5 sm:mt-0" />
                       )}
@@ -1503,6 +1508,10 @@ export default function AdminTokensPage() {
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase tracking-wider">
                               <ExclamationTriangleIcon className="w-3 h-3" />
                               Quota Exhausted ($5 limit)
+                            </span>
+                          ) : isInactive ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-text-secondary border border-white/20 uppercase tracking-wider">
+                              Inactive / Paused
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
