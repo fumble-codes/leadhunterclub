@@ -38,6 +38,7 @@ import {
 } from '@heroicons/react/24/solid'
 import { useToast } from '@/components/ui/Toast'
 import { getFirebaseToken } from '@/lib/firebase'
+import { DEFAULT_TELEGRAM_DRIPS } from '@/lib/services/telegram-drips'
 import { CustomLoader } from '@/components/ui/CustomLoader'
 import { useDebounce } from '@/hooks/useDebounce'
 
@@ -540,6 +541,9 @@ export default function AdminBroadcastPage() {
   const [isSendingTgLeadTest, setIsSendingTgLeadTest] = useState(false)
   const [isSavingTgDrips, setIsSavingTgDrips] = useState(false)
   const [isSendingTgDripTest, setIsSendingTgDripTest] = useState<string | null>(null)
+  const [editingDripKey, setEditingDripKey] = useState<string | null>(null)
+  const [editingDripTemplate, setEditingDripTemplate] = useState<string>('')
+  const [isSavingDripTemplate, setIsSavingDripTemplate] = useState<boolean>(false)
 
   // Interpolated preview for Telegram
   const sampleTgPreview = useMemo(() => {
@@ -760,12 +764,16 @@ export default function AdminBroadcastPage() {
     }
   }
 
-  const handleToggleDripSetting = async (key: 'free_drips_enabled' | 'renewal_drips_enabled' | 'grace_drips_enabled') => {
+  const handleToggleDripSetting = async (key: string) => {
     if (!tgData?.dripSettings) return
     const current = tgData.dripSettings
+    const currentItem = current[key] || {}
     const updated = {
       ...current,
-      [key]: !current[key],
+      [key]: {
+        ...currentItem,
+        enabled: !currentItem.enabled,
+      },
     }
     setTgData((prev) => (prev ? { ...prev, dripSettings: updated } : null))
     setIsSavingTgDrips(true)
@@ -779,26 +787,67 @@ export default function AdminBroadcastPage() {
         },
         body: JSON.stringify({
           action: 'save_drip_settings',
-          ...updated,
+          dripSettings: updated,
         }),
       })
       const json = await res.json()
       if (res.ok && json.success) {
-        addToast({ type: 'success', message: 'Drip campaign settings updated!' })
+        addToast({ type: 'success', message: `${key} drip status updated!` })
       } else {
-        addToast({ type: 'error', message: json.message || 'Failed to update drips' })
+        addToast({ type: 'error', message: json.message || 'Failed to update drip' })
       }
     } catch (err: any) {
-      addToast({ type: 'error', message: err?.message || 'Error updating drips' })
+      addToast({ type: 'error', message: err?.message || 'Error updating drip' })
     } finally {
       setIsSavingTgDrips(false)
     }
   }
 
-  const handleSendTestDrip = async (dripType: 'free_upsell' | 'pre_renewal' | 'grace_recovery') => {
+  const handleSaveDripTemplate = async () => {
+    if (!editingDripKey || !tgData?.dripSettings) return
+    const current = tgData.dripSettings
+    const currentItem = current[editingDripKey] || {}
+    const updated = {
+      ...current,
+      [editingDripKey]: {
+        ...currentItem,
+        template: editingDripTemplate,
+      },
+    }
+    setTgData((prev) => (prev ? { ...prev, dripSettings: updated } : null))
+    setIsSavingDripTemplate(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'save_drip_settings',
+          dripSettings: updated,
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: 'Drip template saved successfully!' })
+        setEditingDripKey(null)
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to save template' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error saving template' })
+    } finally {
+      setIsSavingDripTemplate(false)
+    }
+  }
+
+  const handleSendTestDrip = async (dripType: string) => {
+    const defaultTarget = tgData?.configuredChannelId || '-5349264367'
     const targetChat = prompt(
-      'Enter your personal Telegram Chat ID (or chat ID to receive test drip):',
-      '1192419044',
+      'Enter Target Telegram Chat ID or Channel ID to receive test drip:',
+      defaultTarget,
     )
     if (!targetChat) return
     setIsSendingTgDripTest(dripType)
@@ -818,7 +867,7 @@ export default function AdminBroadcastPage() {
       })
       const json = await res.json()
       if (res.ok && json.success) {
-        addToast({ type: 'success', message: json.message || 'Test drip sent to Telegram!' })
+        addToast({ type: 'success', message: json.message || `Test ${dripType} drip sent to Telegram!` })
       } else {
         addToast({ type: 'error', message: json.message || 'Failed to send test drip' })
       }
@@ -2936,136 +2985,219 @@ export default function AdminBroadcastPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-            {/* Drip 1: Free Member Upsell */}
-            <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3">
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <ArrowTrendingUpIcon className="w-4 h-4" />
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggleDripSetting(
-                        'free_drips_enabled',
-                        !tgData?.dripSettings?.free_drips_enabled
-                      )
-                    }
-                    disabled={isSavingTgDrips}
-                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
-                      tgData?.dripSettings?.free_drips_enabled
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-white/5 text-text-secondary border border-white/10'
-                    }`}
-                  >
-                    {tgData?.dripSettings?.free_drips_enabled ? 'Active' : 'Disabled'}
-                  </button>
-                </div>
-                <div className="mt-2.5">
-                  <h4 className="text-xs font-bold text-white">Free Member Upsell Drip</h4>
-                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
-                    Automatically drips recent high-value lead opportunities to Free tier hunters every 2 days with an upgrade CTA to Freelancer Pro.
-                  </p>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {[
+              {
+                key: 'free_upsell',
+                title: '1. Free Member Upsell',
+                badge: 'CONVERSION',
+                badgeBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+                icon: ArrowTrendingUpIcon,
+                iconColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+                desc: 'Drips high-value leads & community client wins to Free tier members every 2–3 days with an upgrade CTA.',
+              },
+              {
+                key: 'low_credits',
+                title: '2. Low Credits / Top-Up Nudge',
+                badge: 'RECHARGE',
+                badgeBg: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+                icon: CreditCardIcon,
+                iconColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+                desc: 'Nudges members when their balance drops <= 200 credits to buy top-up packs before outreach pauses.',
+              },
+              {
+                key: 'mid_cycle_checkin',
+                title: '3. Mid-Cycle Check-In (Day 10–15)',
+                badge: 'ENGAGEMENT',
+                badgeBg: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+                icon: ChatBubbleLeftRightIcon,
+                iconColor: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+                desc: "How's the hunting going on? Check-in halfway through monthly billing cycle sharing closing tips.",
+              },
+              {
+                key: 'pre_renewal',
+                title: '4. Paid Pre-Renewal Warning',
+                badge: 'BILLING',
+                badgeBg: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+                icon: ClockIcon,
+                iconColor: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+                desc: 'Advance notice sent 7 days & 3 days prior to renewal highlighting 15-day rollover and fresh quota.',
+              },
+              {
+                key: 'grace_period',
+                title: '5. 48-Hour Rollover Rescue',
+                badge: 'URGENT',
+                badgeBg: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+                icon: ShieldExclamationIcon,
+                iconColor: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
+                desc: 'Urgent 48-hour rescue warning if subscription lapsed to recover leftover rollover credits.',
+              },
+              {
+                key: 'win_back',
+                title: '6. Win-Back Re-Engagement',
+                badge: 'WIN-BACK',
+                badgeBg: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+                icon: ArrowPathIcon,
+                iconColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+                desc: 'Re-engagement drips to cancelled / lapsed members after 48 hours highlighting lead drops & return offer.',
+              },
+            ].map((drip) => {
+              const IconComp = drip.icon
+              const isEnabled = tgData?.dripSettings?.[drip.key]?.enabled !== false
+              const currentTemplate =
+                tgData?.dripSettings?.[drip.key]?.template ||
+                (DEFAULT_TELEGRAM_DRIPS as any)[drip.key]?.template ||
+                ''
 
-              <div className="pt-2 border-t border-white/[0.04]">
-                <button
-                  onClick={() => handleSendTestDrip('free_upsell')}
-                  disabled={isSendingTgDripTest === 'free_upsell'}
-                  className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-emerald-300 border border-emerald-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
+              return (
+                <div
+                  key={drip.key}
+                  className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3"
                 >
-                  <span>{isSendingTgDripTest === 'free_upsell' ? 'Sending...' : 'Test Send Sample Upsell'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Drip 2: Paid Pre-Renewal Alert */}
-            <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3">
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                    <ClockIcon className="w-4 h-4" />
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className={`p-2 rounded-lg border ${drip.iconColor}`}>
+                          <IconComp className="w-4 h-4" />
+                        </div>
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-extrabold uppercase border ${drip.badgeBg}`}>
+                          {drip.badge}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleToggleDripSetting(drip.key)}
+                        disabled={isSavingTgDrips}
+                        className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                          isEnabled
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-white/5 text-text-secondary border border-white/10'
+                        }`}
+                      >
+                        {isEnabled ? 'Active' : 'Disabled'}
+                      </button>
+                    </div>
+                    <div className="mt-2.5">
+                      <h4 className="text-xs font-bold text-white">{drip.title}</h4>
+                      <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
+                        {drip.desc}
+                      </p>
+                    </div>
                   </div>
-                  <button
-                    onClick={() =>
-                      handleToggleDripSetting(
-                        'renewal_drips_enabled',
-                        !tgData?.dripSettings?.renewal_drips_enabled
-                      )
-                    }
-                    disabled={isSavingTgDrips}
-                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
-                      tgData?.dripSettings?.renewal_drips_enabled
-                        ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
-                        : 'bg-white/5 text-text-secondary border border-white/10'
-                    }`}
-                  >
-                    {tgData?.dripSettings?.renewal_drips_enabled ? 'Active' : 'Disabled'}
-                  </button>
-                </div>
-                <div className="mt-2.5">
-                  <h4 className="text-xs font-bold text-white">Paid Pre-Renewal Notice</h4>
-                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
-                    Sends advance notices (7 days & 4 days prior to monthly billing) highlighting 15-day credit rollover and upcoming refresh.
-                  </p>
-                </div>
-              </div>
 
-              <div className="pt-2 border-t border-white/[0.04]">
-                <button
-                  onClick={() => handleSendTestDrip('pre_renewal')}
-                  disabled={isSendingTgDripTest === 'pre_renewal'}
-                  className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-sky-300 border border-sky-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
-                >
-                  <span>{isSendingTgDripTest === 'pre_renewal' ? 'Sending...' : 'Test Send Sample Renewal'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Drip 3: Lapsed Payment & Rollover Recovery */}
-            <div className="p-4 rounded-xl bg-surface-elevated/40 border border-white/[0.06] flex flex-col justify-between space-y-3">
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                    <CreditCardIcon className="w-4 h-4" />
+                  <div className="pt-2 border-t border-white/[0.04] grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingDripKey(drip.key)
+                        setEditingDripTemplate(currentTemplate)
+                      }}
+                      className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-text-primary border border-white/[0.08] flex items-center justify-center gap-1 transition-all cursor-pointer"
+                    >
+                      <PencilSquareIcon className="w-3 h-3" />
+                      <span>Edit Copy</span>
+                    </button>
+                    <button
+                      onClick={() => handleSendTestDrip(drip.key)}
+                      disabled={isSendingTgDripTest === drip.key}
+                      className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
+                    >
+                      <span>{isSendingTgDripTest === drip.key ? 'Sending...' : 'Test Send'}</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={() =>
-                      handleToggleDripSetting(
-                        'grace_drips_enabled',
-                        !tgData?.dripSettings?.grace_drips_enabled
-                      )
-                    }
-                    disabled={isSavingTgDrips}
-                    className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
-                      tgData?.dripSettings?.grace_drips_enabled
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-white/5 text-text-secondary border border-white/10'
-                    }`}
-                  >
-                    {tgData?.dripSettings?.grace_drips_enabled ? 'Active' : 'Disabled'}
-                  </button>
                 </div>
-                <div className="mt-2.5">
-                  <h4 className="text-xs font-bold text-white">Lapsed & Rollover Recovery</h4>
-                  <p className="text-[11px] text-text-secondary mt-1 leading-relaxed">
-                    2–3 day grace follow-ups warning users if their subscription lapsed to preserve their 15-day rollover balance before expiry.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-white/[0.04]">
-                <button
-                  onClick={() => handleSendTestDrip('grace_recovery')}
-                  disabled={isSendingTgDripTest === 'grace_recovery'}
-                  className="w-full py-1.5 rounded-lg text-[10px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-amber-300 border border-amber-500/20 flex items-center justify-center gap-1 transition-all cursor-pointer"
-                >
-                  <span>{isSendingTgDripTest === 'grace_recovery' ? 'Sending...' : 'Test Send Sample Recovery'}</span>
-                </button>
-              </div>
-            </div>
+              )
+            })}
           </div>
+
+          {/* Drip Template Editor Modal */}
+          <AnimatePresence>
+            {editingDripKey && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  className="w-full max-w-xl p-5 rounded-2xl bg-[#0e131b] border border-white/10 shadow-2xl space-y-4"
+                >
+                  <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+                    <div>
+                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        <PencilSquareIcon className="w-4 h-4 text-sky-400" />
+                        <span>Edit Telegram Drip: {editingDripKey}</span>
+                      </h3>
+                      <p className="text-[11px] text-text-secondary mt-0.5">
+                        Customize the automated Telegram message copy and call-to-action.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setEditingDripKey(null)}
+                      className="p-1 rounded-lg text-text-secondary hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                    >
+                      <XMarkIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Variable Inserter Pill Buttons */}
+                  <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="text-text-secondary font-medium">Insert Variable:</span>
+                    {[
+                      { tag: '{name}', label: '+ {name}' },
+                      { tag: '{credits}', label: '+ {credits}' },
+                      { tag: '{days_left}', label: '+ {days_left}' },
+                      { tag: '{plan}', label: '+ {plan}' },
+                      { tag: '{link}', label: '+ {link}' },
+                    ].map((item) => (
+                      <button
+                        key={item.tag}
+                        type="button"
+                        onClick={() => setEditingDripTemplate((prev) => `${prev} ${item.tag}`)}
+                        className="px-2 py-0.5 rounded font-mono text-[10px] font-semibold bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 transition-all cursor-pointer"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="space-y-1">
+                    <textarea
+                      value={editingDripTemplate}
+                      onChange={(e) => setEditingDripTemplate(e.target.value)}
+                      rows={7}
+                      className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-white text-xs font-mono leading-relaxed placeholder:text-zinc-500 focus:outline-none focus:border-sky-500 resize-none"
+                      placeholder="Enter Telegram HTML copy..."
+                    />
+                    <div className="flex items-center justify-between text-[10px] text-text-secondary">
+                      <span>Supported HTML: &lt;b&gt;, &lt;i&gt;, &lt;code&gt;, &lt;a href=&quot;...&quot;&gt;</span>
+                      <span className="font-mono">{editingDripTemplate.length} chars</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/[0.08]">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDripKey(null)}
+                      className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-text-secondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveDripTemplate}
+                      disabled={isSavingDripTemplate}
+                      className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+                    >
+                      <CheckIcon className="w-3.5 h-3.5" />
+                      <span>{isSavingDripTemplate ? 'Saving...' : 'Save Drip Template'}</span>
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
       )}

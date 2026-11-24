@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, AuthRequiredError, ForbiddenError } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { sendTelegramMessage, formatTelegramLeadCard } from '@/lib/services/telegram'
+import {
+  getTelegramDripSettings,
+  formatDripMessage,
+  getDripButton,
+  DEFAULT_TELEGRAM_DRIPS,
+  type TelegramDripSettings,
+} from '@/lib/services/telegram-drips'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,6 +55,8 @@ export async function GET(request: NextRequest) {
       ? tgDetected.value.value
       : []
 
+    const dripSettings = await getTelegramDripSettings()
+
     return NextResponse.json({
       success: true,
       data: {
@@ -58,12 +67,7 @@ export async function GET(request: NextRequest) {
         configuredChannelName: channelVal.channel_name || null,
         detectedChats,
         alertTemplate: templateVal.template || DEFAULT_TELEGRAM_COMMUNITY_TEMPLATE,
-        dripSettings: {
-          free_drips_enabled: dripsVal.free_drips_enabled !== false,
-          renewal_drips_enabled: dripsVal.renewal_drips_enabled !== false,
-          grace_drips_enabled: dripsVal.grace_drips_enabled !== false,
-          free_drip_interval_days: dripsVal.free_drip_interval_days || 3,
-        },
+        dripSettings,
       },
     })
   } catch (error: unknown) {
@@ -136,26 +140,54 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'save_drip_settings') {
-      const dripSettings = {
-        free_drips_enabled: Boolean(body.free_drips_enabled),
-        renewal_drips_enabled: Boolean(body.renewal_drips_enabled),
-        grace_drips_enabled: Boolean(body.grace_drips_enabled),
-        free_drip_interval_days: Math.max(1, parseInt(body.free_drip_interval_days, 10) || 3),
+      const existing = await getTelegramDripSettings()
+      const incoming = (body.dripSettings || body) as Partial<TelegramDripSettings>
+
+      const updatedSettings: TelegramDripSettings = {
+        free_upsell: {
+          enabled: incoming.free_upsell?.enabled ?? existing.free_upsell.enabled,
+          template: incoming.free_upsell?.template || existing.free_upsell.template,
+        },
+        low_credits: {
+          enabled: incoming.low_credits?.enabled ?? existing.low_credits.enabled,
+          threshold: incoming.low_credits?.threshold || existing.low_credits.threshold || 200,
+          template: incoming.low_credits?.template || existing.low_credits.template,
+        },
+        mid_cycle_checkin: {
+          enabled: incoming.mid_cycle_checkin?.enabled ?? existing.mid_cycle_checkin.enabled,
+          template: incoming.mid_cycle_checkin?.template || existing.mid_cycle_checkin.template,
+        },
+        pre_renewal: {
+          enabled: incoming.pre_renewal?.enabled ?? existing.pre_renewal.enabled,
+          template: incoming.pre_renewal?.template || existing.pre_renewal.template,
+        },
+        grace_period: {
+          enabled: incoming.grace_period?.enabled ?? existing.grace_period.enabled,
+          template: incoming.grace_period?.template || existing.grace_period.template,
+        },
+        win_back: {
+          enabled: incoming.win_back?.enabled ?? existing.win_back.enabled,
+          template: incoming.win_back?.template || existing.win_back.template,
+        },
       }
 
       await db.setting.upsert({
         where: { key: 'telegram_drip_settings' },
         create: {
           key: 'telegram_drip_settings',
-          value: dripSettings,
-          description: 'Telegram automated marketing & retention drip campaign settings',
+          value: updatedSettings,
+          description: 'Telegram automated marketing & retention drip campaign settings (all 6 triggers)',
         },
         update: {
-          value: dripSettings,
+          value: updatedSettings,
         },
       })
 
-      return NextResponse.json({ success: true, message: 'Drip campaign settings updated successfully' })
+      return NextResponse.json({
+        success: true,
+        message: 'Telegram drip campaigns updated successfully',
+        dripSettings: updatedSettings,
+      })
     }
 
     if (action === 'send_test_alert') {
@@ -237,40 +269,50 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === 'send_test_drip') {
-      const { dripType, targetChatId } = body
-      if (!targetChatId) {
+      const { dripType, targetChatId, templateOverride } = body
+      const channelSetting = await db.setting.findUnique({ where: { key: 'telegram_community_channel' } })
+      const channelVal = (channelSetting?.value as Record<string, any>) || {}
+      const target = targetChatId || channelVal.channel_id
+
+      if (!target) {
         return NextResponse.json(
-          { code: 'BAD_REQUEST', message: 'Target Telegram chat ID required for test drip' },
+          { code: 'BAD_REQUEST', message: 'Target Telegram chat ID or channel required for test drip' },
           { status: 400 },
         )
       }
 
-      let dripMessage = ''
-      let buttons: any[] = []
+      const validTypes = ['free_upsell', 'low_credits', 'mid_cycle_checkin', 'pre_renewal', 'grace_period', 'win_back'] as const
+      const type = (validTypes.includes(dripType) ? dripType : 'free_upsell') as keyof TelegramDripSettings
 
-      if (dripType === 'free_upsell') {
-        dripMessage = `🔥 <b>45+ High-Paying Client Leads Approved This Week!</b>\n\nYou're on the <b>Free Starter Plan</b> (50 credits/mo).\nHunters on <b>Freelancer Pro</b> are currently unlocking direct client emails & closing ₹50k+ contracts.\n\n⚡ Upgrade now to get <b>1,000 monthly credits</b> and never miss a direct client deal!`
-        buttons = [[{ text: '⚡ Upgrade to Freelancer Pro ↗', url: `${APP_URL}/pricing` }]]
-      } else if (dripType === 'pre_renewal') {
-        dripMessage = `💳 <b>Upcoming Renewal Reminder — Lead Hunter Club</b>\n\nYour <b>Freelancer Pro</b> membership renews in <b>4 days</b>.\n• 1,000 fresh credits will be added to your balance.\n• Any unused credits from this month will automatically roll over for <b>15 days</b>.\n\nThank you for being a top hunter!`
-        buttons = [[{ text: 'Manage Subscription ↗', url: `${APP_URL}/settings` }]]
-      } else {
-        dripMessage = `⚠️ <b>Action Required: Subscription Payment Missed</b>\n\nYour recent subscription renewal did not go through.\n\n⏰ <b>Grace Period Active:</b> You have <b>15 days</b> to renew before your accumulated rollover credits expire permanently.\n\nRenew now to keep your credits and continue receiving instant lead drops:`
-        buttons = [[{ text: '🔄 Reactivate Membership ↗', url: `${APP_URL}/pricing` }]]
-      }
+      const currentDrips = await getTelegramDripSettings()
+      const dripConfig = currentDrips[type] || DEFAULT_TELEGRAM_DRIPS[type]
 
-      const ok = await sendTelegramMessage(targetChatId, dripMessage, {
+      const template = templateOverride || dripConfig?.template || DEFAULT_TELEGRAM_DRIPS[type].template
+      const sampleText = formatDripMessage(
+        template,
+        {
+          name: 'Hustler',
+          credits: 140,
+          days_left: 4,
+          plan: 'Freelancer Pro',
+        },
+        APP_URL,
+      )
+
+      const buttons = getDripButton(type, APP_URL)
+
+      const ok = await sendTelegramMessage(target, sampleText, {
         inline_keyboard: buttons,
       })
 
       if (!ok) {
         return NextResponse.json(
-          { code: 'SEND_FAILED', message: `Could not send test message to chat ${targetChatId}` },
+          { code: 'SEND_FAILED', message: `Could not send test message to chat ${target}` },
           { status: 502 },
         )
       }
 
-      return NextResponse.json({ success: true, message: `Test ${dripType} drip delivered successfully!` })
+      return NextResponse.json({ success: true, message: `Test ${type} drip delivered successfully to ${target}!` })
     }
 
     return NextResponse.json({ code: 'BAD_REQUEST', message: 'Invalid action' }, { status: 400 })

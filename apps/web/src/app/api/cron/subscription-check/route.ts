@@ -223,6 +223,15 @@ export async function GET(request: NextRequest) {
       console.warn('[Cron] Lead purge non-critical error:', purgeErr)
     }
 
+    // 4. Run automated Telegram marketing & retention drip evaluations (all 6 flows)
+    let tgDripsResult = { processed: 0, sent: 0, errors: 0 }
+    try {
+      const { runTelegramAutomatedDrips } = await import('@/lib/services/telegram-drips')
+      tgDripsResult = await runTelegramAutomatedDrips()
+    } catch (tgDripErr) {
+      console.warn('[Cron] Telegram drips non-critical error:', tgDripErr)
+    }
+
     return NextResponse.json({
       success: true,
       timestamp: now.toISOString(),
@@ -230,6 +239,7 @@ export async function GET(request: NextRequest) {
         downgradedExpiredPaidAccounts: downgradedCount,
         refreshedFreeStarterAccounts: freeRefreshedCount,
         upcomingRenewalNoticesSent: renewalNoticesSent,
+        telegramDrips: tgDripsResult,
         purgedUnclaimedLeadsOlderThan10Days: purgedUnclaimedCount,
         permanentlyPreservedClaimedLeads: preservedClaimedCount,
       },
