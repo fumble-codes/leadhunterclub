@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, AuthRequiredError, ForbiddenError } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { sendTelegramMessage } from '@/lib/services/telegram'
+import { sendTelegramMessage, formatTelegramLeadCard } from '@/lib/services/telegram'
 
 export const dynamic = 'force-dynamic'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.theleadhunterclub.com'
 
-export const DEFAULT_TELEGRAM_COMMUNITY_TEMPLATE = `🚀 <b>Fresh Leads Dropped — Lead Hunter Club</b>
+const DEFAULT_TELEGRAM_COMMUNITY_TEMPLATE = `🚀 <b>Fresh Leads Dropped — Lead Hunter Club</b>
 
 🔥 <b>{count} new verified client opportunit{count_suffix}</b> {have_has} just been approved and added to the platform!
 
@@ -197,6 +197,43 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ success: true, message: `Test drop alert posted to ${targetChannel}!` })
+    }
+
+    if (action === 'send_test_lead_alert') {
+      const channelSetting = await db.setting.findUnique({ where: { key: 'telegram_community_channel' } })
+      const channelVal = (channelSetting?.value as Record<string, any>) || {}
+      const targetChat = channelVal.channel_id || body.targetChannel || body.targetChatId
+
+      if (!targetChat) {
+        return NextResponse.json(
+          { code: 'BAD_REQUEST', message: 'Target Telegram Channel or Chat ID required.' },
+          { status: 400 },
+        )
+      }
+
+      const sampleCard = {
+        id: 'sample-lead-001',
+        title: 'Enterprise Digital Platform Revamp Project',
+        niche: 'Web Development',
+        content: "We're looking to connect with a website development agency for a website revamp project. We're looking for an agency with expertise in website design, development...",
+      }
+
+      const formatted = formatTelegramLeadCard(sampleCard, APP_URL)
+      const ok = await sendTelegramMessage(targetChat, formatted.text, {
+        inline_keyboard: formatted.inline_keyboard,
+      })
+
+      if (!ok) {
+        return NextResponse.json(
+          {
+            code: 'SEND_FAILED',
+            message: `Could not send test lead card to "${targetChat}". Ensure @leadhunterclubbot has permission to post in that chat/channel.`,
+          },
+          { status: 502 },
+        )
+      }
+
+      return NextResponse.json({ success: true, message: `Sample individual lead card sent to ${targetChat}!` })
     }
 
     if (action === 'send_test_drip') {

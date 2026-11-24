@@ -537,6 +537,7 @@ export default function AdminBroadcastPage() {
   const [isTgTemplateDirty, setIsTgTemplateDirty] = useState(false)
   const [hasLoadedTgTemplate, setHasLoadedTgTemplate] = useState(false)
   const [isSendingTgTest, setIsSendingTgTest] = useState(false)
+  const [isSendingTgLeadTest, setIsSendingTgLeadTest] = useState(false)
   const [isSavingTgDrips, setIsSavingTgDrips] = useState(false)
   const [isSendingTgDripTest, setIsSendingTgDripTest] = useState<string | null>(null)
 
@@ -728,6 +729,34 @@ export default function AdminBroadcastPage() {
       addToast({ type: 'error', message: err?.message || 'Error sending test alert' })
     } finally {
       setIsSendingTgTest(false)
+    }
+  }
+
+  const handleSendTgTestLeadCard = async () => {
+    setIsSendingTgLeadTest(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'send_test_lead_alert',
+          targetChannel: tgChannelInput.trim(),
+        }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: json.message || 'Sample individual lead card dispatched!' })
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to send test lead card' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error sending test lead card' })
+    } finally {
+      setIsSendingTgLeadTest(false)
     }
   }
 
@@ -2868,7 +2897,7 @@ export default function AdminBroadcastPage() {
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-white/[0.04]">
+                <div className="mt-3 pt-2 border-t border-white/[0.04] space-y-2">
                   <button
                     onClick={handleSendTgTestAlert}
                     disabled={isSendingTgTest || !tgData?.hasBotToken || !tgData?.configuredChannelId}
@@ -2876,6 +2905,14 @@ export default function AdminBroadcastPage() {
                   >
                     <PaperAirplaneIcon className={`w-3 h-3 -rotate-45 ${isSendingTgTest ? 'animate-pulse' : ''}`} />
                     <span>{isSendingTgTest ? 'Dispatching Live Test...' : 'Test Send This Template to Channel'}</span>
+                  </button>
+                  <button
+                    onClick={handleSendTgTestLeadCard}
+                    disabled={isSendingTgLeadTest || !tgData?.hasBotToken || !tgData?.configuredChannelId}
+                    className="w-full py-1.5 rounded-lg text-[11px] font-semibold bg-white/[0.02] hover:bg-white/[0.06] text-amber-300 border border-amber-500/20 hover:border-amber-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
+                  >
+                    <PaperAirplaneIcon className={`w-3 h-3 -rotate-45 ${isSendingTgLeadTest ? 'animate-pulse' : ''}`} />
+                    <span>{isSendingTgLeadTest ? 'Sending Sample Lead Card...' : 'Test Send Sample Individual Lead Card'}</span>
                   </button>
                 </div>
               </div>

@@ -418,7 +418,8 @@ export default function LeadsPage() {
     const parseLead = () => {
       try {
         if (typeof window === 'undefined') return
-        const id = new URLSearchParams(window.location.search).get('lead')
+        const params = new URLSearchParams(window.location.search)
+        const id = params.get('lead') || params.get('id')
         if (id) setSelectedLeadId(id)
       } catch {
         // ignore malformed URL

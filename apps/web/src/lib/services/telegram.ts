@@ -39,6 +39,7 @@ export async function sendTelegramMessage(
   text: string,
   options?: {
     parse_mode?: 'HTML' | 'MarkdownV2' | 'Markdown'
+    inline_keyboard?: Array<Array<{ text: string; url?: string; callback_data?: string }>>
     reply_markup?: {
       inline_keyboard?: Array<Array<{ text: string; url?: string; callback_data?: string }>>
     }
@@ -49,6 +50,10 @@ export async function sendTelegramMessage(
     return { success: false, error: 'Telegram bot is not configured or disabled.' }
   }
 
+  const replyMarkup =
+    options?.reply_markup ||
+    (options?.inline_keyboard ? { inline_keyboard: options.inline_keyboard } : undefined)
+
   try {
     const res = await fetch(`https://api.telegram.org/bot${config.botToken}/sendMessage`, {
       method: 'POST',
@@ -58,7 +63,7 @@ export async function sendTelegramMessage(
         text,
         parse_mode: options?.parse_mode || 'HTML',
         disable_web_page_preview: false,
-        reply_markup: options?.reply_markup,
+        reply_markup: replyMarkup,
       }),
     })
 
@@ -75,27 +80,46 @@ export async function sendTelegramMessage(
   }
 }
 
-export async function answerCallbackQuery(
-  callbackQueryId: string,
-  text?: string,
-  showAlert = false,
-): Promise<void> {
-  const config = await getTelegramConfig()
-  if (!config.botToken) return
+export function formatTelegramLeadCard(
+  lead: {
+    id: string
+    title?: string | null
+    niche?: string | null
+    platform?: string | null
+    snippet?: string | null
+    content?: string | null
+    keyword?: string | null
+  },
+  appUrl: string,
+): { text: string; inline_keyboard: Array<Array<{ text: string; url: string }>> } {
+  const displayTitle =
+    lead.title?.trim() ||
+    (lead.niche ? `${lead.niche} Opportunity` : lead.keyword || 'Strategic Client Opportunity')
+  const niche = (lead.niche || lead.keyword || 'Strategic Lead').trim().toUpperCase()
 
-  try {
-    await fetch(`https://api.telegram.org/bot${config.botToken}/answerCallbackQuery`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        callback_query_id: callbackQueryId,
-        text,
-        show_alert: showAlert,
-      }),
-    })
-  } catch (err: any) {
-    console.warn('[Telegram] answerCallbackQuery error:', err.message)
+  let snippet = lead.snippet || ''
+  if (!snippet && lead.content) {
+    const clean = lead.content.replace(/\s+/g, ' ').trim()
+    snippet = clean.length > 200 ? clean.slice(0, 200) + '...' : clean
   }
+
+  const cleanAppUrl = appUrl.replace(/\/+$/, '')
+  const leadUrl = `${cleanAppUrl}/leads?lead=${encodeURIComponent(lead.id)}`
+
+  const text = `💼 <b>Lead Hunter Club</b>
+
+🏷️ <b>[${escapeTgHtml(niche)}]</b>
+<b>${escapeTgHtml(displayTitle)}</b>
+
+${snippet ? `${escapeTgHtml(snippet)}\n\n` : ''}👉 <i>Claim before competitors reach out!</i>`
+
+  const inline_keyboard = [
+    [
+      { text: '⚡ View & Claim Lead ↗', url: leadUrl },
+    ],
+  ]
+
+  return { text, inline_keyboard }
 }
 
 export async function broadcastTelegramLeadAlert(leads: Array<{
@@ -105,6 +129,7 @@ export async function broadcastTelegramLeadAlert(leads: Array<{
   platform?: string | null
   snippet?: string | null
   content?: string | null
+  keyword?: string | null
 }>): Promise<{ sent: number; failed: number }> {
   if (!leads || leads.length === 0) return { sent: 0, failed: 0 }
   const config = await getTelegramConfig()
@@ -127,34 +152,14 @@ export async function broadcastTelegramLeadAlert(leads: Array<{
   let sent = 0
   let failed = 0
 
+  // Send each lead as an INDIVIDUAL Telegram message card matching the email card
   for (const lead of leads) {
-    const leadTitle = lead.title?.trim() || 'New High-Intent Client Requirement'
-    const leadNiche = lead.niche || 'Strategic Lead'
-    const cleanContent = lead.content ? lead.content.replace(/\s+/g, ' ').trim() : ''
-    const snippet = lead.snippet || (cleanContent ? cleanContent.slice(0, 180) + '...' : '')
-    const leadUrl = `${appUrl}/leads?lead=${encodeURIComponent(lead.id)}`
-
-    const messageHtml = `🔥 <b>New Lead Alert | ${escapeTgHtml(leadNiche)}</b>
-
-<b>${escapeTgHtml(leadTitle)}</b>
-
-${snippet ? `<i>"${escapeTgHtml(snippet)}"</i>\n` : ''}
-⚡ <b>Platform:</b> ${escapeTgHtml(lead.platform || 'LinkedIn')}
-👉 <i>Claim before competitors reach out!</i>`
-
-    const keyboard = {
-      inline_keyboard: [
-        [
-          { text: '⚡ Claim Lead (In-Chat)', callback_data: `claim:${lead.id}` },
-          { text: '🌐 View on Platform', url: leadUrl },
-        ],
-      ],
-    }
+    const { text: messageHtml, inline_keyboard } = formatTelegramLeadCard(lead, appUrl)
 
     for (const user of users) {
       if (!user.telegram_chat_id) continue
       const res = await sendTelegramMessage(user.telegram_chat_id, messageHtml, {
-        reply_markup: keyboard,
+        inline_keyboard,
       })
       if (res.success) sent++
       else failed++
