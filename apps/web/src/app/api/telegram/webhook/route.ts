@@ -16,6 +16,16 @@ export async function POST(request: NextRequest) {
   try {
     const update = await request.json()
 
+    // 0. Auto-detect any channel, supergroup, or group the bot is in or receiving updates from
+    const incomingChat =
+      update.my_chat_member?.chat ||
+      update.channel_post?.chat ||
+      update.message?.chat ||
+      update.callback_query?.message?.chat
+    if (incomingChat) {
+      await recordDetectedChat(incomingChat)
+    }
+
     // 1. Handle Inline Button Callback Queries (redirects any click to web dashboard)
     if (update.callback_query) {
       const cb = update.callback_query
@@ -42,6 +52,48 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('[Telegram Webhook] Error processing update:', error.message)
     return NextResponse.json({ ok: false, error: error.message }, { status: 200 }) // Return 200 so Telegram does not loop retries
+  }
+}
+
+async function recordDetectedChat(chat: any) {
+  if (!chat || !chat.id) return
+  const chatIdStr = String(chat.id)
+  const title =
+    chat.title ||
+    (chat.username ? `@${chat.username}` : null) ||
+    `${chat.first_name || ''} ${chat.last_name || ''}`.trim() ||
+    'Telegram Chat'
+  const type = chat.type || 'group'
+
+  try {
+    const existing = await db.setting.findUnique({
+      where: { key: 'telegram_detected_chats' },
+    })
+    const list: Array<{ id: string; title: string; type: string; lastSeen: string }> =
+      Array.isArray(existing?.value) ? (existing?.value as any) : []
+
+    const filtered = list.filter((c) => String(c.id) !== chatIdStr)
+    filtered.unshift({
+      id: chatIdStr,
+      title,
+      type,
+      lastSeen: new Date().toISOString(),
+    })
+
+    const updatedList = filtered.slice(0, 20)
+    await db.setting.upsert({
+      where: { key: 'telegram_detected_chats' },
+      create: {
+        key: 'telegram_detected_chats',
+        value: updatedList,
+        description: 'Auto-detected Telegram channels and groups the bot was added to',
+      },
+      update: {
+        value: updatedList,
+      },
+    })
+  } catch (err: any) {
+    console.warn('[Telegram Webhook] Failed to record detected chat:', err.message)
   }
 }
 

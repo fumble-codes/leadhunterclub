@@ -20,11 +20,12 @@ export async function GET(request: NextRequest) {
   try {
     await requireAdmin(request)
 
-    const [tgConfig, tgChannel, tgTemplate, tgDrips] = await Promise.allSettled([
+    const [tgConfig, tgChannel, tgTemplate, tgDrips, tgDetected] = await Promise.allSettled([
       db.setting.findUnique({ where: { key: 'telegram_config' } }),
       db.setting.findUnique({ where: { key: 'telegram_community_channel' } }),
       db.setting.findUnique({ where: { key: 'telegram_alert_template' } }),
       db.setting.findUnique({ where: { key: 'telegram_drip_settings' } }),
+      db.setting.findUnique({ where: { key: 'telegram_detected_chats' } }),
     ])
 
     const configVal = tgConfig.status === 'fulfilled' && tgConfig.value?.value
@@ -43,6 +44,10 @@ export async function GET(request: NextRequest) {
       ? (tgDrips.value.value as Record<string, any>)
       : {}
 
+    const detectedChats = tgDetected.status === 'fulfilled' && Array.isArray(tgDetected.value?.value)
+      ? tgDetected.value.value
+      : []
+
     return NextResponse.json({
       success: true,
       data: {
@@ -51,6 +56,7 @@ export async function GET(request: NextRequest) {
         hasBotToken: Boolean(configVal.bot_token || process.env.TELEGRAM_BOT_TOKEN),
         configuredChannelId: channelVal.channel_id || '',
         configuredChannelName: channelVal.channel_name || null,
+        detectedChats,
         alertTemplate: templateVal.template || DEFAULT_TELEGRAM_COMMUNITY_TEMPLATE,
         dripSettings: {
           free_drips_enabled: dripsVal.free_drips_enabled !== false,
@@ -92,6 +98,11 @@ export async function POST(request: NextRequest) {
       })
 
       return NextResponse.json({ success: true, message: 'Target Telegram channel saved successfully' })
+    }
+
+    if (action === 'clear_channel') {
+      await db.setting.deleteMany({ where: { key: 'telegram_community_channel' } })
+      return NextResponse.json({ success: true, message: 'Target Telegram channel cleared' })
     }
 
     if (action === 'save_template') {

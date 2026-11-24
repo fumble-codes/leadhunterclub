@@ -519,6 +519,7 @@ export default function AdminBroadcastPage() {
     hasBotToken: boolean
     configuredChannelId: string
     configuredChannelName: string | null
+    detectedChats?: Array<{ id: string; title: string; type: string; lastSeen?: string }>
     alertTemplate: string
     dripSettings: {
       free_drips_enabled: boolean
@@ -530,6 +531,7 @@ export default function AdminBroadcastPage() {
   const [tgLoading, setTgLoading] = useState(false)
   const [tgChannelInput, setTgChannelInput] = useState('')
   const [isSavingTgChannel, setIsSavingTgChannel] = useState(false)
+  const [isClearingTgChannel, setIsClearingTgChannel] = useState(false)
   const [tgTemplate, setTgTemplate] = useState<string>(DEFAULT_TELEGRAM_TEMPLATE)
   const [isSavingTgTemplate, setIsSavingTgTemplate] = useState(false)
   const [isTgTemplateDirty, setIsTgTemplateDirty] = useState(false)
@@ -573,8 +575,9 @@ export default function AdminBroadcastPage() {
     }
   }, [hasLoadedTgTemplate])
 
-  const handleSaveTgChannel = async () => {
-    if (!tgChannelInput.trim()) {
+  const handleSaveTgChannel = async (channelIdOverride?: string, channelNameOverride?: string) => {
+    const idToSave = (channelIdOverride !== undefined ? channelIdOverride : tgChannelInput).trim()
+    if (!idToSave) {
       addToast({ type: 'error', message: 'Channel or Group ID cannot be empty' })
       return
     }
@@ -589,12 +592,19 @@ export default function AdminBroadcastPage() {
         },
         body: JSON.stringify({
           action: 'save_channel',
-          channelId: tgChannelInput.trim(),
+          channelId: idToSave,
+          channelName: channelNameOverride || '',
         }),
       })
       const json = await res.json()
       if (res.ok && json.success) {
-        addToast({ type: 'success', message: 'Target Telegram community channel saved!' })
+        addToast({
+          type: 'success',
+          message: channelNameOverride
+            ? `Target set to "${channelNameOverride}"!`
+            : 'Target Telegram channel saved!',
+        })
+        setTgChannelInput(idToSave)
         fetchTelegramStatus()
       } else {
         addToast({ type: 'error', message: json.message || 'Failed to save channel' })
@@ -603,6 +613,33 @@ export default function AdminBroadcastPage() {
       addToast({ type: 'error', message: err?.message || 'Error saving channel' })
     } finally {
       setIsSavingTgChannel(false)
+    }
+  }
+
+  const handleClearTgChannel = async () => {
+    setIsClearingTgChannel(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: 'clear_channel' }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: 'Target channel cleared' })
+        setTgChannelInput('')
+        fetchTelegramStatus()
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to clear channel' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error clearing channel' })
+    } finally {
+      setIsClearingTgChannel(false)
     }
   }
 
@@ -2567,24 +2604,49 @@ export default function AdminBroadcastPage() {
 
           {/* Channel Binding Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Target Channel Card */}
             <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
-                  <span>Target Telegram Community Channel</span>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded font-mono ${
-                      tgData?.configuredChannelId
-                        ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    }`}
-                  >
-                    {tgData?.configuredChannelId ? 'Target Active' : 'No Target Set'}
-                  </span>
+                  <span>Target Community Telegram Channel</span>
+                  {tgData?.configuredChannelId ? (
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-1 text-[10px] text-sky-400 font-bold bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">
+                        <CheckCircleIcon className="w-3 h-3" /> Active & Saved
+                      </span>
+                      <button
+                        onClick={handleClearTgChannel}
+                        disabled={isClearingTgChannel}
+                        title="Clear / remove this target channel"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all cursor-pointer disabled:opacity-40"
+                      >
+                        <TrashIcon className="w-2.5 h-2.5" />
+                        <span>{isClearingTgChannel ? 'Clearing...' : 'Clear'}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      No Target Set
+                    </span>
+                  )}
                 </div>
-                <p className="text-[11px] text-text-secondary leading-relaxed">
-                  Enter your public channel username (e.g. <code className="text-sky-300">@theleadhunterclub</code>) or private channel/supergroup ID (e.g. <code className="text-sky-300">-100248...</code>).
-                </p>
-                <div className="mt-2.5 flex items-center gap-2">
+
+                {tgData?.configuredChannelId ? (
+                  <div className="p-2.5 rounded-lg bg-sky-950/25 border border-sky-500/20 mb-2.5">
+                    <span className="text-xs font-bold text-white block truncate">
+                      {tgData.configuredChannelName || tgData.configuredChannelId}
+                    </span>
+                    <span className="text-[10px] font-mono text-sky-400/80 block truncate mt-0.5">
+                      {tgData.configuredChannelId}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-text-secondary leading-relaxed mb-2">
+                    Select a detected channel on the right, or enter your channel handle/ID manually below:
+                  </p>
+                )}
+
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={tgChannelInput}
@@ -2593,7 +2655,7 @@ export default function AdminBroadcastPage() {
                     className="flex-1 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-mono placeholder:text-zinc-500 focus:outline-none focus:border-sky-500"
                   />
                   <button
-                    onClick={handleSaveTgChannel}
+                    onClick={() => handleSaveTgChannel()}
                     disabled={isSavingTgChannel}
                     className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all cursor-pointer disabled:opacity-40"
                   >
@@ -2602,24 +2664,95 @@ export default function AdminBroadcastPage() {
                 </div>
               </div>
 
-              {tgData?.configuredChannelName && (
-                <div className="mt-2.5 pt-2 border-t border-white/[0.04] flex items-center justify-between text-[11px]">
-                  <span className="text-text-secondary">Detected Name:</span>
-                  <span className="font-semibold text-white">{tgData.configuredChannelName}</span>
-                </div>
-              )}
+              <p className="text-[10px] text-text-secondary mt-2">
+                Leads approved in the admin queue will be automatically broadcasted to this Telegram channel.
+              </p>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-              <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
-                <span>Setup & Bot Permissions</span>
-                <span className="text-[10px] text-text-secondary">Instructions</span>
+            {/* Detected Channels Card (Just like WhatsApp) */}
+            <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs font-semibold text-white mb-2">
+                  <span>Detected Telegram Channels & Groups</span>
+                  <a
+                    href={`https://t.me/${tgData?.botUsername || 'leadhunterclubbot'}?startgroup=true`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-sky-500/15 text-sky-300 hover:bg-sky-500/25 border border-sky-500/30 transition-all shadow-sm"
+                  >
+                    <span>Add Bot to Channel</span>
+                    <ArrowTopRightOnSquareIcon className="w-2.5 h-2.5" />
+                  </a>
+                </div>
+
+                {tgData?.detectedChats && tgData.detectedChats.length > 0 ? (
+                  <div
+                    data-lenis-prevent
+                    className="space-y-1.5 max-h-48 overflow-y-auto overscroll-contain scrollbar-hide pr-1"
+                  >
+                    {tgData.detectedChats.map((chat) => {
+                      const isTarget =
+                        Boolean(tgData.configuredChannelId) &&
+                        (tgData.configuredChannelId === chat.id ||
+                          tgData.configuredChannelId === `@${chat.title}` ||
+                          tgData.configuredChannelId.toLowerCase() === chat.title.toLowerCase())
+                      return (
+                        <div
+                          key={chat.id}
+                          className={`flex items-center justify-between p-2 rounded-lg border text-[11px] transition-all ${
+                            isTarget
+                              ? 'bg-sky-950/30 border-sky-500/40 shadow-sm'
+                              : 'bg-black/30 border-white/[0.05]'
+                          }`}
+                        >
+                          <div className="truncate pr-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-semibold text-white block truncate">{chat.title}</span>
+                              <span className="px-1.5 py-0.2 rounded text-[8px] font-mono uppercase bg-white/[0.08] text-zinc-300">
+                                {chat.type}
+                              </span>
+                              {isTarget && (
+                                <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                                  ACTIVE
+                                </span>
+                              )}
+                            </div>
+                            <span className="font-mono text-[9px] text-text-secondary block truncate mt-0.5">
+                              {chat.id}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {isTarget ? (
+                              <span className="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-bold flex items-center gap-1">
+                                <CheckCircleIcon className="w-3 h-3 text-sky-400" />
+                                Target
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => handleSaveTgChannel(chat.id, chat.title)}
+                                disabled={isSavingTgChannel}
+                                className="px-2.5 py-1 rounded bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 text-[10px] font-semibold transition-all cursor-pointer"
+                              >
+                                Set as Target
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-lg bg-black/20 border border-white/[0.05] text-[11px] text-text-secondary space-y-1.5">
+                    <p>
+                      👉 Click <strong className="text-sky-300">&quot;Add Bot to Channel&quot;</strong> above, choose your channel/group, and add it with permission to post.
+                    </p>
+                    <p className="text-[10px] text-zinc-400">
+                      Once added, your channel will appear here automatically with a <strong>&quot;Set as Target&quot;</strong> button — exactly like WhatsApp!
+                    </p>
+                  </div>
+                )}
               </div>
-              <ul className="text-[11px] text-text-secondary space-y-1.5 mt-2 list-disc list-inside">
-                <li>Add <strong className="text-white">@{tgData?.botUsername || 'theleadhunter_bot'}</strong> as an Administrator in your Telegram channel or group.</li>
-                <li>Grant permission: <strong className="text-sky-400">Post Messages</strong> (and edit messages if desired).</li>
-                <li>All leads announced here contain deep-links directing hunters directly to the web dashboard for instant claiming with credits.</li>
-              </ul>
             </div>
           </div>
 
