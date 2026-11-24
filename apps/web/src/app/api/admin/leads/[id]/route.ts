@@ -16,6 +16,7 @@ import {
 } from '@/lib/external-api/client'
 import { oracleDb } from '@/lib/oracle-db'
 import { clearFeedCache } from '@/lib/feed-cache'
+import { broadcastTelegramLeadAlert } from '@/lib/services/telegram'
 
 export const dynamic = 'force-dynamic'
 
@@ -83,7 +84,33 @@ export async function POST(
         }
 
         const approved = await approvePost(id)
-        // Lead drop emails are batched and dispatched in bundles of 3 by backend lead-alert-email service
+
+        // Automatically dispatch Telegram lead card directly to community channel and members
+        try {
+          const leadToBroadcast = approved || post
+          let title = leadToBroadcast?.title
+          let niche = (leadToBroadcast as any)?.niche || (leadToBroadcast as any)?.keyword
+          let content = leadToBroadcast?.content
+
+          if (!content || !title) {
+            const dbPost = await db.leadPost.findUnique({ where: { id } })
+            title = title || dbPost?.title
+            niche = niche || dbPost?.niche || dbPost?.keyword
+            content = content || dbPost?.content
+          }
+
+          await broadcastTelegramLeadAlert([
+            {
+              id,
+              title,
+              niche,
+              platform: leadToBroadcast?.platform || 'linkedin',
+              content,
+            },
+          ])
+        } catch (tgErr: any) {
+          console.error('[Admin Leads API] Telegram drop error:', tgErr.message)
+        }
 
         clearFeedCache()
         return NextResponse.json({ success: true, data: approved, mode: intelResult.mode, message: 'Lead approved and released to the feed with intelligence report.' })

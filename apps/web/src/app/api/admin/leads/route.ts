@@ -13,6 +13,7 @@ import {
 } from '@/lib/external-api/client'
 import { db } from '@/lib/db'
 import { oracleDb } from '@/lib/oracle-db'
+import { broadcastTelegramLeadAlert } from '@/lib/services/telegram'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,6 +49,17 @@ export async function POST(request: NextRequest) {
       case 'bulk-approve': {
         if (ids && Array.isArray(ids) && ids.length > 0) {
           const result = await bulkApproveByIds(ids)
+          try {
+            const leads = await db.leadPost.findMany({
+              where: { id: { in: ids } },
+              select: { id: true, title: true, niche: true, platform: true, content: true },
+            })
+            if (leads.length > 0) {
+              await broadcastTelegramLeadAlert(leads)
+            }
+          } catch (tgErr: any) {
+            console.error('[Admin Leads API] Bulk Telegram drop error:', tgErr.message)
+          }
           // Note: Bulk approvals are batched and dispatched in bundles of 3 by backend lead-alert-email service
           return NextResponse.json(result)
         }
