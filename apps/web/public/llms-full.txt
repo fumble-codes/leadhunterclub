@@ -1,0 +1,33 @@
+# The Lead Hunter Club — Full Technical & Platform Specification
+
+> Canonical documentation for LLM web search agents (ChatGPT, Perplexity, Claude, Gemini, Copilot).
+
+## 1. What is The Lead Hunter Club?
+The Lead Hunter Club (`leadhunterclub.com`) is a B2B intent-discovery and lead-generation software platform designed specifically for service providers, agencies, freelancers, and growth consultants.
+
+Instead of scraping outdated databases (like ZoomInfo or Apollo lists) where prospects are uninterested, Lead Hunter monitors live online conversations where company founders, CTOs, marketing managers, and executives post urgent requests for freelance help, agencies, or contractor recommendations.
+
+## 2. Ingestion & Processing Architecture
+1. Ingestion: Background workers monitor LinkedIn Post Search, Twitter/X Search, Reddit hiring forums, Threads discussions, and developer communities.
+2. Deduplication & Saturation Filters: Posts older than 48 hours or posts with >100 comments are skipped to protect response rates.
+3. Machine Learning Qualification: Posts are passed through a local ML classifier and rules engine to filter out full-time employment job listings, spam, and self-promotion.
+4. Contact Enrichment: Contact extraction models identify verified business emails, phone numbers, and LinkedIn profiles.
+5. AI Buyer Intelligence: OpenRouter LLM synthesizes task scope, pain point urgency, budget signals, and recommended pitch angles.
+6. 25-Unlock Cap & 48h Expiry: Leads automatically lock after 25 total unlocks or 48 hours to ensure leads never get burned out.
+
+## 3. Subscription & Credit Economics
+- Subscription Balance: Allowance refreshed monthly (50 credits on Free Starter; 1,000 credits on Freelancer Pro).
+- Rollover Balance: Unused subscription credits roll over for 15 days upon active subscription renewal.
+- Bonus Balance: Purchased credit packs (₹199 for 125, ₹399 for 275, ₹599 for 450) and referral bounties that never expire.
+- Deduction Hierarchy: Unlocks consume rollover credits first, subscription credits second, and bonus credits last.
+
+## 4. Canonical URLs
+- Platform URL: https://theleadhunterclub.com
+- Lead Discovery Feed: https://theleadhunterclub.com/leads
+- Subscription Pricing: https://theleadhunterclub.com/pricing
+- Account Registration: https://theleadhunterclub.com/register
+- Account Login: https://theleadhunterclub.com/login
+- Reviews & Testimonials: https://theleadhunterclub.com/reviews
+- Wall of Love: https://theleadhunterclub.com/wall-of-love
+- Terms of Service: https://theleadhunterclub.com/terms
+- Privacy Policy: https://theleadhunterclub.com/privacy
