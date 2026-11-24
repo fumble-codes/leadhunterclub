@@ -137,25 +137,43 @@ export async function broadcastTelegramLeadAlert(leads: Array<{
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.theleadhunterclub.com'
 
-  const users = await db.user.findMany({
-    where: {
-      status: { in: ['ACTIVE', 'active'] },
-      telegram_chat_id: { not: null },
-    },
-    select: {
-      id: true,
-      name: true,
-      telegram_chat_id: true,
-    },
-  })
+  const [channelSetting, users] = await Promise.all([
+    db.setting.findUnique({ where: { key: 'telegram_community_channel' } }),
+    db.user.findMany({
+      where: {
+        status: { in: ['ACTIVE', 'active'] },
+        telegram_chat_id: { not: null },
+      },
+      select: {
+        id: true,
+        name: true,
+        telegram_chat_id: true,
+      },
+    }),
+  ])
+
+  const channelVal = (channelSetting?.value as Record<string, any>) || {}
+  const channelId = channelVal.channel_id
+
+  if (!channelId && users.length === 0) return { sent: 0, failed: 0 }
 
   let sent = 0
   let failed = 0
 
-  // Send each lead as an INDIVIDUAL Telegram message card matching the email card
+  // Send each lead directly as an INDIVIDUAL Telegram message card
   for (const lead of leads) {
     const { text: messageHtml, inline_keyboard } = formatTelegramLeadCard(lead, appUrl)
 
+    // Send directly to the Telegram Community Channel
+    if (channelId) {
+      const channelRes = await sendTelegramMessage(channelId, messageHtml, {
+        inline_keyboard,
+      })
+      if (channelRes.success) sent++
+      else failed++
+    }
+
+    // Send directly to individual hunters with connected Telegram
     for (const user of users) {
       if (!user.telegram_chat_id) continue
       const res = await sendTelegramMessage(user.telegram_chat_id, messageHtml, {
