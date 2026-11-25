@@ -201,9 +201,9 @@ export default function AdminPlansPage() {
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 border-b border-white/[0.06] pb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2.5">
-            <CreditCardIcon className="w-7 h-7 text-accent-mint" />
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2.5">
+            <CreditCardIcon className="w-7 h-7 shrink-0 text-accent-mint" />
             Plans & Refill Pricing Configuration
           </h1>
           <p className="text-sm text-text-secondary mt-1">
@@ -214,7 +214,7 @@ export default function AdminPlansPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-mint text-black text-sm font-bold shadow-lg shadow-accent-mint/20 hover:bg-accent-mint/90 transition-all disabled:opacity-50 cursor-pointer"
+          className="flex shrink-0 items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-mint text-black text-sm font-bold shadow-lg shadow-accent-mint/20 hover:bg-accent-mint/90 transition-all disabled:opacity-50 cursor-pointer"
         >
           <CheckCircleIcon className="w-5 h-5" />
           {saving ? 'Saving...' : 'Save Changes'}
@@ -222,10 +222,10 @@ export default function AdminPlansPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl w-fit">
+      <div className="flex w-full flex-wrap gap-2 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl sm:w-fit">
         <button
           onClick={() => setActiveTab('plans')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+          className={`flex items-center gap-2 px-4 py-3 sm:py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
             activeTab === 'plans'
               ? 'bg-accent-mint text-black shadow'
               : 'text-text-secondary hover:text-white'
@@ -242,7 +242,7 @@ export default function AdminPlansPage() {
               : 'text-text-secondary hover:text-white'
           }`}
         >
-          <BoltIcon className="w-4 h-4" />
+          <BoltIcon className="w-4 h-4 shrink-0" />
           Credit Refill Packs ({refillPacks.length})
         </button>
       </div>
@@ -250,13 +250,13 @@ export default function AdminPlansPage() {
       {/* TAB 1: SUBSCRIPTION PLANS */}
       {activeTab === 'plans' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-text-secondary uppercase tracking-widest">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+            <h2 className="min-w-0 text-sm font-bold text-text-secondary uppercase tracking-widest">
               Configured Subscription Tiers
             </h2>
             <button
               onClick={addNewPlan}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-accent-mint hover:bg-white/10 transition-all"
+              className="flex shrink-0 items-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-accent-mint hover:bg-white/10 transition-all"
             >
               <PlusIcon className="w-4 h-4" />
               Add New Plan Tier
@@ -267,7 +267,7 @@ export default function AdminPlansPage() {
             {plans.map((p, idx) => (
               <div
                 key={p.id}
-                className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 flex flex-col justify-between shadow-xl relative"
+                className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 flex flex-col justify-between shadow-xl relative"
               >
                 <div className="space-y-4">
                   {/* Top Bar: Name & Active Toggle */}
@@ -357,7 +357,7 @@ export default function AdminPlansPage() {
                       {p.features.map((feat, fIdx) => (
                         <div key={fIdx} className="flex items-center gap-1.5 text-xs">
                           <span className="text-accent-mint">✓</span>
-                          <span className="flex-1 text-zinc-300 text-[11px] truncate">{feat}</span>
+                          <span className="min-w-0 flex-1 text-zinc-300 text-[11px] truncate">{feat}</span>
                           <button
                             type="button"
                             onClick={() => removePlanFeature(idx, fIdx)}
@@ -397,7 +397,7 @@ export default function AdminPlansPage() {
                             setFeatureDrafts((prev) => ({ ...prev, [idx]: '' }))
                           }
                         }}
-                        className="flex-1 bg-surface-elevated border border-white/10 text-xs text-white px-2.5 py-1 rounded-lg outline-none focus:border-accent-mint"
+                        className="min-w-0 flex-1 bg-surface-elevated border border-white/10 text-xs text-white px-2.5 py-2 sm:py-1 rounded-lg outline-none focus:border-accent-mint"
                       />
                       <button
                         type="button"
@@ -408,7 +408,7 @@ export default function AdminPlansPage() {
                             setFeatureDrafts((prev) => ({ ...prev, [idx]: '' }))
                           }
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-accent-mint hover:text-black text-xs font-semibold text-zinc-300 transition-all cursor-pointer"
+                        className="shrink-0 px-2.5 py-2 sm:py-1 rounded-lg bg-white/10 hover:bg-accent-mint hover:text-black text-xs font-semibold text-zinc-300 transition-all cursor-pointer"
                       >
                         + Add
                       </button>
@@ -436,21 +436,21 @@ export default function AdminPlansPage() {
       {/* TAB 2: REFILL PACKS */}
       {activeTab === 'refills' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-text-secondary uppercase tracking-widest">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+            <h2 className="min-w-0 text-sm font-bold text-text-secondary uppercase tracking-widest">
               Configured Credit Refill Packs
             </h2>
             <button
               onClick={addNewRefillPack}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-accent-mint hover:bg-white/10 transition-all"
+              className="flex shrink-0 items-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-semibold text-accent-mint hover:bg-white/10 transition-all"
             >
               <PlusIcon className="w-4 h-4" />
               Add Refill Pack
             </button>
           </div>
 
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden shadow-xl">
-            <table className="w-full text-left text-sm">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-x-auto shadow-xl">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="bg-white/[0.02] border-b border-white/[0.06] text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                 <tr>
                   <th className="px-6 py-4">Pack ID</th>

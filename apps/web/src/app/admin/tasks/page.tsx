@@ -216,14 +216,14 @@ export default function AdminTasksPage() {
     <div className="mx-auto w-full max-w-[1400px] px-4 pb-24 pt-6 md:px-8">
       <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-text-primary">
+          <h1 className="font-display text-xl sm:text-2xl font-semibold tracking-tight text-text-primary">
             Tasks
           </h1>
           <p className="mt-1 text-sm text-text-muted">
             What the team is working on, what&apos;s next, and what&apos;s done.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/admin/products"
             className="inline-flex items-center gap-2 self-start rounded-xl border border-white/[0.09] px-3.5 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:border-white/15 hover:text-text-primary"
@@ -273,7 +273,7 @@ export default function AdminTasksPage() {
             value={productId}
             onChange={(event) => setProductId(event.target.value)}
             aria-label="Filter by product"
-            className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-text-secondary outline-none focus:border-accent-orange/40"
+            className="w-full min-w-0 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-text-secondary outline-none focus:border-accent-orange/40 sm:w-auto"
           >
             <option value="">All products</option>
             <option value="none">No product</option>
@@ -285,7 +285,7 @@ export default function AdminTasksPage() {
             value={assigneeId}
             onChange={(event) => setAssigneeId(event.target.value)}
             aria-label="Filter by assignee"
-            className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-text-secondary outline-none focus:border-accent-orange/40"
+            className="w-full min-w-0 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-text-secondary outline-none focus:border-accent-orange/40 sm:w-auto"
           >
             <option value="">Everyone</option>
             <option value="none">Unassigned</option>
@@ -304,7 +304,7 @@ export default function AdminTasksPage() {
           )}
         </div>
 
-        <div className="flex w-fit items-center gap-1 rounded-xl border border-white/[0.07] bg-white/[0.02] p-1">
+        <div className="flex w-fit shrink-0 items-center gap-1 rounded-xl border border-white/[0.07] bg-white/[0.02] p-1">
           <button
             type="button"
             onClick={() => setView('board')}

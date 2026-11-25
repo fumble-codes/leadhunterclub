@@ -131,11 +131,11 @@ export default function AdminRBACPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary tracking-tight">RBAC Engine</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">RBAC Engine</h1>
         <p className="text-sm text-text-secondary mt-1">Manage roles and permissions</p>
       </div>
 
-      <div className="flex gap-1 mb-6 bg-surface/20 rounded-xl p-1 border border-white/[0.06] w-fit">
+      <div className="flex flex-wrap gap-1 mb-6 bg-surface/20 rounded-xl p-1 border border-white/[0.06] w-fit max-w-full">
         <button onClick={() => setActiveTab('roles')}
           className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'roles' ? 'bg-accent-mint text-white' : 'text-text-secondary hover:text-text-primary'}`}>
           Roles
@@ -150,7 +150,7 @@ export default function AdminRBACPage() {
         <CustomLoader page="admin" />
       ) : activeTab === 'roles' ? (
         <div>
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 mb-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 mb-6">
             <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
               <PlusIcon className="w-4 h-4 text-accent-mint" />Create Role
             </h3>
@@ -177,7 +177,7 @@ export default function AdminRBACPage() {
                   const updated = current.includes(p) ? current.filter(x => x !== p) : [...current, p]
                   setNewRole({ ...newRole, permissions: updated.join(',') })
                 }}
-                  className={`px-2 py-1 rounded text-[10px] font-medium uppercase tracking-wider transition-all ${
+                  className={`px-2 py-1 min-h-[40px] sm:min-h-0 rounded text-[10px] font-medium uppercase tracking-wider transition-all ${
                     newRole.permissions.includes(p) ? 'bg-accent-mint/20 text-accent-mint border border-accent-mint/30' : 'bg-white/5 text-text-secondary border border-white/10 hover:bg-white/10'
                   }`}>{p}</button>
               ))}
@@ -188,7 +188,7 @@ export default function AdminRBACPage() {
             </button>
           </div>
 
-          <div className="relative max-w-xs mb-6">
+          <div className="relative w-full sm:max-w-xs mb-6">
             <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" />
             <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search roles..."
               className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-10 pr-4 py-2.5 text-sm"
@@ -199,11 +199,11 @@ export default function AdminRBACPage() {
             {filteredRoles.length === 0 ? (
               <p className="text-center text-sm text-text-secondary py-12">No roles found</p>
             ) : filteredRoles.map(r => (
-              <div key={r._id || r.id} className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
+              <div key={r._id || r.id} className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-5">
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="text-sm font-semibold text-text-primary">{r.name}</h3>
-                    <p className="text-[10px] text-text-secondary font-mono">{r.slug}</p>
+                    <p className="text-[10px] text-text-secondary font-mono break-all">{r.slug}</p>
                   </div>
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${
                     r.scopeType === 'global' ? 'bg-purple-500/10 text-purple-400' : 'bg-blue-500/10 text-blue-400'
@@ -221,7 +221,7 @@ export default function AdminRBACPage() {
         </div>
       ) : (
         <div>
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 mb-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 mb-6">
             <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
               <PlusIcon className="w-4 h-4 text-accent-mint" />Assign Role
             </h3>
@@ -252,7 +252,8 @@ export default function AdminRBACPage() {
           </div>
 
           <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
-            <table className="w-full">
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/[0.06]">
                   <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">User</th>
@@ -276,7 +277,7 @@ export default function AdminRBACPage() {
                     <td className="px-6 py-4 text-sm text-text-secondary">{a.scope?.type || 'global'}</td>
                     <td className="px-6 py-4 text-sm text-text-secondary">{a.expiresAt ? new Date(a.expiresAt).toLocaleDateString() : 'Never'}</td>
                     <td className="px-6 py-4 text-right">
-                      <button onClick={() => deleteAssignment(a._id || a.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-all">
+                      <button onClick={() => deleteAssignment(a._id || a.id)} className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-red-500/10 text-red-400 transition-all">
                         <TrashIcon className="w-4 h-4" />
                       </button>
                     </td>
@@ -284,6 +285,7 @@ export default function AdminRBACPage() {
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       )}

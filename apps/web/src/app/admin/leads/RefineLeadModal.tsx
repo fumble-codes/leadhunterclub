@@ -85,14 +85,14 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+      <div className="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto p-2 sm:p-4 bg-black/90 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="w-full max-w-5xl overflow-hidden bg-surface border border-white/10 rounded-2xl flex flex-col md:flex-row h-[90vh]"
+          className="w-full max-w-[95vw] sm:max-w-5xl overflow-hidden bg-surface border border-white/10 rounded-2xl flex flex-col md:flex-row h-[92dvh] md:h-[90vh]"
         >
-          <div className="flex-1 bg-black/40 flex flex-col border-r border-white/10 relative">
+          <div className="h-[26vh] sm:h-[30vh] md:h-auto md:flex-1 shrink-0 min-h-0 bg-black/40 flex flex-col border-b md:border-b-0 md:border-r border-white/10 relative">
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PhotoIcon className="w-4 h-4 text-accent-mint" />
@@ -116,18 +116,18 @@ export default function RefineLeadModal({ isOpen, onClose, onSuccess, lead }: Re
             </div>
           </div>
 
-          <div className="w-full md:w-[400px] flex flex-col bg-surface">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <div className="w-full md:w-[400px] min-h-0 flex flex-col bg-surface">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between gap-2 flex-wrap">
               <div>
-                <h2 className="text-xl font-bold text-text-primary tracking-tight">Refine Lead</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight">Refine Lead</h2>
                 <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">Manual Data Entry</p>
               </div>
-              <button onClick={onClose} className="text-text-secondary hover:text-white transition-colors">
+              <button onClick={onClose} aria-label="Close" className="p-2.5 sm:p-1 text-text-secondary hover:text-white transition-colors">
                 <XMarkIcon className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-6 flex-1 overflow-y-auto space-y-6">
+            <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto space-y-6">
               {error && (
                 <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-bold uppercase flex items-center gap-3 rounded-xl">
                   <ExclamationTriangleIcon className="w-4 h-4" />

@@ -132,9 +132,9 @@ export default function AdminTargetsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Watchlist</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Watchlist</h1>
           <p className="text-sm text-text-secondary mt-1">Monitor specific profiles for new content</p>
         </div>
         <button onClick={triggerScrapeAll} disabled={scrapingAll}
@@ -144,22 +144,22 @@ export default function AdminTargetsPage() {
         </button>
       </div>
 
-      <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 mb-6">
+      <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 mb-6">
         <h3 className="text-sm font-semibold text-text-primary mb-3"><UserGroupIcon className="w-4 h-4 inline mr-1.5" />Add Profile</h3>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex-1 min-w-[150px]">
+        <div className="flex flex-wrap items-end gap-2 sm:gap-3">
+          <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[150px]">
             <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1 block">Name</label>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="John Doe"
               className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
             />
           </div>
-          <div className="flex-[2] min-w-[200px]">
+          <div className="w-full sm:w-auto sm:flex-[2] sm:min-w-[200px]">
             <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1 block">Profile URL</label>
             <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://linkedin.com/in/..."
               className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
             />
           </div>
-          <div className="flex-1 min-w-[120px]">
+          <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[120px]">
             <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1 block">Notes</label>
             <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional"
               className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
@@ -172,7 +172,7 @@ export default function AdminTargetsPage() {
         </div>
       </div>
 
-      <div className="relative max-w-xs mb-6">
+      <div className="relative w-full sm:max-w-xs mb-6">
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search profiles..."
           className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
         />
@@ -185,7 +185,7 @@ export default function AdminTargetsPage() {
           {filtered.length === 0 ? (
             <div className="col-span-full text-center text-sm text-text-secondary py-12">No targets found</div>
           ) : filtered.map(t => (
-            <div key={t._id || t.id} className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
+            <div key={t._id || t.id} className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-5">
               {editingId === (t._id || t.id) ? (
                 <div className="space-y-3">
                   <input value={editName} onChange={e => setEditName(e.target.value)} autoFocus
@@ -198,16 +198,16 @@ export default function AdminTargetsPage() {
                     className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2 text-sm"
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => updateTarget(t._id || t.id)} className="px-4 py-1.5 rounded-lg bg-accent-mint text-white text-xs font-medium"><CheckIcon className="w-3.5 h-3.5 inline mr-1" />Save</button>
-                    <button onClick={() => setEditingId(null)} className="px-4 py-1.5 rounded-lg bg-white/5 text-text-secondary text-xs font-medium"><XMarkIcon className="w-3.5 h-3.5 inline mr-1" />Cancel</button>
+                    <button onClick={() => updateTarget(t._id || t.id)} className="px-4 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-accent-mint text-white text-xs font-medium"><CheckIcon className="w-3.5 h-3.5 inline mr-1" />Save</button>
+                    <button onClick={() => setEditingId(null)} className="px-4 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-white/5 text-text-secondary text-xs font-medium"><XMarkIcon className="w-3.5 h-3.5 inline mr-1" />Cancel</button>
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
+                  <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+                    <div className="min-w-0">
                       <h3 className="text-sm font-semibold text-text-primary">{t.name}</h3>
-                      <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-xs text-accent-mint hover:underline flex items-center gap-1 mt-0.5">
+                      <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-xs text-accent-mint hover:underline flex items-center gap-1 mt-0.5 break-all">
                         {t.url.replace(/^https?:\/\//, '').substring(0, 40)}{t.url.length > 40 ? '...' : ''} <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                       </a>
                     </div>
@@ -230,11 +230,11 @@ export default function AdminTargetsPage() {
                   </div>
                   <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
                     <button onClick={() => { setEditingId(t._id || t.id); setEditName(t.name); setEditUrl(t.url); setEditNotes(t.notes || '') }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/5 text-text-secondary text-xs font-medium transition-all">
+                      className="flex items-center gap-1.5 px-3 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-white/5 text-text-secondary text-xs font-medium transition-all">
                       <PencilSquareIcon className="w-3.5 h-3.5" />Edit
                     </button>
                     <button onClick={() => deleteTarget(t._id || t.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-red-400 text-xs font-medium transition-all ml-auto">
+                      className="flex items-center gap-1.5 px-3 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-red-500/10 text-red-400 text-xs font-medium transition-all ml-auto">
                       <TrashIcon className="w-3.5 h-3.5" />Remove
                     </button>
                   </div>

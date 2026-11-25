@@ -87,7 +87,7 @@ const INR = new Intl.NumberFormat('en-IN', {
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 ${className}`}>
+    <div className={`bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl min-w-0 p-4 sm:p-6 ${className}`}>
       {children}
     </div>
   )
@@ -120,8 +120,8 @@ function BarRow({
   const pct = total > 0 ? Math.round((count / total) * 100) : 0
   const row = (
     <div className="mb-3 last:mb-0">
-      <div className="flex items-center justify-between mb-1.5 gap-3">
-        <span className="text-xs font-semibold text-text-primary truncate">{label}</span>
+      <div className="flex flex-wrap items-center justify-between mb-1.5 gap-1 sm:gap-3">
+        <span className="text-xs font-semibold text-text-primary truncate min-w-0">{label}</span>
         <span className="text-xxs font-bold uppercase tracking-widest text-text-secondary tabular-nums shrink-0">
           {count} · {pct}%
         </span>
@@ -147,8 +147,8 @@ function BarRow({
 
 function MiniStat({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-4">
-      <p className="text-xl font-bold text-text-primary tabular-nums">{value}</p>
+    <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-4 min-w-0">
+      <p className="text-xl font-bold text-text-primary tabular-nums truncate">{value}</p>
       <p className="text-xs text-text-secondary mt-1">{label}</p>
       {sub && <p className="text-xxs text-text-secondary/70 mt-0.5">{sub}</p>}
     </div>
@@ -165,7 +165,7 @@ function InsightSkeleton() {
       {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
-          className="bg-surface/40 border border-white/[0.06] rounded-2xl p-6 h-56 animate-pulse"
+          className="bg-surface/40 border border-white/[0.06] rounded-2xl min-w-0 p-4 sm:p-6 h-56 animate-pulse"
         >
           <div className="h-3 w-32 bg-white/10 rounded mb-6" />
           <div className="space-y-4">
@@ -321,14 +321,14 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Admin Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Admin Dashboard</h1>
           <p className="text-sm text-text-secondary mt-1">Manage users and applications</p>
         </div>
         <Link
           href="/admin/users?status=PENDING"
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all shrink-0"
         >
           Review Pending
           <ArrowRightIcon className="w-4 h-4" />
@@ -339,7 +339,7 @@ export default function AdminDashboard() {
         {cards.map((card) => (
           <div
             key={card.label}
-            className={`bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 ${
+            className={`bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl min-w-0 p-4 sm:p-6 ${
               card.label === 'Pending Review' && highlightPending
                 ? 'ring-2 ring-yellow-400/50 animate-pulse'
                 : ''
@@ -357,7 +357,7 @@ export default function AdminDashboard() {
       </div>
 
       {stats && stats.pendingUsers > 0 && (
-        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-6 mb-8">
+        <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-2xl min-w-0 p-4 sm:p-6 mb-6 sm:mb-8">
           <h3 className="text-sm font-semibold text-yellow-400 mb-2">Pending Reviews</h3>
           <p className="text-sm text-text-secondary">
             {stats.pendingUsers} user{stats.pendingUsers !== 1 ? 's' : ''} waiting for approval.{' '}
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
       {insightsLoading ? (
         <InsightSkeleton />
       ) : insights ? (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Growth & funnel */}
           <div>
             <SectionTitle title="Growth & funnel" hint="Signups, activation and conversion" />
@@ -387,9 +387,9 @@ export default function AdminDashboard() {
                 <p className="text-xxs text-text-secondary mb-6">
                   {insights.growth.signups7d} this week · {insights.growth.signups30d} last 30 days
                 </p>
-                <div className="flex items-end gap-2 h-36">
+                <div className="flex items-end gap-1 sm:gap-2 h-36">
                   {insights.growth.weekly.map((w, i) => (
-                    <div key={`${w.label}-${i}`} className="flex-1 flex flex-col items-center gap-2">
+                    <div key={`${w.label}-${i}`} className="flex-1 min-w-0 flex flex-col items-center gap-2">
                       <span className="text-xxs font-bold text-text-secondary tabular-nums">
                         {w.count || ''}
                       </span>
@@ -399,7 +399,7 @@ export default function AdminDashboard() {
                         transition={{ duration: 0.7, delay: i * 0.06, ease: 'easeOut' }}
                         className="w-full min-h-[4px] rounded-t-md bg-gradient-to-t from-accent-mint/10 to-accent-mint/40"
                       />
-                      <span className="text-xxs text-text-secondary whitespace-nowrap">{w.label}</span>
+                      <span className="text-xxs text-text-secondary truncate max-w-full">{w.label}</span>
                     </div>
                   ))}
                 </div>

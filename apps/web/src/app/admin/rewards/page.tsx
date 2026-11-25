@@ -295,11 +295,11 @@ export default function AdminRewardsPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-2.5">
             <TrophyIcon className="w-7 h-7 text-accent-mint" />
             Milestone Rewards Review
           </h1>
@@ -338,15 +338,15 @@ export default function AdminRewardsPage() {
       </div>
 
       {/* Controls & Filter Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
-        <div ref={tabsScrollRef} className="flex items-center gap-2 overflow-x-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 border-b border-white/[0.08] pb-4">
+        <div ref={tabsScrollRef} className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto min-w-0">
           {(['PENDING', 'APPROVED', 'REJECTED', 'ALL'] as const).map((tab) => {
             const isActive = activeTab === tab
             return (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-accent-mint text-black'
                     : 'bg-surface-elevated text-zinc-400 hover:text-white border border-white/[0.08]'
@@ -375,7 +375,7 @@ export default function AdminRewardsPage() {
             placeholder="Search by user or note..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-1.5 bg-surface-elevated border border-white/[0.08] rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-accent-mint"
+            className="w-full pl-9 pr-3.5 py-1.5 min-h-[40px] sm:min-h-0 bg-surface-elevated border border-white/[0.08] rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-accent-mint"
           />
         </div>
       </div>
@@ -400,11 +400,11 @@ export default function AdminRewardsPage() {
             return (
               <div
                 key={proof.id}
-                className="bg-surface-elevated border border-white/[0.08] rounded-2xl p-5 hover:border-white/[0.15] transition-colors shadow-lg"
+                className="bg-surface-elevated border border-white/[0.08] rounded-2xl p-4 sm:p-5 hover:border-white/[0.15] transition-colors shadow-lg"
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex flex-wrap lg:flex-nowrap items-start lg:items-center justify-between gap-4">
                   {/* Left: User & Submission Details */}
-                  <div className="flex items-start gap-4 min-w-0">
+                  <div className="flex items-start gap-4 min-w-0 w-full lg:w-auto">
                     {/* Clickable Screenshot Thumbnail */}
                     <div
                       onClick={() => setLightboxImage(proof.imageUrl)}
@@ -428,7 +428,7 @@ export default function AdminRewardsPage() {
                         <span className="text-sm font-bold text-white">
                           {proof.user?.name || 'Unnamed User'}
                         </span>
-                        <span className="text-xs text-text-secondary font-mono">
+                        <span className="text-xs text-text-secondary font-mono break-all">
                           {proof.user?.email}
                         </span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-white/[0.06] text-zinc-400 border border-white/[0.08]">
@@ -467,19 +467,19 @@ export default function AdminRewardsPage() {
                   </div>
 
                   {/* Right: Actions / Status */}
-                  <div className="flex items-center gap-3 lg:self-center flex-shrink-0">
+                  <div className="flex items-center gap-3 lg:self-center flex-shrink-0 w-full lg:w-auto">
                     {proof.status === 'PENDING' ? (
                       <div className="flex items-center gap-2 w-full sm:w-auto">
                         <button
                           onClick={() => openApproveModal(proof)}
-                          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20"
+                          className="flex-1 sm:flex-initial px-4 py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20"
                         >
                           <CheckCircleIcon className="w-4 h-4" />
                           Approve (+{defaultReward})
                         </button>
                         <button
                           onClick={() => setRejectTarget(proof)}
-                          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-surface-elevated hover:bg-red-500/10 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                          className="flex-1 sm:flex-initial px-4 py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-surface-elevated hover:bg-red-500/10 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
                         >
                           <XCircleIcon className="w-4 h-4" />
                           Reject
@@ -529,12 +529,12 @@ export default function AdminRewardsPage() {
       {/* Approve Modal (Confirm / Adjust Credits) */}
       <AnimatePresence>
         {approveTarget && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-surface-elevated border border-white/[0.12] rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4"
+              className="bg-surface-elevated border border-white/[0.12] rounded-2xl p-4 sm:p-6 w-full max-w-[95vw] sm:max-w-md max-h-[90dvh] overflow-y-auto shadow-2xl space-y-4"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
@@ -546,7 +546,7 @@ export default function AdminRewardsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-container-lowest border border-white/[0.08] rounded-xl text-xs space-y-1">
+              <div className="p-3 bg-surface-container-lowest border border-white/[0.08] rounded-xl text-xs space-y-1 break-all">
                 <div className="text-zinc-400">
                   User: <span className="text-white font-bold">{approveTarget.user?.name}</span> ({approveTarget.user?.email})
                 </div>
@@ -575,12 +575,12 @@ export default function AdminRewardsPage() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setApproveTarget(null)}
                   disabled={approving}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-400 hover:text-white"
+                  className="px-4 py-2 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-bold text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
@@ -588,7 +588,7 @@ export default function AdminRewardsPage() {
                   type="button"
                   onClick={handleApprove}
                   disabled={approving}
-                  className="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
+                  className="px-5 py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
                 >
                   {approving ? 'Granting Credits...' : `Confirm & Award +${customCredits} Credits`}
                 </button>
@@ -601,12 +601,12 @@ export default function AdminRewardsPage() {
       {/* Reject Modal */}
       <AnimatePresence>
         {rejectTarget && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-surface-elevated border border-white/[0.12] rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4"
+              className="bg-surface-elevated border border-white/[0.12] rounded-2xl p-4 sm:p-6 w-full max-w-[95vw] sm:max-w-md max-h-[90dvh] overflow-y-auto shadow-2xl space-y-4"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
@@ -631,12 +631,12 @@ export default function AdminRewardsPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setRejectTarget(null)}
                   disabled={rejecting}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-400 hover:text-white"
+                  className="px-4 py-2 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-bold text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
@@ -644,7 +644,7 @@ export default function AdminRewardsPage() {
                   type="button"
                   onClick={handleReject}
                   disabled={rejecting}
-                  className="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-400 text-white font-bold text-xs transition-colors"
+                  className="px-5 py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-red-500 hover:bg-red-400 text-white font-bold text-xs transition-colors"
                 >
                   {rejecting ? 'Rejecting...' : 'Confirm Rejection'}
                 </button>
@@ -657,12 +657,12 @@ export default function AdminRewardsPage() {
       {/* Feature in Community Hub Modal */}
       <AnimatePresence>
         {featureTarget && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-surface-elevated border border-white/[0.12] rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4"
+              className="bg-surface-elevated border border-white/[0.12] rounded-2xl p-4 sm:p-6 w-full max-w-[95vw] sm:max-w-lg max-h-[90dvh] overflow-y-auto shadow-2xl space-y-4"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center text-accent-mint">
@@ -676,7 +676,7 @@ export default function AdminRewardsPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-container-lowest border border-white/[0.08] rounded-xl text-xs space-y-1">
+              <div className="p-3 bg-surface-container-lowest border border-white/[0.08] rounded-xl text-xs space-y-1 break-all">
                 <div className="text-zinc-400">
                   Member: <span className="text-white font-bold">{featureTarget.user?.name}</span> ({featureTarget.user?.plan || 'PRO'})
                 </div>
@@ -698,7 +698,7 @@ export default function AdminRewardsPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-text-secondary mb-1">
                       Deal Size (e.g. $4,500/mo)
@@ -751,12 +751,12 @@ export default function AdminRewardsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3">
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 pt-3">
                 <button
                   type="button"
                   onClick={() => setFeatureTarget(null)}
                   disabled={featuring}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-400 hover:text-white"
+                  className="px-4 py-2 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-bold text-zinc-400 hover:text-white"
                 >
                   Cancel
                 </button>
@@ -764,7 +764,7 @@ export default function AdminRewardsPage() {
                   type="button"
                   onClick={handleFeatureSubmit}
                   disabled={featuring || !featureForm.title.trim() || !featureForm.content.trim()}
-                  className="px-5 py-2 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-black font-bold text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-accent-mint/20 disabled:opacity-50"
+                  className="px-5 py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-black font-bold text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-accent-mint/20 disabled:opacity-50"
                 >
                   {featuring ? 'Publishing...' : 'Publish to Community Feed'}
                 </button>
@@ -779,14 +779,14 @@ export default function AdminRewardsPage() {
         {lightboxImage && (
           <div
             onClick={() => setLightboxImage(null)}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-5xl max-h-[90vh] bg-surface-elevated border border-white/[0.15] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
+              className="relative w-full max-w-[95vw] sm:max-w-5xl max-h-[90dvh] bg-surface-elevated border border-white/[0.15] rounded-2xl overflow-hidden shadow-2xl flex flex-col"
             >
               <div className="p-3 border-b border-white/[0.08] flex items-center justify-between">
                 <span className="text-xs font-semibold text-text-secondary">Submitted Screenshot Proof</span>
@@ -795,14 +795,14 @@ export default function AdminRewardsPage() {
                     href={lightboxImage}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-1 rounded text-zinc-400 hover:text-white"
+                    className="p-1 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded text-zinc-400 hover:text-white"
                     title="Open in new tab"
                   >
                     <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                   </a>
                   <button
                     onClick={() => setLightboxImage(null)}
-                    className="p-1 rounded text-zinc-400 hover:text-white"
+                    className="p-1 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded text-zinc-400 hover:text-white"
                   >
                     <XMarkIcon className="w-5 h-5" />
                   </button>
@@ -813,7 +813,7 @@ export default function AdminRewardsPage() {
                 <img
                   src={lightboxImage}
                   alt="Proof Full"
-                  className="max-h-[80vh] w-auto object-contain rounded"
+                  className="max-h-[80dvh] w-auto max-w-full object-contain rounded"
                 />
               </div>
             </motion.div>

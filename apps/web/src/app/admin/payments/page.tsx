@@ -84,14 +84,14 @@ export default function AdminPaymentsPage() {
   return (
     <div className="space-y-6">
       {/* Header & Stats Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pb-6 border-b border-white/[0.08]">
+        <div className="min-w-0">
           <div className="flex items-center gap-3 mb-1">
             <div className="w-10 h-10 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center">
               <BanknotesIcon className="w-5 h-5 text-accent-mint" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Payments & Billing</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Payments & Billing</h1>
               <p className="text-xs text-text-secondary">
                 Track all completed user subscriptions and credit top-up transactions
               </p>
@@ -99,7 +99,7 @@ export default function AdminPaymentsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="px-4 py-2 rounded-xl bg-surface-elevated border border-white/[0.08] text-right">
             <span className="text-[10px] text-text-secondary uppercase font-semibold block">Total Transactions</span>
             <span className="text-base font-bold text-white tabular-nums">{totalCount}</span>
@@ -119,7 +119,7 @@ export default function AdminPaymentsPage() {
       </div>
 
       {/* Controls: Search and Filter Tabs */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-80">
           <MagnifyingGlassIcon className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary" />
           <input
@@ -131,12 +131,12 @@ export default function AdminPaymentsPage() {
           />
         </form>
 
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-surface-elevated border border-white/[0.06] self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-surface-elevated border border-white/[0.06] self-start sm:self-auto">
           {(['all', 'plan', 'topup'] as const).map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+              className={`px-3 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg text-xs font-semibold capitalize transition-all ${
                 filterType === type
                   ? 'bg-accent-mint text-black shadow-sm'
                   : 'text-text-secondary hover:text-white'
@@ -164,8 +164,8 @@ export default function AdminPaymentsPage() {
             </p>
           </div>
         ) : (
-          <div ref={tableScrollRef} className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div ref={tableScrollRef} className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <table className="w-full min-w-[640px] text-left text-xs">
               <thead>
                 <tr className="border-b border-white/[0.08] bg-white/[0.02] text-text-secondary uppercase tracking-wider text-[10px]">
                   <th className="py-3 px-4 font-semibold">Date & Time</th>
@@ -179,7 +179,7 @@ export default function AdminPaymentsPage() {
               <tbody className="divide-y divide-white/[0.04]">
                 {filteredPayments.map((p) => (
                   <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3.5 px-4 text-text-secondary whitespace-nowrap">
+                    <td className="py-3.5 px-4 text-text-secondary sm:whitespace-nowrap">
                       {new Date(p.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -206,7 +206,7 @@ export default function AdminPaymentsPage() {
                         </Link>
                       )}
                       {p.userEmail && (
-                        <span className="text-[11px] text-text-secondary/70 block">{p.userEmail}</span>
+                        <span className="text-[11px] text-text-secondary/70 block break-all">{p.userEmail}</span>
                       )}
                     </td>
                     <td className="py-3.5 px-4">
@@ -217,17 +217,17 @@ export default function AdminPaymentsPage() {
                         </span>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 sm:whitespace-nowrap">
                       <span className="font-bold text-white text-sm">
                         ₹{p.amount?.toLocaleString('en-IN') || 0}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[11px]">
+                    <td className="py-3.5 px-4 font-mono text-[11px] break-all">
                       <div className="flex items-center gap-1.5">
                         <span className="text-white font-medium">{p.paymentId}</span>
                         <button
                           onClick={() => copyToClipboard(p.paymentId, 'Payment ID')}
-                          className="text-text-secondary hover:text-white p-0.5"
+                          className="text-text-secondary hover:text-white p-0.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0"
                           title="Copy Payment ID"
                         >
                           <DocumentDuplicateIcon className="w-3.5 h-3.5" />
@@ -238,7 +238,7 @@ export default function AdminPaymentsPage() {
                           <span>Order: {p.orderId}</span>
                           <button
                             onClick={() => copyToClipboard(p.orderId, 'Order ID')}
-                            className="text-text-secondary hover:text-white p-0.5"
+                            className="text-text-secondary hover:text-white p-0.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0"
                             title="Copy Order ID"
                           >
                             <DocumentDuplicateIcon className="w-3 h-3" />
@@ -246,7 +246,7 @@ export default function AdminPaymentsPage() {
                         </div>
                       )}
                     </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
+                    <td className="py-3.5 px-4 sm:whitespace-nowrap">
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         <CheckCircleIcon className="w-3 h-3" />
                         Paid
@@ -261,7 +261,7 @@ export default function AdminPaymentsPage() {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-white/[0.08] flex items-center justify-between text-xs text-text-secondary">
+          <div className="p-4 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-2 sm:gap-0 text-xs text-text-secondary">
             <span>
               Page {page} of {totalPages} ({totalCount} total)
             </span>
@@ -269,14 +269,14 @@ export default function AdminPaymentsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1 || loading}
-                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages || loading}
-                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
               </button>

@@ -1270,6 +1270,35 @@ deferred the exact semantics — fits their cross-functional team).
 
 ---
 
+### #24 Admin panel mobile optimization — ALL 25 screens (2026-11-25) — built, locally verified, NOT pushed
+User ask: "make the whole admin side admin front end mobile optimized and every screen optimized."
+- **Shell (`admin/layout.tsx`):** the old always-on `w-64` sidebar left ~119px of content at 375px.
+  Replaced with a mobile drawer: sticky mobile top bar (hamburger + Admin Panel link), off-canvas
+  `<aside>` (`fixed inset-y-0 left-0 z-[60] w-[280px] max-w-[85vw]`, `-translate-x-full` →
+  `translate-x-0`), backdrop (`z-[55]`), auto-close on pathname change + Escape + link click,
+  close button in drawer header. Desktop (`lg:`) keeps the original static `w-64` sidebar exactly.
+  `<main>` now `p-4 sm:p-5 lg:p-8` + `min-w-0`; nav links/tile 44px targets.
+- **All 25 admin pages** got a consistent responsive pass (className + minimal wrappers only, no
+  logic/copy/icon/color changes, desktop ≥1024px preserved via `sm:`/`lg:` restores): headers wrap
+  + `min-w-0` + responsive title sizes; filter/search/select/pill toolbars wrap with full-width
+  mobile inputs; bare `grid-cols-3/4/5/12` → 1-col mobile; tables (`credits`, `keywords`, `plans`,
+  `rbac`, `users`, `users/[id]`, `payments`, `broadcast`) got `overflow-x-auto` + `min-w-[640px]`;
+  all modals `max-w-[95vw] sm:max-w-*`, `max-h-[90dvh] overflow-y-auto`, `p-4 sm:p-6`, wrapping
+  footers; long emails/IDs/URLs `break-all`; touch targets ≥40px. Broadcast's 90 flex rows,
+  leads/tokens' dense panels, community, rewards, reviews, tasks/products/blog/support all covered.
+- **Shared admin components:** `ApifyExhaustionModal` (backdrop/panel scroll, stacked buttons,
+  touch close) + `ApifyExhaustionBanner` (wraps, full-width mobile) made responsive — these appear
+  on every admin screen. `leads/ManualLeadModal` + `RefineLeadModal` (OCR upload / refine screens):
+  responsive shells, stacked image+form on mobile, touch-visible thumbnail remove buttons.
+- **Verified:** `npx next lint --file` on all 29 touched files → clean (only 2 pre-existing
+  `exhaustive-deps` warnings in payments:64 / plans:47 + 2 pre-existing `<img>` warnings in the
+  lead modals). `npx tsc --noEmit` → 90 errors = documented baseline, **0 new**. `git diff` review
+  confirms className/wrapper-only changes. **Not browser-verified:** `/admin/*` is auth-gated and
+  no admin session was available this session — needs a real login to eyeball 375px vs 1440px.
+- **NOT pushed** (shared tree has other sessions' heavy WIP — isolate files in a clean worktree if pushing).
+
+---
+
 ## 3. Blocked — waiting on user input
 
 1. **Video asset for capabilities card 4** (#4).

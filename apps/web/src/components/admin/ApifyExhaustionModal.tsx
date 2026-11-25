@@ -68,8 +68,8 @@ export function ApifyExhaustionModal({ initialStatus }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-lg bg-[#0d0f12] border border-amber-500/30 rounded-3xl p-7 shadow-2xl shadow-amber-500/10 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-3 sm:p-4 bg-black/75 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-[95vw] sm:max-w-lg bg-[#0d0f12] border border-amber-500/30 rounded-3xl p-4 sm:p-7 shadow-2xl shadow-amber-500/10 overflow-x-hidden overflow-y-auto max-h-[92dvh]">
         {/* Ambient background glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-red-500/10 rounded-full blur-2xl pointer-events-none -ml-16 -mb-16" />
@@ -77,24 +77,24 @@ export function ApifyExhaustionModal({ initialStatus }: Props) {
         {/* Close Button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-5 right-5 p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+          className="absolute top-3 right-3 sm:top-5 sm:right-5 p-2.5 sm:p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
         >
           <XMarkIcon className="w-5 h-5" />
         </button>
 
         {/* Header with Warning Beacon */}
-        <div className="flex items-start gap-4 mb-5">
+        <div className="flex items-start gap-3 sm:gap-4 mb-5 pr-8 min-w-0">
           <div className="relative flex-shrink-0 w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
             <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-400 animate-ping opacity-75" />
             <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-400" />
             <ExclamationTriangleIcon className="w-6 h-6" />
           </div>
 
-          <div>
+          <div className="min-w-0">
             <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 mb-1.5">
               Action Required · Scraping Paused
             </span>
-            <h3 className="text-xl font-bold text-white tracking-tight">
+            <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight break-words">
               {details?.title || 'Apify Scraper Tokens Exhausted'}
             </h3>
           </div>
@@ -137,10 +137,10 @@ export function ApifyExhaustionModal({ initialStatus }: Props) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <button
             onClick={handleNavigateTokens}
-            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-black font-semibold text-sm transition-all shadow-lg shadow-accent-mint/20"
+            className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-accent-mint hover:bg-accent-mint/90 text-black font-semibold text-sm transition-all shadow-lg shadow-accent-mint/20"
           >
             <KeyIcon className="w-4 h-4" />
             <span>Add / Manage Apify Keys</span>

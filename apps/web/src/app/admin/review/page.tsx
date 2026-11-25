@@ -190,16 +190,16 @@ export default function AdminReviewPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Review Applications</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Review Applications</h1>
           <p className="text-sm text-text-secondary mt-1">
             {users.length} pending application{users.length !== 1 ? 's' : ''}
           </p>
         </div>
         <Link
           href="/admin/users?status=PENDING"
-          className="text-sm text-accent-mint hover:underline"
+          className="text-sm text-accent-mint hover:underline inline-flex items-center min-h-[40px] sm:min-h-0"
         >
           View all in table
         </Link>
@@ -220,8 +220,8 @@ export default function AdminReviewPage() {
               className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl"
             >
               <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
+                <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-0 mb-4">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <UserIcon className="w-4 h-4 text-accent-mint" />
                       <Link
@@ -243,9 +243,9 @@ export default function AdminReviewPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-text-secondary mt-0.5 ml-6">{u.email}</p>
+                    <p className="text-sm text-text-secondary mt-0.5 ml-6 break-all">{u.email}</p>
                   </div>
-                  <div className="text-right shrink-0">
+                  <div className="text-right shrink-0 min-w-0">
                     {u.phone && (
                       <p className="text-xs text-text-secondary">{u.phone}</p>
                     )}
@@ -334,7 +334,7 @@ export default function AdminReviewPage() {
                 </div>
               </div>
 
-              <div className="border-t border-white/[0.06] p-4 bg-white/[0.02] flex items-center gap-2">
+              <div className="border-t border-white/[0.06] p-4 bg-white/[0.02] flex flex-wrap items-center gap-2">
                 <ReviewActions
                   user={u}
                   actionLoading={actionLoading}
@@ -362,11 +362,11 @@ export default function AdminReviewPage() {
                 <span className="text-text-primary font-medium">{pagination.total}</span> pending applications
               </p>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   onClick={() => handlePageChange(page - 1)}
                   disabled={!pagination.hasPrev}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="px-3.5 py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   Previous
                 </button>
@@ -393,7 +393,7 @@ export default function AdminReviewPage() {
                       <button
                         key={item}
                         onClick={() => handlePageChange(item)}
-                        className={`min-w-[32px] h-8 px-2 rounded-xl text-xs font-medium border transition-all ${
+                        className={`min-w-[40px] sm:min-w-[32px] h-10 sm:h-8 px-2 rounded-xl text-xs font-medium border transition-all ${
                           item === pagination.page
                             ? 'bg-accent-mint text-surface font-semibold border-accent-mint shadow-sm'
                             : 'bg-white/[0.03] border-white/[0.06] text-text-secondary hover:text-white hover:bg-white/[0.06]'
@@ -407,7 +407,7 @@ export default function AdminReviewPage() {
                 <button
                   onClick={() => handlePageChange(page + 1)}
                   disabled={!pagination.hasNext}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="px-3.5 py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   Next
                 </button>
@@ -443,7 +443,7 @@ function ReviewActions({
         <button
           onClick={() => onSendReminder(user.id, user.email)}
           disabled={actionLoading === `${user.id}-REMIND`}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium hover:bg-amber-500/20 transition-all disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[40px] sm:min-h-0 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium hover:bg-amber-500/20 transition-all disabled:opacity-50"
           title="Send onboarding reminder email"
         >
           <EnvelopeIcon className="w-4 h-4" />
@@ -457,7 +457,7 @@ function ReviewActions({
             setShowPlans(!showPlans)
           }}
           disabled={actionLoading === `${user.id}-APPROVE` || actionLoading === `${user.id}-REJECT`}
-          className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium hover:bg-green-500/20 transition-all disabled:opacity-50"
+          className="inline-flex items-center gap-1 px-4 py-2 min-h-[40px] sm:min-h-0 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium hover:bg-green-500/20 transition-all disabled:opacity-50"
         >
           <CheckCircleIcon className="w-4 h-4" />
           Approve
@@ -489,7 +489,7 @@ function ReviewActions({
       <button
         onClick={() => onAction(user.id, 'REJECT')}
         disabled={actionLoading === `${user.id}-REJECT`}
-        className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
+        className="inline-flex items-center gap-1 px-4 py-2 min-h-[40px] sm:min-h-0 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
       >
         <XCircleIcon className="w-4 h-4" />
         {actionLoading === `${user.id}-REJECT` ? '...' : 'Reject'}

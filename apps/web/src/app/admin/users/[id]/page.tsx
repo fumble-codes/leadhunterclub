@@ -473,7 +473,7 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="max-w-4xl">
-      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-6">
         <Link
           href={backUrl}
           className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-white transition-colors group"
@@ -486,46 +486,46 @@ export default function AdminUserDetailPage() {
           {prevUser && (
             <Link
               href={`/admin/users/${prevUser.id}?fromPage=${fromPage}${statusParam ? `&status=${statusParam}` : ''}${fromReview ? '&from=review' : ''}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-text-secondary hover:text-white transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-text-secondary hover:text-white transition-all shadow-sm"
               title={`Previous: ${prevUser.name}`}
             >
               <ArrowLeftIcon className="w-3 h-3 text-accent-mint" />
-              <span>Prev: <span className="text-text-primary font-medium">{prevUser.name}</span></span>
+              <span className="min-w-0 break-words">Prev: <span className="text-text-primary font-medium">{prevUser.name}</span></span>
             </Link>
           )}
           {nextUser && (
             <Link
               href={`/admin/users/${nextUser.id}?fromPage=${fromPage}${statusParam ? `&status=${statusParam}` : ''}${fromReview ? '&from=review' : ''}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-text-secondary hover:text-white transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-text-secondary hover:text-white transition-all shadow-sm"
               title={`Next: ${nextUser.name}`}
             >
-              <span>Next: <span className="text-text-primary font-medium">{nextUser.name}</span></span>
+              <span className="min-w-0 break-words">Next: <span className="text-text-primary font-medium">{nextUser.name}</span></span>
               <ArrowRightIcon className="w-3 h-3 text-accent-mint" />
             </Link>
           )}
         </div>
       </div>
 
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-bold text-text-primary tracking-tight">{user.name}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight break-words">{user.name}</h1>
             <span
               className={`inline-flex text-xs font-medium px-3 py-1 rounded-full border ${STATUS_BADGES[user.status] || ''}`}
             >
               {user.status}
             </span>
           </div>
-          <p className="text-sm text-text-secondary">{user.email}</p>
+          <p className="text-sm text-text-secondary break-all">{user.email}</p>
         </div>
       </div>
 
-      <div className="flex gap-1 mb-6 border-b border-white/[0.06]">
+      <div className="flex flex-wrap gap-1 sm:gap-2 mb-6 border-b border-white/[0.06]">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all ${
+            className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium whitespace-nowrap shrink-0 border-b-2 transition-all ${
               activeTab === tab.id
                 ? 'border-accent-mint text-white'
                 : 'border-transparent text-text-secondary hover:text-text-primary'
@@ -538,13 +538,13 @@ export default function AdminUserDetailPage() {
       </div>
 
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
               Account Info
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between text-sm items-center">
+              <div className="flex flex-wrap justify-between items-center gap-1 text-sm">
                 <span className="text-text-secondary">Plan</span>
                 <span
                   className={`inline-flex items-center text-xs font-medium px-2.5 py-1 rounded-full ${PLAN_BADGES[user.plan] || 'text-text-secondary bg-white/5'}`}
@@ -552,7 +552,7 @@ export default function AdminUserDetailPage() {
                   {plans.find((p) => p.id === user.plan)?.label || (user.plan === 'FREE' ? 'Free Starter' : user.plan)}
                 </span>
               </div>
-              <div className="flex justify-between text-sm items-center">
+              <div className="flex flex-wrap justify-between items-center gap-1 text-sm">
                 <span className="text-text-secondary">Onboarding</span>
                 {Boolean(user.linkedin && (user.servicesOffered?.length ?? 0) > 0) ? (
                   <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full text-emerald-400 bg-emerald-500/10 border border-emerald-500/20">
@@ -566,24 +566,24 @@ export default function AdminUserDetailPage() {
                   </span>
                 )}
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex flex-wrap justify-between items-center gap-1 text-sm">
                 <span className="text-text-secondary">Role</span>
-                <span className="text-text-primary font-medium">{user.role}</span>
+                <span className="text-text-primary font-medium min-w-0 break-words text-right">{user.role}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex flex-wrap justify-between items-center gap-1 text-sm">
                 <span className="text-text-secondary">Phone</span>
-                <span className="text-text-primary font-medium">{user.phone || '—'}</span>
+                <span className="text-text-primary font-medium min-w-0 break-all text-right">{user.phone || '—'}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              <div className="flex flex-wrap justify-between items-center gap-1 text-sm">
                 <span className="text-text-secondary">Joined</span>
-                <span className="text-text-primary font-medium">
+                <span className="text-text-primary font-medium min-w-0 break-words text-right">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
               Actions
             </h3>
@@ -613,7 +613,7 @@ export default function AdminUserDetailPage() {
                   <label className="text-xs text-text-secondary font-medium block">
                     Approve with Plan & Renewal
                   </label>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     {plans.map((p) => (
                       <button
                         key={p.id}
@@ -622,7 +622,7 @@ export default function AdminUserDetailPage() {
                           setSelectedPlan(p.id)
                           setApprovalCredits(String(p.credits))
                         }}
-                        className={`flex-1 px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
+                        className={`flex-1 min-w-[120px] px-3 py-2.5 sm:py-2 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium border transition-all ${
                           selectedPlan === p.id
                             ? 'bg-green-500/10 border-green-500/30 text-green-400'
                             : 'bg-white/[0.03] border-white/[0.06] text-text-secondary hover:text-text-primary'
@@ -643,7 +643,7 @@ export default function AdminUserDetailPage() {
                         type="date"
                         value={approvalRenewalDate}
                         onChange={(e) => setApprovalRenewalDate(e.target.value)}
-                        className="w-full bg-surface-elevated border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-2.5 py-1.5 text-xs"
+                        className="w-full bg-surface-elevated border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-2.5 py-2.5 sm:py-1.5 text-xs"
                       />
                       <span className="text-xxs text-text-muted mt-0.5 block">Next Autopay cycle</span>
                     </div>
@@ -656,7 +656,7 @@ export default function AdminUserDetailPage() {
                         min="0"
                         value={approvalCredits}
                         onChange={(e) => setApprovalCredits(e.target.value)}
-                        className="w-full bg-surface-elevated border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-2.5 py-1.5 text-xs"
+                        className="w-full bg-surface-elevated border border-white/10 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-2.5 py-2.5 sm:py-1.5 text-xs"
                       />
                       <span className="text-xxs text-text-muted mt-0.5 block">Starting credits</span>
                     </div>
@@ -715,7 +715,7 @@ export default function AdminUserDetailPage() {
           </div>
 
           {user.servicesOffered.length > 0 && (
-            <div className="md:col-span-2 bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+            <div className="md:col-span-2 bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
               <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
                 Onboarding Info
               </h3>
@@ -765,7 +765,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.portfolio)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-accent-mint hover:underline"
+                      className="text-sm text-accent-mint hover:underline break-all"
                     >
                       {user.portfolio}
                     </a>
@@ -778,7 +778,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.website)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-accent-mint hover:underline"
+                      className="text-sm text-accent-mint hover:underline break-all"
                     >
                       {user.website}
                     </a>
@@ -791,7 +791,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.linkedin)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-accent-mint hover:underline"
+                      className="text-sm text-accent-mint hover:underline break-all"
                     >
                       {user.linkedin}
                     </a>
@@ -804,7 +804,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.dribbble)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-accent-mint hover:underline"
+                      className="text-sm text-accent-mint hover:underline break-all"
                     >
                       {user.dribbble}
                     </a>
@@ -817,7 +817,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.behance)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-400 hover:underline"
+                      className="text-sm text-blue-400 hover:underline break-all"
                     >
                       {user.behance}
                     </a>
@@ -830,7 +830,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.github)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-text-secondary hover:text-white"
+                      className="text-sm text-text-secondary hover:text-white break-all"
                     >
                       {user.github}
                     </a>
@@ -843,7 +843,7 @@ export default function AdminUserDetailPage() {
                       href={ensureUrl(user.twitter)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-cyan-400 hover:underline"
+                      className="text-sm text-cyan-400 hover:underline break-all"
                     >
                       {user.twitter}
                     </a>
@@ -856,25 +856,25 @@ export default function AdminUserDetailPage() {
       )}
 
       {activeTab === 'credits' && (
-        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
           <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
             Credit Management
           </h3>
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              <div className="p-3 min-w-0 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-xs text-text-secondary block mb-1">Subscription</span>
                 <span className="text-lg font-bold text-text-primary">
                   {user.creditAccount?.subscriptionBalance ?? 0}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="p-3 min-w-0 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-xs text-text-secondary block mb-1">Bonus</span>
                 <span className="text-lg font-bold text-text-primary">
                   {user.creditAccount?.bonusBalance ?? 0}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="p-3 min-w-0 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                 <span className="text-xs text-text-secondary block mb-1">Total</span>
                 <span className="text-lg font-bold text-accent-mint">
                   {user.creditAccount?.total ?? 0}
@@ -897,7 +897,7 @@ export default function AdminUserDetailPage() {
               </p>
             )}
             <div className="flex flex-wrap gap-3 pt-2">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <span className="text-sm text-text-secondary">Grant Bonus:</span>
                 <input
                   type="number"
@@ -905,12 +905,12 @@ export default function AdminUserDetailPage() {
                   onChange={(e) => setBonusCreditInput(e.target.value)}
                   min="0"
                   placeholder="Amount"
-                  className="w-24 bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2 text-sm"
+                  className="w-full sm:w-24 bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2 text-sm"
                 />
                 <button
                   onClick={handleBonusCreditGrant}
                   disabled={actionLoading === 'bonusCredits'}
-                  className="px-4 py-2 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
+                  className="px-4 py-2.5 sm:py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
                 >
                   {actionLoading === 'bonusCredits' ? 'Granting...' : 'Grant'}
                 </button>
@@ -918,7 +918,7 @@ export default function AdminUserDetailPage() {
               <button
                 onClick={() => handleAction('RENEW_NOW')}
                 disabled={actionLoading === 'RENEW_NOW'}
-                className="px-4 py-2 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-sm font-medium hover:bg-accent-mint/20 transition-all disabled:opacity-50"
+                className="px-4 py-2.5 sm:py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-accent-mint text-sm font-medium hover:bg-accent-mint/20 transition-all disabled:opacity-50"
               >
                 {actionLoading === 'RENEW_NOW' ? 'Renewing...' : 'Renew Now'}
               </button>
@@ -931,13 +931,13 @@ export default function AdminUserDetailPage() {
 
               {renewalMessage && (
                 <div
-                  className={`p-3 rounded-xl text-xs flex items-center justify-between border transition-all ${
+                  className={`p-3 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 border transition-all ${
                     renewalMessage.type === 'success'
                       ? 'bg-green-500/10 border-green-500/30 text-green-400'
                       : 'bg-red-500/10 border-red-500/30 text-red-400'
                   }`}
                 >
-                  <span className="font-medium">{renewalMessage.text}</span>
+                  <span className="font-medium min-w-0 break-words">{renewalMessage.text}</span>
                   <button
                     type="button"
                     onClick={() => setRenewalMessage(null)}
@@ -1003,17 +1003,17 @@ export default function AdminUserDetailPage() {
         <div className="space-y-6">
           {/* Quick Payment Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
+            <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-5">
               <span className="text-xxs text-text-secondary uppercase tracking-wider block font-semibold">
                 Total Revenue from User
               </span>
-              <div className="text-2xl font-bold text-white mt-1">
+              <div className="text-2xl font-bold text-white mt-1 break-words">
                 ₹{payments.reduce((acc, p) => acc + (p.amount || 0), 0).toLocaleString('en-IN')}
               </div>
               <span className="text-xs text-text-muted mt-0.5 block">Lifetime successful charges</span>
             </div>
 
-            <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
+            <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-5">
               <span className="text-xxs text-text-secondary uppercase tracking-wider block font-semibold">
                 Total Transactions
               </span>
@@ -1023,7 +1023,7 @@ export default function AdminUserDetailPage() {
               <span className="text-xs text-text-muted mt-0.5 block">Subscriptions & Credit Refills</span>
             </div>
 
-            <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-5">
+            <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-5">
               <span className="text-xxs text-text-secondary uppercase tracking-wider block font-semibold">
                 Latest Transaction
               </span>
@@ -1043,15 +1043,15 @@ export default function AdminUserDetailPage() {
           </div>
 
           {/* Transactions Table Card */}
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
                 Payment Transactions ({payments.length})
               </h3>
               <button
                 onClick={fetchPayments}
                 disabled={paymentsLoading}
-                className="text-xs text-text-secondary hover:text-white transition-colors flex items-center gap-1.5"
+                className="text-xs text-text-secondary hover:text-white transition-colors flex items-center gap-1.5 p-2 sm:p-0 min-h-[40px] sm:min-h-0"
               >
                 <span>↻ Refresh</span>
               </button>
@@ -1069,7 +1069,7 @@ export default function AdminUserDetailPage() {
               </div>
             ) : (
               <div ref={tableScrollRef} className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
+                <table className="w-full min-w-[640px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-white/[0.08] text-xxs uppercase tracking-wider text-text-secondary font-semibold">
                       <th className="pb-3 pr-4">Date & Time</th>
@@ -1130,7 +1130,7 @@ export default function AdminUserDetailPage() {
                                 setCopiedId(p.paymentId)
                                 setTimeout(() => setCopiedId(null), 2000)
                               }}
-                              className="p-1 rounded hover:bg-white/10 text-text-secondary hover:text-white transition-colors"
+                              className="p-2.5 sm:p-1 rounded hover:bg-white/10 text-text-secondary hover:text-white transition-colors"
                               title="Copy Payment ID"
                             >
                               {copiedId === p.paymentId ? (
@@ -1152,7 +1152,7 @@ export default function AdminUserDetailPage() {
                                   setCopiedId(p.orderId)
                                   setTimeout(() => setCopiedId(null), 2000)
                                 }}
-                                className="p-1 rounded hover:bg-white/10 text-text-secondary hover:text-white transition-colors"
+                                className="p-2.5 sm:p-1 rounded hover:bg-white/10 text-text-secondary hover:text-white transition-colors"
                                 title="Copy Order ID"
                               >
                                 {copiedId === p.orderId ? (
@@ -1175,7 +1175,7 @@ export default function AdminUserDetailPage() {
       )}
 
       {activeTab === 'history' && (
-        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
           <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
             Status History
           </h3>
@@ -1188,7 +1188,7 @@ export default function AdminUserDetailPage() {
           ) : (
             <div className="space-y-0">
               {auditLogs.map((log, i) => (
-                <div key={log.id} className="flex gap-4 pb-4 relative">
+                <div key={log.id} className="flex gap-3 sm:gap-4 pb-4 relative">
                   {i < auditLogs.length - 1 && (
                     <div className="absolute left-[11px] top-6 bottom-0 w-px bg-white/[0.06]" />
                   )}
@@ -1202,8 +1202,8 @@ export default function AdminUserDetailPage() {
                     <div className="w-2 h-2 rounded-full bg-current" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-text-primary">{formatLogAction(log)}</p>
-                    <p className="text-xs text-text-secondary mt-0.5">
+                    <p className="text-sm text-text-primary break-words">{formatLogAction(log)}</p>
+                    <p className="text-xs text-text-secondary mt-0.5 break-words">
                       by {log.adminName} · {new Date(log.createdAt).toLocaleString()}
                     </p>
                   </div>
@@ -1216,7 +1216,7 @@ export default function AdminUserDetailPage() {
 
       {activeTab === 'notes' && (
         <div className="space-y-4">
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
               Add Note
             </h3>
@@ -1231,14 +1231,14 @@ export default function AdminUserDetailPage() {
               <button
                 onClick={handleSendNote}
                 disabled={noteSending || !noteInput.trim()}
-                className="px-4 py-2 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
+                className="px-4 py-2.5 sm:py-2 min-h-[40px] sm:min-h-0 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
               >
                 {noteSending ? 'Saving...' : 'Save Note'}
               </button>
             </div>
           </div>
 
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-4">
               Notes
             </h3>

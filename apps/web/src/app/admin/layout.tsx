@@ -31,6 +31,8 @@ import {
   BanknotesIcon,
   ClipboardDocumentListIcon,
   CubeIcon,
+  Bars3Icon,
+  XMarkIcon,
 } from '@heroicons/react/24/solid'
 
 const adminNav = [
@@ -60,6 +62,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const router = useRouter()
   const { user, loading, logout, firebaseUser } = useAuth()
+
+  // Mobile sidebar drawer state (desktop keeps the permanent sidebar)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Close the drawer on navigation and on Escape
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [pathname])
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSidebarOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [sidebarOpen])
 
   const [apifyStatus, setApifyStatus] = useState<{
     exhausted: boolean
@@ -148,13 +166,52 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         />
       )}
 
-      <div className="flex-1 flex min-h-0">
-        <aside className="w-64 border-r border-white/[0.06] bg-surface/30 p-6 flex flex-col">
-          <Link href="/admin" className="text-lg font-bold text-text-primary tracking-tight mb-8">
-            Admin Panel
-          </Link>
+      {/* Mobile top bar — the permanent sidebar is hidden below lg */}
+      <div className="lg:hidden shrink-0 flex items-center gap-3 px-4 py-3 border-b border-white/[0.06] bg-surface/80 backdrop-blur-xl sticky top-0 z-30">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open admin menu"
+          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-text-primary active:scale-95 transition-transform"
+        >
+          <Bars3Icon className="w-5 h-5" />
+        </button>
+        <Link href="/admin" className="text-base font-bold text-text-primary tracking-tight truncate">
+          Admin Panel
+        </Link>
+      </div>
 
-          <nav className="flex flex-col gap-1 flex-1 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 flex min-h-0 relative">
+        {/* Backdrop (mobile only) */}
+        {sidebarOpen && (
+          <button
+            type="button"
+            aria-label="Close admin menu"
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden fixed inset-0 z-[55] bg-black/70 backdrop-blur-sm cursor-default"
+          />
+        )}
+
+        <aside
+          className={`fixed inset-y-0 left-0 z-[60] w-[280px] max-w-[85vw] border-r border-white/[0.06] bg-[#0b0b0e] p-5 flex flex-col shadow-2xl transition-transform duration-300 ease-out
+            lg:static lg:z-auto lg:translate-x-0 lg:w-64 lg:shrink-0 lg:bg-surface/30 lg:shadow-none lg:p-6
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        >
+          <div className="flex items-center justify-between gap-2 mb-6 lg:mb-8">
+            <Link href="/admin" className="text-lg font-bold text-text-primary tracking-tight">
+              Admin Panel
+            </Link>
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close admin menu"
+              className="lg:hidden w-9 h-9 shrink-0 flex items-center justify-center rounded-lg text-text-secondary hover:text-text-primary hover:bg-white/[0.06]"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          </div>
+
+          <nav className="flex flex-col gap-1 flex-1 overflow-y-auto scrollbar-hide overscroll-contain">
             {adminNav.map((item) => {
               const isActive =
                 pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
@@ -162,14 +219,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-accent-mint/10 text-accent-mint border border-accent-mint/20'
                       : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
                   }`}
                 >
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
+                  <item.icon className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{item.name}</span>
                 </Link>
               )
             })}
@@ -179,12 +237,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={() => logout()}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-text-secondary hover:text-red-400 hover:bg-red-500/5 transition-all duration-200 mt-4"
           >
-            <ArrowLeftOnRectangleIcon className="w-4 h-4" />
+            <ArrowLeftOnRectangleIcon className="w-4 h-4 shrink-0" />
             Sign Out
           </button>
         </aside>
 
-        <main className="flex-1 overflow-y-auto p-8">{children}</main>
+        <main className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-5 lg:p-8">{children}</main>
       </div>
 
       <ApifyExhaustionModal />

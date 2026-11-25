@@ -131,14 +131,14 @@ export default function AdminProductsPage() {
     <div className="mx-auto w-full max-w-[1200px] px-4 pb-24 pt-6 md:px-8">
       <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-text-primary">
+          <h1 className="font-display text-xl sm:text-2xl font-semibold tracking-tight text-text-primary">
             Products
           </h1>
           <p className="mt-1 text-sm text-text-muted">
             The workstreams your team plans around. Each one has its own task board.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/admin/tasks"
             className="inline-flex items-center gap-2 self-start rounded-xl border border-white/[0.09] px-3.5 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:border-white/15 hover:text-text-primary"
@@ -207,7 +207,7 @@ export default function AdminProductsPage() {
                   <button
                     type="button"
                     onClick={() => setModal({ mode: 'edit', product })}
-                    className="rounded-lg border border-white/[0.08] p-1.5 text-text-muted transition-colors hover:border-white/15 hover:text-text-primary"
+                    className="shrink-0 rounded-lg border border-white/[0.08] p-2.5 text-text-muted transition-colors hover:border-white/15 hover:text-text-primary sm:p-1.5"
                     title="Edit product"
                     aria-label={`Edit ${product.name}`}
                   >
@@ -217,7 +217,7 @@ export default function AdminProductsPage() {
                     type="button"
                     onClick={() => handleDelete(product)}
                     disabled={busyId === product.id}
-                    className="rounded-lg border border-white/[0.08] p-1.5 text-text-muted transition-colors hover:border-red-500/40 hover:text-red-400 disabled:opacity-50"
+                    className="shrink-0 rounded-lg border border-white/[0.08] p-2.5 text-text-muted transition-colors hover:border-red-500/40 hover:text-red-400 disabled:opacity-50 sm:p-1.5"
                     title="Delete product"
                     aria-label={`Delete ${product.name}`}
                   >
@@ -258,7 +258,7 @@ export default function AdminProductsPage() {
                   ))}
                 </div>
 
-                <div className="mt-auto flex items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
+                <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
                   <span className="inline-flex min-w-0 items-center gap-2 text-[11px] text-text-secondary">
                     <AssigneeAvatar member={product.owner} size={22} />
                     <span className="truncate">

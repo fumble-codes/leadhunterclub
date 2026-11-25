@@ -210,14 +210,14 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto p-3 sm:p-4 bg-black/80 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="w-full max-w-2xl overflow-hidden bg-surface border border-white/10 rounded-2xl"
+            className="w-full max-w-[95vw] sm:max-w-2xl overflow-hidden bg-surface border border-white/10 rounded-2xl"
           >
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+            <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between gap-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-accent-mint/10 flex items-center justify-center rounded-xl border border-accent-mint/30">
                   <DocumentTextIcon className="text-accent-mint w-5 h-5" />
@@ -229,17 +229,17 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
                   </p>
                 </div>
               </div>
-              <button onClick={resetForm} className="text-text-secondary hover:text-white transition-colors">
+              <button onClick={resetForm} aria-label="Close" className="shrink-0 p-2.5 sm:p-1 text-text-secondary hover:text-white transition-colors">
                 <XMarkIcon className="w-6 h-6" />
               </button>
             </div>
 
             {/* Mode Switcher */}
-            <div className="px-6 pt-4 flex gap-2 border-b border-white/5 pb-3">
+            <div className="px-4 sm:px-6 pt-4 flex flex-wrap gap-2 border-b border-white/5 pb-3">
               <button
                 type="button"
                 onClick={() => setMode('upload')}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
                   mode === 'upload'
                     ? 'bg-accent-mint text-black shadow-sm'
                     : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
@@ -250,7 +250,7 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
               <button
                 type="button"
                 onClick={() => setMode('text')}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
                   mode === 'text'
                     ? 'bg-accent-mint text-black shadow-sm'
                     : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
@@ -260,7 +260,7 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
               </button>
             </div>
 
-            <div className="p-6 space-y-6 max-h-[65vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 space-y-6 max-h-[65dvh] overflow-y-auto">
               {error && (
                 <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center gap-3 rounded-xl">
                   <ExclamationTriangleIcon className="w-4 h-4" />
@@ -306,13 +306,13 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
                       />
 
                       {previews.length > 0 ? (
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
                           {previews.map((preview, index) => (
                             <div key={index} className="relative aspect-square group/preview">
                               <img src={preview} alt="preview" className="w-full h-full object-cover rounded-xl border border-white/10" />
                               <button
                                 onClick={(e) => { e.stopPropagation(); removeFile(index) }}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover/preview:opacity-100 transition-opacity"
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 sm:p-1 opacity-100 sm:opacity-0 sm:group-hover/preview:opacity-100 transition-opacity"
                               >
                                 <XMarkIcon className="w-3 h-3" />
                               </button>
@@ -488,15 +488,15 @@ export default function ManualLeadModal({ isOpen, onClose, onSuccess }: ManualLe
               )}
             </div>
 
-            <div className="p-6 bg-black/40 border-t border-white/10 flex gap-4">
+            <div className="p-4 sm:p-6 bg-black/40 border-t border-white/10 flex flex-wrap sm:flex-nowrap gap-2 sm:gap-4">
               <button onClick={onClose} disabled={isUploading}
-                className="flex-1 py-2.5 bg-white/5 border border-white/10 text-text-secondary rounded-xl font-bold text-sm hover:bg-white/10 transition-all disabled:opacity-50">
+                className="flex-1 min-w-[120px] py-3 sm:py-2.5 bg-white/5 border border-white/10 text-text-secondary rounded-xl font-bold text-sm hover:bg-white/10 transition-all disabled:opacity-50">
                 Cancel
               </button>
               <button
                 onClick={handleUpload}
                 disabled={isUploading || (mode === 'upload' && selectedFiles.length === 0 && results === null) || (mode === 'text' && !textContent.trim())}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-accent-mint text-black rounded-xl font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50"
+                className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-3 sm:py-2.5 bg-accent-mint text-black rounded-xl font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50"
               >
                 {isUploading ? (
                   <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">

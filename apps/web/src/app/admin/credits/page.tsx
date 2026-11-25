@@ -79,11 +79,11 @@ export default function AdminCreditsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary tracking-tight">Credit Management</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Credit Management</h1>
         <p className="text-sm text-text-secondary mt-1">Adjust user credits manually</p>
       </div>
 
-      <div className="relative max-w-xs mb-6">
+      <div className="relative w-full sm:max-w-xs mb-6">
         <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" />
         <input
           value={search}
@@ -97,7 +97,8 @@ export default function AdminCreditsPage() {
         <CustomLoader page="admin" />
       ) : (
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-white/[0.06]">
                 <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
@@ -141,7 +142,7 @@ export default function AdminCreditsPage() {
                       >
                         {u.name}
                       </Link>
-                      <p className="text-xs text-text-secondary">{u.email}</p>
+                      <p className="text-xs text-text-secondary break-all">{u.email}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-xs text-text-secondary">{u.status}</span>
@@ -170,7 +171,7 @@ export default function AdminCreditsPage() {
                       <button
                         onClick={() => handleGrantBonus(u.id)}
                         disabled={updating === u.id}
-                        className="px-4 py-1.5 rounded-lg bg-accent-mint text-white text-xs font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
+                        className="px-4 py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-accent-mint text-white text-xs font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
                       >
                         {updating === u.id ? '...' : 'Grant'}
                       </button>
@@ -180,6 +181,7 @@ export default function AdminCreditsPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

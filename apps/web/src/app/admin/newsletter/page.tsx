@@ -149,12 +149,12 @@ export default function AdminNewsletterPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3 min-w-0">
           <EnvelopeIcon className="w-6 h-6 text-text-secondary" />
           Newsletter
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge size="sm" color="mint">
             {byStatus.SUBSCRIBED ?? 0} subscribed
           </Badge>
@@ -163,7 +163,7 @@ export default function AdminNewsletterPage() {
       </div>
 
       {/* Compose broadcast */}
-      <div className="metallic-card p-6">
+      <div className="metallic-card p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <PaperAirplaneIcon className="w-5 h-5 text-accent-mint" />
           <h3 className="text-lg font-bold text-text-primary">Send Broadcast</h3>
@@ -205,7 +205,7 @@ export default function AdminNewsletterPage() {
               className="w-full bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-accent-mint/40 transition-all"
             />
           </div>
-          <div className="flex justify-end">
+          <div className="flex flex-wrap justify-end">
             <Button color="mint" loading={broadcasting} onClick={sendBroadcast}>
               {broadcasting ? '' : <PaperAirplaneIcon className="w-4 h-4" />}
               Send to {byStatus.SUBSCRIBED ?? 0} subscribers
@@ -215,19 +215,19 @@ export default function AdminNewsletterPage() {
       </div>
 
       {/* Add subscriber */}
-      <div className="metallic-card p-6">
+      <div className="metallic-card p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
           <UserPlusIcon className="w-5 h-5 text-accent-purple" />
           <h3 className="text-lg font-bold text-text-primary">Add Subscriber</h3>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <input
             type="email"
             value={addingEmail}
             onChange={(e) => setAddingEmail(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addSubscriber()}
             placeholder="you@company.com"
-            className="flex-1 bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-accent-purple/40 transition-all"
+            className="w-full sm:w-auto sm:flex-1 min-w-0 bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-accent-purple/40 transition-all"
           />
           <Button color="purple" onClick={addSubscriber}>
             <UserPlusIcon className="w-4 h-4" />
@@ -239,7 +239,7 @@ export default function AdminNewsletterPage() {
       {/* Subscriber list */}
       <div className="metallic-card overflow-hidden">
         {subscribers.length === 0 && !loading && (
-          <div className="p-14 text-center">
+          <div className="p-8 sm:p-14 text-center">
             <EnvelopeIcon className="w-8 h-8 text-text-secondary mx-auto mb-4" />
             <p className="text-text-secondary text-sm">No subscribers yet.</p>
           </div>
@@ -253,25 +253,25 @@ export default function AdminNewsletterPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 + i * 0.02 }}
-                className="grid grid-cols-12 gap-4 px-8 py-4 items-center hover:bg-white/[0.02] transition-colors"
+                className="grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-4 px-4 sm:px-8 py-4 items-center hover:bg-white/[0.02] transition-colors"
               >
-                <div className="col-span-5">
-                  <div className="text-sm font-bold text-text-primary">{sub.email}</div>
+                <div className="col-span-1 sm:col-span-5 min-w-0">
+                  <div className="text-sm font-bold text-text-primary break-all">{sub.email}</div>
                   <div className="text-xxs text-text-secondary mt-0.5 capitalize">{sub.source}</div>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-1 sm:col-span-2">
                   <Badge size="sm" color={statusColor[sub.status] || 'purple'}>
                     {sub.status.replace('_', ' ')}
                   </Badge>
                 </div>
-                <div className="col-span-3 text-xxs text-text-secondary">
+                <div className="col-span-1 sm:col-span-3 text-xxs text-text-secondary">
                   {new Date(sub.createdAt).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
                     year: 'numeric',
                   })}
                 </div>
-                <div className="col-span-2 flex justify-end gap-2">
+                <div className="col-span-1 sm:col-span-2 flex flex-wrap justify-end gap-2">
                   {sub.status !== 'SUBSCRIBED' ? (
                     <Button size="sm" color="mint" variant="ghost" onClick={() => setStatus(sub.email, 'SUBSCRIBED')}>
                       Resubscribe

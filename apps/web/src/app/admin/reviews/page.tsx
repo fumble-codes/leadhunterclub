@@ -215,8 +215,8 @@ export default function AdminReviewsPage() {
   return (
     <div>
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-text-primary">Reviews</h1>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">Reviews</h1>
           <p className="mt-1 text-sm text-text-secondary">
             Moderate member submissions and upload reviews. Approved reviews appear on the reviews page and homepage.
           </p>
@@ -296,10 +296,10 @@ export default function AdminReviewsPage() {
             const busy = actionLoading?.startsWith(`${review.id}-`)
             return (
               <div key={review.id} className="overflow-hidden rounded-2xl border border-white/[0.06] bg-surface/40">
-                <div className="flex gap-4 p-4">
+                <div className="flex gap-3 p-3 sm:gap-4 sm:p-4">
                   <button
                     onClick={() => setLightbox(review.imageUrl)}
-                    className="h-28 w-28 shrink-0 overflow-hidden rounded-lg border border-white/[0.06] bg-black/30"
+                    className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-white/[0.06] bg-black/30 sm:h-28 sm:w-28"
                     title="View full screenshot"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -469,7 +469,7 @@ export default function AdminReviewsPage() {
             <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 bg-white/[0.02] px-4 py-5 text-center hover:border-accent-mint/40">
               {formPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={formPreview} alt="Preview" className="max-h-40 w-auto rounded-lg object-contain" />
+                <img src={formPreview} alt="Preview" className="max-h-40 max-w-full w-auto rounded-lg object-contain" />
               ) : (
                 <>
                   <PhotoIcon style={{ strokeWidth: 1.6 }} className="h-7 w-7 text-text-muted" />
@@ -527,7 +527,7 @@ export default function AdminReviewsPage() {
       <Modal open={!!lightbox} onClose={() => setLightbox(null)} title="Review screenshot">
         {lightbox && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={lightbox} alt="Full review screenshot" className="mx-auto max-h-[70vh] w-auto rounded-lg object-contain" />
+          <img src={lightbox} alt="Full review screenshot" className="mx-auto max-h-[70vh] max-w-full w-auto rounded-lg object-contain" />
         )}
       </Modal>
     </div>

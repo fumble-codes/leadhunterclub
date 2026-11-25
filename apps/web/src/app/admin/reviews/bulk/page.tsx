@@ -180,7 +180,7 @@ export default function AdminBulkReviewsPage() {
           <ArrowLeftIcon style={{ strokeWidth: 1.6 }} className="h-4 w-4" />
           Back to reviews
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight text-text-primary">Bulk upload reviews</h1>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">Bulk upload reviews</h1>
         <p className="mt-1 max-w-2xl text-sm text-text-secondary">
           Drop a whole folder of deal or closure screenshots. The folder name becomes the label on each review.
           Text is optional — screenshots go live on their own.
@@ -199,7 +199,7 @@ export default function AdminBulkReviewsPage() {
           setDragging(false)
           addFiles(e.dataTransfer.files)
         }}
-        className={`mb-6 rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
+        className={`mb-6 rounded-2xl border-2 border-dashed p-5 text-center transition-colors sm:p-8 ${
           dragging ? 'border-accent-mint/60 bg-accent-mint/5' : 'border-white/10 bg-white/[0.02]'
         }`}
       >
@@ -248,12 +248,12 @@ export default function AdminBulkReviewsPage() {
       {items.length > 0 && (
         <>
           {/* Shared settings */}
-          <div className="mb-6 rounded-2xl border border-white/[0.06] bg-surface/40 p-5">
+          <div className="mb-6 rounded-2xl border border-white/[0.06] bg-surface/40 p-4 sm:p-5">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-display text-base font-semibold text-text-primary">
                 {items.length} image{items.length === 1 ? '' : 's'} · {sizeLabel}
               </h2>
-              <button onClick={clearAll} disabled={running} className="text-xs text-text-secondary hover:text-red-400 disabled:opacity-40">
+              <button onClick={clearAll} disabled={running} className="py-2 text-xs text-text-secondary hover:text-red-400 disabled:opacity-40">
                 Clear all
               </button>
             </div>
@@ -306,7 +306,7 @@ export default function AdminBulkReviewsPage() {
                     onClick={() => removeItem(item.id)}
                     disabled={running}
                     aria-label={`Remove ${item.name}`}
-                    className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-lg bg-black/70 text-white/80 opacity-0 transition-opacity hover:text-white group-hover:opacity-100 disabled:opacity-40"
+                    className="absolute right-1.5 top-1.5 flex h-8 w-8 items-center justify-center rounded-lg bg-black/70 text-white/80 opacity-100 transition-opacity hover:text-white sm:h-7 sm:w-7 sm:opacity-0 sm:group-hover:opacity-100 disabled:opacity-40"
                   >
                     <XMarkIcon style={{ strokeWidth: 1.6 }} className="h-4 w-4" />
                   </button>

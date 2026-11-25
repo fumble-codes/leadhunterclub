@@ -290,9 +290,9 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Users</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Users</h1>
           <p className="text-sm text-text-secondary mt-1">
             {pagination
               ? `${pagination.total} user${pagination.total !== 1 ? 's' : ''}`
@@ -301,8 +301,8 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 mb-6">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6">
+        <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-xs">
           <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" />
           <input
             value={search}
@@ -314,14 +314,14 @@ export default function AdminUsersPage() {
             className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-10 pr-4 py-2.5 text-sm"
           />
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <select
             value={serviceFilter}
             onChange={(e) => {
               setServiceFilter(e.target.value)
               setPage(1)
             }}
-            className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-3 pr-8 py-2.5 text-sm appearance-none cursor-pointer min-w-[150px]"
+            className="w-full sm:w-auto sm:min-w-[150px] bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-3 pr-8 py-2.5 text-sm appearance-none cursor-pointer"
           >
             <option value="">All Services</option>
             {users.length > 0 &&
@@ -333,14 +333,14 @@ export default function AdminUsersPage() {
           </select>
           <ChevronDownIcon className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary/60 pointer-events-none" />
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <select
             value={onboardingFilter}
             onChange={(e) => {
               setOnboardingFilter(e.target.value)
               setPage(1)
             }}
-            className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-3 pr-8 py-2.5 text-sm appearance-none cursor-pointer min-w-[160px]"
+            className="w-full sm:w-auto sm:min-w-[160px] bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-3 pr-8 py-2.5 text-sm appearance-none cursor-pointer"
           >
             <option value="ALL">All Onboarding</option>
             <option value="COMPLETE">Complete</option>
@@ -348,7 +348,7 @@ export default function AdminUsersPage() {
           </select>
           <ChevronDownIcon className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-text-secondary/60 pointer-events-none" />
         </div>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1 sm:gap-2 w-full sm:w-auto">
           {STATUS_FILTERS.map((s) => (
             <button
               key={s}
@@ -356,7 +356,7 @@ export default function AdminUsersPage() {
                 setStatusFilter(s)
                 setPage(1)
               }}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`px-3 py-2.5 sm:py-2 min-h-[40px] sm:min-h-0 rounded-lg text-xs font-medium transition-all ${
                 statusFilter === s
                   ? 'bg-accent-mint/20 text-accent-mint border border-accent-mint/30'
                   : 'text-text-secondary hover:text-text-primary bg-white/[0.02] border border-white/[0.06]'
@@ -372,8 +372,8 @@ export default function AdminUsersPage() {
         <CustomLoader page="admin" />
       ) : (
         <>
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl">
-            <table className="w-full">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-x-auto">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-white/[0.06]">
                   <th className="text-left px-6 py-4 text-xs font-semibold text-text-secondary uppercase tracking-wider">
@@ -418,11 +418,11 @@ export default function AdminUsersPage() {
                       <td className="px-6 py-4">
                         <Link
                           href={`/admin/users/${u.id}?fromPage=${page}&status=${statusFilter}`}
-                          className="text-sm font-medium text-text-primary hover:text-accent-mint transition-colors"
+                          className="text-sm font-medium text-text-primary hover:text-accent-mint transition-colors break-words"
                         >
                           {u.name}
                         </Link>
-                        <p className="text-xs text-text-secondary mt-0.5">{u.email}</p>
+                        <p className="text-xs text-text-secondary mt-0.5 break-all">{u.email}</p>
                         {u.phone && (
                           <p className="text-xxs font-mono text-accent-mint/90 mt-0.5">
                             {u.phone}
@@ -587,13 +587,13 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         {u.status === 'PENDING' ? (
-                          <div className="flex items-center justify-end gap-2 relative">
+                          <div className="flex flex-wrap items-center justify-end gap-2 relative">
                             {!isOnboardingComplete(u) && (
                               <button
                                 onClick={() => handleSendReminder(u.id, u.email)}
                                 disabled={actionLoading === `${u.id}-REMIND`}
                                 title="Send onboarding reminder email"
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium hover:bg-amber-500/20 transition-all disabled:opacity-50"
+                                className="inline-flex items-center gap-1 px-2.5 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium hover:bg-amber-500/20 transition-all disabled:opacity-50"
                               >
                                 <EnvelopeIcon className="w-3.5 h-3.5" />
                                 {actionLoading === `${u.id}-REMIND` ? 'Sending...' : 'Remind'}
@@ -610,7 +610,7 @@ export default function AdminUsersPage() {
                                 actionLoading === `${u.id}-APPROVE` ||
                                 actionLoading === `${u.id}-REJECT`
                               }
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/20 transition-all disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/20 transition-all disabled:opacity-50"
                             >
                               <CheckCircleIcon className="w-3.5 h-3.5" />
                               Approve
@@ -643,7 +643,7 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleAction(u.id, 'REJECT')}
                               disabled={actionLoading === `${u.id}-REJECT`}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium hover:bg-red-500/20 transition-all disabled:opacity-50"
                             >
                               <XCircleIcon className="w-3.5 h-3.5" />
                               {actionLoading === `${u.id}-REJECT` ? '...' : 'Reject'}
@@ -652,13 +652,13 @@ export default function AdminUsersPage() {
                               onClick={() => handleDeleteUser(u.id, u.name, u.email)}
                               disabled={actionLoading === `${u.id}-DELETE`}
                               title="Delete user from database and Firebase Auth"
-                              className="p-1.5 rounded-lg text-text-secondary/60 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all cursor-pointer"
+                              className="p-2.5 sm:p-1.5 rounded-lg text-text-secondary/60 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all cursor-pointer"
                             >
                               <TrashIcon className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex flex-wrap items-center justify-end gap-2">
                             <span className="text-xs text-text-secondary/60">
                               {u.status === 'ACTIVE'
                                 ? 'Approved'
@@ -671,7 +671,7 @@ export default function AdminUsersPage() {
                                 onClick={() => handleResendEmail(u.id, u.email)}
                                 disabled={actionLoading === `${u.id}-RESEND`}
                                 title="Resend Welcome Approval Email"
-                                className="p-1.5 rounded-lg text-text-secondary/60 hover:text-accent-mint hover:bg-accent-mint/10 border border-transparent hover:border-accent-mint/20 transition-all cursor-pointer"
+                                className="p-2.5 sm:p-1.5 rounded-lg text-text-secondary/60 hover:text-accent-mint hover:bg-accent-mint/10 border border-transparent hover:border-accent-mint/20 transition-all cursor-pointer"
                               >
                                 <PaperAirplaneIcon className="w-3.5 h-3.5" />
                               </button>
@@ -680,7 +680,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleDeleteUser(u.id, u.name, u.email)}
                               disabled={actionLoading === `${u.id}-DELETE`}
                               title="Delete user from database and Firebase Auth"
-                              className="p-1.5 rounded-lg text-text-secondary/60 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all cursor-pointer"
+                              className="p-2.5 sm:p-1.5 rounded-lg text-text-secondary/60 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all cursor-pointer"
                             >
                               <TrashIcon className="w-3.5 h-3.5" />
                             </button>
@@ -709,11 +709,11 @@ export default function AdminUsersPage() {
                 <span className="text-text-primary font-medium">{pagination.total}</span> members
               </p>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center justify-center gap-1.5">
                 <button
                   onClick={() => handlePageChange(page - 1)}
                   disabled={!pagination.hasPrev}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="px-3.5 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   Previous
                 </button>
@@ -741,7 +741,7 @@ export default function AdminUsersPage() {
                       <button
                         key={item}
                         onClick={() => handlePageChange(item)}
-                        className={`min-w-[32px] h-8 px-2 rounded-xl text-xs font-medium border transition-all ${
+                        className={`min-w-[40px] sm:min-w-[32px] h-10 sm:h-8 px-2 rounded-xl text-xs font-medium border transition-all ${
                           item === pagination.page
                             ? 'bg-accent-mint text-surface font-semibold border-accent-mint shadow-sm'
                             : 'bg-white/[0.03] border-white/[0.06] text-text-secondary hover:text-white hover:bg-white/[0.06]'
@@ -755,7 +755,7 @@ export default function AdminUsersPage() {
                 <button
                   onClick={() => handlePageChange(page + 1)}
                   disabled={!pagination.hasNext}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  className="px-3.5 py-2.5 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   Next
                 </button>

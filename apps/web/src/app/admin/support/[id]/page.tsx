@@ -161,10 +161,10 @@ export default function AdminSupportThreadPage() {
       {!loading && ticket && (
         <>
           {/* Header */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-bold text-text-primary tracking-tight">{ticket.subject}</h2>
-              <div className="flex items-center gap-2 mt-1">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold text-text-primary tracking-tight break-words">{ticket.subject}</h2>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <span className="text-xxs text-text-secondary capitalize">{ticket.category}</span>
                 <Badge size="sm" color={statusColor[ticket.status] || 'purple'}>
                   {ticket.status.replace('_', ' ')}
@@ -172,16 +172,16 @@ export default function AdminSupportThreadPage() {
                 <span className="text-xxs text-text-secondary">·</span>
                 <Link
                   href={ticket.userId ? `/admin/users/${ticket.userId}` : `/admin/users?search=${encodeURIComponent(ticket.user.email)}`}
-                  className="text-xxs text-accent-mint hover:underline font-medium inline-flex items-center gap-1 transition-colors"
+                  className="min-w-0 break-all text-xxs text-accent-mint hover:underline font-medium inline-flex items-center gap-1 transition-colors"
                   title={`View ${ticket.user.name}'s profile in Admin`}
                 >
                   {ticket.user.name} ({ticket.user.email})
-                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3 shrink-0" />
                 </Link>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-40">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+              <div className="w-full sm:w-40">
                 <Select
                   value={ticket.status}
                   onChange={(v) => handleUpdate({ status: v })}
@@ -194,7 +194,7 @@ export default function AdminSupportThreadPage() {
                   ]}
                 />
               </div>
-              <div className="w-40">
+              <div className="w-full sm:w-40">
                 <Select
                   value={ticket.priority}
                   onChange={(v) => handleUpdate({ priority: v })}
@@ -220,7 +220,7 @@ export default function AdminSupportThreadPage() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.04 }}
-                  className={`max-w-[85%] rounded-2xl p-4 ${
+                  className={`min-w-0 max-w-[85%] rounded-2xl p-4 ${
                     msg.isInternal
                       ? 'self-center w-full max-w-none bg-accent-purple/[0.06] border border-dashed border-accent-purple/30'
                       : isUser
@@ -228,16 +228,16 @@ export default function AdminSupportThreadPage() {
                         : 'self-end bg-accent-mint/10 border border-accent-mint/20'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-x-2 mb-1.5">
                     <span className="text-10 font-bold text-text-primary uppercase tracking-wide flex items-center gap-1.5">
                       {msg.isInternal && <LockClosedIcon className="w-3 h-3 text-accent-purple" />}
                       {msg.isInternal ? 'Internal Note' : isUser ? ticket.user.name : 'Support Team'}
                     </span>
-                    <span className="text-10 text-text-secondary">
+                    <span className="shrink-0 text-10 text-text-secondary">
                       {new Date(msg.createdAt).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-sm text-text-primary/90 leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm text-text-primary/90 leading-relaxed whitespace-pre-wrap break-words">
                     {msg.body}
                   </p>
                   {messageScreenshots(msg).length > 0 && (
@@ -263,7 +263,7 @@ export default function AdminSupportThreadPage() {
 
           {/* Reply composer */}
           <div className="bg-surface border border-border-subtle rounded-2xl p-4">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex flex-wrap items-center gap-3 mb-3">
               <button
                 onClick={() => setIsInternal(!isInternal)}
                 className={`flex items-center gap-2 text-10 font-bold uppercase tracking-wide px-3 py-1.5 rounded-lg transition-all ${
@@ -305,7 +305,7 @@ export default function AdminSupportThreadPage() {
 
           {lightboxSrc && (
             <div
-              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 cursor-zoom-out"
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-3 sm:p-6 cursor-zoom-out"
               onClick={() => setLightboxSrc(null)}
               role="dialog"
               aria-label="Bug screenshot viewer"
@@ -314,7 +314,7 @@ export default function AdminSupportThreadPage() {
               <img src={lightboxSrc} alt="Bug screenshot full size" className="max-h-full max-w-full object-contain rounded-lg" />
               <button
                 type="button"
-                className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white hover:bg-white/20"
+                className="absolute top-3 right-3 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 sm:top-5 sm:right-5 sm:p-2"
                 aria-label="Close screenshot viewer"
                 onClick={() => setLightboxSrc(null)}
               >

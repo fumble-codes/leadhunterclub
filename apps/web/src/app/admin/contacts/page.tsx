@@ -186,17 +186,17 @@ export default function AdminContactsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Contacts</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Contacts</h1>
           <p className="text-sm text-text-secondary mt-1">
             {filteredUsers.length} contact{filteredUsers.length !== 1 ? 's' : ''}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 mb-6 flex-wrap">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-6">
+        <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-xs min-w-0">
           <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" />
           <input
             value={search}
@@ -208,7 +208,7 @@ export default function AdminContactsPage() {
         <select
           value={serviceFilter}
           onChange={(e) => setServiceFilter(e.target.value)}
-          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2.5 text-sm appearance-none cursor-pointer min-w-[160px]"
+          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2.5 text-sm appearance-none cursor-pointer w-full sm:w-auto sm:min-w-[160px]"
         >
           <option value="">All Services</option>
           {allServices.map((s) => (
@@ -218,19 +218,19 @@ export default function AdminContactsPage() {
         <select
           value={tagFilter}
           onChange={(e) => setTagFilter(e.target.value)}
-          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2.5 text-sm appearance-none cursor-pointer min-w-[140px]"
+          className="bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-3 py-2.5 text-sm appearance-none cursor-pointer w-full sm:w-auto sm:min-w-[140px]"
         >
           <option value="">All Tags</option>
           {allTags.map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {STATUS_FILTERS.map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`px-3 py-2 min-h-[40px] sm:min-h-0 rounded-lg text-xs font-medium transition-all ${
                 statusFilter === s
                   ? 'bg-accent-mint/20 text-accent-mint border border-accent-mint/30'
                   : 'text-text-secondary hover:text-text-primary bg-white/[0.02] border border-white/[0.06]'
@@ -375,12 +375,12 @@ export default function AdminContactsPage() {
                         }
                       }}
                       placeholder="Add tag..."
-                      className="flex-1 min-w-0 bg-surface-elevated border border-white/5 text-white rounded-lg outline-none focus:ring-1 focus:ring-accent-mint/30 transition-all px-2.5 py-1.5 text-xs"
+                      className="flex-1 min-w-0 bg-surface-elevated border border-white/5 text-white rounded-lg outline-none focus:ring-1 focus:ring-accent-mint/30 transition-all px-2.5 py-1.5 min-h-[40px] sm:min-h-0 text-xs"
                     />
                     <button
                       onClick={() => addTag(u.id, tagInputs[u.id] || '')}
                       disabled={savingTag === u.id || !(tagInputs[u.id] || '').trim()}
-                      className="p-1.5 rounded-lg bg-accent-mint/10 text-accent-mint hover:bg-accent-mint/20 transition-all disabled:opacity-40"
+                      className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg bg-accent-mint/10 text-accent-mint hover:bg-accent-mint/20 transition-all disabled:opacity-40"
                     >
                       <PlusIcon className="w-3.5 h-3.5" />
                     </button>
@@ -406,11 +406,11 @@ export default function AdminContactsPage() {
               <span className="text-text-primary font-medium">{pagination.total}</span> contacts
             </p>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={!pagination.hasPrev}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="px-3.5 py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 Previous
               </button>
@@ -437,7 +437,7 @@ export default function AdminContactsPage() {
                     <button
                       key={item}
                       onClick={() => handlePageChange(item)}
-                      className={`min-w-[32px] h-8 px-2 rounded-xl text-xs font-medium border transition-all ${
+                      className={`min-w-[40px] sm:min-w-[32px] h-10 sm:h-8 px-2 rounded-xl text-xs font-medium border transition-all ${
                         item === pagination.page
                           ? 'bg-accent-mint text-surface font-semibold border-accent-mint shadow-sm'
                           : 'bg-white/[0.03] border-white/[0.06] text-text-secondary hover:text-white hover:bg-white/[0.06]'
@@ -451,7 +451,7 @@ export default function AdminContactsPage() {
               <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={!pagination.hasNext}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                className="px-3.5 py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-medium bg-white/[0.04] border border-white/[0.06] text-text-secondary hover:text-text-primary hover:bg-white/[0.08] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
                 Next
               </button>

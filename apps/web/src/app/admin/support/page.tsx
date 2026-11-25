@@ -70,16 +70,16 @@ export default function AdminSupportPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
-          <LifebuoyIcon className="w-6 h-6 text-text-secondary" />
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+        <h2 className="min-w-0 text-xl sm:text-2xl font-bold text-text-primary tracking-tight flex items-center gap-3">
+          <LifebuoyIcon className="w-6 h-6 shrink-0 text-text-secondary" />
           Support Tickets
         </h2>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="relative w-full sm:w-64 sm:flex-1 sm:max-w-sm">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
           <input
             type="text"
@@ -90,7 +90,7 @@ export default function AdminSupportPage() {
             className="w-full bg-surface-secondary/50 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-border-subtle transition-all"
           />
         </div>
-        <div className="w-40">
+        <div className="w-full sm:w-40">
           <Select
             value={status}
             onChange={(v) => setStatus(v)}
@@ -104,7 +104,7 @@ export default function AdminSupportPage() {
             ]}
           />
         </div>
-        <div className="w-40">
+        <div className="w-full sm:w-40">
           <Select
             value={priority}
             onChange={(v) => setPriority(v)}
@@ -118,7 +118,7 @@ export default function AdminSupportPage() {
             ]}
           />
         </div>
-        <div className="w-40">
+        <div className="w-full sm:w-40">
           <Select
             value={category}
             onChange={(v) => setCategory(v)}
@@ -139,7 +139,7 @@ export default function AdminSupportPage() {
       {/* Queue */}
       <div className="metallic-card overflow-hidden">
         {tickets.length === 0 && !loading && (
-          <div className="p-14 text-center">
+          <div className="p-8 text-center sm:p-14">
             <LifebuoyIcon className="w-8 h-8 text-text-secondary mx-auto mb-4" />
             <p className="text-text-secondary text-sm">No tickets match.</p>
           </div>
@@ -153,7 +153,7 @@ export default function AdminSupportPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 + i * 0.03 }}
-                className="grid grid-cols-12 gap-4 px-8 py-4 items-center hover:bg-white/[0.02] transition-colors"
+                className="grid grid-cols-12 gap-x-2 gap-y-2 px-4 py-4 items-center hover:bg-white/[0.02] transition-colors sm:gap-4 sm:px-8"
               >
                 <div className="col-span-1 flex items-center">
                   <div
@@ -166,10 +166,10 @@ export default function AdminSupportPage() {
                     }`}
                   />
                 </div>
-                <div className="col-span-5">
+                <div className="col-span-11 min-w-0 sm:col-span-5">
                   <Link
                     href={`/admin/support/${ticket.id}`}
-                    className="block group-hover:text-accent-mint transition-colors"
+                    className="block break-words group-hover:text-accent-mint transition-colors"
                   >
                     <div className="text-sm font-bold text-text-primary">{ticket.subject}</div>
                     <div className="text-xxs text-text-secondary mt-0.5 flex items-center gap-2 capitalize">
@@ -180,7 +180,7 @@ export default function AdminSupportPage() {
                     </div>
                   </Link>
                 </div>
-                <div className="col-span-3">
+                <div className="col-span-12 min-w-0 sm:col-span-3">
                   <Link
                     href={`/admin/users/${ticket.userId}`}
                     title="Open user details"
@@ -188,14 +188,14 @@ export default function AdminSupportPage() {
                   >
                     {ticket.user.name}
                   </Link>
-                  <div className="text-xxs text-text-secondary">{ticket.user.email}</div>
+                  <div className="break-all text-xxs text-text-secondary">{ticket.user.email}</div>
                 </div>
-                <div className="col-span-1">
+                <div className="col-span-4 sm:col-span-1">
                   <Badge size="sm" color={statusColor[ticket.status] || 'purple'}>
                     {ticket.status.replace('_', ' ')}
                   </Badge>
                 </div>
-                <div className="col-span-1">
+                <div className="col-span-4 sm:col-span-1">
                   <span className={`text-xxs font-bold uppercase tracking-wide ${
                     ticket.priority === 'urgent'
                       ? 'text-accent-mint'
@@ -206,7 +206,7 @@ export default function AdminSupportPage() {
                     {ticket.priority}
                   </span>
                 </div>
-                <div className="col-span-1 text-right text-xxs text-text-secondary">
+                <div className="col-span-4 text-right text-xxs text-text-secondary sm:col-span-1">
                   {ticket._count.messages}
                 </div>
               </motion.div>

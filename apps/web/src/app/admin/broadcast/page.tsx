@@ -1795,8 +1795,8 @@ export default function AdminBroadcastPage() {
           <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary shrink-0">
             <MegaphoneIcon className="w-7 h-7" />
           </div>
-          <div>
-            <div className="flex items-center gap-2.5">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 Communications &amp; Broadcast Hub
               </h1>
@@ -1811,9 +1811,9 @@ export default function AdminBroadcastPage() {
         </div>
 
         {/* Diagnostics & Provider Health Card */}
-        <div className="flex items-center gap-2 self-start lg:self-center">
+        <div className="flex flex-wrap items-center gap-2 self-start lg:self-center max-w-full">
           <div
-            className={`flex items-center gap-3 px-4 py-2 rounded-2xl border backdrop-blur-md shadow-sm transition-all ${
+            className={`flex items-center gap-3 min-w-0 max-w-full px-4 py-2 rounded-2xl border backdrop-blur-md shadow-sm transition-all ${
               data?.smtpStatus.working
                 ? 'bg-secondary/10 border-secondary/30 text-secondary'
                 : 'bg-red-500/10 border-red-500/30 text-red-400'
@@ -1846,7 +1846,7 @@ export default function AdminBroadcastPage() {
                   {data?.smtpStatus.working ? 'Online' : 'Offline'}
                 </span>
               </div>
-              <p className="text-[10px] text-text-secondary max-w-[280px] line-clamp-2" title={data?.smtpStatus.message}>
+              <p className="text-[10px] text-text-secondary min-w-0 max-w-full sm:max-w-[280px] break-words line-clamp-2" title={data?.smtpStatus.message}>
                 {data?.smtpStatus.message}
               </p>
             </div>
@@ -1873,7 +1873,7 @@ export default function AdminBroadcastPage() {
               <EnvelopeIcon className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-white tabular-nums tracking-tight">
+          <div className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums tracking-tight">
             {data?.stats.totalActive || 0}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-text-secondary">
@@ -1890,7 +1890,7 @@ export default function AdminBroadcastPage() {
               <SparklesIcon className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-secondary tabular-nums tracking-tight">
+          <div className="text-2xl sm:text-3xl font-extrabold text-secondary tabular-nums tracking-tight">
             {data?.stats.paidSubscribers || 0}
           </div>
           <p className="text-xs text-text-secondary">Freelancer Pro &amp; Agency tier</p>
@@ -1904,7 +1904,7 @@ export default function AdminBroadcastPage() {
               <ClockIcon className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-primary tabular-nums tracking-tight">
+          <div className="text-2xl sm:text-3xl font-extrabold text-primary tabular-nums tracking-tight">
             {data?.stats.freeStarters || 0}
           </div>
           <p className="text-xs text-text-secondary">Upgrade targets with 50 credits/mo</p>
@@ -1918,7 +1918,7 @@ export default function AdminBroadcastPage() {
               <CheckCircleIcon className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-white tabular-nums tracking-tight">
+          <div className="text-2xl sm:text-3xl font-extrabold text-white tabular-nums tracking-tight">
             {successRate}%
           </div>
           <p className="text-xs text-text-secondary">
@@ -1930,12 +1930,12 @@ export default function AdminBroadcastPage() {
       {/* Email Lifecycle Automations Banner / Controls */}
       <div className="bg-surface/50 border border-white/[0.08] backdrop-blur-xl rounded-2xl p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="p-2.5 rounded-xl bg-accent-orange/15 text-accent-orange border border-accent-orange/20">
               <BoltIcon className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 gap-y-1">
                 <h2 className="text-sm font-bold text-white">Email Automations &amp; Lifecycle Triggers</h2>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -1953,7 +1953,7 @@ export default function AdminBroadcastPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 self-end sm:self-center">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 self-end sm:self-center max-w-full">
             {/* Manual Run Button */}
             <button
               onClick={handleTriggerLifecycleNow}
@@ -1999,14 +1999,14 @@ export default function AdminBroadcastPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {/* 1. Renewal Reminders */}
           <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-            <div className="space-y-0.5 pr-2">
+            <div className="space-y-0.5 pr-2 min-w-0">
               <span className="text-xs font-semibold text-white block">Renewal Reminders</span>
               <span className="text-[10px] text-text-secondary block">Notice 3 days before monthly renewal</span>
             </div>
             <button
               onClick={() => handleToggleAutomation('renewal_reminders_enabled')}
               disabled={automationSaving === 'renewal_reminders_enabled' || !data?.automationSettings?.auto_email_enabled}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
+              className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
                 data?.automationSettings?.renewal_reminders_enabled && data?.automationSettings?.auto_email_enabled
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : 'bg-white/5 text-text-secondary border border-white/10'
@@ -2018,14 +2018,14 @@ export default function AdminBroadcastPage() {
 
           {/* 2. Low Credits Nudge */}
           <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-            <div className="space-y-0.5 pr-2">
+            <div className="space-y-0.5 pr-2 min-w-0">
               <span className="text-xs font-semibold text-white block">Low Credits Alert</span>
               <span className="text-[10px] text-text-secondary block">Nudge when balance drops &lt;= 2 credits</span>
             </div>
             <button
               onClick={() => handleToggleAutomation('low_credits_nudge_enabled')}
               disabled={automationSaving === 'low_credits_nudge_enabled' || !data?.automationSettings?.auto_email_enabled}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
+              className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
                 data?.automationSettings?.low_credits_nudge_enabled && data?.automationSettings?.auto_email_enabled
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : 'bg-white/5 text-text-secondary border border-white/10'
@@ -2037,14 +2037,14 @@ export default function AdminBroadcastPage() {
 
           {/* 3. Onboarding & Approval */}
           <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-            <div className="space-y-0.5 pr-2">
+            <div className="space-y-0.5 pr-2 min-w-0">
               <span className="text-xs font-semibold text-white block">User Approval / Welcome</span>
               <span className="text-[10px] text-text-secondary block">Welcome email upon admin approval</span>
             </div>
             <button
               onClick={() => handleToggleAutomation('onboarding_emails_enabled')}
               disabled={automationSaving === 'onboarding_emails_enabled' || !data?.automationSettings?.auto_email_enabled}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
+              className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
                 data?.automationSettings?.onboarding_emails_enabled && data?.automationSettings?.auto_email_enabled
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : 'bg-white/5 text-text-secondary border border-white/10'
@@ -2056,14 +2056,14 @@ export default function AdminBroadcastPage() {
 
           {/* 4. Plan Upgrade / Downgrade */}
           <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-            <div className="space-y-0.5 pr-2">
+            <div className="space-y-0.5 pr-2 min-w-0">
               <span className="text-xs font-semibold text-white block">Plan Upgrade / Change</span>
               <span className="text-[10px] text-text-secondary block">Notice on plan upgrade or downgrade</span>
             </div>
             <button
               onClick={() => handleToggleAutomation('plan_change_emails_enabled')}
               disabled={automationSaving === 'plan_change_emails_enabled' || !data?.automationSettings?.auto_email_enabled}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
+              className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
                 data?.automationSettings?.plan_change_emails_enabled !== false && data?.automationSettings?.auto_email_enabled
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : 'bg-white/5 text-text-secondary border border-white/10'
@@ -2075,14 +2075,14 @@ export default function AdminBroadcastPage() {
 
           {/* 5. Credit Top-up */}
           <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-            <div className="space-y-0.5 pr-2">
+            <div className="space-y-0.5 pr-2 min-w-0">
               <span className="text-xs font-semibold text-white block">Credit Top-ups</span>
               <span className="text-[10px] text-text-secondary block">Confirmation when credits refilled</span>
             </div>
             <button
               onClick={() => handleToggleAutomation('topup_emails_enabled')}
               disabled={automationSaving === 'topup_emails_enabled' || !data?.automationSettings?.auto_email_enabled}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
+              className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
                 data?.automationSettings?.topup_emails_enabled !== false && data?.automationSettings?.auto_email_enabled
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : 'bg-white/5 text-text-secondary border border-white/10'
@@ -2094,14 +2094,14 @@ export default function AdminBroadcastPage() {
 
           {/* 6. Lead Drop Alerts */}
           <div className="flex items-center justify-between p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04]">
-            <div className="space-y-0.5 pr-2">
+            <div className="space-y-0.5 pr-2 min-w-0">
               <span className="text-xs font-semibold text-white block">Lead Drop Alerts</span>
               <span className="text-[10px] text-text-secondary block">Instant alerts when leads are approved</span>
             </div>
             <button
               onClick={() => handleToggleAutomation('lead_drop_emails_enabled')}
               disabled={automationSaving === 'lead_drop_emails_enabled' || !data?.automationSettings?.auto_email_enabled}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
+              className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 ${
                 data?.automationSettings?.lead_drop_emails_enabled !== false && data?.automationSettings?.auto_email_enabled
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : 'bg-white/5 text-text-secondary border border-white/10'
@@ -2115,11 +2115,11 @@ export default function AdminBroadcastPage() {
 
       {/* Channel Switcher Tabs */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-1.5 bg-surface/80 border border-white/[0.08] backdrop-blur-xl rounded-2xl">
-        <div className="flex items-center gap-1.5 p-1 bg-black/40 rounded-xl w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 p-1 bg-black/40 rounded-xl w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setActiveChannelTab('whatsapp')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`w-full sm:w-auto sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer min-w-0 whitespace-nowrap ${
               activeChannelTab === 'whatsapp'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950/50'
                 : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
@@ -2135,7 +2135,7 @@ export default function AdminBroadcastPage() {
           <button
             type="button"
             onClick={() => setActiveChannelTab('telegram')}
-            className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`w-full sm:w-auto sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer min-w-0 whitespace-nowrap ${
               activeChannelTab === 'telegram'
                 ? 'bg-sky-600 text-white shadow-lg shadow-sky-950/50'
                 : 'text-text-secondary hover:text-white hover:bg-white/[0.04]'
@@ -2149,9 +2149,9 @@ export default function AdminBroadcastPage() {
           </button>
         </div>
 
-        <div className="text-[11px] text-text-secondary px-3 py-1 flex items-center gap-2">
+        <div className="text-[11px] text-text-secondary px-3 py-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0 break-words">
           <span>Active channel:</span>
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-white min-w-0 break-words">
             {activeChannelTab === 'whatsapp' ? 'WhatsApp Community Drops' : 'Telegram Lead Drops & Marketing Drips'}
           </span>
         </div>
@@ -2161,12 +2161,12 @@ export default function AdminBroadcastPage() {
       {activeChannelTab === 'whatsapp' && (
       <div className="bg-gradient-to-br from-emerald-950/20 via-surface/60 to-surface/40 border border-emerald-500/20 backdrop-blur-xl rounded-2xl p-5 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
               <ChatBubbleLeftRightIcon className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 gap-y-1">
                 <h2 className="text-sm font-bold text-white">WhatsApp Community Lead Drops</h2>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -2199,7 +2199,7 @@ export default function AdminBroadcastPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 self-end sm:self-center">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 self-end sm:self-center max-w-full">
             {/* Switch to Telegram Button */}
             <button
               onClick={() => setActiveChannelTab('telegram')}
@@ -2270,10 +2270,10 @@ export default function AdminBroadcastPage() {
           {/* Configured Group Banner */}
           <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04] flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
-                <span>Target Community WhatsApp Group</span>
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-white mb-1.5">
+                <span className="min-w-0 break-words">Target Community WhatsApp Group</span>
                 {waData?.configuredGroupId ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center justify-end gap-2">
                     <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                       <CheckCircleIcon className="w-3 h-3" /> Active & Saved
                     </span>
@@ -2321,7 +2321,7 @@ export default function AdminBroadcastPage() {
 
           {/* Bot-Joined Groups */}
           <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04] flex flex-col justify-between">
-            <div className="flex items-center justify-between text-xs font-semibold text-white mb-1.5">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-white mb-1.5">
               <span>Detected WhatsApp Groups</span>
               <span className="text-[10px] text-text-secondary">
                 {waData?.groups?.length || 0} group(s) found
@@ -2348,13 +2348,13 @@ export default function AdminBroadcastPage() {
                   return (
                     <div
                       key={grp.id}
-                      className={`flex items-center justify-between p-2 rounded-lg border text-[11px] transition-all ${
+                      className={`flex items-center justify-between gap-2 min-w-0 p-2 rounded-lg border text-[11px] transition-all ${
                         isTarget
                           ? 'bg-emerald-950/30 border-emerald-500/40 shadow-sm'
                           : 'bg-black/30 border-white/[0.05]'
                       }`}
                     >
-                      <div className="truncate pr-2">
+                      <div className="min-w-0 truncate pr-2">
                         <div className="flex items-center gap-1.5">
                           <span className="font-semibold text-white block truncate">{grp.subject}</span>
                           {isTarget && (
@@ -2376,7 +2376,7 @@ export default function AdminBroadcastPage() {
                             onClick={() => handleSelectTargetGroup(grp.id, grp.subject)}
                             disabled={isSettingTargetGroup === grp.id}
                             title="Set this group as the destination for automated lead alerts"
-                            className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[10px] flex items-center gap-1 cursor-pointer transition-all shadow-sm disabled:opacity-50"
+                            className="px-2.5 py-2.5 sm:py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[10px] flex items-center gap-1 cursor-pointer transition-all shadow-sm disabled:opacity-50"
                           >
                             {isSettingTargetGroup === grp.id ? (
                               <>
@@ -2391,7 +2391,7 @@ export default function AdminBroadcastPage() {
                         <button
                           onClick={() => handleCopyJid(grp.id)}
                           title="Copy group ID"
-                          className="p-1 rounded bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white transition-all cursor-pointer"
+                          className="p-2.5 sm:p-1 rounded bg-white/5 hover:bg-white/10 text-text-secondary hover:text-white transition-all cursor-pointer"
                         >
                           {copiedJid === grp.id ? (
                             <ClipboardDocumentCheckIcon className="w-3.5 h-3.5 text-emerald-400" />
@@ -2422,8 +2422,8 @@ export default function AdminBroadcastPage() {
               <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <PencilSquareIcon className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 gap-y-1">
                   <h3 className="text-xs font-bold text-white tracking-wide">
                     Automated Alert Message Template
                   </h3>
@@ -2443,7 +2443,7 @@ export default function AdminBroadcastPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 shrink-0 max-w-full">
               <button
                 type="button"
                 onClick={handleResetWaTemplate}
@@ -2525,7 +2525,7 @@ export default function AdminBroadcastPage() {
               </div>
 
               {/* Formatting Helper & Char Counter */}
-              <div className="flex items-center justify-between text-[10px] text-text-secondary pt-0.5">
+              <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-text-secondary pt-0.5">
                 <span className="flex items-center gap-1.5">
                   <span>Formatting:</span>
                   <code className="text-zinc-300">*bold*</code>
@@ -2539,8 +2539,8 @@ export default function AdminBroadcastPage() {
 
             {/* Right: Authentic WhatsApp Bubble Live Preview */}
             <div className="lg:col-span-5 flex flex-col justify-between space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-1.5 min-w-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
                     Live WhatsApp Bubble Preview
@@ -2586,7 +2586,7 @@ export default function AdminBroadcastPage() {
                     ? 'Connect WhatsApp bot first to send alert'
                     : 'Dispatch this exact template right now to the connected WhatsApp group'
                 }
-                className="w-full py-1.5 rounded-lg text-[11px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
+                className="w-full py-2.5 sm:py-1.5 rounded-lg text-[11px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
               >
                 <PaperAirplaneIcon className={`w-3 h-3 ${isSendingWaTest ? 'animate-pulse' : ''}`} />
                 <span>{isSendingWaTest ? 'Dispatching Live Test...' : 'Test Send This Template to Group'}</span>
@@ -2602,12 +2602,12 @@ export default function AdminBroadcastPage() {
       <div className="bg-gradient-to-br from-sky-950/25 via-surface/60 to-surface/40 border border-sky-500/20 backdrop-blur-xl rounded-2xl p-5 shadow-sm space-y-6">
         {/* Telegram Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="p-2.5 rounded-xl bg-sky-500/15 text-sky-400 border border-sky-500/30">
               <PaperAirplaneIcon className="w-5 h-5 -rotate-45" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 gap-y-1">
                 <h2 className="text-sm font-bold text-white">Telegram Community Drops & Automated Drips</h2>
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -2630,7 +2630,7 @@ export default function AdminBroadcastPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 self-end sm:self-center">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 self-end sm:self-center max-w-full">
             {/* Quick switch back to WhatsApp */}
             <button
               onClick={() => setActiveChannelTab('whatsapp')}
@@ -2671,7 +2671,7 @@ export default function AdminBroadcastPage() {
 
         {/* FEATURE 1: COMMUNITY LEAD DROPS SECTION */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
             <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-sky-500/20 text-sky-300 border border-sky-500/30">
               Feature 1
             </span>
@@ -2730,12 +2730,12 @@ export default function AdminBroadcastPage() {
                     value={tgChannelInput}
                     onChange={(e) => setTgChannelInput(e.target.value)}
                     placeholder="@theleadhunterclub or -100..."
-                    className="flex-1 px-3 py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-mono placeholder:text-zinc-500 focus:outline-none focus:border-sky-500"
+                    className="min-w-0 flex-1 px-3 py-2.5 sm:py-1.5 rounded-lg bg-black/40 border border-white/10 text-white text-xs font-mono placeholder:text-zinc-500 focus:outline-none focus:border-sky-500"
                   />
                   <button
                     onClick={() => handleSaveTgChannel()}
                     disabled={isSavingTgChannel}
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all cursor-pointer disabled:opacity-40"
+                    className="px-3.5 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all cursor-pointer disabled:opacity-40 shrink-0"
                   >
                     {isSavingTgChannel ? 'Saving...' : 'Save Target'}
                   </button>
@@ -2837,8 +2837,8 @@ export default function AdminBroadcastPage() {
           {/* Template Editor & Telegram Dark Bubble Preview */}
           <div className="p-4 rounded-xl bg-surface-elevated/30 border border-white/[0.06] space-y-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2 border-b border-white/[0.04]">
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 gap-y-1">
                   <PencilSquareIcon className="w-4 h-4 text-sky-400" />
                   <span className="text-xs font-bold text-white">Telegram Community Drop Template</span>
                   <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/20 text-sky-400 border border-sky-500/30">
@@ -2850,12 +2850,12 @@ export default function AdminBroadcastPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={handleResetTgTemplate}
                   disabled={isSavingTgTemplate}
-                  className="px-2.5 py-1 rounded-lg text-[11px] text-text-secondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40"
+                  className="px-2.5 py-2.5 sm:py-1 rounded-lg text-[11px] text-text-secondary hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-40"
                 >
                   <ArrowPathIcon className="w-3 h-3" />
                   <span>Reset Default</span>
@@ -2864,7 +2864,7 @@ export default function AdminBroadcastPage() {
                   type="button"
                   onClick={handleSaveTgTemplate}
                   disabled={isSavingTgTemplate || !isTgTemplateDirty}
-                  className="px-3 py-1 rounded-lg text-[11px] font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
+                  className="px-3 py-2.5 sm:py-1 rounded-lg text-[11px] font-semibold bg-sky-600 hover:bg-sky-500 text-white transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40"
                 >
                   <CheckIcon className="w-3 h-3" />
                   <span>{isSavingTgTemplate ? 'Saving...' : 'Save Template'}</span>
@@ -2908,7 +2908,7 @@ export default function AdminBroadcastPage() {
                   className="w-full h-full min-h-[180px] p-3 rounded-xl bg-black/40 border border-white/10 text-white text-xs font-mono leading-relaxed placeholder:text-zinc-500 focus:outline-none focus:border-sky-500 resize-none"
                   placeholder="Enter Telegram HTML alert template..."
                 />
-                <div className="mt-1.5 flex items-center justify-between text-[10px] text-text-secondary">
+                <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[10px] text-text-secondary">
                   <span>Supported HTML: &lt;b&gt;, &lt;i&gt;, &lt;code&gt;, &lt;a href=&quot;...&quot;&gt; + Emojis</span>
                   <span className="font-mono">{tgTemplate.length} chars</span>
                 </div>
@@ -2917,7 +2917,7 @@ export default function AdminBroadcastPage() {
               {/* Telegram Dark Bubble Preview */}
               <div className="flex flex-col justify-between p-3.5 rounded-xl bg-[#0f141c] border border-white/[0.08]">
                 <div>
-                  <div className="flex items-center justify-between text-[11px] font-semibold text-text-secondary mb-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-text-secondary mb-2">
                     <span className="flex items-center gap-1.5 text-sky-400">
                       <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
                       Live Telegram Dark Bubble Preview
@@ -2933,7 +2933,7 @@ export default function AdminBroadcastPage() {
 
                     {/* Dashboard Claim Deep Link Button */}
                     <div className="pt-2">
-                      <div className="w-full py-1.5 px-3 rounded-lg bg-[#2b5278]/60 border border-[#2b5278] text-[#53bdeb] font-semibold text-center text-xs flex items-center justify-center gap-1.5">
+                      <div className="w-full py-2.5 sm:py-1.5 px-3 rounded-lg bg-[#2b5278]/60 border border-[#2b5278] text-[#53bdeb] font-semibold text-center text-xs flex items-center justify-center gap-1.5">
                         <span>🚀 Review & Claim on Dashboard</span>
                         <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
                       </div>
@@ -2950,7 +2950,7 @@ export default function AdminBroadcastPage() {
                   <button
                     onClick={handleSendTgTestAlert}
                     disabled={isSendingTgTest || !tgData?.hasBotToken || !tgData?.configuredChannelId}
-                    className="w-full py-1.5 rounded-lg text-[11px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-sky-300 border border-sky-500/20 hover:border-sky-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
+                    className="w-full py-2.5 sm:py-1.5 rounded-lg text-[11px] font-semibold bg-white/[0.04] hover:bg-white/[0.08] text-sky-300 border border-sky-500/20 hover:border-sky-500/40 flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40"
                   >
                     <PaperAirplaneIcon className={`w-3 h-3 -rotate-45 ${isSendingTgTest ? 'animate-pulse' : ''}`} />
                     <span>{isSendingTgTest ? 'Dispatching Live Test...' : 'Test Send This Template to Channel'}</span>
@@ -2972,7 +2972,7 @@ export default function AdminBroadcastPage() {
         {/* FEATURE 2: AUTOMATED MARKETING & RETENTION DRIPS */}
         <div className="pt-2 border-t border-white/[0.08] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
               <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 Feature 2
               </span>
@@ -3267,9 +3267,9 @@ export default function AdminBroadcastPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Composer Form */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="p-6 sm:p-8 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-2xl space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
+            <div className="p-4 sm:p-8 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-2xl space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
                   <h2 className="text-lg font-bold text-white tracking-tight">
                     Compose Broadcast Announcement
                   </h2>
@@ -3295,7 +3295,7 @@ export default function AdminBroadcastPage() {
 
               {/* 1. Target Audience Segment */}
               <div className="space-y-2.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                   <span>1. Target Audience Segment</span>
                   <span className="text-[11px] text-primary font-mono font-semibold">
                     Selected: {audienceCount} recipients
@@ -3385,8 +3385,8 @@ export default function AdminBroadcastPage() {
 
               {/* 2. Load Preset Template (Optional Quick Selector) */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex flex-wrap items-center gap-1.5 min-w-0">
                     <BookmarkIcon className="w-3.5 h-3.5 text-primary" />
                     <span>2. Load Saved Template (Optional)</span>
                   </label>
@@ -3422,7 +3422,7 @@ export default function AdminBroadcastPage() {
 
               {/* 3. Subject Input */}
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                   <span>3. Email Subject Line</span>
                   <span className="text-[11px] text-text-secondary font-mono">
                     {subject.length} chars
@@ -3439,7 +3439,7 @@ export default function AdminBroadcastPage() {
 
               {/* 4. Message Body (Increased Size & Cleaned Up) */}
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                     4. Message Body
                   </label>
@@ -3511,13 +3511,13 @@ export default function AdminBroadcastPage() {
                   <EnvelopeIcon className="w-4 h-4 text-primary" />
                   <span>Send Test Preview:</span>
                 </div>
-                <div className="flex items-center gap-2 flex-1 sm:max-w-md">
+                <div className="flex items-center gap-2 w-full min-w-0 flex-1 sm:max-w-md">
                   <input
                     type="email"
                     placeholder="Enter your email to test draft..."
                     value={testEmail}
                     onChange={(e) => setTestEmail(e.target.value)}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-text-secondary/50 focus:outline-none focus:border-primary"
+                    className="min-w-0 flex-1 px-4 py-2.5 rounded-xl bg-surface-container-lowest border border-white/10 text-xs text-white placeholder:text-text-secondary/50 focus:outline-none focus:border-primary"
                   />
                   <button
                     type="button"
@@ -3531,8 +3531,8 @@ export default function AdminBroadcastPage() {
               </div>
 
               {/* Real-time SMTP Status Bar */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px]">
-                <div className="flex items-center gap-2 max-w-[85%]">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/5 text-[11px]">
+                <div className="flex items-center gap-2 min-w-0 max-w-full sm:max-w-[85%]">
                   <span
                     className={`w-2 h-2 rounded-full shrink-0 ${
                       data?.smtpStatus.working ? 'bg-secondary' : 'bg-red-500'
@@ -3564,8 +3564,8 @@ export default function AdminBroadcastPage() {
           {/* Right Column: Live Email Preview & Testing Sandbox */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-4">
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                <div className="flex flex-wrap items-center gap-2 min-w-0 text-xs font-bold text-white uppercase tracking-wider">
                   <EnvelopeIcon className="w-4 h-4 text-primary" />
                   <span>Live Email Preview</span>
                   {activePreviewOverride && (
@@ -3607,7 +3607,7 @@ export default function AdminBroadcastPage() {
               {/* Email Client Shell */}
               <div
                 className={`transition-all duration-300 ${
-                  previewDevice === 'mobile' ? 'max-w-[360px] mx-auto' : 'w-full'
+                  previewDevice === 'mobile' ? 'max-w-full sm:max-w-[360px] mx-auto' : 'w-full'
                 }`}
               >
                 <div className="rounded-3xl border border-white/10 bg-surface-container-lowest shadow-2xl overflow-hidden font-sans">
@@ -3626,8 +3626,8 @@ export default function AdminBroadcastPage() {
 
                   {/* Flow Simulation Notice Bar (Active when testing an automated flow) */}
                   {activePreviewOverride && (
-                    <div className="px-4 py-2 bg-amber-500/15 border-b border-amber-500/30 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5 text-amber-300 font-semibold truncate">
+                    <div className="px-4 py-2 bg-amber-500/15 border-b border-amber-500/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 min-w-0 truncate text-amber-300 font-semibold">
                         <BoltIcon className="w-3.5 h-3.5 shrink-0 text-amber-400" />
                         <span className="truncate">Simulating: {activePreviewOverride.flowTitle}</span>
                       </div>
@@ -3643,15 +3643,15 @@ export default function AdminBroadcastPage() {
 
                   {/* Email Header Info */}
                   <div className="p-4 bg-surface-container-low border-b border-white/5 space-y-1.5 text-xs text-left">
-                    <div className="flex items-center justify-between text-[11px]">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                       <span className="text-text-secondary">From:</span>
-                      <span className="font-semibold text-white">
+                      <span className="font-semibold text-white min-w-0 break-all text-right">
                         Lead Hunter Club &lt;noreply@theleadhunterclub.com&gt;
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-[11px]">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px]">
                       <span className="text-text-secondary">To:</span>
-                      <span className="text-text-secondary truncate max-w-[280px]">
+                      <span className="text-text-secondary truncate min-w-0 max-w-full sm:max-w-[280px]">
                         {activePreviewOverride
                           ? `${activePreviewOverride.recipientName} <${activePreviewOverride.toEmail}>`
                           : 'Recipient <member@domain.com>'}
@@ -3684,7 +3684,7 @@ export default function AdminBroadcastPage() {
                     </div>
 
                     {/* Body Content */}
-                    <div className="p-5 rounded-2xl bg-surface-container border border-white/5 space-y-4">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-surface-container border border-white/5 space-y-4">
                       <div className="text-xs sm:text-sm text-text-primary leading-relaxed whitespace-pre-line break-words max-h-[300px] overflow-y-auto">
                         {activePreviewOverride ? (
                           activePreviewOverride.body
@@ -3701,7 +3701,7 @@ export default function AdminBroadcastPage() {
                                 textSegment.split(/(https?:\/\/[^\s<]+)/g).forEach((subPart, subIdx) => {
                                   if (subPart.startsWith('http')) {
                                     parts.push(
-                                      <a key={`bare-${lastIndex}-${subIdx}`} href={subPart} target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium">
+                                      <a key={`bare-${lastIndex}-${subIdx}`} href={subPart} target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium break-all">
                                         {subPart}
                                       </a>
                                     )
@@ -3718,7 +3718,7 @@ export default function AdminBroadcastPage() {
                                   href={url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-primary underline font-semibold"
+                                  className="text-primary underline font-semibold break-all"
                                 >
                                   {label}
                                 </a>
@@ -3731,7 +3731,7 @@ export default function AdminBroadcastPage() {
                               textSegment.split(/(https?:\/\/[^\s<]+)/g).forEach((subPart, subIdx) => {
                                 if (subPart.startsWith('http')) {
                                   parts.push(
-                                    <a key={`bare-end-${subIdx}`} href={subPart} target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium">
+                                    <a key={`bare-end-${subIdx}`} href={subPart} target="_blank" rel="noopener noreferrer" className="text-primary underline font-medium break-all">
                                       {subPart}
                                     </a>
                                   )
@@ -3780,15 +3780,15 @@ export default function AdminBroadcastPage() {
             </div>
 
             {/* Email Flow Testing Sandbox Card */}
-            <div className="p-6 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-xl space-y-5">
+            <div className="p-4 sm:p-6 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-xl space-y-5">
               {/* Card Header */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div className="p-2 rounded-xl bg-amber-500/15 text-amber-400">
                     <SparklesIcon className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-white flex flex-wrap items-center gap-2 min-w-0">
                       Email Flow Testing Sandbox
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-mono font-medium">
                         15 Flows
@@ -3803,7 +3803,7 @@ export default function AdminBroadcastPage() {
 
               {/* 1. Select Email Flow / Trigger Type */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <label className="text-xs font-semibold text-text-primary">
                     1. Select Email Type / Trigger
                   </label>
@@ -3857,8 +3857,8 @@ export default function AdminBroadcastPage() {
 
               {/* 2. Target Test Email Address */}
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label className="text-xs font-semibold text-text-primary flex flex-wrap items-center gap-1.5 min-w-0">
                     <EnvelopeIcon className="w-3.5 h-3.5 text-primary" />
                     <span>2. Select Destination Test Inbox</span>
                   </label>
@@ -3878,13 +3878,13 @@ export default function AdminBroadcastPage() {
                           setSelectedTestEmail(item.email)
                           handlePreviewFlowInShell(undefined, item.email)
                         }}
-                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                        className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 min-w-0 ${
                           isSelected
                             ? 'bg-primary/10 border-primary text-white shadow-sm'
                             : 'bg-surface-container border-white/10 text-text-secondary hover:text-white hover:border-white/20'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 truncate">
+                        <div className="flex items-center gap-2.5 min-w-0 truncate">
                           <div
                             className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                               isSelected ? 'bg-primary text-black' : 'bg-surface-elevated text-text-secondary'
@@ -3942,7 +3942,7 @@ export default function AdminBroadcastPage() {
                         value={flowLeadTitle}
                         onChange={(e) => setFlowLeadTitle(e.target.value)}
                         placeholder="e.g. Senior Next.js & Stripe Developer for SaaS Platform"
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white placeholder-text-secondary/40 focus:outline-none focus:border-primary/50"
+                        className="w-full px-2.5 py-2.5 sm:py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white placeholder-text-secondary/40 focus:outline-none focus:border-primary/50"
                       />
                     </div>
                     <div>
@@ -3952,7 +3952,7 @@ export default function AdminBroadcastPage() {
                       <select
                         value={flowLeadNiche}
                         onChange={(e) => setFlowLeadNiche(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white focus:outline-none focus:border-primary/50 cursor-pointer"
+                        className="w-full px-2.5 py-2.5 sm:py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white focus:outline-none focus:border-primary/50 cursor-pointer"
                       >
                         <option value="Web Development">Web Development</option>
                         <option value="Mobile Development">Mobile Development</option>
@@ -3982,7 +3982,7 @@ export default function AdminBroadcastPage() {
                       type="number"
                       value={flowCreditsAdded}
                       onChange={(e) => setFlowCreditsAdded(parseInt(e.target.value) || 0)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white font-mono"
+                      className="w-full px-2.5 py-2.5 sm:py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white font-mono"
                     />
                   </div>
                 </div>
@@ -4000,7 +4000,7 @@ export default function AdminBroadcastPage() {
                       value={flowPlanTier}
                       onChange={(e) => setFlowPlanTier(e.target.value)}
                       placeholder="e.g., Freelancer Pro ($49/mo)"
-                      className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white"
+                      className="w-full px-2.5 py-2.5 sm:py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white"
                     />
                   </div>
                 </div>
@@ -4018,7 +4018,7 @@ export default function AdminBroadcastPage() {
                         type="text"
                         value={flowTicketSubject}
                         onChange={(e) => setFlowTicketSubject(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white"
+                        className="w-full px-2.5 py-2.5 sm:py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white"
                       />
                     </div>
                     <div>
@@ -4027,7 +4027,7 @@ export default function AdminBroadcastPage() {
                         value={flowTicketReply}
                         onChange={(e) => setFlowTicketReply(e.target.value)}
                         rows={2}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white resize-none"
+                        className="w-full px-2.5 py-2.5 sm:py-1.5 text-xs rounded-lg bg-surface border border-white/10 text-white resize-none"
                       />
                     </div>
                   </div>
@@ -4067,12 +4067,12 @@ export default function AdminBroadcastPage() {
               </div>
 
               {/* Status Footer */}
-              <div className="flex items-center justify-between text-[11px] text-text-secondary/70 pt-2 border-t border-white/5">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-text-secondary/70 pt-2 border-t border-white/5">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse" />
                   <span>Delivered via Brevo SMTP &bull; port 587</span>
                 </span>
-                <span className="font-mono text-[10px] truncate max-w-[220px]">
+                <span className="font-mono text-[10px] truncate min-w-0 max-w-full sm:max-w-[220px]">
                   Target: {selectedTestEmail}
                 </span>
               </div>
@@ -4086,9 +4086,9 @@ export default function AdminBroadcastPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Create or Edit Template Form */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="p-6 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-xl space-y-5">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2.5">
+            <div className="p-4 sm:p-6 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-xl space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div className="p-2 rounded-xl bg-primary/15 text-primary">
                     <BookmarkIcon className="w-5 h-5" />
                   </div>
@@ -4261,20 +4261,20 @@ export default function AdminBroadcastPage() {
 
                 {/* Send Test of Current Template Draft */}
                 <div className="p-3.5 rounded-2xl bg-surface-container-lowest border border-white/10 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-white flex items-center gap-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span className="font-bold text-white flex flex-wrap items-center gap-1.5 min-w-0">
                       <EnvelopeIcon className="w-3.5 h-3.5 text-primary" />
                       <span>Test This Email Template</span>
                     </span>
                     <span className="text-[10px] text-text-secondary">Send single sample to inbox</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full min-w-0">
                     <input
                       type="email"
                       placeholder="Enter email to test (e.g. you@gmail.com)..."
                       value={templateTestEmail}
                       onChange={(e) => setTemplateTestEmail(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-xl bg-surface-container border border-white/10 text-xs text-white placeholder:text-text-secondary/50 focus:outline-none focus:border-primary"
+                      className="min-w-0 flex-1 px-3 py-2 rounded-xl bg-surface-container border border-white/10 text-xs text-white placeholder:text-text-secondary/50 focus:outline-none focus:border-primary"
                     />
                     <button
                       type="button"
@@ -4289,7 +4289,7 @@ export default function AdminBroadcastPage() {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex items-center justify-end gap-2.5 pt-2">
+                <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2">
                   {editingTemplateId && (
                     <button
                       type="button"
@@ -4340,7 +4340,7 @@ export default function AdminBroadcastPage() {
                     key={cat.id}
                     type="button"
                     onClick={() => setTemplateCategoryFilter(cat.id)}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-2.5 sm:py-1.5 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
                       templateCategoryFilter === cat.id
                         ? 'bg-primary text-black font-bold'
                         : 'bg-surface hover:bg-white/10 text-text-secondary hover:text-white border border-white/10'
@@ -4355,7 +4355,7 @@ export default function AdminBroadcastPage() {
             {/* Template Cards List */}
             <div className="space-y-3">
               {filteredTemplates.length === 0 ? (
-                <div className="p-12 rounded-2xl bg-surface/30 border border-white/[0.06] text-center space-y-2">
+                <div className="p-8 sm:p-12 rounded-2xl bg-surface/30 border border-white/[0.06] text-center space-y-2">
                   <DocumentTextIcon className="w-10 h-10 text-text-secondary/40 mx-auto" />
                   <h4 className="text-sm font-bold text-white">No Templates Found</h4>
                   <p className="text-xs text-text-secondary">
@@ -4395,17 +4395,17 @@ export default function AdminBroadcastPage() {
                         )}
                       </div>
 
-                      <p className="text-xs text-text-secondary font-medium">
+                      <p className="text-xs text-text-secondary font-medium break-words">
                         <strong className="text-white">Subject:</strong> {tpl.subject}
                       </p>
 
-                      <p className="text-xs text-text-secondary/70 line-clamp-3 leading-relaxed whitespace-pre-line">
+                      <p className="text-xs text-text-secondary/70 line-clamp-3 leading-relaxed whitespace-pre-line break-words">
                         {tpl.body}
                       </p>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-start">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-start max-w-full">
                       <button
                         type="button"
                         onClick={() => handleSendCardTemplateTest(tpl)}
@@ -4456,7 +4456,7 @@ export default function AdminBroadcastPage() {
       {/* Tab 3: Delivery Logs */}
       {activeTab === 'logs' && (
         <div className="space-y-4">
-          <div className="p-5 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+          <div className="p-4 sm:p-5 rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-2 flex-1 max-w-md">
               <div className="relative w-full">
                 <MagnifyingGlassIcon className="w-4 h-4 text-text-secondary absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -4470,12 +4470,12 @@ export default function AdminBroadcastPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {(['ALL', 'SENT', 'FAILED', 'SKIPPED'] as const).map((st) => (
                 <button
                   key={st}
                   onClick={() => setLogStatusFilter(st)}
-                  className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
+                  className={`px-3 py-2.5 sm:py-1.5 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
                     logStatusFilter === st
                       ? 'bg-primary text-black font-bold'
                       : 'bg-surface hover:bg-white/10 text-text-secondary hover:text-white border border-white/10'
@@ -4489,7 +4489,7 @@ export default function AdminBroadcastPage() {
 
           <div className="overflow-hidden rounded-3xl bg-surface/50 border border-white/[0.08] backdrop-blur-xl shadow-xl">
             <div ref={tableScrollRef} className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full min-w-[640px] text-left text-xs">
                 <thead className="bg-surface-elevated/70 border-b border-white/[0.08] text-text-secondary uppercase tracking-wider font-semibold text-[10px]">
                   <tr>
                     <th className="px-5 py-3.5">Recipient</th>
@@ -4509,13 +4509,13 @@ export default function AdminBroadcastPage() {
                   ) : (
                     filteredLogs.map((log) => (
                       <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="px-5 py-3.5 font-mono text-white text-xs">{log.to}</td>
+                        <td className="px-5 py-3.5 font-mono text-white text-xs break-all">{log.to}</td>
                         <td className="px-5 py-3.5">
                           <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] uppercase font-mono">
                             {log.type}
                           </span>
                         </td>
-                        <td className="px-5 py-3.5 max-w-[280px] truncate text-text-secondary font-medium">
+                        <td className="px-5 py-3.5 min-w-0 max-w-[280px] truncate text-text-secondary font-medium">
                           {log.subject}
                         </td>
                         <td className="px-5 py-3.5">
@@ -4552,17 +4552,17 @@ export default function AdminBroadcastPage() {
       {/* WhatsApp QR Code Pairing Modal */}
       <AnimatePresence>
         {showQrModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-3 sm:p-6 bg-black/80 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-md bg-surface border border-white/10 rounded-3xl p-6 shadow-2xl text-center space-y-5"
+              className="relative w-full max-w-[95vw] sm:max-w-md max-h-[90dvh] overflow-y-auto bg-surface border border-white/10 rounded-3xl p-4 sm:p-6 shadow-2xl text-center space-y-5"
             >
               {/* Close Button */}
               <button
                 onClick={() => setShowQrModal(false)}
-                className="absolute top-4 right-4 p-2 rounded-xl text-text-secondary hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2.5 sm:p-2 rounded-xl text-text-secondary hover:text-white hover:bg-white/10 transition-all cursor-pointer"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
@@ -4611,7 +4611,7 @@ export default function AdminBroadcastPage() {
                       <img
                         src={waData.qrDataUrl}
                         alt="WhatsApp QR Code"
-                        className="w-56 h-56 object-contain"
+                        className="w-48 h-48 sm:w-56 sm:h-56 object-contain"
                       />
                     </div>
                     <p className="text-[11px] text-text-secondary animate-pulse">
@@ -4637,7 +4637,7 @@ export default function AdminBroadcastPage() {
                 </ol>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => fetchWhatsAppStatus()}
                   className="flex-1 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-semibold text-white border border-white/[0.08] transition-all cursor-pointer flex items-center justify-center gap-1.5"

@@ -303,10 +303,10 @@ export default function AdminKeywordsPage() {
   const filtered = keywords.filter(k => k.text.toLowerCase().includes(search.toLowerCase()))
 
   const PlatformToggle = ({ platforms, onChange }: { platforms: string[]; onChange: (p: string[]) => void }) => (
-    <div className="flex gap-1.5">
+    <div className="flex flex-wrap gap-1.5">
       {PLATFORMS.map(p => (
         <button key={p} onClick={() => onChange(platforms.includes(p) ? platforms.filter(x => x !== p) : [...platforms, p])}
-          className={`px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider transition-all ${
+          className={`px-2 py-0.5 min-h-[40px] sm:min-h-0 rounded text-[10px] font-medium uppercase tracking-wider transition-all ${
             platforms.includes(p) ? 'bg-accent-mint/20 text-accent-mint border border-accent-mint/30' : 'bg-white/5 text-text-secondary border border-white/10'
           }`}
         >{p === 'linkedin' ? 'LI' : p === 'twitter' ? 'X' : p === 'reddit' ? 'RD' : 'TH'}</button>
@@ -316,9 +316,9 @@ export default function AdminKeywordsPage() {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Search Keywords</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Search Keywords</h1>
           <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
             <p className="text-sm text-text-secondary">Manage keywords for social media lead discovery</p>
             {autoScrapeEnabled !== null && (
@@ -341,7 +341,7 @@ export default function AdminKeywordsPage() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
             onClick={handleScrapeAll}
             disabled={isScrapingAll || loading || keywords.filter(k => k.is_active).length === 0}
@@ -361,13 +361,13 @@ export default function AdminKeywordsPage() {
       </div>
 
       {isBulkAdd ? (
-        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 mb-6">
+        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 mb-6">
           <h3 className="text-sm font-semibold text-text-primary mb-3">Bulk Add Keywords</h3>
           <p className="text-xs text-text-secondary mb-3">One keyword per line</p>
           <textarea value={bulkText} onChange={e => setBulkText(e.target.value)} rows={6}
             className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all p-4 text-sm mb-3 resize-none"
           />
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <PlatformToggle platforms={bulkPlatforms} onChange={setBulkPlatforms} />
             <button onClick={bulkAdd} disabled={!bulkText.trim()}
               className="px-5 py-2 rounded-xl bg-accent-mint text-white text-xs font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50"
@@ -375,11 +375,11 @@ export default function AdminKeywordsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 mb-6">
-          <div className="flex items-center gap-4">
+        <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 mb-6">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <input value={newKeyword} onChange={e => setNewKeyword(e.target.value)} onKeyDown={e => e.key === 'Enter' && addKeyword()}
               placeholder="Enter keyword..."
-              className="flex-1 bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
+              className="w-full sm:w-auto sm:flex-1 min-w-0 bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
             />
             <PlatformToggle platforms={selectedPlatforms} onChange={setSelectedPlatforms} />
             <button onClick={addKeyword} disabled={!newKeyword.trim()}
@@ -389,7 +389,7 @@ export default function AdminKeywordsPage() {
         </div>
       )}
 
-      <div className="relative max-w-xs mb-6">
+      <div className="relative w-full sm:max-w-xs mb-6">
         <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary/40" />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search keywords..."
           className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all pl-10 pr-4 py-2.5 text-sm"
@@ -397,7 +397,7 @@ export default function AdminKeywordsPage() {
       </div>
 
       {selectedIds.length > 0 && (
-        <div className="flex items-center gap-3 mb-4 px-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 px-1">
           <span className="text-xs text-text-secondary">{selectedIds.length} selected</span>
           <button onClick={bulkDelete} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-medium hover:bg-red-500/20 transition-all">
             <TrashIcon className="w-3.5 h-3.5" />Delete Selected
@@ -409,7 +409,8 @@ export default function AdminKeywordsPage() {
         <CustomLoader page="admin" />
       ) : (
         <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl overflow-hidden">
-          <table className="w-full">
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-white/[0.06]">
                 <th className="w-10 px-4 py-4"><input type="checkbox" className="rounded" /></th>
@@ -453,7 +454,7 @@ export default function AdminKeywordsPage() {
                     <button
                       onClick={() => toggleKeywordActive(k)}
                       disabled={togglingId === (k._id || k.id)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 min-h-[40px] sm:min-h-0 rounded-full text-[11px] font-medium transition-all ${
                         k.is_active
                           ? 'bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20'
                           : 'bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20'
@@ -468,10 +469,10 @@ export default function AdminKeywordsPage() {
                     <div className="flex items-center justify-end gap-1.5">
                       {editingId === (k._id || k.id) ? (
                         <>
-                          <button onClick={() => updateKeyword(k._id || k.id)} className="p-1.5 rounded-lg hover:bg-accent-mint/10 text-accent-mint transition-all">
+                          <button onClick={() => updateKeyword(k._id || k.id)} className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-accent-mint/10 text-accent-mint transition-all">
                             <CheckIcon className="w-4 h-4" />
                           </button>
-                          <button onClick={() => setEditingId(null)} className="p-1.5 rounded-lg hover:bg-white/5 text-text-secondary transition-all">
+                          <button onClick={() => setEditingId(null)} className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-white/5 text-text-secondary transition-all">
                             <XMarkIcon className="w-4 h-4" />
                           </button>
                         </>
@@ -480,7 +481,7 @@ export default function AdminKeywordsPage() {
                           <button
                             onClick={() => handleScrapeSingle(k._id || k.id, k.text)}
                             disabled={scrapingId === (k._id || k.id) || !k.is_active}
-                            className="p-1.5 rounded-lg hover:bg-accent-mint/10 text-accent-mint transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                            className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-accent-mint/10 text-accent-mint transition-all disabled:opacity-30 disabled:hover:bg-transparent"
                             title={k.is_active ? `Scrape "${k.text}" now on enabled platforms` : 'Activate keyword to scrape'}
                           >
                             {scrapingId === (k._id || k.id) ? (
@@ -490,10 +491,10 @@ export default function AdminKeywordsPage() {
                             )}
                           </button>
                           <button onClick={() => { setEditingId(k._id || k.id); setEditText(k.text); setEditPlatforms(k.platforms || []) }}
-                            className="p-1.5 rounded-lg hover:bg-white/5 text-text-secondary transition-all">
+                            className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-white/5 text-text-secondary transition-all">
                             <PencilSquareIcon className="w-4 h-4" />
                           </button>
-                          <button onClick={() => deleteKeyword(k._id || k.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-400 transition-all">
+                          <button onClick={() => deleteKeyword(k._id || k.id)} className="p-1.5 min-w-[40px] sm:min-w-0 min-h-[40px] sm:min-h-0 rounded-lg hover:bg-red-500/10 text-red-400 transition-all">
                             <TrashIcon className="w-4 h-4" />
                           </button>
                         </>
@@ -504,6 +505,7 @@ export default function AdminKeywordsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

@@ -902,7 +902,7 @@ export default function AdminLeadsPage() {
     <div className="max-w-7xl mx-auto">
       <header className="mb-8">
         <div className="flex flex-col gap-6">
-          <h1 className="text-4xl md:text-5xl font-bold uppercase tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold uppercase tracking-tight">
             Lead <span className="text-accent-mint italic underline">Intelligence.</span>
           </h1>
 
@@ -981,7 +981,7 @@ export default function AdminLeadsPage() {
                 <button
                   onClick={handleTrainAi}
                   disabled={isTrainingAi || aiMetrics.samples < 8}
-                  className="h-8 px-4 text-[9px] uppercase font-black rounded-lg bg-accent-mint text-black hover:bg-accent-mint/80 disabled:opacity-50 transition-all flex items-center gap-1.5"
+                  className="h-10 sm:h-8 px-4 text-[9px] uppercase font-black rounded-lg bg-accent-mint text-black hover:bg-accent-mint/80 disabled:opacity-50 transition-all flex items-center gap-1.5"
                 >
                   {isTrainingAi ? (
                     <>
@@ -1015,12 +1015,12 @@ export default function AdminLeadsPage() {
       </header>
 
       <div className="flex flex-col gap-4 mb-4">
-        <div className="flex flex-wrap gap-2 p-1 bg-surface/60 backdrop-blur-xl border border-white/[0.06] rounded-xl w-fit">
+        <div className="flex flex-wrap gap-2 p-1 bg-surface/60 backdrop-blur-xl border border-white/[0.06] rounded-xl w-full sm:w-fit max-w-full">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 rounded-lg ${
+              className={`px-4 py-2 h-10 sm:h-auto sm:px-6 text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 rounded-lg ${
                 activeTab === tab.id
                   ? 'bg-accent-mint text-black'
                   : 'text-zinc-500 hover:text-white hover:bg-white/5'
@@ -1106,7 +1106,7 @@ export default function AdminLeadsPage() {
                       ? 'Selected leads must be awaiting approval with contact details'
                       : undefined
                   }
-                  className="h-9 px-4 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-black transition-all disabled:opacity-50"
+                  className="h-10 sm:h-9 px-4 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-black transition-all disabled:opacity-50"
                 >
                   {bulkSelectionBusy ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <CheckCircleIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                   Approve Selected{selectedApprovableCount > 0 ? ` (${selectedApprovableCount})` : ''}
@@ -1114,7 +1114,7 @@ export default function AdminLeadsPage() {
                 <button
                   onClick={handleBulkDeleteSelected}
                   disabled={bulkSelectionBusy}
-                  className="h-9 px-4 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
+                  className="h-10 sm:h-9 px-4 text-[10px] uppercase font-black rounded-xl flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
                 >
                   {bulkSelectionBusy ? <ArrowPathIcon className="w-[14px] h-[14px] animate-spin" strokeWidth={1.6} /> : <TrashIcon className="w-[14px] h-[14px]" strokeWidth={1.6} />}
                   Delete Selected ({selectedLeadIds.length})
@@ -1132,16 +1132,16 @@ export default function AdminLeadsPage() {
         )}
       </div>
 
-      <div className="mb-8 flex items-center gap-2">
-        <div className="h-[1px] flex-1 bg-white/[0.06]" />
-        <span className="text-[10px] uppercase font-black tracking-widest text-zinc-500">
+      <div className="mb-8 flex flex-wrap items-center justify-center gap-2 sm:flex-nowrap sm:justify-start">
+        <div className="hidden sm:block h-[1px] flex-1 bg-white/[0.06]" />
+        <span className="min-w-0 text-center sm:text-left text-[10px] uppercase font-black tracking-widest text-zinc-500">
           Showing {leads.length} of {totalCount} {activeTab} posts (Page {currentPage} of {totalPages})
         </span>
-        <div className="h-[1px] flex-1 bg-white/[0.06]" />
+        <div className="hidden sm:block h-[1px] flex-1 bg-white/[0.06]" />
       </div>
 
-      <form onSubmit={handleSearch} className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 mb-10 flex flex-col md:flex-row gap-4">
-        <div className="flex-1 flex items-center gap-2 bg-surface-elevated border border-white/5 rounded-xl px-4 py-1.5 focus-within:ring-1 focus-within:ring-accent-mint/50 transition-all">
+      <form onSubmit={handleSearch} className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6 mb-10 flex flex-col md:flex-row gap-4">
+        <div className="flex-1 flex items-center gap-2 bg-surface-elevated border border-white/5 rounded-xl px-4 py-2 sm:py-1.5 focus-within:ring-1 focus-within:ring-accent-mint/50 transition-all">
           <input
             placeholder="Search by name, email, title, keyword, or content..."
             value={searchQuery}
@@ -1219,7 +1219,7 @@ export default function AdminLeadsPage() {
                 transition={{ delay: Math.min(i * 0.03, 0.3) }}
                 className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 flex flex-col hover:border-accent-mint/40 transition-all group"
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-2 sm:gap-4">
                   <label className="mt-2 shrink-0 cursor-pointer">
                     <input
                       type="checkbox"
@@ -1240,8 +1240,8 @@ export default function AdminLeadsPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-4 mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2 sm:gap-4">
+                      <div className="flex flex-wrap items-center gap-1.5 min-w-0 sm:gap-2">
                         <h3 className="text-base font-bold uppercase tracking-tight group-hover:text-accent-mint transition-colors truncate">
                           {typeof lead.author?.name === 'string'
                             ? lead.author.name
@@ -1291,7 +1291,7 @@ export default function AdminLeadsPage() {
                           <span>{lead.author?.is_international || (lead as any).is_international ? 'International' : 'Domestic'}</span>
                         </button>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
+                      <div className="flex flex-wrap items-center gap-2 justify-end min-w-0 sm:flex-shrink-0">
                         {lead.created_at && (() => {
                           const { relative, full } = formatScrapedTime(lead.created_at)
                           const tool = getScraperToolInfo(lead)
@@ -1331,7 +1331,7 @@ export default function AdminLeadsPage() {
                         )}
 
                         {lead.keyword && (
-                          <div className="px-2 py-0.5 bg-surface-elevated border border-white/[0.08] text-zinc-400 text-[9px] font-bold tracking-wide flex-shrink-0 rounded">
+                          <div className="px-2 py-0.5 bg-surface-elevated border border-white/[0.08] text-zinc-400 text-[9px] font-bold tracking-wide max-w-full break-words sm:flex-shrink-0 rounded">
                             {lead.keyword.toLowerCase().startsWith('watchlist:') ? (
                               <>
                                 Watchlist: <span className="text-purple-400 font-semibold">{lead.keyword.replace(/^watchlist:\s*/i, '')}</span>
@@ -1391,7 +1391,7 @@ export default function AdminLeadsPage() {
                     )}
 
                     {lead.status === 'relevant' && lead.review_status === 'awaiting_review' && (
-                      <div className="mb-4 p-3 bg-blue-500/5 border border-blue-500/30 border-l-2 border-l-blue-500 rounded-lg flex items-center justify-between gap-3">
+                      <div className="mb-4 p-3 bg-blue-500/5 border border-blue-500/30 border-l-2 border-l-blue-500 rounded-lg flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <ClipboardDocumentCheckIcon className="w-[14px] h-[14px] text-blue-400" strokeWidth={1.6} />
                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-300">
@@ -1513,11 +1513,11 @@ export default function AdminLeadsPage() {
                               Contact Enrichment{lead.enrichment_status ? `: ${getEnrichmentStatusLabel(lead.enrichment_status)}` : ''}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                               <button
                                 onClick={() => handleRegenerateIntel(lead.id)}
                                 disabled={intelActionIds.includes(lead.id)}
-                                className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+                                className="h-10 sm:h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
                               >
                                 {intelActionIds.includes(lead.id) ? (
                                   <ArrowPathIcon className="w-[12px] h-[12px] animate-spin" strokeWidth={1.6} />
@@ -1529,7 +1529,7 @@ export default function AdminLeadsPage() {
                             <button
                               onClick={() => handleReEnrichLead(lead.id)}
                               disabled={enrichingIds.includes(lead.id)}
-                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-accent-mint/10 text-accent-mint border border-accent-mint/30 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
+                              className="h-10 sm:h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-accent-mint/10 text-accent-mint border border-accent-mint/30 hover:bg-accent-mint hover:text-black transition-all disabled:opacity-50"
                             >
                               {enrichingIds.includes(lead.id) ? (
                                 <ArrowPathIcon className="w-[12px] h-[12px] animate-spin" strokeWidth={1.6} />
@@ -1544,7 +1544,7 @@ export default function AdminLeadsPage() {
                                 setManualContactLead(lead)
                                 setIsManualContactOpen(true)
                               }}
-                              className="h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
+                              className="h-10 sm:h-8 px-3 text-[9px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                               title="Paste contact details manually"
                             >
                               <ClipboardDocumentIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
@@ -1635,7 +1635,7 @@ export default function AdminLeadsPage() {
                               setManualContactLead(lead)
                               setIsManualContactOpen(true)
                             }}
-                            className="h-7 text-[9px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
+                            className="h-10 sm:h-7 text-[9px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                             title="Edit or add contact details manually"
                           >
                             <ClipboardDocumentIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
@@ -1688,7 +1688,7 @@ export default function AdminLeadsPage() {
 
                         {lead.contact_info?.phone_numbers?.map((p, i) => (
                           <div key={i} className="mt-3">
-                            <p className="text-sm font-bold text-zinc-400">{p.number}</p>
+                            <p className="text-sm font-bold text-zinc-400 break-all">{p.number}</p>
                             {getEmailSourceLabel(p.source) && (
                               <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
                                 Found via: {getEmailSourceLabel(p.source)}
@@ -1708,7 +1708,7 @@ export default function AdminLeadsPage() {
                                 setManualContactLead(lead)
                                 setIsManualContactOpen(true)
                               }}
-                              className="h-7 text-[9px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
+                              className="h-10 sm:h-7 text-[9px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1.5 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                               title="Paste contact details manually"
                             >
                               <ClipboardDocumentIcon className="w-[12px] h-[12px]" strokeWidth={1.6} />
@@ -1756,7 +1756,7 @@ export default function AdminLeadsPage() {
                     <div className="flex flex-wrap gap-2 mb-4">
                       {lead.image_url && (
                         <div
-                          className="flex items-center gap-2 p-2 bg-black/20 border border-white/[0.06] rounded-lg w-fit cursor-pointer hover:border-zinc-600 transition-colors group/img"
+                          className="flex items-center gap-2 p-2.5 sm:p-2 bg-black/20 border border-white/[0.06] rounded-lg w-fit max-w-full cursor-pointer hover:border-zinc-600 transition-colors group/img"
                           onClick={() => {
                             const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace(/\/api\/?$/, '')
                             const cleanUrl = lead.image_url?.startsWith('/') ? lead.image_url : `/${lead.image_url}`
@@ -1775,13 +1775,13 @@ export default function AdminLeadsPage() {
                               setRefineLead(lead)
                               setIsRefineModalOpen(true)
                             }}
-                            className="h-8 px-3 text-[9px] font-black uppercase rounded-lg bg-surface-elevated text-zinc-300 border border-white/10 hover:bg-white/10 transition-all"
+                            className="h-10 sm:h-8 px-3 text-[9px] font-black uppercase rounded-lg bg-surface-elevated text-zinc-300 border border-white/10 hover:bg-white/10 transition-all"
                           >
                             Manual Refine
                           </button>
                           <button
                             onClick={() => handleReExtract(lead.id)}
-                            className="h-8 px-3 text-[9px] font-black uppercase rounded-lg bg-accent-mint text-black hover:bg-accent-mint/80 transition-all"
+                            className="h-10 sm:h-8 px-3 text-[9px] font-black uppercase rounded-lg bg-accent-mint text-black hover:bg-accent-mint/80 transition-all"
                           >
                             Re-extract with AI
                           </button>
@@ -1794,7 +1794,7 @@ export default function AdminLeadsPage() {
                         <button
                           type="button"
                           onClick={() => toggleInternational(lead)}
-                          className={`h-7 px-2.5 rounded-lg text-[8px] font-black uppercase flex items-center gap-1 border transition-all ${
+                          className={`h-10 sm:h-7 px-2.5 rounded-lg text-[8px] font-black uppercase flex items-center gap-1 border transition-all ${
                             lead.author?.is_international || (lead as any).is_international
                               ? 'bg-sky-500/20 text-sky-400 border-sky-500/40 hover:bg-sky-500/30 shadow-[0_0_8px_rgba(56,189,248,0.2)]'
                               : 'bg-white/5 text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white'
@@ -1808,13 +1808,13 @@ export default function AdminLeadsPage() {
                           <>
                             <button
                               onClick={() => updateLeadLabel(lead.id, { status: 'relevant' })}
-                              className="h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-black transition-all"
+                              className="h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-black transition-all"
                             >
                               Mark Relevant
                             </button>
                             <button
                               onClick={() => updateLeadLabel(lead.id, { status: 'irrelevant' })}
-                              className="h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 transition-all"
+                              className="h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 transition-all"
                             >
                               Irrelevant
                             </button>
@@ -1827,7 +1827,7 @@ export default function AdminLeadsPage() {
                               onClick={() => handleApproveReview(lead.id)}
                               disabled={reviewActionIds.includes(lead.id) || !leadHasContactDetails(lead)}
                               title={!leadHasContactDetails(lead) ? 'Contact details required before approval' : undefined}
-                              className={`h-7 text-[8px] uppercase font-black px-3 rounded-lg transition-all ${
+                              className={`h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg transition-all ${
                                 leadHasContactDetails(lead)
                                   ? 'bg-green-500 text-black border border-green-500 hover:bg-green-600'
                                   : 'bg-surface-elevated text-zinc-500 border border-white/10 cursor-not-allowed'
@@ -1847,7 +1847,7 @@ export default function AdminLeadsPage() {
                                   setManualContactLead(lead)
                                   setIsManualContactOpen(true)
                                 }}
-                                className="h-7 text-[8px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
+                                className="h-10 sm:h-7 text-[8px] uppercase font-black px-2.5 rounded-lg flex items-center gap-1 bg-blue-500/10 text-blue-300 border border-blue-500/30 hover:bg-blue-500 hover:text-black transition-all"
                                 title="Paste contact details manually to enable approval"
                               >
                                 <ClipboardDocumentIcon className="w-[11px] h-[11px]" strokeWidth={1.6} />
@@ -1857,13 +1857,13 @@ export default function AdminLeadsPage() {
                             <button
                               onClick={() => handleRejectReview(lead.id)}
                               disabled={reviewActionIds.includes(lead.id)}
-                              className="h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
+                              className="h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
                             >
                               Reject
                             </button>
                             <button
                               onClick={() => updateLeadLabel(lead.id, { status: 'pending' })}
-                              className="h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 transition-all"
+                              className="h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 transition-all"
                             >
                               Reset
                             </button>
@@ -1873,7 +1873,7 @@ export default function AdminLeadsPage() {
                         {lead.status === 'irrelevant' && (
                           <button
                             onClick={() => updateLeadLabel(lead.id, { status: 'pending' })}
-                            className="h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 transition-all"
+                            className="h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 transition-all"
                           >
                             Reset
                           </button>
@@ -1888,7 +1888,7 @@ export default function AdminLeadsPage() {
                               type="button"
                               onClick={() => openCreditModal(lead)}
                               title="Click to set or adjust credit cost for this lead"
-                              className={`h-7 px-3 text-[8px] uppercase font-black rounded-lg flex items-center gap-1.5 border transition-all ${
+                              className={`h-10 sm:h-7 px-3 text-[8px] uppercase font-black rounded-lg flex items-center gap-1.5 border transition-all ${
                                 hasCustomCost
                                   ? 'bg-amber-500/15 text-amber-400 border-amber-500/40 hover:bg-amber-500/25 shadow-sm'
                                   : 'bg-surface-elevated text-zinc-300 border-white/10 hover:border-accent-mint/50 hover:text-white'
@@ -1909,7 +1909,7 @@ export default function AdminLeadsPage() {
                           onClick={() => handleRegenerateIntel(lead.id)}
                           disabled={intelActionIds.includes(lead.id)}
                           title="Generate or refresh AI intelligence report"
-                          className="h-7 px-3 text-[8px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
+                          className="h-10 sm:h-7 px-3 text-[8px] uppercase font-black rounded-lg flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500 hover:text-black transition-all disabled:opacity-50"
                         >
                           {intelActionIds.includes(lead.id) ? (
                             <ArrowPathIcon className="w-[11px] h-[11px] animate-spin" strokeWidth={1.6} />
@@ -1945,12 +1945,12 @@ export default function AdminLeadsPage() {
                               onClick={() => {
                                 document.getElementById(`lead-intel-${lead.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                               }}
-                              className="h-7 text-[8px] uppercase font-black px-4 rounded-lg bg-surface-elevated text-white border border-white/10 hover:border-accent-mint flex items-center gap-2 transition-all"
+                              className="h-10 sm:h-7 text-[8px] uppercase font-black px-4 rounded-lg bg-surface-elevated text-white border border-white/10 hover:border-accent-mint flex items-center gap-2 transition-all"
                             >
                               <CpuChipIcon className="w-[12px] h-[12px]" strokeWidth={1.6} /> View Intel
                             </button>
                             <Link href={`/leads`}>
-                              <button className="h-7 text-[8px] uppercase font-black px-4 rounded-lg bg-accent-mint text-black border border-black flex items-center gap-2 transition-all">
+                              <button className="h-10 sm:h-7 text-[8px] uppercase font-black px-4 rounded-lg bg-accent-mint text-black border border-black flex items-center gap-2 transition-all">
                                 <ArrowTopRightOnSquareIcon className="w-[12px] h-[12px]" strokeWidth={1.6} /> Hunter Preview
                               </button>
                             </Link>
@@ -1958,7 +1958,7 @@ export default function AdminLeadsPage() {
                         )}
                         {lead.review_status === 'approved' && (
                           <button
-                            className={`h-7 text-[8px] uppercase font-black px-4 rounded-lg transition-all ${
+                            className={`h-10 sm:h-7 text-[8px] uppercase font-black px-4 rounded-lg transition-all ${
                               lead.is_claimed
                                 ? 'bg-surface-elevated text-zinc-500 border border-white/10 pointer-events-none'
                                 : 'bg-white text-black hover:bg-accent-mint hover:text-black border border-white'
@@ -1980,7 +1980,7 @@ export default function AdminLeadsPage() {
                         <button
                           onClick={() => handleDeleteLead(lead)}
                           disabled={deletingIds.includes(lead.id)}
-                          className="h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
+                          className="h-10 sm:h-7 text-[8px] uppercase font-black px-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black transition-all disabled:opacity-50"
                           title="Delete lead"
                         >
                           {deletingIds.includes(lead.id) ? (
@@ -2003,16 +2003,16 @@ export default function AdminLeadsPage() {
       </div>
 
       {!isLoading && totalPages > 1 && (
-        <div className="mt-12 flex justify-center items-center gap-4">
+        <div className="mt-12 flex flex-wrap justify-center items-center gap-2 sm:gap-4">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="w-24 h-8 rounded-lg bg-surface-elevated text-zinc-400 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50 text-[10px] font-black uppercase"
+            className="w-24 h-10 sm:h-8 rounded-lg bg-surface-elevated text-zinc-400 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50 text-[10px] font-black uppercase"
           >
             Previous
           </button>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {[...Array(totalPages)].map((_, i) => {
               const pageNum = i + 1
               if (
@@ -2024,7 +2024,7 @@ export default function AdminLeadsPage() {
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`w-8 h-8 font-bold text-xs rounded-lg transition-all border ${
+                    className={`w-8 h-10 sm:h-8 font-bold text-xs rounded-lg transition-all border ${
                       currentPage === pageNum
                         ? 'bg-accent-mint text-black border-accent-mint'
                         : 'bg-surface-elevated text-zinc-500 border-white/10 hover:border-accent-mint'
@@ -2046,7 +2046,7 @@ export default function AdminLeadsPage() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="w-24 h-8 rounded-lg bg-surface-elevated text-zinc-400 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50 text-[10px] font-black uppercase"
+            className="w-24 h-10 sm:h-8 rounded-lg bg-surface-elevated text-zinc-400 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50 text-[10px] font-black uppercase"
           >
             Next
           </button>
@@ -2080,14 +2080,14 @@ export default function AdminLeadsPage() {
       {/* Quick Credit Cost Override Modal */}
       <AnimatePresence>
         {creditModalLead && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="w-full max-w-md bg-surface border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+              className="w-full max-w-[95vw] sm:max-w-md bg-surface border border-white/10 rounded-2xl overflow-hidden overflow-y-auto max-h-[90dvh] shadow-2xl"
             >
-              <div className="p-5 border-b border-white/10 flex items-center justify-between">
+              <div className="p-4 sm:p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
                     <BanknotesIcon className="w-[16px] h-[16px] text-amber-400" strokeWidth={1.6} />
@@ -2101,21 +2101,21 @@ export default function AdminLeadsPage() {
                 </div>
                 <button
                   onClick={() => setCreditModalLead(null)}
-                  className="text-zinc-500 hover:text-white transition-colors p-1"
+                  className="text-zinc-500 hover:text-white transition-colors p-2.5 sm:p-1"
                 >
                   <XCircleIcon className="w-[18px] h-[18px]" strokeWidth={1.6} />
                 </button>
               </div>
 
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-5 space-y-4">
                 <div className="p-3 bg-surface-elevated/60 border border-white/[0.06] rounded-xl text-xs space-y-1">
-                  <div className="flex justify-between text-zinc-400 text-[11px]">
+                  <div className="flex flex-wrap justify-between gap-2 text-zinc-400 text-[11px]">
                     <span>Default Contact-Bundle Cost:</span>
                     <span className="font-bold text-white">
                       {getLeadRevealCost({ ...creditModalLead, credit_cost: null, creditCost: null }) ?? 'None'} credits
                     </span>
                   </div>
-                  <div className="flex justify-between text-zinc-400 text-[11px]">
+                  <div className="flex flex-wrap justify-between gap-2 text-zinc-400 text-[11px]">
                     <span>Current Active Cost:</span>
                     <span className="font-bold text-accent-mint">
                       {getLeadRevealCost(creditModalLead) ?? 'None'} credits
@@ -2145,7 +2145,7 @@ export default function AdminLeadsPage() {
                 </div>
               </div>
 
-              <div className="p-5 bg-black/40 border-t border-white/10 flex items-center gap-3">
+              <div className="p-4 sm:p-5 bg-black/40 border-t border-white/10 flex flex-wrap items-center gap-3">
                 {(creditModalLead.credit_cost ?? (creditModalLead as any).creditCost) !== null &&
                  (creditModalLead.credit_cost ?? (creditModalLead as any).creditCost) !== undefined && (
                   <button

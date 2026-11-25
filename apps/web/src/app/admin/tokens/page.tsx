@@ -679,9 +679,9 @@ export default function AdminTokensPage() {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">API Keys & Tokens</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-8">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">API Keys & Tokens</h1>
           <p className="text-sm text-text-secondary mt-1">Manage scraping and enrichment service credentials</p>
         </div>
 
@@ -692,7 +692,7 @@ export default function AdminTokensPage() {
             scraper_engine: lastScrapeInfo?.last_engine || 'apify',
           })
           return (
-            <div className="flex items-center gap-3 bg-surface/60 backdrop-blur-xl border border-white/[0.08] px-4 py-3 rounded-2xl shadow-lg shadow-black/20 self-start md:self-auto">
+            <div className="flex flex-wrap items-center gap-3 max-w-full bg-surface/60 backdrop-blur-xl border border-white/[0.08] px-4 py-3 rounded-2xl shadow-lg shadow-black/20 self-start sm:self-auto">
               <div className="w-9 h-9 rounded-xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center shrink-0">
                 <ClockIcon className="w-5 h-5 text-accent-mint" />
               </div>
@@ -732,7 +732,7 @@ export default function AdminTokensPage() {
                 onClick={fetchLastScrape}
                 disabled={isRefreshingScrape}
                 title="Refresh scrape timing"
-                className="ml-2 p-2 rounded-xl text-text-secondary hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+                className="ml-2 p-2.5 sm:p-2 rounded-xl text-text-secondary hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
               >
                 <ArrowPathIcon className={`w-4 h-4 ${isRefreshingScrape ? 'animate-spin text-accent-mint' : ''}`} />
               </button>
@@ -748,11 +748,11 @@ export default function AdminTokensPage() {
           {/* Quick Primary Engine Flip Switch */}
           <div className="bg-surface/60 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-4 sm:p-5 shadow-xl">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-3.5">
                 <div className="w-12 h-12 rounded-xl bg-accent-mint/10 border border-accent-mint/25 flex items-center justify-center shrink-0 text-2xl shadow-inner shadow-accent-mint/10">
                   {primaryEngine === 'hunter_crawler' ? '🎯' : primaryEngine === 'apify' ? '⚡' : '🌐'}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] uppercase tracking-wider font-bold text-text-secondary">
                       Active Primary Scraper Engine
@@ -789,7 +789,7 @@ export default function AdminTokensPage() {
                     type="button"
                     disabled={isSavingRouting}
                     onClick={() => handleQuickSwitchEngine('hunter_crawler')}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1.5 h-10 sm:h-auto px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                       primaryEngine === 'hunter_crawler'
                         ? 'bg-accent-mint text-black shadow-md shadow-accent-mint/25 scale-[1.02]'
                         : 'text-text-secondary hover:text-white hover:bg-white/5'
@@ -803,7 +803,7 @@ export default function AdminTokensPage() {
                     type="button"
                     disabled={isSavingRouting}
                     onClick={() => handleQuickSwitchEngine('apify')}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1.5 h-10 sm:h-auto px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                       primaryEngine === 'apify'
                         ? 'bg-accent-mint text-black shadow-md shadow-accent-mint/25 scale-[1.02]'
                         : 'text-text-secondary hover:text-white hover:bg-white/5'
@@ -825,7 +825,7 @@ export default function AdminTokensPage() {
                   disabled={isSavingRouting}
                   onClick={() => handleQuickSwitchEngine(primaryEngine === 'hunter_crawler' ? 'apify' : 'hunter_crawler')}
                   title={`Flip to ${primaryEngine === 'hunter_crawler' ? 'Apify' : 'HunterCrawler'}`}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-elevated/90 border border-white/10 hover:border-accent-mint/50 text-xs font-semibold text-text-secondary hover:text-white transition-all shadow-md group"
+                  className="flex items-center gap-1.5 h-10 sm:h-auto px-3 py-2 rounded-xl bg-surface-elevated/90 border border-white/10 hover:border-accent-mint/50 text-xs font-semibold text-text-secondary hover:text-white transition-all shadow-md group"
                 >
                   <ArrowPathIcon className={`w-3.5 h-3.5 text-accent-mint transition-transform duration-300 ${isSavingRouting ? 'animate-spin' : 'group-hover:rotate-180'}`} />
                   <span>Flip</span>
@@ -836,7 +836,7 @@ export default function AdminTokensPage() {
                   value={primaryEngine}
                   disabled={isSavingRouting}
                   onChange={(e) => handleQuickSwitchEngine(e.target.value)}
-                  className="bg-surface-elevated/90 border border-white/10 text-xs text-text-secondary hover:text-white rounded-xl px-3 py-2 outline-none focus:border-accent-mint transition-all cursor-pointer shadow-md"
+                  className="bg-surface-elevated/90 border border-white/10 text-xs text-text-secondary hover:text-white rounded-xl px-3 py-2 h-10 sm:h-auto outline-none focus:border-accent-mint transition-all cursor-pointer shadow-md min-w-0 max-w-full"
                 >
                   <option value="hunter_crawler">🎯 HunterCrawler (Local)</option>
                   <option value="apify">⚡ Apify ({tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length} active)</option>
@@ -850,13 +850,13 @@ export default function AdminTokensPage() {
             </div>
           </div>
 
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             {/* Scraper Engine Selection Tabs */}
-            <div className="flex items-center gap-2 border-b border-white/[0.08] pb-4 mb-6 overflow-x-auto">
+            <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.08] pb-4 mb-6">
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('hunter_crawler')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'hunter_crawler'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -877,7 +877,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('apify')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'apify'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -898,7 +898,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('scrapedog')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'scrapedog'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -919,7 +919,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('crawlbase')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'crawlbase'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -940,7 +940,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('scrapingbee')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'scrapingbee'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -961,7 +961,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('zenrows')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'zenrows'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -982,7 +982,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('zyte')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all h-10 sm:h-auto ${
                   activeEngineTab === 'zyte'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -1003,7 +1003,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setActiveEngineTab('routing')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ml-auto whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ml-auto h-10 sm:h-auto ${
                   activeEngineTab === 'routing'
                     ? 'bg-accent-mint text-black font-bold shadow-md shadow-accent-mint/20'
                     : 'bg-surface-elevated/60 text-text-secondary hover:text-white hover:bg-surface-elevated border border-white/5'
@@ -1036,13 +1036,13 @@ export default function AdminTokensPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {primaryEngine !== 'hunter_crawler' ? (
                       <button
                         type="button"
                         disabled={isSavingRouting}
                         onClick={() => handleQuickSwitchEngine('hunter_crawler')}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-accent-mint hover:bg-accent-mint/90 text-black shadow-md shadow-accent-mint/20 transition-all"
+                        className="flex items-center gap-1.5 h-10 sm:h-auto px-4 py-2 rounded-xl text-xs font-bold bg-accent-mint hover:bg-accent-mint/90 text-black shadow-md shadow-accent-mint/20 transition-all"
                       >
                         <span>🎯 Set as Primary Engine</span>
                       </button>
@@ -1051,7 +1051,7 @@ export default function AdminTokensPage() {
                         type="button"
                         disabled={isSavingRouting}
                         onClick={() => handleQuickSwitchEngine('apify')}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all"
+                        className="flex items-center gap-1.5 h-10 sm:h-auto px-4 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-all"
                       >
                         <span>⚡ Switch to Apify Cloud</span>
                       </button>
@@ -1088,7 +1088,7 @@ export default function AdminTokensPage() {
                 </div>
 
                 {/* Operational Commands & Triggering */}
-                <div className="p-5 rounded-2xl bg-surface-elevated/30 border border-white/[0.08] space-y-3">
+                <div className="p-4 sm:p-5 rounded-2xl bg-surface-elevated/30 border border-white/[0.08] space-y-3">
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider">Operational Commands & Triggering</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="p-3 rounded-xl bg-black/40 border border-white/5">
@@ -1148,7 +1148,7 @@ export default function AdminTokensPage() {
                   type="button"
                   disabled={isTogglingEnginePause['apify']}
                   onClick={() => handleToggleScraperPause('apify', !pausedEngines.includes('apify'))}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
+                  className={`h-10 sm:h-auto px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
                     pausedEngines.includes('apify')
                       ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
                       : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
@@ -1160,7 +1160,7 @@ export default function AdminTokensPage() {
 
                 <button
                   onClick={() => setIsBulkMode(!isBulkMode)}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm ${
+                  className={`h-10 sm:h-auto px-4 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm ${
                     isBulkMode
                       ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
                       : 'bg-accent-mint text-black hover:bg-accent-mint/90'
@@ -1182,9 +1182,9 @@ export default function AdminTokensPage() {
             </div>
 
             {pausedEngines.includes('apify') && (
-              <div className="p-3.5 mb-5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 flex items-center gap-2.5">
+              <div className="p-3.5 mb-5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs text-amber-200 flex flex-wrap items-start gap-2.5">
                 <span className="text-base">⏸️</span>
-                <div>
+                <div className="min-w-0">
                   <span className="font-bold">Apify scraper engine is currently paused.</span>
                   <span className="text-amber-300/80 ml-1.5">
                     Keyword scrapes and profile monitoring will bypass Apify and failover to active engines (Scrapingdog / Crawlbase) or wait until resumed.
@@ -1194,11 +1194,11 @@ export default function AdminTokensPage() {
             )}
 
             {/* Mode Switcher Tabs */}
-            <div className="flex items-center gap-2 mb-4 p-1 bg-surface-elevated/70 border border-white/5 rounded-xl w-fit">
+            <div className="flex flex-wrap items-center gap-2 mb-4 p-1 bg-surface-elevated/70 border border-white/5 rounded-xl w-full sm:w-fit max-w-full">
               <button
                 type="button"
                 onClick={() => setIsBulkMode(false)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs transition-all ${
+                className={`flex items-center gap-2 h-10 sm:h-auto px-3.5 py-1.5 rounded-lg text-xs transition-all ${
                   !isBulkMode
                     ? 'bg-accent-mint text-black font-bold shadow-sm'
                     : 'text-text-secondary hover:text-white font-medium'
@@ -1210,7 +1210,7 @@ export default function AdminTokensPage() {
               <button
                 type="button"
                 onClick={() => setIsBulkMode(true)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs transition-all ${
+                className={`flex items-center gap-2 h-10 sm:h-auto px-3.5 py-1.5 rounded-lg text-xs transition-all ${
                   isBulkMode
                     ? 'bg-accent-mint text-black font-bold shadow-sm'
                     : 'text-text-secondary hover:text-white font-medium'
@@ -1223,8 +1223,8 @@ export default function AdminTokensPage() {
 
             {isBulkMode ? (
               <div className="mb-6 p-4 rounded-xl bg-surface-elevated/60 border border-white/10 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-text-primary flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label className="text-xs font-semibold text-text-primary flex flex-wrap items-center gap-2">
                     <span>Paste Tokens / Message</span>
                     <span className="text-[10px] text-text-secondary font-normal">
                       (Supports format: <code className="text-accent-mint">T1: apify_api_...</code> or one token per line)
@@ -1260,20 +1260,20 @@ export default function AdminTokensPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                  <div className="flex flex-wrap items-center gap-2 self-end sm:self-auto">
                     <button
                       onClick={() => {
                         setBulkText('')
                         setIsBulkMode(false)
                       }}
-                      className="px-3.5 py-2 rounded-xl text-xs font-medium text-text-secondary hover:text-white transition-all"
+                      className="h-10 sm:h-auto px-3.5 py-2 rounded-xl text-xs font-medium text-text-secondary hover:text-white transition-all"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleBulkAdd}
                       disabled={isBulkAdding || parsedPreview.length === 0}
-                      className="px-5 py-2 rounded-xl bg-accent-mint text-black text-xs font-bold hover:bg-accent-mint/90 transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-accent-mint/10"
+                      className="h-10 sm:h-auto px-5 py-2 rounded-xl bg-accent-mint text-black text-xs font-bold hover:bg-accent-mint/90 transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-accent-mint/10"
                     >
                       {isBulkAdding ? (
                         <>
@@ -1292,8 +1292,8 @@ export default function AdminTokensPage() {
               </div>
             ) : (
               <div className="mb-6 space-y-2">
-                <div className="flex items-end gap-3">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+                  <div className="flex-1 min-w-0">
                     <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1 block">API Key</label>
                     <input
                       value={newKey}
@@ -1303,7 +1303,7 @@ export default function AdminTokensPage() {
                       className="w-full bg-surface-elevated border border-white/5 text-white rounded-xl outline-none focus:ring-1 focus:ring-accent-mint/50 transition-all px-4 py-2.5 text-sm"
                     />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <label className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1 block">Label</label>
                     <input
                       value={newLabel}
@@ -1315,7 +1315,7 @@ export default function AdminTokensPage() {
                   <button
                     onClick={addKey}
                     disabled={!newKey.trim() || isAddingKey}
-                    className="px-5 py-2.5 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50 flex items-center justify-center min-w-[48px]"
+                    className="h-11 sm:h-auto w-full sm:w-auto px-5 py-2.5 rounded-xl bg-accent-mint text-white text-sm font-medium hover:bg-accent-mint/90 transition-all disabled:opacity-50 flex items-center justify-center min-w-[48px] shrink-0"
                     title="Add Apify Key"
                   >
                     {isAddingKey ? (
@@ -1387,7 +1387,7 @@ export default function AdminTokensPage() {
                           .filter(Boolean)
                         setSelectedIds(invalidIds)
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[11px] font-semibold transition-all"
+                      className="h-10 sm:h-auto px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[11px] font-semibold transition-all"
                     >
                       Select Invalid Only ({tokens.filter(k => Boolean(k.error_message)).length})
                     </button>
@@ -1402,7 +1402,7 @@ export default function AdminTokensPage() {
                           .filter(Boolean)
                         setSelectedIds(exhaustedIds)
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[11px] font-semibold transition-all"
+                      className="h-10 sm:h-auto px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[11px] font-semibold transition-all"
                     >
                       Select Exhausted Only
                     </button>
@@ -1416,7 +1416,7 @@ export default function AdminTokensPage() {
                         type="button"
                         onClick={() => handleBulkDelete(false)}
                         disabled={isBulkDeleting}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/20 text-xs font-bold transition-all disabled:opacity-50"
+                        className="flex items-center gap-1.5 h-10 sm:h-auto px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/20 text-xs font-bold transition-all disabled:opacity-50"
                       >
                         {isBulkDeleting ? (
                           <>
@@ -1436,7 +1436,7 @@ export default function AdminTokensPage() {
                       type="button"
                       onClick={() => handleBulkDelete(true)}
                       disabled={isBulkDeleting}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/10 text-text-secondary hover:text-red-400 border border-white/5 hover:border-red-500/20 text-xs font-medium transition-all disabled:opacity-50"
+                      className="flex items-center gap-1.5 h-10 sm:h-auto px-3 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/10 text-text-secondary hover:text-red-400 border border-white/5 hover:border-red-500/20 text-xs font-medium transition-all disabled:opacity-50"
                       title="Delete all keys at once"
                     >
                       <TrashIcon className="w-3.5 h-3.5" />
@@ -1530,9 +1530,9 @@ export default function AdminTokensPage() {
 
                         {/* Error explanation if present */}
                         {isInvalid ? (
-                          <p className="text-[11px] text-red-400 font-medium flex items-center gap-1 mt-1">
+                          <p className="text-[11px] text-red-400 font-medium flex flex-wrap items-center gap-1 mt-1">
                             <span>Apify Auth Error:</span>
-                            <span className="font-semibold">{k.error_message}</span>
+                            <span className="min-w-0 break-all font-semibold">{k.error_message}</span>
                           </p>
                         ) : isExhausted ? (
                           <div className="mt-1 space-y-0.5">
@@ -1568,7 +1568,7 @@ export default function AdminTokensPage() {
                     <button
                       onClick={() => deleteKey(keyId)}
                       disabled={isDeleting || isBulkDeleting}
-                      className="p-1.5 ml-2 rounded-lg hover:bg-red-500/10 text-red-400 transition-all disabled:opacity-50 flex-shrink-0"
+                      className="p-2.5 sm:p-1.5 ml-2 rounded-lg hover:bg-red-500/10 text-red-400 transition-all disabled:opacity-50 flex-shrink-0"
                       title="Delete key"
                     >
                       {isDeleting ? (
@@ -1711,7 +1711,7 @@ export default function AdminTokensPage() {
                         return (
                           <div
                             key={engine.id}
-                            className={`p-3 rounded-xl border flex items-center justify-between transition-all ${
+                            className={`p-3 rounded-xl border flex flex-wrap items-center justify-between gap-2 transition-all ${
                               isPaused
                                 ? 'bg-amber-500/10 border-amber-500/30'
                                 : 'bg-surface-elevated/60 border-white/5'
@@ -1746,7 +1746,7 @@ export default function AdminTokensPage() {
                               type="button"
                               disabled={isTogglingEnginePause[engine.id]}
                               onClick={() => handleToggleScraperPause(engine.id, !isPaused)}
-                              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all border ${
+                              className={`h-10 sm:h-auto px-3 py-1 rounded-lg text-xs font-bold transition-all border ${
                                 isPaused
                                   ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
                                   : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
@@ -1816,7 +1816,7 @@ export default function AdminTokensPage() {
                         return (
                           <label
                             key={engine}
-                            className={`flex items-center justify-between p-3 rounded-lg border text-xs ${
+                            className={`flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border text-xs ${
                               isPrimary
                                 ? 'opacity-40 cursor-not-allowed border-white/5 bg-surface-elevated/20'
                                 : 'border-white/5 bg-surface-elevated/40 hover:border-white/10 cursor-pointer'
@@ -1843,7 +1843,7 @@ export default function AdminTokensPage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-text-secondary">
+                            <span className="min-w-0 break-words text-[10px] text-text-secondary">
                               {engine === 'hunter_crawler'
                                 ? 'HunterCrawler Local & Playwright Scraper'
                                 : engine === 'scrapedog'
@@ -1888,7 +1888,7 @@ export default function AdminTokensPage() {
             )}
           </div>
 
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             <h2 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
               <KeyIcon className="w-4 h-4 text-accent-mint" />Enrichment Service Keys
             </h2>
@@ -1906,12 +1906,12 @@ export default function AdminTokensPage() {
                   <div key={field.label} className={`border rounded-xl p-4 transition-all ${
                     isProviderPaused ? 'bg-amber-500/[0.04] border-amber-500/20' : 'bg-surface-elevated/30 border-white/[0.03]'
                   }`}>
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex flex-wrap items-center gap-3 mb-3">
                       <div className="w-9 h-9 bg-accent-mint/10 rounded-lg flex items-center justify-center">
                         <field.icon className="w-4 h-4 text-accent-mint" />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0 sm:flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
                           <h3 className="text-sm font-medium text-text-primary">{field.label}</h3>
                           {isProviderPaused && (
                             <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
@@ -1936,7 +1936,7 @@ export default function AdminTokensPage() {
                             type="button"
                             disabled={isTogglingEnrichmentPause[field.service]}
                             onClick={() => handleToggleEnrichmentPause(field.service)}
-                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all border shadow-sm ${
+                            className={`h-10 sm:h-auto px-3 py-1 rounded-lg text-xs font-semibold transition-all border shadow-sm ${
                               isProviderPaused
                                 ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40'
                                 : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40'
@@ -1955,8 +1955,8 @@ export default function AdminTokensPage() {
                       </p>
                     )}
 
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex-1">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <div className="relative flex-1 min-w-0">
                         <input
                           type={show ? 'text' : 'password'}
                           value={state?.value || ''}
@@ -1979,7 +1979,7 @@ export default function AdminTokensPage() {
                       <button
                         onClick={() => handleEnrichmentSave(field.service, field.label, state?.value || '')}
                         disabled={isSaving || !state?.value?.trim()}
-                        className="h-10 px-5 rounded-lg bg-accent-mint text-black font-medium text-sm hover:bg-accent-mint/80 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="h-10 w-full sm:w-auto px-5 rounded-lg bg-accent-mint text-black font-medium text-sm hover:bg-accent-mint/80 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {isSaving ? (
                           <>
@@ -2000,7 +2000,7 @@ export default function AdminTokensPage() {
             </div>
           </div>
 
-          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6">
+          <div className="bg-surface/40 backdrop-blur-xl border border-white/[0.06] rounded-2xl p-4 sm:p-6">
             <h2 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
               <Cog6ToothIcon className="w-4 h-4 text-accent-mint" />Automation
             </h2>
@@ -2015,18 +2015,18 @@ export default function AdminTokensPage() {
               <div className="space-y-4">
                 {automationItems.map((item) => (
                   <div key={item.key} className="bg-surface-elevated/30 border border-white/[0.03] rounded-xl p-4">
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center mb-3">
                       <div className="w-9 h-9 bg-accent-mint/10 rounded-lg flex items-center justify-center">
                         <item.icon className="w-4 h-4 text-accent-mint" />
                       </div>
-                      <div className="flex-1">
+                      <div className="min-w-0 sm:flex-1">
                         <h3 className="text-sm font-medium text-text-primary">{item.label}</h3>
                         <p className="text-[10px] text-text-secondary">{item.description}</p>
                       </div>
                       <button
                         onClick={() => handleAutomationSave(item.key)}
                         disabled={saving === item.key || (item.key === 'keep_alive_enabled' && !automationSettings.keep_alive_configured)}
-                        className={`h-10 px-5 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                        className={`h-10 w-full sm:w-auto px-5 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 shrink-0 ${
                           automationSettings[item.key]
                             ? 'bg-green-500 text-black hover:bg-green-600'
                             : 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-black'
