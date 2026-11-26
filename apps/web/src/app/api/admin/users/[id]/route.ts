@@ -551,6 +551,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         })
       }
 
+      if (body.subscriptionCredits !== undefined && body.subscriptionCredits >= 1000 && user.plan === 'FREE') {
+        await db.user.update({
+          where: { id: targetUserId },
+          data: { plan: 'FREELANCER' },
+        })
+        user.plan = 'FREELANCER'
+      }
+
       if (result) {
         return NextResponse.json({
           data: {
