@@ -1556,20 +1556,33 @@ export default function AdminTokensPage() {
                               <span className="font-normal text-text-secondary">Free monthly credits are fully spent on this account.</span>
                             </p>
                             {k.platform_usage && typeof k.platform_usage.used === 'number' && (
-                              <p className="text-[11px] text-amber-300 font-mono font-medium">
-                                Used: ${k.platform_usage.used.toFixed(2)} / ${Number(k.platform_usage.limit ?? 5).toFixed(2)} | Remaining Balance: $0.00
+                              <p className="text-[11px] text-amber-300 font-mono font-medium flex flex-wrap items-center gap-2">
+                                <span>Used: ${k.platform_usage.used.toFixed(2)} / ${Number(k.platform_usage.limit ?? 5).toFixed(2)} | Remaining Balance: $0.00</span>
+                                {k.platform_usage.reset_date && (
+                                  <span className="text-amber-400/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 text-[10px]">
+                                    🗓️ Renews: {new Date(new Date(k.platform_usage.reset_date).getTime() + 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </span>
+                                )}
                               </p>
                             )}
                           </div>
                         ) : (
                           <p className="text-[11px] text-text-secondary mt-0.5">
                             {k.platform_usage && typeof k.platform_usage.used === 'number' ? (
-                              <span className="font-mono">
+                              <span className="font-mono flex flex-wrap items-center gap-1.5">
                                 <span className="text-text-secondary">Used: </span>
                                 <span className="text-text-primary font-semibold">${k.platform_usage.used.toFixed(2)} / ${Number(k.platform_usage.limit ?? 5).toFixed(2)}</span>
-                                <span className="mx-1.5 text-white/20">|</span>
+                                <span className="text-white/20">|</span>
                                 <span className="text-emerald-400 font-semibold">Remaining Balance: </span>
                                 <span className="text-emerald-300 font-bold">${Number(k.platform_usage.remaining ?? Math.max(0, (k.platform_usage.limit ?? 5) - k.platform_usage.used)).toFixed(2)}</span>
+                                {k.platform_usage.reset_date && (
+                                  <>
+                                    <span className="text-white/20">|</span>
+                                    <span className="text-zinc-400 text-[10px]">
+                                      🗓️ Renews: {new Date(new Date(k.platform_usage.reset_date).getTime() + 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </span>
+                                  </>
+                                )}
                               </span>
                             ) : (
                               <span>Used: {k.comments_used}/{k.comments_limit} | Remaining: {k.comments_remaining}</span>

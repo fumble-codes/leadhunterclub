@@ -13,20 +13,23 @@ async function getLiveApifyPlatformUsage(token: string) {
   try {
     const res = await fetch('https://api.apify.com/v2/users/me/limits', {
       headers: { Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(5000),
     })
     if (!res.ok) return null
     const json = await res.json()
     const used = json?.data?.current?.monthlyUsageUsd ?? null
     const limit = json?.data?.limits?.maxMonthlyUsageUsd ?? 5.0
     const remaining = used != null ? Math.max(0, limit - used) : null
+    const cycle = json?.data?.monthlyUsageCycle
+    const reset_date = cycle?.endAt ?? null
     const data = {
       used,
       limit,
       remaining,
-      exhausted: remaining === 0 || (used != null && used >= limit),
+      exhausted: remaining != null ? remaining <= 0.01 : false,
+      reset_date,
     }
-    platformCache.set(token, { data, expiresAt: Date.now() + 120000 })
+    platformCache.set(token, { data, expiresAt: Date.now() + 60000 })
     return data
   } catch {
     return null
@@ -78,11 +81,12 @@ export async function GET(request: NextRequest) {
         let platformUsage = ext?.platform_usage || null
 
         if (!platformUsage) {
-          const parsed = parseExhaustedSpend(dbKey.error_message || ext?.error_message)
-          if (parsed) {
-            platformUsage = parsed
-          } else if (dbKey.is_active) {
-            platformUsage = await getLiveApifyPlatformUsage(dbKey.key)
+          platformUsage = await getLiveApifyPlatformUsage(dbKey.key)
+          if (!platformUsage) {
+            const parsed = parseExhaustedSpend(dbKey.error_message || ext?.error_message)
+            if (parsed) {
+              platformUsage = parsed
+            }
           }
         }
         return { key: dbKey.key, platformUsage }
@@ -98,12 +102,13 @@ export async function GET(request: NextRequest) {
       const platformUsage = platformUsageMap.get(dbKey.key) || ext?.platform_usage || null
 
       const isSpendExhausted = Boolean(
+        (platformUsage && typeof platformUsage.remaining === 'number' && platformUsage.remaining <= 0.01) ||
+        (platformUsage && typeof platformUsage.used === 'number' && typeof platformUsage.limit === 'number' && platformUsage.used >= platformUsage.limit) ||
         dbKey.error_message?.toLowerCase().includes('spend exhausted') ||
-        ext?.error_message?.toLowerCase().includes('spend exhausted') ||
-        (platformUsage && platformUsage.remaining === 0) ||
-        (platformUsage && typeof platformUsage.used === 'number' && typeof platformUsage.limit === 'number' && platformUsage.used >= platformUsage.limit)
+        ext?.error_message?.toLowerCase().includes('spend exhausted')
       )
 
+      // Auto-exhaust strictly if balance runs out
       if (isSpendExhausted && dbKey.is_active) {
         db.apifyKey.update({
           where: { id: dbKey.id },
@@ -112,6 +117,17 @@ export async function GET(request: NextRequest) {
             error_message: platformUsage?.used
               ? `Apify spend exhausted ($${platformUsage.used.toFixed(2)} / $${(platformUsage.limit ?? 5).toFixed(2)})`
               : 'Apify spend exhausted ($5.00 / $5.00)',
+          },
+        }).catch(() => {})
+      }
+
+      // Auto-reactivate if renewed (has balance > 0.05 and currently inactive)
+      if (!isSpendExhausted && !dbKey.is_active && platformUsage && platformUsage.remaining > 0.05) {
+        db.apifyKey.update({
+          where: { id: dbKey.id },
+          data: {
+            is_active: true,
+            error_message: null,
           },
         }).catch(() => {})
       }
