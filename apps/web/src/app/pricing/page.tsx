@@ -87,6 +87,7 @@ function PricingContent() {
   const [processingPack, setProcessingPack] = useState<string | null>(null)
   const [confirmDowngradePlan, setConfirmDowngradePlan] = useState<PlanConfig | null>(null)
   const [downgrading, setDowngrading] = useState(false)
+  const [autoRenew, setAutoRenew] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const tabParam = searchParams.get('tab')
@@ -159,13 +160,19 @@ function PricingContent() {
     setSubscribingPlan(plan.id)
     try {
       const token = await getToken()
+      const isAuto = autoRenew[plan.id] ?? true
+      const mode = isAuto ? 'subscription' : 'one_time'
+
       const res = await fetch('/api/payments/razorpay/order', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ plan: plan.id.toLowerCase() }),
+        body: JSON.stringify({
+          plan: plan.id.toLowerCase(),
+          mode,
+        }),
       })
 
       const data = await res.json()
@@ -436,7 +443,32 @@ function PricingContent() {
                     </div>
                   </div>
 
-                  <div className="pt-8 mt-8 border-t border-white/5">
+                  <div className="pt-6 mt-6 border-t border-white/5">
+                    {plan.price > 0 && !isCurrent && (
+                      <div className="mb-4 p-3 rounded-xl bg-surface/50 border border-white/[0.08] hover:border-white/15 transition-all text-left">
+                        <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={autoRenew[plan.id] ?? true}
+                            onChange={(e) =>
+                              setAutoRenew((prev) => ({ ...prev, [plan.id]: e.target.checked }))
+                            }
+                            className="mt-0.5 h-4 w-4 rounded border-white/20 bg-black/50 text-accent-mint focus:ring-0 cursor-pointer shrink-0"
+                          />
+                          <div>
+                            <span className="text-xs font-semibold text-white block">
+                              Auto-renew monthly
+                            </span>
+                            <span className="text-[10px] text-text-secondary block mt-0.5 leading-snug">
+                              {(autoRenew[plan.id] ?? true)
+                                ? 'UPI AutoPay / Bank Mandate (cancel anytime)'
+                                : 'One-time payment for 30 days (No mandate / No auto-debit)'}
+                            </span>
+                          </div>
+                        </label>
+                      </div>
+                    )}
+
                     <button
                       onClick={() =>
                         !user ? router.push('/register') : handleSelectPlan(plan)

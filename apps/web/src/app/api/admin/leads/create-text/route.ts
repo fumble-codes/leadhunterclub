@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth'
 import { fetchApi } from '@/lib/external-api/client'
 import { ExternalApiError } from '@/lib/external-api/client'
@@ -40,6 +41,38 @@ export async function POST(request: NextRequest) {
     const profileLink = (body as any).authorUrl?.trim() || (body as any).profileUrl?.trim() || undefined
     const contactEmail = body.contactEmail?.trim() || undefined
     const contactPhone = body.contactPhone?.trim() || undefined
+
+    // Check for duplicate lead before creating
+    const cleanContent = body.content.trim()
+    const cleanPrefix = cleanContent.replace(/\s+/g, ' ').slice(0, 80)
+
+    try {
+      const existingLead = await db.leadPost.findFirst({
+        where: {
+          is_deleted: false,
+          OR: [
+            ...(cleanPrefix.length >= 35 ? [{ content: { contains: cleanPrefix } }] : []),
+            ...(contactEmail ? [{ email: contactEmail.toLowerCase() }] : []),
+            ...(profileLink && profileLink.length > 20 ? [{ url: { contains: profileLink } }] : []),
+          ],
+        },
+        select: { id: true, title: true, platform: true },
+      })
+
+      if (existingLead) {
+        return NextResponse.json(
+          {
+            success: false,
+            isDuplicate: true,
+            message: `Duplicate lead detected! This lead already exists (Platform: ${existingLead.platform.toUpperCase()}, Title: "${existingLead.title || 'Untitled'}").`,
+            existingLead,
+          },
+          { status: 409 }
+        )
+      }
+    } catch (dedupCheckErr) {
+      console.warn('[Create Text Lead] Dedup check warning:', dedupCheckErr)
+    }
 
     // Step 1 — create the manual lead post
     const createRes = await fetchApi<{ success: boolean; data?: ExternalPost; message?: string }>(

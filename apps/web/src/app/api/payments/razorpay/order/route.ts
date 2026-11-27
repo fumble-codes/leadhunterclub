@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
         let price = 999
         let planDisplayName = `Plan upgrade — ${resolvedPlan}`
-        let credits = 500
+        let credits = resolvedPlan === 'AGENCY' ? 2500 : 1000
 
         try {
           const plansSetting = await db.setting.findUnique({ where: { key: 'plans_config' } })
