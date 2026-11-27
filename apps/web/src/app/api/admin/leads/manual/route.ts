@@ -51,33 +51,31 @@ export async function POST(request: NextRequest) {
     const contactEmail = body.contactEmail?.trim() || (body.content.match(EMAIL_REGEX)?.[0] || undefined)
     const contactPhone = body.contactPhone?.trim() || (body.content.match(PHONE_REGEX)?.[0] || undefined)
 
-    // Check for duplicate lead before creating
+    // Check for duplicate lead content before creating (allows same client with different requirements)
     const cleanContent = body.content.trim()
     const cleanPrefix = cleanContent.replace(/\s+/g, ' ').slice(0, 80)
 
     try {
-      const existingLead = await db.leadPost.findFirst({
-        where: {
-          is_deleted: false,
-          OR: [
-            ...(cleanPrefix.length >= 35 ? [{ content: { contains: cleanPrefix } }] : []),
-            ...(contactEmail ? [{ email: contactEmail.toLowerCase() }] : []),
-            ...(profileLink && profileLink.length > 20 ? [{ url: { contains: profileLink } }] : []),
-          ],
-        },
-        select: { id: true, title: true, platform: true },
-      })
-
-      if (existingLead) {
-        return NextResponse.json(
-          {
-            success: false,
-            isDuplicate: true,
-            message: `Duplicate lead detected! This lead already exists (Platform: ${existingLead.platform.toUpperCase()}, Title: "${existingLead.title || 'Untitled'}").`,
-            existingLead,
+      if (cleanPrefix.length >= 35) {
+        const existingLead = await db.leadPost.findFirst({
+          where: {
+            is_deleted: false,
+            content: { contains: cleanPrefix },
           },
-          { status: 409 }
-        )
+          select: { id: true, title: true, platform: true },
+        })
+
+        if (existingLead) {
+          return NextResponse.json(
+            {
+              success: false,
+              isDuplicate: true,
+              message: `Duplicate requirement detected! An identical post already exists (Platform: ${existingLead.platform.toUpperCase()}, Title: "${existingLead.title || 'Untitled'}").`,
+              existingLead,
+            },
+            { status: 409 }
+          )
+        }
       }
     } catch (dedupCheckErr) {
       console.warn('[Manual Lead] Dedup check warning:', dedupCheckErr)
