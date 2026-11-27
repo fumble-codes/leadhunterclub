@@ -1307,6 +1307,21 @@ export default function AdminLeadsPage() {
                           )
                         })()}
 
+                        {lead.review_status === 'approved' && (lead.reviewed_at || lead.updated_at) && (() => {
+                          const approvedDate = lead.reviewed_at || lead.updated_at
+                          const { relative, full } = formatScrapedTime(approvedDate)
+                          return (
+                            <div
+                              className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[8px] font-black uppercase tracking-wider flex items-center gap-1.5 rounded"
+                              title={`Approved at ${full}${lead.reviewed_by_name ? ` by ${lead.reviewed_by_name}` : ''}`}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                              <span>Approved {relative}</span>
+                              <span className="text-emerald-400/60 font-mono text-[8px] hidden md:inline">({full})</span>
+                            </div>
+                          )
+                        })()}
+
                         {(() => {
                           const dynamicPosted = formatDynamicPostedAgo(lead.posted_at, lead.created_at)
                           if (!dynamicPosted) return null
