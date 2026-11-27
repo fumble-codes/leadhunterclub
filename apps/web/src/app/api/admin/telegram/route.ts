@@ -109,6 +109,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'Target Telegram channel cleared' })
     }
 
+    if (action === 'delete_detected_chat') {
+      const chatIdToDelete = String(body.chatId || '').trim()
+      if (!chatIdToDelete) {
+        return NextResponse.json({ code: 'BAD_REQUEST', message: 'Chat ID required' }, { status: 400 })
+      }
+
+      const existing = await db.setting.findUnique({ where: { key: 'telegram_detected_chats' } })
+      const list = Array.isArray(existing?.value) ? existing.value : []
+      const filtered = list.filter((c: any) => String(c?.id) !== chatIdToDelete)
+
+      await db.setting.upsert({
+        where: { key: 'telegram_detected_chats' },
+        create: {
+          key: 'telegram_detected_chats',
+          value: filtered,
+          description: 'Detected Telegram channels and groups the bot has been added to',
+        },
+        update: {
+          value: filtered,
+        },
+      })
+
+      return NextResponse.json({ success: true, message: 'Detected channel removed', detectedChats: filtered })
+    }
+
+    if (action === 'clear_all_detected_chats') {
+      await db.setting.deleteMany({ where: { key: 'telegram_detected_chats' } })
+      return NextResponse.json({ success: true, message: 'All detected channels cleared', detectedChats: [] })
+    }
+
     if (action === 'save_template') {
       const template = (body.template || '').trim()
       if (!template) {

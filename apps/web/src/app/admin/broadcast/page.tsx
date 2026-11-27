@@ -544,6 +544,8 @@ export default function AdminBroadcastPage() {
   const [editingDripKey, setEditingDripKey] = useState<string | null>(null)
   const [editingDripTemplate, setEditingDripTemplate] = useState<string>('')
   const [isSavingDripTemplate, setIsSavingDripTemplate] = useState<boolean>(false)
+  const [deletingChatId, setDeletingChatId] = useState<string | null>(null)
+  const [isClearingAllChats, setIsClearingAllChats] = useState<boolean>(false)
 
   // Interpolated preview for Telegram
   const sampleTgPreview = useMemo(() => {
@@ -645,6 +647,69 @@ export default function AdminBroadcastPage() {
       addToast({ type: 'error', message: err?.message || 'Error clearing channel' })
     } finally {
       setIsClearingTgChannel(false)
+    }
+  }
+
+  const handleDeleteDetectedChat = async (chatId: string, chatTitle?: string) => {
+    setDeletingChatId(chatId)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: 'delete_detected_chat', chatId }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({
+          type: 'success',
+          message: chatTitle ? `"${chatTitle}" removed from list` : 'Channel removed from list',
+        })
+        setTgData((prev) =>
+          prev
+            ? {
+                ...prev,
+                detectedChats: prev.detectedChats?.filter((c) => String(c.id) !== String(chatId)),
+              }
+            : null
+        )
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to remove channel' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error removing channel' })
+    } finally {
+      setDeletingChatId(null)
+    }
+  }
+
+  const handleClearAllDetectedChats = async () => {
+    if (!confirm('Are you sure you want to remove all detected channels from the list?')) return
+    setIsClearingAllChats(true)
+    try {
+      const token = await getFirebaseToken()
+      const res = await fetch('/api/admin/telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action: 'clear_all_detected_chats' }),
+      })
+      const json = await res.json()
+      if (res.ok && json.success) {
+        addToast({ type: 'success', message: 'All detected channels cleared' })
+        setTgData((prev) => (prev ? { ...prev, detectedChats: [] } : null))
+      } else {
+        addToast({ type: 'error', message: json.message || 'Failed to clear channels' })
+      }
+    } catch (err: any) {
+      addToast({ type: 'error', message: err?.message || 'Error clearing channels' })
+    } finally {
+      setIsClearingAllChats(false)
     }
   }
 
@@ -2751,7 +2816,19 @@ export default function AdminBroadcastPage() {
             <div className="p-3.5 rounded-xl bg-surface-elevated/40 border border-white/[0.04] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-white mb-2">
-                  <span>Detected Telegram Channels & Groups</span>
+                  <div className="flex items-center gap-2">
+                    <span>Detected Telegram Channels & Groups</span>
+                    {tgData?.detectedChats && tgData.detectedChats.length > 0 && (
+                      <button
+                        onClick={handleClearAllDetectedChats}
+                        disabled={isClearingAllChats}
+                        title="Clear all detected channels from list"
+                        className="text-[9px] font-normal text-zinc-500 hover:text-red-400 transition-colors cursor-pointer disabled:opacity-40"
+                      >
+                        {isClearingAllChats ? 'Clearing...' : 'Clear all'}
+                      </button>
+                    )}
+                  </div>
                   <a
                     href={`https://t.me/${tgData?.botUsername || 'leadhunterclubbot'}?startgroup=true`}
                     target="_blank"
@@ -2815,6 +2892,15 @@ export default function AdminBroadcastPage() {
                                 Set as Target
                               </button>
                             )}
+
+                            <button
+                              onClick={() => handleDeleteDetectedChat(chat.id, chat.title)}
+                              disabled={deletingChatId === chat.id}
+                              title={`Delete "${chat.title}" from list`}
+                              className="p-1 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 transition-all cursor-pointer disabled:opacity-40"
+                            >
+                              <TrashIcon className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
                       )
