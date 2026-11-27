@@ -1357,56 +1357,71 @@ export default function AdminTokensPage() {
                   </label>
 
                   {/* Summary badges */}
-                  <div className="flex items-center gap-1.5 text-[11px] flex-wrap">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
-                      {tokens.filter(k => !k.error_message && !(k as any).is_exhausted && k.is_active).length} Active
-                    </span>
-                    {tokens.some(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active)) && (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold flex items-center gap-1">
-                        <ExclamationTriangleIcon className="w-3 h-3" />
-                        {tokens.filter(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active)).length} Quota Exhausted ($5 limit)
-                      </span>
-                    )}
-                    {tokens.some(k => Boolean(k.error_message)) && (
-                      <span className="px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-semibold flex items-center gap-1">
-                        <XCircleIcon className="w-3 h-3" />
-                        {tokens.filter(k => Boolean(k.error_message)).length} Invalid / 401 on Apify
-                      </span>
-                    )}
-                  </div>
+                  {(() => {
+                    const isKeyInvalid = (k: any) => Boolean(k.error_message) && !k.error_message?.toLowerCase().includes('spend exhausted')
+                    const isKeyExhausted = (k: any) => !isKeyInvalid(k) && (Boolean(k.is_exhausted) || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')) || !k.is_active)
+                    const activeCount = tokens.filter(k => !isKeyInvalid(k) && !isKeyExhausted(k) && k.is_active).length
+                    const exhaustedCount = tokens.filter(isKeyExhausted).length
+                    const invalidCount = tokens.filter(isKeyInvalid).length
+
+                    return (
+                      <div className="flex items-center gap-1.5 text-[11px] flex-wrap">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                          {activeCount} Active
+                        </span>
+                        {exhaustedCount > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold flex items-center gap-1">
+                            <ExclamationTriangleIcon className="w-3 h-3" />
+                            {exhaustedCount} Quota Exhausted ($5 limit)
+                          </span>
+                        )}
+                        {invalidCount > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-semibold flex items-center gap-1">
+                            <XCircleIcon className="w-3 h-3" />
+                            {invalidCount} Invalid / 401 on Apify
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  {tokens.some(k => Boolean(k.error_message)) && selectedIds.length === 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const invalidIds = tokens
-                          .filter(k => Boolean(k.error_message))
-                          .map(k => k._id || k.id)
-                          .filter(Boolean)
-                        setSelectedIds(invalidIds)
-                      }}
-                      className="h-10 sm:h-auto px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[11px] font-semibold transition-all"
-                    >
-                      Select Invalid Only ({tokens.filter(k => Boolean(k.error_message)).length})
-                    </button>
-                  )}
-                  {tokens.some(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active)) && selectedIds.length === 0 && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const exhaustedIds = tokens
-                          .filter(k => !k.error_message && (Boolean((k as any).is_exhausted) || !k.is_active))
-                          .map(k => k._id || k.id)
-                          .filter(Boolean)
-                        setSelectedIds(exhaustedIds)
-                      }}
-                      className="h-10 sm:h-auto px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[11px] font-semibold transition-all"
-                    >
-                      Select Exhausted Only
-                    </button>
-                  )}
+                  {(() => {
+                    const isKeyInvalid = (k: any) => Boolean(k.error_message) && !k.error_message?.toLowerCase().includes('spend exhausted')
+                    const isKeyExhausted = (k: any) => !isKeyInvalid(k) && (Boolean(k.is_exhausted) || Boolean(k.error_message?.toLowerCase().includes('spend exhausted')) || !k.is_active)
+                    const invalidCount = tokens.filter(isKeyInvalid).length
+                    const exhaustedCount = tokens.filter(isKeyExhausted).length
+
+                    return (
+                      <>
+                        {invalidCount > 0 && selectedIds.length === 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const invalidIds = tokens.filter(isKeyInvalid).map(k => k._id || k.id).filter(Boolean)
+                              setSelectedIds(invalidIds)
+                            }}
+                            className="h-10 sm:h-auto px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[11px] font-semibold transition-all"
+                          >
+                            Select Invalid Only ({invalidCount})
+                          </button>
+                        )}
+                        {exhaustedCount > 0 && selectedIds.length === 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const exhaustedIds = tokens.filter(isKeyExhausted).map(k => k._id || k.id).filter(Boolean)
+                              setSelectedIds(exhaustedIds)
+                            }}
+                            className="h-10 sm:h-auto px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[11px] font-semibold transition-all"
+                          >
+                            Select Exhausted Only ({exhaustedCount})
+                          </button>
+                        )}
+                      </>
+                    )
+                  })()}
                   {selectedIds.length > 0 ? (
                     <>
                       <span className="text-xs text-text-secondary font-medium mr-1">
