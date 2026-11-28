@@ -231,13 +231,21 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchStats()
-    const interval = setInterval(fetchStats, 30000)
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchStats()
+      }
+    }, 120_000)
     return () => clearInterval(interval)
   }, [fetchStats])
 
   useEffect(() => {
     fetchInsights()
-    const interval = setInterval(fetchInsights, 60000)
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        fetchInsights()
+      }
+    }, 180_000)
     return () => clearInterval(interval)
   }, [fetchInsights])
 

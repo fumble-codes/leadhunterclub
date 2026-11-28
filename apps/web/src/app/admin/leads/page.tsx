@@ -299,12 +299,12 @@ export default function AdminLeadsPage() {
           fetchLeads(currentPage, activeTab, searchQuery, true)
           fetchLeadStats()
         }
-      }, 3000)
+      }, 5000)
 
       burstTimeout = setTimeout(() => {
         if (burstInterval) clearInterval(burstInterval)
         burstInterval = null
-      }, 45000)
+      }, 15000)
     }
 
     const unsubscribe = subscribeToLeadsUpdated(() => {
@@ -329,7 +329,7 @@ export default function AdminLeadsPage() {
     if (!hasSearching) return
     const interval = setInterval(() => {
       fetchLeads(currentPage, activeTab, searchQuery, true)
-    }, 8000)
+    }, 30_000)
     return () => clearInterval(interval)
   }, [leads, currentPage, activeTab, searchQuery, fetchLeads])
 
@@ -340,17 +340,28 @@ export default function AdminLeadsPage() {
     if (!awaitingIntel) return
     const interval = setInterval(() => {
       fetchLeads(currentPage, activeTab, searchQuery, true)
-    }, 6000)
+    }, 30_000)
     return () => clearInterval(interval)
   }, [leads, currentPage, activeTab, searchQuery, fetchLeads])
 
   useEffect(() => {
-    const shouldPoll = reanalysePolling || (counts.pending ?? 0) > 0
-    if (!shouldPoll) return
-    const interval = setInterval(() => {
-      fetchLeads(currentPage, activeTab, searchQuery, true)
-    }, 4000)
-    return () => clearInterval(interval)
+    if (reanalysePolling) {
+      // Active manual reanalysis: poll fast until done
+      const interval = setInterval(() => {
+        fetchLeads(currentPage, activeTab, searchQuery, true)
+      }, 4000)
+      return () => clearInterval(interval)
+    }
+
+    if ((counts.pending ?? 0) > 0) {
+      // Passive pending items check: gentle 60s poll to protect database egress
+      const interval = setInterval(() => {
+        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          fetchLeads(currentPage, activeTab, searchQuery, true)
+        }
+      }, 60_000)
+      return () => clearInterval(interval)
+    }
   }, [reanalysePolling, counts.pending, currentPage, activeTab, searchQuery, fetchLeads])
 
   useEffect(() => {

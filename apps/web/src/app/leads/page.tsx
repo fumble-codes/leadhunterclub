@@ -387,12 +387,12 @@ export default function LeadsPage() {
   useEffect(() => {
     fetchLeads()
 
-    // Smart lightweight delta-check every 2 minutes: only checks for new leads since latest lead
+    // Smart lightweight delta-check every 3 minutes: only checks for new leads since latest lead
     const pollInterval = setInterval(() => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
         checkForNewLeads()
       }
-    }, 120_000)
+    }, 180_000)
 
     // Re-check delta when user switches focus back to this tab
     const handleVisibilityChange = () => {

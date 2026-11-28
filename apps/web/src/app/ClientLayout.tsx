@@ -245,13 +245,13 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
     window.addEventListener('community-new-post', handleNewWinEvent)
 
-    // Poll periodically every 2 minutes
+    // Poll periodically every 10 minutes
     const interval = setInterval(() => {
       const currentElapsed = Date.now() - sessionStart
       if (currentElapsed >= twoMinutes && typeof document !== 'undefined' && document.visibilityState === 'visible') {
         checkCommunityWinPopup()
       }
-    }, 2 * 60_000)
+    }, 10 * 60_000)
 
     return () => {
       isSubscribed = false
