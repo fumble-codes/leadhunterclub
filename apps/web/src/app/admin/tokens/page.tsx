@@ -285,7 +285,7 @@ export default function AdminTokensPage() {
       }
       const isNowPaused = res?.data?.is_paused ?? !pausedEngines.includes(engine)
       addToast({
-        type: isNowPaused ? 'warning' : 'success',
+        type: isNowPaused ? 'info' : 'success',
         message: `${engine.toUpperCase()} scraping is now ${isNowPaused ? 'PAUSED' : 'ACTIVE'}`,
       })
     } catch (err: any) {
@@ -315,7 +315,7 @@ export default function AdminTokensPage() {
       }
       const isNowPaused = res?.data?.is_paused ?? !pausedEnrichment.map(p => p.toLowerCase().replace(/[-_]/g, '')).includes(providerKey)
       addToast({
-        type: isNowPaused ? 'warning' : 'success',
+        type: isNowPaused ? 'info' : 'success',
         message: `${service} enrichment is now ${isNowPaused ? 'PAUSED' : 'ACTIVE'}`,
       })
     } catch (err: any) {
@@ -488,10 +488,27 @@ export default function AdminTokensPage() {
         sessionStorage.removeItem('apify_exhausted_modal_dismissed')
       } catch {}
 
-      addToast({
-        type: (json.flaggedCount > 0 || json.errorsCount > 0) ? 'warning' : 'success',
-        message: json.message || `Successfully added ${json.addedCount} Apify keys!`,
-      })
+      if (json.errors && json.errors.length > 0) {
+        json.errors.forEach((err: any) => {
+          addToast({
+            type: 'error',
+            message: `Dropped ${err.label || err.key.slice(0, 15)}: ${err.error}`,
+            duration: 8000,
+          })
+        })
+      }
+
+      if (json.addedCount > 0) {
+        addToast({
+          type: json.errorsCount > 0 ? 'info' : 'success',
+          message: json.message || `Successfully added ${json.addedCount} Apify keys!`,
+        })
+      } else if (json.errorsCount > 0) {
+        addToast({
+          type: 'error',
+          message: json.message || `All ${json.errorsCount} token(s) were invalid and dropped.`,
+        })
+      }
     } catch (err: any) {
       addToast({ type: 'error', message: err?.message || 'Failed to bulk import Apify keys' })
     } finally {

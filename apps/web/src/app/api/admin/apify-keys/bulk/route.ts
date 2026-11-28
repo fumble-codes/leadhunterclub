@@ -64,6 +64,12 @@ export async function POST(request: NextRequest) {
         errors.push({ key: rawKey, label: label || undefined, error: apifyError })
       }
 
+      if (!isValid) {
+        skippedCount++
+        errors.push({ key: rawKey, label: label || undefined, error: apifyError || 'User was not found or authentication token is not valid' })
+        continue
+      }
+
       // Attempt creation on external VPS API (catch 400/429 so local DB save still succeeds)
       try {
         await createApifyKey({ key: rawKey, label })
@@ -71,7 +77,7 @@ export async function POST(request: NextRequest) {
         console.warn(`[Bulk Apify Keys] External API notice for ${label || rawKey}:`, externalErr.message)
       }
 
-      // Save to database (persists BOTH valid and problematic tokens)
+      // Save to database (only valid verified tokens)
       try {
         await db.apifyKey.upsert({
           where: { key: rawKey },
@@ -80,15 +86,15 @@ export async function POST(request: NextRequest) {
             label,
             usage_month: month,
             comments_limit: 2500,
-            is_active: isValid,
+            is_active: true,
             is_deleted: false,
-            error_message: isValid ? null : apifyError,
+            error_message: null,
           },
           update: {
-            is_active: isValid,
+            is_active: true,
             is_deleted: false,
             label: label || undefined,
-            error_message: isValid ? null : apifyError,
+            error_message: null,
           },
         })
         addedCount++
@@ -98,8 +104,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const summaryMsg = flaggedCount > 0
-      ? `Added all ${addedCount} token(s). ${addedCount - flaggedCount} active, ${flaggedCount} flagged with errors.`
+    const summaryMsg = errors.length > 0
+      ? `Added ${addedCount} token(s). Dropped ${errors.length} invalid token(s).`
       : `Successfully added and verified all ${addedCount} token(s)!`
 
     return NextResponse.json({

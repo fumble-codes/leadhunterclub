@@ -212,6 +212,14 @@ export async function POST(request: NextRequest) {
       isValid = false
     }
 
+    // If invalid on Apify, DROP it immediately and do not persist
+    if (!isValid) {
+      return NextResponse.json({
+        code: 'INVALID_APIFY_KEY',
+        message: `Apify Auth Error: ${apifyError || 'User was not found or authentication token is not valid'}. Token dropped.`,
+      }, { status: 400 })
+    }
+
     // 1. Create on external API (VPS backend)
     try {
       await createApifyKey({ key: rawKey, label })
@@ -219,7 +227,7 @@ export async function POST(request: NextRequest) {
       console.warn('[Admin Apify Keys] External API notice:', extErr.message)
     }
 
-    // 2. Save to database (persists both valid and problematic tokens)
+    // 2. Save to database (only valid tokens)
     const month = new Date().toISOString().slice(0, 7)
     const savedKey = await db.apifyKey.upsert({
       where: { key: rawKey },
@@ -228,25 +236,23 @@ export async function POST(request: NextRequest) {
         label,
         usage_month: month,
         comments_limit: 2500,
-        is_active: isValid,
+        is_active: true,
         is_deleted: false,
-        error_message: isValid ? null : apifyError,
+        error_message: null,
       },
       update: {
-        is_active: isValid,
+        is_active: true,
         is_deleted: false,
         label: label || undefined,
-        error_message: isValid ? null : apifyError,
+        error_message: null,
       },
     })
 
     return NextResponse.json({
       success: true,
       data: { ...savedKey, _id: savedKey.id },
-      flagged: !isValid,
-      message: isValid
-        ? 'Apify key added and verified successfully'
-        : `Token added with warning: ${apifyError}`,
+      flagged: false,
+      message: 'Apify key added and verified successfully',
     }, { status: 201 })
   } catch (error: unknown) {
     if (error instanceof ForbiddenError) {
