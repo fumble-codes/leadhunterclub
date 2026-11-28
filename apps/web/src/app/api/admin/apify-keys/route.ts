@@ -122,7 +122,10 @@ export async function GET(request: NextRequest) {
       }
 
       // Auto-reactivate if renewed (has balance > 0.05 and currently inactive)
-      if (!isSpendExhausted && !dbKey.is_active && platformUsage && platformUsage.remaining > 0.05) {
+      const hasPositiveBalance = Boolean(platformUsage && typeof platformUsage.remaining === 'number' && platformUsage.remaining > 0.05)
+      const shouldBeActive = !isSpendExhausted && (dbKey.is_active || hasPositiveBalance)
+
+      if (hasPositiveBalance && !dbKey.is_active) {
         db.apifyKey.update({
           where: { id: dbKey.id },
           data: {
@@ -137,7 +140,7 @@ export async function GET(request: NextRequest) {
         id: dbKey.id,
         key: dbKey.key,
         label: dbKey.label || ext?.label || null,
-        is_active: dbKey.is_active && !isSpendExhausted,
+        is_active: shouldBeActive,
         is_exhausted: isSpendExhausted,
         error_message: dbKey.error_message || ext?.error_message || null,
         comments_used: ext?.comments_used ?? dbKey.comments_used,
